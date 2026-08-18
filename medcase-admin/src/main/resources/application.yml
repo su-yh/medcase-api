@@ -69,11 +69,6 @@ spring:
   jackson:
     time-zone: GMT+8
     date-format: yyyy-MM-dd HH:mm:ss
-  # 服务模块
-  devtools:
-    restart:
-      # 热部署开关
-      enabled: true
   data:
     # redis 配置
     redis:
