@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	
-    <groupId>com.ruoyi</groupId>
+    <groupId>com.medcase</groupId>
     <artifactId>medcase-api</artifactId>
     <version>3.9.2</version>
 
@@ -52,6 +52,7 @@
                 <artifactId>druid-spring-boot-4-starter</artifactId>
                 <version>${druid.version}</version>
             </dependency>
+
 
             <!-- 解析客户端操作系统、浏览器等 -->
             <dependency>
@@ -137,35 +138,35 @@
 
             <!-- 定时任务-->
             <dependency>
-                <groupId>com.ruoyi</groupId>
+                <groupId>com.medcase</groupId>
                 <artifactId>medcase-quartz</artifactId>
                 <version>${medcase.version}</version>
             </dependency>
 
             <!-- 代码生成-->
             <dependency>
-                <groupId>com.ruoyi</groupId>
+                <groupId>com.medcase</groupId>
                 <artifactId>medcase-generator</artifactId>
                 <version>${medcase.version}</version>
             </dependency>
 
             <!-- 核心模块-->
             <dependency>
-                <groupId>com.ruoyi</groupId>
+                <groupId>com.medcase</groupId>
                 <artifactId>medcase-framework</artifactId>
                 <version>${medcase.version}</version>
             </dependency>
 
             <!-- 系统模块-->
             <dependency>
-                <groupId>com.ruoyi</groupId>
+                <groupId>com.medcase</groupId>
                 <artifactId>medcase-system</artifactId>
                 <version>${medcase.version}</version>
             </dependency>
 
             <!-- 通用工具-->
             <dependency>
-                <groupId>com.ruoyi</groupId>
+                <groupId>com.medcase</groupId>
                 <artifactId>medcase-common</artifactId>
                 <version>${medcase.version}</version>
             </dependency>
