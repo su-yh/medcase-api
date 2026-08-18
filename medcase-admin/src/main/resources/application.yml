@@ -113,10 +113,10 @@ mybatis-plus:
   type-aliases-package: com.ruoyi.**.domain
   # 配置mapper的扫描，找到所有的mapper.xml映射文件
   mapper-locations: classpath*:mapper/**/*Mapper.xml
-  # 加载全局的配置文件
-  config-location: classpath:mybatis/mybatis-config.xml
-  # 检查全局配置文件是否存在
-  check-config-location: true
+  configuration:
+    # 保留原 mybatis-config.xml 中的有效行为
+    use-generated-keys: true
+    log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
 
 # PageHelper分页插件
 pagehelper:
