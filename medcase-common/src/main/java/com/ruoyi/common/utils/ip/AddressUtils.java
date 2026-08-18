@@ -2,11 +2,10 @@ package com.ruoyi.common.utils.ip;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.alibaba.fastjson2.JSON;
-import com.alibaba.fastjson2.JSONObject;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.http.HttpUtils;
+import com.ruoyi.common.utils.json.JsonUtils;
 
 /**
  * 获取地址类
@@ -47,9 +46,8 @@ public class AddressUtils
                     log.error("获取地理位置异常 {}", ip);
                     return UNKNOWN;
                 }
-                JSONObject obj = JSON.parseObject(rspStr);
-                String region = obj.getString("pro");
-                String city = obj.getString("city");
+                String region = JsonUtils.readTree(rspStr).path("pro").asText();
+                String city = JsonUtils.readTree(rspStr).path("city").asText();
                 return String.format("%s %s", region, city);
             }
             catch (Exception e)

@@ -4,11 +4,11 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import com.alibaba.fastjson2.JSONArray;
 import com.ruoyi.common.constant.CacheConstants;
 import com.ruoyi.common.core.domain.entity.SysDictData;
 import com.ruoyi.common.core.redis.RedisCache;
 import com.ruoyi.common.utils.spring.SpringUtils;
+import com.ruoyi.common.utils.json.JsonUtils;
 
 /**
  * 字典工具类
@@ -30,7 +30,7 @@ public class DictUtils
      */
     public static void setDictCache(String key, List<SysDictData> dictDatas)
     {
-        SpringUtils.getBean(RedisCache.class).setCacheObject(getCacheKey(key), dictDatas);
+        SpringUtils.getBean(RedisCache.class).setCacheObject(getCacheKey(key), JsonUtils.toJSONString(dictDatas));
     }
 
     /**
@@ -41,10 +41,10 @@ public class DictUtils
      */
     public static List<SysDictData> getDictCache(String key)
     {
-        JSONArray arrayCache = SpringUtils.getBean(RedisCache.class).getCacheObject(getCacheKey(key));
-        if (StringUtils.isNotNull(arrayCache))
+        String arrayCache = SpringUtils.getBean(RedisCache.class).getCacheObject(getCacheKey(key));
+        if (StringUtils.isNotEmpty(arrayCache))
         {
-            return arrayCache.toList(SysDictData.class);
+            return JsonUtils.parseArray(arrayCache, SysDictData.class);
         }
         return null;
     }

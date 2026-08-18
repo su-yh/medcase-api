@@ -69,6 +69,13 @@
             <artifactId>medcase-system</artifactId>
         </dependency>
 
+        <!-- 单元测试 -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
 </project>

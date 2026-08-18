@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import com.alibaba.fastjson2.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ruoyi.common.core.domain.entity.SysUser;
 
 /**
@@ -123,7 +123,7 @@ public class LoginUser implements UserDetails
         this.token = token;
     }
 
-    @JSONField(serialize = false)
+    @JsonIgnore
     @Override
     public String getPassword()
     {
@@ -139,7 +139,7 @@ public class LoginUser implements UserDetails
     /**
      * 账户是否未过期,过期无法验证
      */
-    @JSONField(serialize = false)
+    @JsonIgnore
     @Override
     public boolean isAccountNonExpired()
     {
@@ -151,7 +151,7 @@ public class LoginUser implements UserDetails
      * 
      * @return
      */
-    @JSONField(serialize = false)
+    @JsonIgnore
     @Override
     public boolean isAccountNonLocked()
     {
@@ -163,7 +163,7 @@ public class LoginUser implements UserDetails
      * 
      * @return
      */
-    @JSONField(serialize = false)
+    @JsonIgnore
     @Override
     public boolean isCredentialsNonExpired()
     {
@@ -175,7 +175,7 @@ public class LoginUser implements UserDetails
      * 
      * @return
      */
-    @JSONField(serialize = false)
+    @JsonIgnore
     @Override
     public boolean isEnabled()
     {
@@ -263,7 +263,7 @@ public class LoginUser implements UserDetails
     }
 
     @Override
-    @JSONField(serialize = false)
+    @JsonIgnore
     public Collection<? extends GrantedAuthority> getAuthorities()
     {
         if (permissions == null || permissions.isEmpty())

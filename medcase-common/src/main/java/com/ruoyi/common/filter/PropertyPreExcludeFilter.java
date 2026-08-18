@@ -1,14 +1,17 @@
 package com.ruoyi.common.filter;
 
-import com.alibaba.fastjson2.filter.SimplePropertyPreFilter;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 /**
  * 排除JSON敏感属性
  * 
  * @author ruoyi
  */
-public class PropertyPreExcludeFilter extends SimplePropertyPreFilter
+public class PropertyPreExcludeFilter
 {
+    private final Set<String> excludes = new LinkedHashSet<>();
+
     public PropertyPreExcludeFilter()
     {
     }
@@ -17,8 +20,13 @@ public class PropertyPreExcludeFilter extends SimplePropertyPreFilter
     {
         for (int i = 0; i < filters.length; i++)
         {
-            this.getExcludes().add(filters[i]);
+            this.excludes.add(filters[i]);
         }
         return this;
+    }
+
+    public Set<String> getExcludes()
+    {
+        return excludes;
     }
 }
