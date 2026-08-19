@@ -16,6 +16,7 @@ import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.domain.entity.SysRole;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.exception.ServiceException;
+import com.ruoyi.common.enums.UserTypeEnums;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.bean.BeanValidators;
@@ -74,8 +75,8 @@ public class SysUserServiceImpl implements ISysUserService
      */
     @Override
     @DataScope(deptAlias = "d", userAlias = "u")
-    public List<SysUser> selectUserList(SysUser user)
-    {
+    public List<SysUser> selectUserList(SysUser user) {
+        useAdminUserTypeIfAbsent(user);
         return userMapper.selectUserList(user);
     }
 
@@ -87,8 +88,8 @@ public class SysUserServiceImpl implements ISysUserService
      */
     @Override
     @DataScope(deptAlias = "d", userAlias = "u")
-    public List<SysUser> selectAllocatedList(SysUser user)
-    {
+    public List<SysUser> selectAllocatedList(SysUser user) {
+        useAdminUserTypeIfAbsent(user);
         return userMapper.selectAllocatedList(user);
     }
 
@@ -100,9 +101,15 @@ public class SysUserServiceImpl implements ISysUserService
      */
     @Override
     @DataScope(deptAlias = "d", userAlias = "u")
-    public List<SysUser> selectUnallocatedList(SysUser user)
-    {
+    public List<SysUser> selectUnallocatedList(SysUser user) {
+        useAdminUserTypeIfAbsent(user);
         return userMapper.selectUnallocatedList(user);
+    }
+
+    private void useAdminUserTypeIfAbsent(SysUser user) {
+        if (user != null && user.getUserType() == null) {
+            user.setUserType(UserTypeEnums.ADMIN);
+        }
     }
 
     /**
@@ -170,12 +177,11 @@ public class SysUserServiceImpl implements ISysUserService
      * @return 结果
      */
     @Override
-    public boolean checkUserNameUnique(SysUser user)
-    {
+    public boolean checkUserNameUnique(SysUser user) {
         Long userId = StringUtils.isNull(user.getUserId()) ? -1L : user.getUserId();
-        SysUser info = userMapper.checkUserNameUnique(user.getUserName());
-        if (StringUtils.isNotNull(info) && info.getUserId().longValue() != userId.longValue())
-        {
+        useAdminUserTypeIfAbsent(user);
+        SysUser info = userMapper.checkUserNameUnique(user);
+        if (StringUtils.isNotNull(info) && info.getUserId().longValue() != userId.longValue()) {
             return UserConstants.NOT_UNIQUE;
         }
         return UserConstants.UNIQUE;
@@ -188,12 +194,11 @@ public class SysUserServiceImpl implements ISysUserService
      * @return
      */
     @Override
-    public boolean checkPhoneUnique(SysUser user)
-    {
+    public boolean checkPhoneUnique(SysUser user) {
         Long userId = StringUtils.isNull(user.getUserId()) ? -1L : user.getUserId();
-        SysUser info = userMapper.checkPhoneUnique(user.getPhonenumber());
-        if (StringUtils.isNotNull(info) && info.getUserId().longValue() != userId.longValue())
-        {
+        useAdminUserTypeIfAbsent(user);
+        SysUser info = userMapper.checkPhoneUnique(user);
+        if (StringUtils.isNotNull(info) && info.getUserId().longValue() != userId.longValue()) {
             return UserConstants.NOT_UNIQUE;
         }
         return UserConstants.UNIQUE;
@@ -206,12 +211,11 @@ public class SysUserServiceImpl implements ISysUserService
      * @return
      */
     @Override
-    public boolean checkEmailUnique(SysUser user)
-    {
+    public boolean checkEmailUnique(SysUser user) {
         Long userId = StringUtils.isNull(user.getUserId()) ? -1L : user.getUserId();
-        SysUser info = userMapper.checkEmailUnique(user.getEmail());
-        if (StringUtils.isNotNull(info) && info.getUserId().longValue() != userId.longValue())
-        {
+        useAdminUserTypeIfAbsent(user);
+        SysUser info = userMapper.checkEmailUnique(user);
+        if (StringUtils.isNotNull(info) && info.getUserId().longValue() != userId.longValue()) {
             return UserConstants.NOT_UNIQUE;
         }
         return UserConstants.UNIQUE;
@@ -223,10 +227,8 @@ public class SysUserServiceImpl implements ISysUserService
      * @param user 用户信息
      */
     @Override
-    public void checkUserAllowed(SysUser user)
-    {
-        if (StringUtils.isNotNull(user.getUserId()) && user.isAdmin())
-        {
+    public void checkUserAllowed(SysUser user) {
+        if (StringUtils.isNotNull(user.getUserId()) && user.isAdmin()) {
             throw new ServiceException("不允许操作超级管理员用户");
         }
     }
@@ -261,6 +263,7 @@ public class SysUserServiceImpl implements ISysUserService
     @Transactional
     public int insertUser(SysUser user)
     {
+        user.setUserType(UserTypeEnums.ADMIN);
         // 新增用户信息
         int rows = userMapper.insertUser(user);
         // 新增用户岗位关联
@@ -279,6 +282,7 @@ public class SysUserServiceImpl implements ISysUserService
     @Override
     public boolean registerUser(SysUser user)
     {
+        user.setUserType(UserTypeEnums.ADMIN);
         return userMapper.insertUser(user) > 0;
     }
 
@@ -519,6 +523,7 @@ public class SysUserServiceImpl implements ISysUserService
                     deptService.checkDeptDataScope(user.getDeptId());
                     String password = configService.selectConfigByKey("sys.user.initPassword");
                     user.setPassword(SecurityUtils.encryptPassword(password));
+                    user.setUserType(UserTypeEnums.ADMIN);
                     user.setCreateBy(operName);
                     userMapper.insertUser(user);
                     successNum++;
@@ -532,6 +537,7 @@ public class SysUserServiceImpl implements ISysUserService
                     deptService.checkDeptDataScope(user.getDeptId());
                     user.setUserId(u.getUserId());
                     user.setDeptId(u.getDeptId());
+                    user.setUserType(UserTypeEnums.ADMIN);
                     user.setUpdateBy(operName);
                     userMapper.updateUser(user);
                     successNum++;

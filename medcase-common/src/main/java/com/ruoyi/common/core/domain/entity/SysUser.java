@@ -12,6 +12,7 @@ import com.ruoyi.common.annotation.Excel.ColumnType;
 import com.ruoyi.common.annotation.Excel.Type;
 import com.ruoyi.common.annotation.Excels;
 import com.ruoyi.common.core.domain.BaseEntity;
+import com.ruoyi.common.enums.UserTypeEnums;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.xss.Xss;
 
@@ -39,6 +40,10 @@ public class SysUser extends BaseEntity
     /** 用户昵称 */
     @Excel(name = "用户名称")
     private String nickName;
+
+    /** 用户类型 */
+    @Excel(name = "用户类型", type = Type.EXPORT, readConverterExp = "00=后台用户,01=医生端用户")
+    private UserTypeEnums userType;
 
     /** 用户邮箱 */
     @Excel(name = "用户邮箱")
@@ -141,6 +146,16 @@ public class SysUser extends BaseEntity
     public void setNickName(String nickName)
     {
         this.nickName = nickName;
+    }
+
+    public UserTypeEnums getUserType()
+    {
+        return userType;
+    }
+
+    public void setUserType(UserTypeEnums userType)
+    {
+        this.userType = userType;
     }
 
     @Xss(message = "用户账号不能包含脚本字符")
@@ -317,6 +332,7 @@ public class SysUser extends BaseEntity
             .append("deptId", getDeptId())
             .append("userName", getUserName())
             .append("nickName", getNickName())
+            .append("userType", getUserType())
             .append("email", getEmail())
             .append("phonenumber", getPhonenumber())
             .append("sex", getSex())
