@@ -29,6 +29,10 @@ import java.util.Set;
 public class WrapperResponseBodyAdvice implements ResponseBodyAdvice<Object> {
     private static final Set<String> BASE_PACKAGES = new HashSet<>();
 
+    static {
+        BASE_PACKAGES.add("com.ruoyi.web.controller.doctor");
+    }
+
     public void addBasePackages(Collection<String> basePackages) {
         if (basePackages == null) {
             return;
