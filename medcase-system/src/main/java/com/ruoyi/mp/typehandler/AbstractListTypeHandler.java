@@ -1,8 +1,10 @@
 package com.ruoyi.mp.typehandler;
 
 import com.baomidou.mybatisplus.extension.handlers.AbstractJsonTypeHandler;
+import com.ruoyi.common.utils.json.JsonUtils;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author suyh
@@ -10,20 +12,20 @@ import java.util.List;
  * @param <E> 可以是对象，也可以是枚举。应该也可以是 Integer Long String 等(这个是没有测.)
  */
 public abstract class AbstractListTypeHandler<E> extends AbstractJsonTypeHandler<List<E>> {
-    private final Class<E> type;
-    public AbstractListTypeHandler(Class<E> type) {
-        this.type = type;
+    private final Class<E> elementType;
+
+    public AbstractListTypeHandler(Class<E> elementType) {
+        super(List.class);
+        this.elementType = Objects.requireNonNull(elementType, "elementType cannot be null");
     }
 
     @Override
-    protected List<E> parse(String json) {
-//        return JsonUtils.deserializeToList(json, type, JacksonTypeHandler.getObjectMapper());
-        return null;    // 这里没有引入json 就懒得弄了
+    public List<E> parse(String json) {
+        return JsonUtils.parseArray(json, elementType);
     }
 
     @Override
-    protected String toJson(List<E> obj) {
-//        return JsonUtils.serializable(obj, JacksonTypeHandler.getObjectMapper());
-        return null;   // 这里没有引入json 就懒得弄了
+    public String toJson(List<E> value) {
+        return JsonUtils.toJSONString(value);
     }
 }
