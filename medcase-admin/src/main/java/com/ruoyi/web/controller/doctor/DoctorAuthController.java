@@ -5,6 +5,7 @@ import com.ruoyi.common.core.domain.model.LoginBody;
 import com.ruoyi.common.core.domain.model.RegisterBody;
 import com.ruoyi.web.service.DoctorAuthService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequiredArgsConstructor
+@Slf4j
 @RequestMapping("/doctor/auth")
 public class DoctorAuthController {
     private final DoctorAuthService doctorAuthService;
@@ -25,12 +27,14 @@ public class DoctorAuthController {
     @Anonymous
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     public String login(@RequestBody LoginBody loginBody) {
+        log.trace("doctor auth controller login");
         return doctorAuthService.login(loginBody);
     }
 
     @Anonymous
     @RequestMapping(value = "/register", method = RequestMethod.POST)
     public void register(@RequestBody RegisterBody registerBody) {
+        log.trace("doctor auth controller register");
         doctorAuthService.register(registerBody);
     }
 }

@@ -20,6 +20,7 @@ import com.ruoyi.framework.web.service.TokenService;
 import com.ruoyi.system.domain.DoctorUserEntity;
 import com.ruoyi.system.mapper.DoctorUserMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 /**
@@ -29,6 +30,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class DoctorAuthService {
     private final DoctorUserMapper doctorUserMapper;
 
@@ -41,6 +43,7 @@ public class DoctorAuthService {
     public void register(RegisterBody registerBody) {
         String username = registerBody.getUsername();
         String password = registerBody.getPassword();
+        log.info("doctor register request, username={}", username);
         loginService.validateCaptcha(username, registerBody.getCode(), registerBody.getUuid());
 
         if (StringUtils.isEmpty(username)) {
@@ -67,15 +70,18 @@ public class DoctorAuthService {
         if (doctorUserMapper.insert(user) <= 0) {
             throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_REGISTER_FAILED);
         }
+        log.info("doctor register success, username={}", username);
     }
 
     public String login(LoginBody loginBody) {
         String username = loginBody.getUsername();
+        log.info("doctor login request, username={}", username);
         loginService.validateCaptcha(username, loginBody.getCode(), loginBody.getUuid());
         loginService.loginPreCheck(username, loginBody.getPassword());
 
         DoctorUserEntity doctorUser = doctorUserMapper.selectDoctorByUsername(username);
-        if (StringUtils.isNull(doctorUser)) {
+        if (doctorUser == null) {
+            log.warn("doctor login failed, user not exists, username={}", username);
             throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_LOGIN_USER_NOT_EXISTS);
         } else if (UserStatus.DISABLE.getCode().equals(doctorUser.getStatus())) {
             throw new UserPasswordNotMatchException();
@@ -91,6 +97,7 @@ public class DoctorAuthService {
         SysUser sysUser = toSysUser(doctorUser);
         LoginUser loginUser = new LoginUser(sysUser.getUserId(), sysUser.getDeptId(), sysUser,
                 permissionService.getMenuPermission(sysUser));
+        log.info("doctor login success, username={}, userId={}", username, doctorUser.getUserId());
         return tokenService.createToken(loginUser);
     }
 
