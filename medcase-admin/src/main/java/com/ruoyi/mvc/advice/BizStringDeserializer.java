@@ -1,11 +1,10 @@
 package com.ruoyi.mvc.advice;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.deser.std.StringDeserializer;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.JsonParser;
+import tools.jackson.databind.DeserializationContext;
+import tools.jackson.databind.deser.jdk.StringDeserializer;
 import org.springframework.web.bind.annotation.ControllerAdvice;
-
-import java.io.IOException;
 
 /**
  * @author suyh
@@ -19,7 +18,7 @@ public class BizStringDeserializer extends StringDeserializer {
      * 反序列化，处理空白字符串
      */
     @Override
-    public String deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
+    public String deserialize(JsonParser p, DeserializationContext ctxt) throws JacksonException {
         return super.deserialize(p,ctxt).trim();
     }
 }

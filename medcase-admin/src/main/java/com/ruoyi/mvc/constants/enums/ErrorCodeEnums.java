@@ -8,7 +8,7 @@ import com.ruoyi.mvc.error.IErrorCode;
  * @author suyh
  * @since 2025-05-16
  */
-public enum BaseWebErrorCodeEnums implements IErrorCode {
+public enum ErrorCodeEnums implements IErrorCode {
     ACCESS_DENIED(1000403, "禁止访问"),
     NO_IMPLEMENT(1000404, "功能代码还未实现"),
     SERVICE_ERROR(1000500, "服务错误"),
@@ -19,7 +19,7 @@ public enum BaseWebErrorCodeEnums implements IErrorCode {
     private final int code;
     private final String msg;
 
-    BaseWebErrorCodeEnums(int code, String msg) {
+    ErrorCodeEnums(int code, String msg) {
         this.code = code;
         this.msg = msg;
     }

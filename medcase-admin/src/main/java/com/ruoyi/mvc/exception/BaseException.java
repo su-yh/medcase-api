@@ -2,7 +2,7 @@ package com.ruoyi.mvc.exception;
 
 import com.ruoyi.mvc.error.IErrorCode;
 import lombok.Getter;
-import org.springframework.lang.NonNull;
+import org.jspecify.annotations.NonNull;
 
 @Getter
 public class BaseException extends AbstractBusinessException {

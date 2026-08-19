@@ -5,17 +5,17 @@ import lombok.Getter;
 @Getter
 public class R<T> {
     public static final Integer SUCCESS_CODE = 0;
-    public static final String SUCCESS_MSG = "SUCCESS";
+    public static final String SUCCESS_MSG = "操作成功";
 
     private final Integer code;
 
-    private final String message;
+    private final String msg;
 
     private final T data;
 
-    protected R(Integer code, String message, T data) {
+    protected R(Integer code, String msg, T data) {
         this.code = code;
-        this.message = message;
+        this.msg = msg;
         this.data = data;
     }
 

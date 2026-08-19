@@ -2,12 +2,14 @@ package com.ruoyi.mvc.error;
 
 import com.ruoyi.mvc.exception.AbstractBusinessException;
 import com.ruoyi.mvc.exception.ExceptionCategory;
+import com.ruoyi.mvc.constants.enums.ErrorCodeEnums;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConfiguration;
+import org.springframework.boot.webmvc.autoconfigure.error.ErrorMvcAutoConfiguration;
 import org.springframework.boot.web.error.ErrorAttributeOptions;
-import org.springframework.boot.web.servlet.error.DefaultErrorAttributes;
+import org.springframework.boot.webmvc.error.DefaultErrorAttributes;
 import org.springframework.context.MessageSource;
+import org.springframework.stereotype.Component;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.context.request.WebRequest;
 
@@ -33,6 +35,7 @@ import java.util.Map;
  */
 @RequiredArgsConstructor
 @Slf4j
+@Component
 public class BaseErrorAttributes extends DefaultErrorAttributes {
     // i18n 国际化
     private final MessageSource messageSource;
@@ -50,7 +53,7 @@ public class BaseErrorAttributes extends DefaultErrorAttributes {
         Throwable throwable = getError(webRequest);
 
         if (throwable != null) {
-            IErrorCode ec = BaseWebErrorCodeEnums.SERVICE_ERROR;
+            IErrorCode ec = ErrorCodeEnums.SERVICE_ERROR;
             Object[] params = null;
             if (AbstractBusinessException.class.isAssignableFrom(throwable.getClass())) {
                 AbstractBusinessException exception = (AbstractBusinessException) throwable;
@@ -59,7 +62,7 @@ public class BaseErrorAttributes extends DefaultErrorAttributes {
                     // 系统异常，打印堆栈信息。
                     log.warn("system exception, timestamp: {}", timestampFormat, throwable);
                 }
-                if (exception.getEc() == BaseWebErrorCodeEnums.SERVICE_ERROR) {
+                if (exception.getEc() == ErrorCodeEnums.SERVICE_ERROR) {
                     // 当前环境没有使用系统异常和业务异常，这里就判断对应的ID 做处理打印堆栈信息。
                     log.warn("service exception, timestamp: {}", timestampFormat, throwable);
                 }
@@ -67,7 +70,7 @@ public class BaseErrorAttributes extends DefaultErrorAttributes {
                 ec = exception.getEc();
                 params = exception.getParams();
             } else if (AccessDeniedException.class.isAssignableFrom(throwable.getClass())) {
-                ec = BaseWebErrorCodeEnums.ACCESS_DENIED;
+                ec = ErrorCodeEnums.ACCESS_DENIED;
             }
 
             String messageSourceCode = IErrorCode.ERROR_CODE_PREFIX + "." + ec.getCode();
