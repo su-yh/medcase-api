@@ -1,5 +1,7 @@
 package com.ruoyi.common.enums;
 
+import com.baomidou.mybatisplus.annotation.EnumValue;
+import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
 
 /**
@@ -12,6 +14,8 @@ public enum UserTypeEnums implements BaseEnums {
     DOCTOR("01", "医生端用户"),
     ;
 
+    @EnumValue
+    @JsonValue
     private final String code;
     private final String desc;
 
