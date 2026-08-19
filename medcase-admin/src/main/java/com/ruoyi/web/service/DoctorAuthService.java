@@ -1,7 +1,5 @@
 package com.ruoyi.web.service;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.domain.model.LoginBody;
@@ -9,13 +7,13 @@ import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.core.domain.model.RegisterBody;
 import com.ruoyi.common.enums.UserStatus;
 import com.ruoyi.common.enums.UserTypeEnums;
-import com.ruoyi.common.exception.ServiceException;
-import com.ruoyi.common.exception.user.UserNotExistsException;
 import com.ruoyi.common.exception.user.UserPasswordNotMatchException;
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.ip.IpUtils;
+import com.ruoyi.mvc.constants.enums.ErrorCodeEnums;
+import com.ruoyi.mvc.exception.ExceptionUtil;
 import com.ruoyi.framework.web.service.SysLoginService;
 import com.ruoyi.framework.web.service.SysPermissionService;
 import com.ruoyi.framework.web.service.TokenService;
@@ -46,17 +44,17 @@ public class DoctorAuthService {
         loginService.validateCaptcha(username, registerBody.getCode(), registerBody.getUuid());
 
         if (StringUtils.isEmpty(username)) {
-            throw new ServiceException("用户名不能为空");
+            throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_REGISTER_USERNAME_EMPTY);
         } else if (StringUtils.isEmpty(password)) {
-            throw new ServiceException("用户密码不能为空");
+            throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_REGISTER_PASSWORD_EMPTY);
         } else if (username.length() < UserConstants.USERNAME_MIN_LENGTH
                 || username.length() > UserConstants.USERNAME_MAX_LENGTH) {
-            throw new ServiceException("账户长度必须在2到20个字符之间");
+            throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_REGISTER_USERNAME_LENGTH_INVALID);
         } else if (password.length() < UserConstants.PASSWORD_MIN_LENGTH
                 || password.length() > UserConstants.PASSWORD_MAX_LENGTH) {
-            throw new ServiceException("密码长度必须在5到20个字符之间");
+            throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_REGISTER_PASSWORD_LENGTH_INVALID);
         } else if (existsDoctorUsername(username)) {
-            throw new ServiceException("保存用户'" + username + "'失败，注册账号已存在");
+            throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_REGISTER_USER_EXISTS, username);
         }
 
         DoctorUserEntity user = new DoctorUserEntity();
@@ -64,11 +62,10 @@ public class DoctorAuthService {
         user.setNickName(username);
         user.setUserType(UserTypeEnums.DOCTOR);
         user.setStatus(UserStatus.OK.getCode());
-        user.setDelFlag("0");
         user.setPwdUpdateDate(DateUtils.getNowDate());
         user.setPassword(SecurityUtils.encryptPassword(password));
         if (doctorUserMapper.insert(user) <= 0) {
-            throw new ServiceException("注册失败,请联系系统管理人员");
+            throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_REGISTER_FAILED);
         }
     }
 
@@ -77,16 +74,20 @@ public class DoctorAuthService {
         loginService.validateCaptcha(username, loginBody.getCode(), loginBody.getUuid());
         loginService.loginPreCheck(username, loginBody.getPassword());
 
-        DoctorUserEntity doctorUser = selectDoctorByUsername(username);
+        DoctorUserEntity doctorUser = doctorUserMapper.selectDoctorByUsername(username);
         if (StringUtils.isNull(doctorUser)) {
-            throw new UserNotExistsException();
+            throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_LOGIN_USER_NOT_EXISTS);
         } else if (UserStatus.DISABLE.getCode().equals(doctorUser.getStatus())) {
             throw new UserPasswordNotMatchException();
         } else if (!SecurityUtils.matchesPassword(loginBody.getPassword(), doctorUser.getPassword())) {
             throw new UserPasswordNotMatchException();
         }
 
-        updateLoginInfo(doctorUser.getUserId());
+        DoctorUserEntity updateDoctorUser = new DoctorUserEntity();
+        updateDoctorUser.setUserId(doctorUser.getUserId());
+        updateDoctorUser.setLoginIp(IpUtils.getIpAddr());
+        updateDoctorUser.setLoginDate(DateUtils.getNowDate());
+        doctorUserMapper.updateById(updateDoctorUser);
         SysUser sysUser = toSysUser(doctorUser);
         LoginUser loginUser = new LoginUser(sysUser.getUserId(), sysUser.getDeptId(), sysUser,
                 permissionService.getMenuPermission(sysUser));
@@ -94,25 +95,7 @@ public class DoctorAuthService {
     }
 
     private boolean existsDoctorUsername(String username) {
-        Long count = doctorUserMapper.selectCount(new QueryWrapper<DoctorUserEntity>()
-                .eq("user_name", username)
-                .eq("user_type", UserTypeEnums.DOCTOR)
-                .eq("del_flag", "0"));
-        return count != null && count > 0;
-    }
-
-    private DoctorUserEntity selectDoctorByUsername(String username) {
-        return doctorUserMapper.selectOne(new QueryWrapper<DoctorUserEntity>()
-                .eq("user_name", username)
-                .eq("user_type", UserTypeEnums.DOCTOR)
-                .eq("del_flag", "0"));
-    }
-
-    private void updateLoginInfo(Long userId) {
-        doctorUserMapper.update(null, new UpdateWrapper<DoctorUserEntity>()
-                .eq("user_id", userId)
-                .set("login_ip", IpUtils.getIpAddr())
-                .set("login_date", DateUtils.getNowDate()));
+        return doctorUserMapper.usernameExists(username);
     }
 
     private SysUser toSysUser(DoctorUserEntity doctorUser) {
