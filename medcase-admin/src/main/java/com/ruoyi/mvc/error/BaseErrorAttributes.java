@@ -5,6 +5,8 @@ import com.ruoyi.mvc.exception.ExceptionCategory;
 import com.ruoyi.mvc.constants.enums.ErrorCodeEnums;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.springframework.boot.webmvc.autoconfigure.error.ErrorMvcAutoConfiguration;
 import org.springframework.boot.web.error.ErrorAttributeOptions;
 import org.springframework.boot.webmvc.error.DefaultErrorAttributes;
@@ -41,12 +43,13 @@ public class BaseErrorAttributes extends DefaultErrorAttributes {
     private final MessageSource messageSource;
 
     @Override
-    public Map<String, Object> getErrorAttributes(WebRequest webRequest, ErrorAttributeOptions options) {
+    public @NonNull Map<String, @Nullable Object> getErrorAttributes(
+            @NonNull WebRequest webRequest, @NonNull ErrorAttributeOptions options) {
 
         LocalDateTime localDateTime = LocalDateTime.now(ZoneId.of("Asia/Shanghai"));
         String timestampFormat = localDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS"));
 
-        Map<String, Object> errorAttributes = super.getErrorAttributes(webRequest, options);
+        Map<String, @Nullable Object> errorAttributes = super.getErrorAttributes(webRequest, options);
         errorAttributes.remove("error");
         errorAttributes.put("timestamp_zh", timestampFormat);
 
