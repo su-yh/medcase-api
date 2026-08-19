@@ -1,10 +1,9 @@
-package com.ruoyi.framework.web.service;
+package com.ruoyi.web.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.domain.entity.SysUser;
-import com.ruoyi.common.core.domain.model.DoctorLoginResponse;
 import com.ruoyi.common.core.domain.model.LoginBody;
 import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.core.domain.model.RegisterBody;
@@ -17,8 +16,12 @@ import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.ip.IpUtils;
+import com.ruoyi.framework.web.service.SysLoginService;
+import com.ruoyi.framework.web.service.SysPermissionService;
+import com.ruoyi.framework.web.service.TokenService;
+import com.ruoyi.system.domain.DoctorUserEntity;
 import com.ruoyi.system.mapper.DoctorUserMapper;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 /**
@@ -27,18 +30,15 @@ import org.springframework.stereotype.Component;
  * @author suyh
  */
 @Component
+@RequiredArgsConstructor
 public class DoctorAuthService {
-    @Autowired
-    private DoctorUserMapper doctorUserMapper;
+    private final DoctorUserMapper doctorUserMapper;
 
-    @Autowired
-    private SysLoginService loginService;
+    private final SysLoginService loginService;
 
-    @Autowired
-    private SysPermissionService permissionService;
+    private final SysPermissionService permissionService;
 
-    @Autowired
-    private TokenService tokenService;
+    private final TokenService tokenService;
 
     public void register(RegisterBody registerBody) {
         String username = registerBody.getUsername();
@@ -59,7 +59,7 @@ public class DoctorAuthService {
             throw new ServiceException("保存用户'" + username + "'失败，注册账号已存在");
         }
 
-        SysUser user = new SysUser();
+        DoctorUserEntity user = new DoctorUserEntity();
         user.setUserName(username);
         user.setNickName(username);
         user.setUserType(UserTypeEnums.DOCTOR);
@@ -72,45 +72,62 @@ public class DoctorAuthService {
         }
     }
 
-    public DoctorLoginResponse login(LoginBody loginBody) {
+    public String login(LoginBody loginBody) {
         String username = loginBody.getUsername();
         loginService.validateCaptcha(username, loginBody.getCode(), loginBody.getUuid());
         loginService.loginPreCheck(username, loginBody.getPassword());
 
-        SysUser user = selectDoctorByUsername(username);
-        if (StringUtils.isNull(user)) {
+        DoctorUserEntity doctorUser = selectDoctorByUsername(username);
+        if (StringUtils.isNull(doctorUser)) {
             throw new UserNotExistsException();
-        } else if (UserStatus.DELETED.getCode().equals(user.getDelFlag())) {
-            throw new UserNotExistsException();
-        } else if (UserStatus.DISABLE.getCode().equals(user.getStatus())) {
+        } else if (UserStatus.DISABLE.getCode().equals(doctorUser.getStatus())) {
             throw new UserPasswordNotMatchException();
-        } else if (!SecurityUtils.matchesPassword(loginBody.getPassword(), user.getPassword())) {
+        } else if (!SecurityUtils.matchesPassword(loginBody.getPassword(), doctorUser.getPassword())) {
             throw new UserPasswordNotMatchException();
         }
 
-        updateLoginInfo(user.getUserId());
-        LoginUser loginUser = new LoginUser(user.getUserId(), user.getDeptId(), user, permissionService.getMenuPermission(user));
-        return new DoctorLoginResponse(tokenService.createToken(loginUser));
+        updateLoginInfo(doctorUser.getUserId());
+        SysUser sysUser = toSysUser(doctorUser);
+        LoginUser loginUser = new LoginUser(sysUser.getUserId(), sysUser.getDeptId(), sysUser,
+                permissionService.getMenuPermission(sysUser));
+        return tokenService.createToken(loginUser);
     }
 
     private boolean existsDoctorUsername(String username) {
-        Long count = doctorUserMapper.selectCount(new QueryWrapper<SysUser>()
+        Long count = doctorUserMapper.selectCount(new QueryWrapper<DoctorUserEntity>()
                 .eq("user_name", username)
                 .eq("user_type", UserTypeEnums.DOCTOR)
                 .eq("del_flag", "0"));
         return count != null && count > 0;
     }
 
-    private SysUser selectDoctorByUsername(String username) {
-        return doctorUserMapper.selectOne(new QueryWrapper<SysUser>()
+    private DoctorUserEntity selectDoctorByUsername(String username) {
+        return doctorUserMapper.selectOne(new QueryWrapper<DoctorUserEntity>()
                 .eq("user_name", username)
-                .eq("user_type", UserTypeEnums.DOCTOR));
+                .eq("user_type", UserTypeEnums.DOCTOR)
+                .eq("del_flag", "0"));
     }
 
     private void updateLoginInfo(Long userId) {
-        doctorUserMapper.update(null, new UpdateWrapper<SysUser>()
+        doctorUserMapper.update(null, new UpdateWrapper<DoctorUserEntity>()
                 .eq("user_id", userId)
                 .set("login_ip", IpUtils.getIpAddr())
                 .set("login_date", DateUtils.getNowDate()));
+    }
+
+    private SysUser toSysUser(DoctorUserEntity doctorUser) {
+        SysUser sysUser = new SysUser();
+        sysUser.setUserId(doctorUser.getUserId());
+        sysUser.setDeptId(doctorUser.getDeptId());
+        sysUser.setUserName(doctorUser.getUserName());
+        sysUser.setNickName(doctorUser.getNickName());
+        sysUser.setUserType(doctorUser.getUserType());
+        sysUser.setPassword(doctorUser.getPassword());
+        sysUser.setStatus(doctorUser.getStatus());
+        sysUser.setDelFlag(doctorUser.getDelFlag());
+        sysUser.setLoginIp(doctorUser.getLoginIp());
+        sysUser.setLoginDate(doctorUser.getLoginDate());
+        sysUser.setPwdUpdateDate(doctorUser.getPwdUpdateDate());
+        return sysUser;
     }
 }
