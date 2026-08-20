@@ -44,7 +44,6 @@ public class DoctorAuthService {
         String username = registerBody.getUsername();
         String password = registerBody.getPassword();
         log.info("doctor register request, username={}", username);
-        loginService.validateCaptcha(username, registerBody.getCode(), registerBody.getUuid());
 
         if (!StringUtils.hasText(username)) {
             throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_REGISTER_USERNAME_EMPTY);
