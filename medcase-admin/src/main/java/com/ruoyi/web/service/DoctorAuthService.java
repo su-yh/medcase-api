@@ -5,7 +5,6 @@ import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.enums.UserStatus;
 import com.ruoyi.common.enums.UserTypeEnums;
-import com.ruoyi.common.exception.user.UserPasswordNotMatchException;
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.ip.IpUtils;
@@ -83,9 +82,11 @@ public class DoctorAuthService {
             log.warn("doctor login failed, user not exists, username={}", username);
             throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_LOGIN_USER_NOT_EXISTS);
         } else if (UserStatus.DISABLE.getCode().equals(doctorUser.getStatus())) {
-            throw new UserPasswordNotMatchException();
+            log.warn("doctor login failed, user disabled, username={}", username);
+            throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_LOGIN_FAILED);
         } else if (!SecurityUtils.matchesPassword(loginBody.getPassword(), doctorUser.getPassword())) {
-            throw new UserPasswordNotMatchException();
+            log.warn("doctor login failed, password mismatch, username={}", username);
+            throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_LOGIN_FAILED);
         }
 
         DoctorUserEntity updateDoctorUser = new DoctorUserEntity();

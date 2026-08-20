@@ -1,0 +1,8 @@
+
+
+# 日志配置
+logging:
+  file:
+    path: /Users/suyunhong/suyh-develop/logs/ruoyi-doctor
+
+

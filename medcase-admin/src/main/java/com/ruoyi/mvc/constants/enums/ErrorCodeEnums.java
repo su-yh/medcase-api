@@ -20,6 +20,11 @@ public enum ErrorCodeEnums implements IErrorCode {
     DOCTOR_REGISTER_USER_EXISTS(2000005, "保存用户'{0}'失败，注册账号已存在"),
     DOCTOR_REGISTER_FAILED(2000006, "医生注册失败，请联系系统管理人员"),
     DOCTOR_LOGIN_USER_NOT_EXISTS(2000007, "医生账号不存在"),
+    DOCTOR_CASE_CONTENT_EMPTY(2000008, "病例内容不能为空"),
+    DOCTOR_CASE_NOT_FOUND(2000009, "病例不存在"),
+    DOCTOR_CASE_SUBMIT_FAILED(2000010, "病例提交失败，请稍后重试"),
+    DOCTOR_CASE_STATUS_INVALID(2000011, "病例状态参数无效"),
+    DOCTOR_LOGIN_FAILED(2000012, "医生登录失败，请检查账号和密码"),
 
     ;
 

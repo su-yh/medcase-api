@@ -19,7 +19,7 @@ server:
   port: 8080
   servlet:
     # 应用的访问路径
-    context-path: /
+    context-path: /medcase
   tomcat:
     # tomcat的URI编码
     uri-encoding: UTF-8
@@ -38,7 +38,6 @@ logging:
     org.springframework: warn
   file:
     name: doctor
-    path: /Users/suyunhong/suyh-develop/logs/ruoyi-doctor
 
 # 用户配置
 user:

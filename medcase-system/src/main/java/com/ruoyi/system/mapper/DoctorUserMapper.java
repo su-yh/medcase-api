@@ -5,6 +5,7 @@ import com.ruoyi.common.enums.UserTypeEnums;
 import com.ruoyi.mp.mybatis.BaseMapperX;
 import com.ruoyi.mp.mybatis.LambdaQueryWrapperX;
 import com.ruoyi.system.domain.DoctorUserEntity;
+import org.apache.ibatis.annotations.Mapper;
 import org.springframework.util.StringUtils;
 
 /**
@@ -12,6 +13,7 @@ import org.springframework.util.StringUtils;
  *
  * @author suyh
  */
+@Mapper
 public interface DoctorUserMapper extends BaseMapperX<DoctorUserEntity> {
     default boolean usernameExists(String username) {
         if (!StringUtils.hasText(username)) {

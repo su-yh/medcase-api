@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
-@RequestMapping("/doctor/auth")
+@RequestMapping(value = "/doctor/auth")
 public class DoctorAuthController {
     private final DoctorAuthService doctorAuthService;
 
