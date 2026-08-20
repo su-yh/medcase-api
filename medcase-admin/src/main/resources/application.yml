@@ -54,8 +54,9 @@ spring:
   messages:
     # 国际化资源文件路径
     basename: i18n/messages
-  profiles:
-    active: druid
+  config:
+    import:
+      - application-druid.yml
   autoconfigure:
     exclude:
       - org.mybatis.spring.boot.autoconfigure.MybatisAutoConfiguration

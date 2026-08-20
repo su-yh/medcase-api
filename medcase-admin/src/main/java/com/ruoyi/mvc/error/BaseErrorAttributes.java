@@ -80,7 +80,7 @@ public class BaseErrorAttributes extends DefaultErrorAttributes {
             Locale locale = webRequest.getLocale();
             String message = messageSource.getMessage(messageSourceCode, params, ec.getMsg(), locale);
             errorAttributes.put("code", ec.getCode());
-            errorAttributes.put("message", message);
+            errorAttributes.put("msg", message);
         }
 
         return errorAttributes;
