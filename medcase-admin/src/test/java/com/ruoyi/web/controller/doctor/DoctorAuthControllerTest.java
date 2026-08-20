@@ -1,18 +1,18 @@
 package com.ruoyi.web.controller.doctor;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import com.ruoyi.common.annotation.Anonymous;
-import com.ruoyi.common.core.domain.model.LoginBody;
-import com.ruoyi.common.core.domain.model.RegisterBody;
+import com.ruoyi.web.controller.doctor.request.DoctorLoginRequest;
+import com.ruoyi.web.controller.doctor.request.DoctorRegisterRequest;
 import com.ruoyi.web.service.DoctorAuthService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 class DoctorAuthControllerTest {
     private DoctorAuthController doctorController;
@@ -28,27 +28,27 @@ class DoctorAuthControllerTest {
 
     @Test
     void loginReturnsToken() {
-        LoginBody loginBody = new LoginBody();
-        when(doctorAuthService.login(loginBody)).thenReturn("doctor-token");
+        DoctorLoginRequest loginRequest = new DoctorLoginRequest();
+        when(doctorAuthService.login(loginRequest)).thenReturn("doctor-token");
 
-        String response = doctorController.login(loginBody);
+        String response = doctorController.login(loginRequest);
 
         assertEquals("doctor-token", response);
-        verify(doctorAuthService).login(loginBody);
+        verify(doctorAuthService).login(loginRequest);
     }
 
     @Test
     void registerDelegatesToService() {
-        RegisterBody registerBody = new RegisterBody();
+        DoctorRegisterRequest registerRequest = new DoctorRegisterRequest();
 
-        doctorController.register(registerBody);
+        doctorController.register(registerRequest);
 
-        verify(doctorAuthService).register(registerBody);
+        verify(doctorAuthService).register(registerRequest);
     }
 
     @Test
     void loginAndRegisterAreAnonymous() throws NoSuchMethodException {
-        assertNotNull(DoctorAuthController.class.getMethod("login", LoginBody.class).getAnnotation(Anonymous.class));
-        assertNotNull(DoctorAuthController.class.getMethod("register", RegisterBody.class).getAnnotation(Anonymous.class));
+        assertNotNull(DoctorAuthController.class.getMethod("login", DoctorLoginRequest.class).getAnnotation(Anonymous.class));
+        assertNotNull(DoctorAuthController.class.getMethod("register", DoctorRegisterRequest.class).getAnnotation(Anonymous.class));
     }
 }

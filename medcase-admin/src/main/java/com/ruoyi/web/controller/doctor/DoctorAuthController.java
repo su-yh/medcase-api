@@ -1,8 +1,8 @@
 package com.ruoyi.web.controller.doctor;
 
 import com.ruoyi.common.annotation.Anonymous;
-import com.ruoyi.common.core.domain.model.LoginBody;
-import com.ruoyi.common.core.domain.model.RegisterBody;
+import com.ruoyi.web.controller.doctor.request.DoctorLoginRequest;
+import com.ruoyi.web.controller.doctor.request.DoctorRegisterRequest;
 import com.ruoyi.web.service.DoctorAuthService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,14 +26,14 @@ public class DoctorAuthController {
 
     @Anonymous
     @RequestMapping(value = "/login", method = RequestMethod.POST)
-    public String login(@RequestBody LoginBody loginBody) {
+    public String login(@RequestBody DoctorLoginRequest loginBody) {
         log.trace("doctor auth controller login");
         return doctorAuthService.login(loginBody);
     }
 
     @Anonymous
     @RequestMapping(value = "/register", method = RequestMethod.POST)
-    public void register(@RequestBody RegisterBody registerBody) {
+    public void register(@RequestBody DoctorRegisterRequest registerBody) {
         log.trace("doctor auth controller register");
         doctorAuthService.register(registerBody);
     }

@@ -2,10 +2,10 @@ package com.ruoyi.system.mapper;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ruoyi.common.enums.UserTypeEnums;
-import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.mp.mybatis.BaseMapperX;
 import com.ruoyi.mp.mybatis.LambdaQueryWrapperX;
 import com.ruoyi.system.domain.DoctorUserEntity;
+import org.springframework.util.StringUtils;
 
 /**
  * 医生端用户 Mapper

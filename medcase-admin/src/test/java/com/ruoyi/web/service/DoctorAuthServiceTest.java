@@ -10,18 +10,17 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.ruoyi.common.core.domain.entity.SysUser;
-import com.ruoyi.common.core.domain.model.LoginBody;
 import com.ruoyi.common.core.domain.model.LoginUser;
-import com.ruoyi.common.core.domain.model.RegisterBody;
 import com.ruoyi.common.enums.UserStatus;
 import com.ruoyi.common.enums.UserTypeEnums;
 import com.ruoyi.common.exception.user.UserPasswordNotMatchException;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.mvc.constants.enums.ErrorCodeEnums;
 import com.ruoyi.mvc.exception.AbstractBusinessException;
+import com.ruoyi.web.controller.doctor.request.DoctorLoginRequest;
+import com.ruoyi.web.controller.doctor.request.DoctorRegisterRequest;
 import com.ruoyi.system.domain.DoctorUserEntity;
 import com.ruoyi.system.mapper.DoctorUserMapper;
-import java.util.Date;
 import java.util.Set;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -64,11 +63,11 @@ class DoctorAuthServiceTest {
 
     @Test
     void registerInsertsDoctorUserWithEncryptedPassword() {
-        RegisterBody registerBody = registerBody("doctor01", "secret123");
+        DoctorRegisterRequest registerRequest = registerRequest("doctor01", "secret123");
         when(doctorUserMapper.usernameExists("doctor01")).thenReturn(false);
         when(doctorUserMapper.insert(any(DoctorUserEntity.class))).thenReturn(1);
 
-        doctorAuthService.register(registerBody);
+        doctorAuthService.register(registerRequest);
 
         ArgumentCaptor<DoctorUserEntity> captor = ArgumentCaptor.forClass(DoctorUserEntity.class);
         verify(doctorUserMapper).insert(captor.capture());
@@ -86,10 +85,10 @@ class DoctorAuthServiceTest {
 
     @Test
     void registerRejectsDuplicateDoctorUsername() {
-        RegisterBody registerBody = registerBody("doctor01", "secret123");
+        DoctorRegisterRequest registerRequest = registerRequest("doctor01", "secret123");
         when(doctorUserMapper.usernameExists("doctor01")).thenReturn(true);
 
-        AbstractBusinessException exception = assertThrows(AbstractBusinessException.class, () -> doctorAuthService.register(registerBody));
+        AbstractBusinessException exception = assertThrows(AbstractBusinessException.class, () -> doctorAuthService.register(registerRequest));
 
         assertEquals(ErrorCodeEnums.DOCTOR_REGISTER_USER_EXISTS, exception.getEc());
         verify(doctorUserMapper, never()).insert(any(DoctorUserEntity.class));
@@ -98,9 +97,9 @@ class DoctorAuthServiceTest {
 
     @Test
     void registerRejectsEmptyUsername() {
-        RegisterBody registerBody = registerBody("", "secret123");
+        DoctorRegisterRequest registerRequest = registerRequest("", "secret123");
 
-        AbstractBusinessException exception = assertThrows(AbstractBusinessException.class, () -> doctorAuthService.register(registerBody));
+        AbstractBusinessException exception = assertThrows(AbstractBusinessException.class, () -> doctorAuthService.register(registerRequest));
 
         assertEquals(ErrorCodeEnums.DOCTOR_REGISTER_USERNAME_EMPTY, exception.getEc());
         verify(doctorUserMapper, never()).insert(any(DoctorUserEntity.class));
@@ -108,9 +107,9 @@ class DoctorAuthServiceTest {
 
     @Test
     void registerRejectsEmptyPassword() {
-        RegisterBody registerBody = registerBody("doctor01", "");
+        DoctorRegisterRequest registerRequest = registerRequest("doctor01", "");
 
-        AbstractBusinessException exception = assertThrows(AbstractBusinessException.class, () -> doctorAuthService.register(registerBody));
+        AbstractBusinessException exception = assertThrows(AbstractBusinessException.class, () -> doctorAuthService.register(registerRequest));
 
         assertEquals(ErrorCodeEnums.DOCTOR_REGISTER_PASSWORD_EMPTY, exception.getEc());
         verify(doctorUserMapper, never()).insert(any(DoctorUserEntity.class));
@@ -118,9 +117,9 @@ class DoctorAuthServiceTest {
 
     @Test
     void registerRejectsInvalidUsernameLength() {
-        RegisterBody registerBody = registerBody("d", "secret123");
+        DoctorRegisterRequest registerRequest = registerRequest("d", "secret123");
 
-        AbstractBusinessException exception = assertThrows(AbstractBusinessException.class, () -> doctorAuthService.register(registerBody));
+        AbstractBusinessException exception = assertThrows(AbstractBusinessException.class, () -> doctorAuthService.register(registerRequest));
 
         assertEquals(ErrorCodeEnums.DOCTOR_REGISTER_USERNAME_LENGTH_INVALID, exception.getEc());
         verify(doctorUserMapper, never()).insert(any(DoctorUserEntity.class));
@@ -128,9 +127,9 @@ class DoctorAuthServiceTest {
 
     @Test
     void registerRejectsInvalidPasswordLength() {
-        RegisterBody registerBody = registerBody("doctor01", "1234");
+        DoctorRegisterRequest registerRequest = registerRequest("doctor01", "1234");
 
-        AbstractBusinessException exception = assertThrows(AbstractBusinessException.class, () -> doctorAuthService.register(registerBody));
+        AbstractBusinessException exception = assertThrows(AbstractBusinessException.class, () -> doctorAuthService.register(registerRequest));
 
         assertEquals(ErrorCodeEnums.DOCTOR_REGISTER_PASSWORD_LENGTH_INVALID, exception.getEc());
         verify(doctorUserMapper, never()).insert(any(DoctorUserEntity.class));
@@ -138,11 +137,11 @@ class DoctorAuthServiceTest {
 
     @Test
     void registerRejectsInsertFailure() {
-        RegisterBody registerBody = registerBody("doctor01", "secret123");
+        DoctorRegisterRequest registerRequest = registerRequest("doctor01", "secret123");
         when(doctorUserMapper.usernameExists("doctor01")).thenReturn(false);
         when(doctorUserMapper.insert(any(DoctorUserEntity.class))).thenReturn(0);
 
-        AbstractBusinessException exception = assertThrows(AbstractBusinessException.class, () -> doctorAuthService.register(registerBody));
+        AbstractBusinessException exception = assertThrows(AbstractBusinessException.class, () -> doctorAuthService.register(registerRequest));
 
         assertEquals(ErrorCodeEnums.DOCTOR_REGISTER_FAILED, exception.getEc());
         verify(doctorUserMapper).usernameExists("doctor01");
@@ -150,13 +149,13 @@ class DoctorAuthServiceTest {
 
     @Test
     void loginCreatesTokenForDoctorUserAndUpdatesLoginInfo() {
-        LoginBody loginBody = loginBody("doctor01", "secret123");
+        DoctorLoginRequest loginRequest = loginRequest("doctor01", "secret123");
         DoctorUserEntity doctor = doctorUser("doctor01", "secret123");
         when(doctorUserMapper.selectDoctorByUsername("doctor01")).thenReturn(doctor);
         when(permissionService.getMenuPermission(any(SysUser.class))).thenReturn(Set.of("doctor:home"));
         when(tokenService.createToken(any(LoginUser.class))).thenReturn("doctor-token");
 
-        String response = doctorAuthService.login(loginBody);
+        String response = doctorAuthService.login(loginRequest);
 
         ArgumentCaptor<LoginUser> loginUserCaptor = ArgumentCaptor.forClass(LoginUser.class);
         verify(tokenService).createToken(loginUserCaptor.capture());
@@ -171,10 +170,10 @@ class DoctorAuthServiceTest {
 
     @Test
     void loginRejectsMissingDoctorUser() {
-        LoginBody loginBody = loginBody("sameName", "secret123");
+        DoctorLoginRequest loginRequest = loginRequest("sameName", "secret123");
         when(doctorUserMapper.selectDoctorByUsername("sameName")).thenReturn(null);
 
-        AbstractBusinessException exception = assertThrows(AbstractBusinessException.class, () -> doctorAuthService.login(loginBody));
+        AbstractBusinessException exception = assertThrows(AbstractBusinessException.class, () -> doctorAuthService.login(loginRequest));
 
         assertEquals(ErrorCodeEnums.DOCTOR_LOGIN_USER_NOT_EXISTS, exception.getEc());
         verify(doctorUserMapper).selectDoctorByUsername("sameName");
@@ -183,27 +182,27 @@ class DoctorAuthServiceTest {
 
     @Test
     void loginRejectsWrongPassword() {
-        LoginBody loginBody = loginBody("doctor01", "badpass");
+        DoctorLoginRequest loginRequest = loginRequest("doctor01", "badpass");
         when(doctorUserMapper.selectDoctorByUsername("doctor01")).thenReturn(doctorUser("doctor01", "secret123"));
 
-        assertThrows(UserPasswordNotMatchException.class, () -> doctorAuthService.login(loginBody));
+        assertThrows(UserPasswordNotMatchException.class, () -> doctorAuthService.login(loginRequest));
 
         verify(doctorUserMapper).selectDoctorByUsername("doctor01");
         verify(tokenService, never()).createToken(any(LoginUser.class));
     }
 
-    private RegisterBody registerBody(String username, String password) {
-        RegisterBody registerBody = new RegisterBody();
-        registerBody.setUsername(username);
-        registerBody.setPassword(password);
-        return registerBody;
+    private DoctorRegisterRequest registerRequest(String username, String password) {
+        DoctorRegisterRequest registerRequest = new DoctorRegisterRequest();
+        registerRequest.setUsername(username);
+        registerRequest.setPassword(password);
+        return registerRequest;
     }
 
-    private LoginBody loginBody(String username, String password) {
-        LoginBody loginBody = new LoginBody();
-        loginBody.setUsername(username);
-        loginBody.setPassword(password);
-        return loginBody;
+    private DoctorLoginRequest loginRequest(String username, String password) {
+        DoctorLoginRequest loginRequest = new DoctorLoginRequest();
+        loginRequest.setUsername(username);
+        loginRequest.setPassword(password);
+        return loginRequest;
     }
 
     private DoctorUserEntity doctorUser(String username, String rawPassword) {
