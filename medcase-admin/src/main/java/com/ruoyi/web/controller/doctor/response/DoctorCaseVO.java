@@ -1,10 +1,12 @@
 package com.ruoyi.web.controller.doctor.response;
 
+import com.ruoyi.web.domain.FileAttachment;
 import com.ruoyi.web.domain.DoctorCaseEntity;
 import com.ruoyi.web.enums.DoctorCaseStatusEnums;
 import lombok.Data;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * 医生病例返回对象
@@ -17,7 +19,9 @@ public class DoctorCaseVO {
 
     private String doctorNickname;
 
-    private String caseContent;
+    private String remark;
+
+    private List<FileAttachment> attachments;
 
     private DoctorCaseStatusEnums status;
 
@@ -35,7 +39,8 @@ public class DoctorCaseVO {
         DoctorCaseVO result = new DoctorCaseVO();
         result.setId(entity.getId());
         result.setDoctorNickname(entity.getDoctorNickname());
-        result.setCaseContent(entity.getCaseContent());
+        result.setRemark(entity.getRemark());
+        result.setAttachments(entity.getAttachments());
         result.setStatus(entity.getStatus());
         result.setStatusDesc(entity.getStatus() == null ? null : entity.getStatus().getDesc());
         result.setReviewReason(entity.getReviewReason());

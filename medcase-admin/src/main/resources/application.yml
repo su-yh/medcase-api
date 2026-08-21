@@ -37,7 +37,7 @@ logging:
     com.ruoyi: debug
     org.springframework: warn
   file:
-    name: doctor
+    name: medcase
 
 # 用户配置
 user:

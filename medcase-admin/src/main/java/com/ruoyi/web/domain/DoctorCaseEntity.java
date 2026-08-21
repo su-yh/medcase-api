@@ -1,13 +1,16 @@
 package com.ruoyi.web.domain;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import com.ruoyi.web.enums.DoctorCaseStatusEnums;
 import lombok.Data;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * 医生病例实体 medcase_doctor_case
@@ -24,7 +27,10 @@ public class DoctorCaseEntity {
 
     private String doctorNickname;
 
-    private String caseContent;
+    private String remark;
+
+    @TableField(value = "attachments", typeHandler = JacksonTypeHandler.class)
+    private List<FileAttachment> attachments;
 
     private DoctorCaseStatusEnums status;
 

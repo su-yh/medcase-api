@@ -1,6 +1,9 @@
 package com.ruoyi.web.controller.doctor.request;
 
+import com.ruoyi.web.domain.FileAttachment;
 import lombok.Data;
+
+import java.util.List;
 
 /**
  * 医生病例提交请求
@@ -9,5 +12,7 @@ import lombok.Data;
  */
 @Data
 public class DoctorCaseSubmitRequest {
-    private String caseContent;
+    private String remark;
+
+    private List<FileAttachment> attachments;
 }

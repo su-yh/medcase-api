@@ -33,8 +33,8 @@ public class DoctorCaseService {
     private final DoctorCaseMapper doctorCaseMapper;
 
     public DoctorCaseVO submit(DoctorCaseSubmitRequest request) {
-        if (request == null || !StringUtils.hasText(request.getCaseContent())) {
-            throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_CASE_CONTENT_EMPTY);
+        if (request == null || !StringUtils.hasText(request.getRemark())) {
+            throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_CASE_REMARK_EMPTY);
         }
 
         SysUser doctor = currentDoctor();
@@ -43,7 +43,8 @@ public class DoctorCaseService {
         DoctorCaseEntity entity = new DoctorCaseEntity();
         entity.setDoctorId(doctorId);
         entity.setDoctorNickname(doctor.getNickName());
-        entity.setCaseContent(request.getCaseContent());
+        entity.setRemark(request.getRemark());
+        entity.setAttachments(request.getAttachments());
         entity.setStatus(DoctorCaseStatusEnums.PENDING_REVIEW);
         entity.setCreateTime(now);
         entity.setUpdateTime(now);

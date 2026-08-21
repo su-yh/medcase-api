@@ -1,8 +1,11 @@
 
 
+ruoyi:
+  profile: /Users/suyunhong/suyh-develop/medcase/attachmes
+
 # 日志配置
 logging:
   file:
-    path: /Users/suyunhong/suyh-develop/logs/ruoyi-doctor
+    path: /Users/suyunhong/suyh-develop/medcase/logs
 
 
