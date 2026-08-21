@@ -25,12 +25,12 @@
     <!-- 参考 Spring Boot 的 file-appender.xml 编写 -->
     <appender name="FILE"  class="ch.qos.logback.core.rolling.RollingFileAppender">
         <!-- 日志文件名:${logging.file.name} -->
-        <file>${LOG_FILE_PATH}/${LOG_FILE_NAME}/${LOG_FILE_NAME}.log</file>
+        <file>${LOG_FILE_PATH}/${LOG_FILE_NAME}.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
             <!-- 滚动后的日志文件名 -->
             <!--如果变量对应的值不存在则取默认值，格式为：':-' -->
             <!--变量(LOGBACK_ROLLINGPOLICY_FILE_NAME_PATTERN) ==> 对应配置文件 中的配置项： logging.logback.rollingpolicy.file-name-pattern-->
-            <fileNamePattern>${LOGBACK_ROLLINGPOLICY_FILE_NAME_PATTERN:-${LOG_FILE_PATH}/${LOG_FILE_NAME}/%d{yyyy-MM-dd}/${LOG_FILE_NAME}-%03i.log}</fileNamePattern>
+            <fileNamePattern>${LOGBACK_ROLLINGPOLICY_FILE_NAME_PATTERN:-${LOG_FILE_PATH}/%d{yyyy-MM-dd}/${LOG_FILE_NAME}-%03i.log}</fileNamePattern>
             <!-- 启动服务时，是否清理历史日志，一般不建议清理 -->
             <!--LOGBACK_ROLLINGPOLICY_CLEAN_HISTORY_ON_START  对应配置文件中的： logging.logback.rollingpolicy.clean-history-on-start -->
             <cleanHistoryOnStart>${LOGBACK_ROLLINGPOLICY_CLEAN_HISTORY_ON_START:-true}</cleanHistoryOnStart>
