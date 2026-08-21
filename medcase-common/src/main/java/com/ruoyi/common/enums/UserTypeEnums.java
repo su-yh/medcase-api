@@ -9,7 +9,7 @@ import lombok.Getter;
  * @since 2026-08-19
  */
 @Getter
-public enum UserTypeEnums implements BaseEnums {
+public enum UserTypeEnums implements BaseEnum {
     ADMIN("00", "后台用户"),
     DOCTOR("01", "医生端用户"),
     ;

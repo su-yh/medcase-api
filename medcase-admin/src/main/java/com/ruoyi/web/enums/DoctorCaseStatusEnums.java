@@ -2,7 +2,7 @@ package com.ruoyi.web.enums;
 
 import com.baomidou.mybatisplus.annotation.EnumValue;
 import com.fasterxml.jackson.annotation.JsonValue;
-import com.ruoyi.common.enums.BaseEnums;
+import com.ruoyi.common.enums.BaseEnum;
 import lombok.Getter;
 
 /**
@@ -11,7 +11,7 @@ import lombok.Getter;
  * @author suyh
  */
 @Getter
-public enum DoctorCaseStatusEnums implements BaseEnums {
+public enum DoctorCaseStatusEnums implements BaseEnum {
     PENDING_REVIEW("pending_review", "待审核"),
     REVIEW_FAILED("review_failed", "审核失败"),
     APPROVED_PENDING_SETTLEMENT("approved_pending_settlement", "审核通过 / 待结算"),

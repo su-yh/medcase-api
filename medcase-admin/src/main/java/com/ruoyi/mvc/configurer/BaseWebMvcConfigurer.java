@@ -1,7 +1,9 @@
 package com.ruoyi.mvc.configurer;
 
+import com.ruoyi.mvc.converter.EnumConverterFactory;
 import com.ruoyi.mvc.error.BaseHandlerExceptionResolver;
 import org.jspecify.annotations.NonNull;
+import org.springframework.format.FormatterRegistry;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -26,5 +28,10 @@ public class BaseWebMvcConfigurer implements WebMvcConfigurer {
         }
 
         resolvers.add(new BaseHandlerExceptionResolver());
+    }
+
+    @Override
+    public void addFormatters(@NonNull FormatterRegistry registry) {
+        registry.addConverterFactory(new EnumConverterFactory());
     }
 }

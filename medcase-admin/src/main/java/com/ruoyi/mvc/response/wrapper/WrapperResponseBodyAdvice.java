@@ -62,6 +62,8 @@ public class WrapperResponseBodyAdvice implements ResponseBodyAdvice<Object> {
             @NonNull ServerHttpResponse response) {
 
         if (String.class.isAssignableFrom(returnType.getParameterType())) {
+            response.getHeaders().setContentType(MediaType.APPLICATION_JSON);
+
             R<Object> result = R.ofSuccess(body);
             return JsonUtils.toJSONString(result);
         }
