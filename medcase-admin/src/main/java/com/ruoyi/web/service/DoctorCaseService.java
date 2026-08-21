@@ -16,7 +16,6 @@ import com.ruoyi.web.mapper.DoctorCaseMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 
 import java.util.Date;
 import java.util.stream.Collectors;
@@ -32,11 +31,7 @@ import java.util.stream.Collectors;
 public class DoctorCaseService {
     private final DoctorCaseMapper doctorCaseMapper;
 
-    public DoctorCaseVO submit(DoctorCaseSubmitRequest request) {
-        if (request == null || !StringUtils.hasText(request.getRemark())) {
-            throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_CASE_REMARK_EMPTY);
-        }
-
+    public void submit(DoctorCaseSubmitRequest request) {
         SysUser doctor = currentDoctor();
         Long doctorId = doctor.getUserId();
         Date now = new Date();
@@ -55,7 +50,6 @@ public class DoctorCaseService {
         }
 
         log.info("doctor case submitted, doctorId={}, id={}", doctorId, entity.getId());
-        return DoctorCaseVO.fromEntity(entity);
     }
 
     public PageResult<DoctorCaseVO> page(PageParam pageParam, DoctorCaseStatusEnums status) {

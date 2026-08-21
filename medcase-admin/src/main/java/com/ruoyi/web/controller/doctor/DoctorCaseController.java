@@ -28,9 +28,9 @@ public class DoctorCaseController {
     private final DoctorCaseService doctorCaseService;
 
     @RequestMapping(value = "/cases", method = RequestMethod.POST)
-    public DoctorCaseVO submit(@RequestBody DoctorCaseSubmitRequest request) {
+    public void submit(@RequestBody DoctorCaseSubmitRequest request) {
         log.trace("doctor case controller submit");
-        return doctorCaseService.submit(request);
+        doctorCaseService.submit(request);
     }
 
     @RequestMapping(value = "/cases", method = RequestMethod.GET)

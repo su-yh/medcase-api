@@ -1,15 +1,17 @@
 package com.ruoyi.common.core.domain;
 
-import java.util.HashMap;
-import java.util.Objects;
 import com.ruoyi.common.constant.HttpStatus;
 import com.ruoyi.common.utils.StringUtils;
+
+import java.util.HashMap;
+import java.util.Objects;
 
 /**
  * 操作消息提醒
  * 
  * @author ruoyi
  */
+@Deprecated
 public class AjaxResult extends HashMap<String, Object>
 {
     private static final long serialVersionUID = 1L;
