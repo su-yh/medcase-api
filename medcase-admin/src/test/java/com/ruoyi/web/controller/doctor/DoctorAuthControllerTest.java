@@ -47,6 +47,13 @@ class DoctorAuthControllerTest {
     }
 
     @Test
+    void logoutDelegatesToService() {
+        doctorController.logout();
+
+        verify(doctorAuthService).logout();
+    }
+
+    @Test
     void loginAndRegisterAreAnonymous() throws NoSuchMethodException {
         assertNotNull(DoctorAuthController.class.getMethod("login", DoctorLoginRequest.class).getAnnotation(Anonymous.class));
         assertNotNull(DoctorAuthController.class.getMethod("register", DoctorRegisterRequest.class).getAnnotation(Anonymous.class));

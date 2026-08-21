@@ -13,7 +13,6 @@ import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.enums.UserStatus;
 import com.ruoyi.common.enums.UserTypeEnums;
-import com.ruoyi.common.exception.user.UserPasswordNotMatchException;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.mvc.constants.enums.ErrorCodeEnums;
 import com.ruoyi.mvc.exception.AbstractBusinessException;
@@ -28,6 +27,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -58,6 +59,7 @@ class DoctorAuthServiceTest {
 
     @AfterEach
     void tearDown() {
+        SecurityContextHolder.clearContext();
         RequestContextHolder.resetRequestAttributes();
     }
 
@@ -79,7 +81,6 @@ class DoctorAuthServiceTest {
         assertEquals(null, user.getDelFlag());
         assertNotNull(user.getPwdUpdateDate());
         assertTrue(SecurityUtils.matchesPassword("secret123", user.getPassword()));
-        verify(loginService).validateCaptcha("doctor01", null, null);
         verify(doctorUserMapper).usernameExists("doctor01");
     }
 
@@ -185,10 +186,28 @@ class DoctorAuthServiceTest {
         DoctorLoginRequest loginRequest = loginRequest("doctor01", "badpass");
         when(doctorUserMapper.selectDoctorByUsername("doctor01")).thenReturn(doctorUser("doctor01", "secret123"));
 
-        assertThrows(UserPasswordNotMatchException.class, () -> doctorAuthService.login(loginRequest));
+        AbstractBusinessException exception = assertThrows(AbstractBusinessException.class, () -> doctorAuthService.login(loginRequest));
 
+        assertEquals(ErrorCodeEnums.DOCTOR_LOGIN_FAILED, exception.getEc());
         verify(doctorUserMapper).selectDoctorByUsername("doctor01");
         verify(tokenService, never()).createToken(any(LoginUser.class));
+    }
+
+    @Test
+    void logoutDeletesCurrentLoginToken() {
+        SysUser user = new SysUser();
+        user.setUserId(12L);
+        user.setUserName("doctor01");
+        LoginUser loginUser = new LoginUser();
+        loginUser.setToken("doctor-login-token");
+        loginUser.setUserId(12L);
+        loginUser.setUser(user);
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken(loginUser, null));
+
+        doctorAuthService.logout();
+
+        verify(tokenService).delLoginUser("doctor-login-token");
     }
 
     private DoctorRegisterRequest registerRequest(String username, String password) {

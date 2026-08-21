@@ -37,4 +37,10 @@ public class DoctorAuthController {
         log.trace("doctor auth controller register");
         doctorAuthService.register(registerBody);
     }
+
+    @RequestMapping(value = "/logout", method = RequestMethod.POST)
+    public void logout() {
+        log.trace("doctor auth controller logout");
+        doctorAuthService.logout();
+    }
 }

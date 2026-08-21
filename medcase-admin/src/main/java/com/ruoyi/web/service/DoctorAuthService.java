@@ -101,6 +101,12 @@ public class DoctorAuthService {
         return tokenService.createToken(loginUser);
     }
 
+    public void logout() {
+        LoginUser loginUser = SecurityUtils.getLoginUser();
+        tokenService.delLoginUser(loginUser.getToken());
+        log.info("doctor logout success, username={}, userId={}", loginUser.getUsername(), loginUser.getUserId());
+    }
+
     private boolean existsDoctorUsername(String username) {
         return doctorUserMapper.usernameExists(username);
     }
