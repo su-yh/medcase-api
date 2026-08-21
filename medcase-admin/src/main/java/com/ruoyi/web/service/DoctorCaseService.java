@@ -38,6 +38,7 @@ public class DoctorCaseService {
         DoctorCaseEntity entity = new DoctorCaseEntity();
         entity.setDoctorId(doctorId);
         entity.setDoctorNickname(doctor.getNickName());
+        entity.setTitle(request.getTitle());
         entity.setRemark(request.getRemark());
         entity.setAttachments(request.getAttachments());
         entity.setStatus(DoctorCaseStatusEnums.PENDING_REVIEW);

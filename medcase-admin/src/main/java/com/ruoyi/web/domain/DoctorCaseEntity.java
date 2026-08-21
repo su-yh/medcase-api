@@ -27,6 +27,8 @@ public class DoctorCaseEntity {
 
     private String doctorNickname;
 
+    private String title;
+
     private String remark;
 
     @TableField(value = "attachments", typeHandler = JacksonTypeHandler.class)

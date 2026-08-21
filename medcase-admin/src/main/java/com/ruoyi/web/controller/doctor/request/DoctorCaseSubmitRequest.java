@@ -12,6 +12,8 @@ import java.util.List;
  */
 @Data
 public class DoctorCaseSubmitRequest {
+    private String title;
+
     private String remark;
 
     private List<FileAttachment> attachments;
