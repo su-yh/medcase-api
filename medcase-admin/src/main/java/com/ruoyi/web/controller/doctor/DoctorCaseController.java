@@ -4,6 +4,7 @@ import com.ruoyi.mp.mybatis.PageParam;
 import com.ruoyi.mp.mybatis.PageResult;
 import com.ruoyi.web.controller.doctor.request.DoctorCaseSubmitRequest;
 import com.ruoyi.web.controller.doctor.response.DoctorCaseVO;
+import com.ruoyi.web.enums.DoctorCaseStatusEnums;
 import com.ruoyi.web.service.DoctorCaseService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,7 +36,7 @@ public class DoctorCaseController {
     @RequestMapping(value = "/cases", method = RequestMethod.GET)
     public PageResult<DoctorCaseVO> page(
             PageParam pageParam,
-            @RequestParam(value = "status", required = false) String status) {
+            @RequestParam(value = "status", required = false) DoctorCaseStatusEnums status) {
         log.trace("doctor case controller page, status={}", status);
         return doctorCaseService.page(pageParam, status);
     }

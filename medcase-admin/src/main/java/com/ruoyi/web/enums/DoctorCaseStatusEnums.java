@@ -28,15 +28,6 @@ public enum DoctorCaseStatusEnums implements BaseEnum {
         this.desc = desc;
     }
 
-    public static DoctorCaseStatusEnums fromCode(String code) {
-        for (DoctorCaseStatusEnums value : values()) {
-            if (value.code.equals(code)) {
-                return value;
-            }
-        }
-        return null;
-    }
-
     @Override
     public String toString() {
         return String.format("%s(%s)", desc, code);

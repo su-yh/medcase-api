@@ -57,9 +57,8 @@ public class DoctorCaseService {
         return DoctorCaseVO.fromEntity(entity);
     }
 
-    public PageResult<DoctorCaseVO> page(PageParam pageParam, String statusCode) {
+    public PageResult<DoctorCaseVO> page(PageParam pageParam, DoctorCaseStatusEnums status) {
         Long doctorId = currentDoctorId();
-        DoctorCaseStatusEnums status = parseStatus(statusCode);
         PageResult<DoctorCaseEntity> pageResult = doctorCaseMapper.selectDoctorCasePage(doctorId, status, pageParam);
         PageResult<DoctorCaseVO> result = new PageResult<>();
         result.setTotal(pageResult.getTotal());
@@ -75,18 +74,6 @@ public class DoctorCaseService {
             throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_CASE_NOT_FOUND);
         }
         return DoctorCaseVO.fromEntity(entity);
-    }
-
-    private DoctorCaseStatusEnums parseStatus(String statusCode) {
-        if (!StringUtils.hasText(statusCode)) {
-            return null;
-        }
-
-        DoctorCaseStatusEnums status = DoctorCaseStatusEnums.fromCode(statusCode);
-        if (status == null) {
-            throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_CASE_STATUS_INVALID);
-        }
-        return status;
     }
 
     private Long currentDoctorId() {

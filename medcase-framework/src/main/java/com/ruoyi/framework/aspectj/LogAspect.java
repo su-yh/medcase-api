@@ -1,7 +1,21 @@
 package com.ruoyi.framework.aspectj;
 
-import java.util.Collection;
-import java.util.Map;
+import com.ruoyi.common.annotation.Log;
+import com.ruoyi.common.core.domain.entity.SysUser;
+import com.ruoyi.common.core.domain.model.LoginUser;
+import com.ruoyi.common.core.text.Convert;
+import com.ruoyi.common.enums.BusinessStatus;
+import com.ruoyi.common.enums.HttpMethod;
+import com.ruoyi.common.filter.PropertyPreExcludeFilter;
+import com.ruoyi.common.utils.SecurityUtils;
+import com.ruoyi.common.utils.ServletUtils;
+import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.common.utils.ToolUtils;
+import com.ruoyi.common.utils.ip.IpUtils;
+import com.ruoyi.common.utils.json.JsonUtils;
+import com.ruoyi.framework.manager.AsyncManager;
+import com.ruoyi.framework.manager.factory.AsyncFactory;
+import com.ruoyi.system.domain.SysOperLog;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.ArrayUtils;
@@ -16,22 +30,9 @@ import org.springframework.core.NamedThreadLocal;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.multipart.MultipartFile;
-import com.ruoyi.common.annotation.Log;
-import com.ruoyi.common.core.domain.entity.SysUser;
-import com.ruoyi.common.core.domain.model.LoginUser;
-import com.ruoyi.common.core.text.Convert;
-import com.ruoyi.common.enums.BusinessStatus;
-import com.ruoyi.common.enums.HttpMethod;
-import com.ruoyi.common.filter.PropertyPreExcludeFilter;
-import com.ruoyi.common.utils.ExceptionUtil;
-import com.ruoyi.common.utils.SecurityUtils;
-import com.ruoyi.common.utils.ServletUtils;
-import com.ruoyi.common.utils.StringUtils;
-import com.ruoyi.common.utils.json.JsonUtils;
-import com.ruoyi.common.utils.ip.IpUtils;
-import com.ruoyi.framework.manager.AsyncManager;
-import com.ruoyi.framework.manager.factory.AsyncFactory;
-import com.ruoyi.system.domain.SysOperLog;
+
+import java.util.Collection;
+import java.util.Map;
 
 /**
  * 操作日志记录处理
@@ -112,7 +113,7 @@ public class LogAspect
             if (e != null)
             {
                 operLog.setStatus(BusinessStatus.FAIL.ordinal());
-                operLog.setErrorMsg(StringUtils.substring(Convert.toStr(e.getMessage(), ExceptionUtil.getExceptionMessage(e)), 0, 2000));
+                operLog.setErrorMsg(StringUtils.substring(Convert.toStr(e.getMessage(), ToolUtils.getExceptionMessage(e)), 0, 2000));
             }
             // 设置方法名称
             String className = joinPoint.getTarget().getClass().getName();
