@@ -1,8 +1,10 @@
 package com.ruoyi.web.controller.doctor.request;
 
-import com.ruoyi.mvc.advice.DateOffset;
+import com.ruoyi.mvc.advice.date.DateTimeFormatPlus;
+import com.ruoyi.mvc.advice.date.OffsetUnit;
 import com.ruoyi.web.enums.DoctorCaseStatusEnums;
 import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
 
@@ -16,9 +18,9 @@ public class DoctorCasePageRequest {
 
     private DoctorCaseStatusEnums status;
 
-    @DateOffset(offsetDays = 0, description = "提交开始日期")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date createTimeLowerBound;
 
-    @DateOffset(description = "提交结束日期")
+    @DateTimeFormatPlus(pattern = "yyyy-MM-dd", offset = 1, unit = OffsetUnit.DAY)
     private Date createTimeUpperBound;
 }

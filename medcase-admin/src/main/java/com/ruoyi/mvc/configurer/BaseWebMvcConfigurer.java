@@ -1,5 +1,6 @@
 package com.ruoyi.mvc.configurer;
 
+import com.ruoyi.mvc.advice.date.DateTimeFormatPlusFormatterFactory;
 import com.ruoyi.mvc.converter.EnumConverterFactory;
 import com.ruoyi.mvc.error.BaseHandlerExceptionResolver;
 import org.jspecify.annotations.NonNull;
@@ -33,5 +34,8 @@ public class BaseWebMvcConfigurer implements WebMvcConfigurer {
     @Override
     public void addFormatters(@NonNull FormatterRegistry registry) {
         registry.addConverterFactory(new EnumConverterFactory());
+
+        // 注册 DateTimeFormatPlus
+        registry.addFormatterForFieldAnnotation(new DateTimeFormatPlusFormatterFactory());
     }
 }
