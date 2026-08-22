@@ -2,6 +2,7 @@ package com.ruoyi.web.controller.doctor;
 
 import com.ruoyi.mp.mybatis.PageParam;
 import com.ruoyi.mp.mybatis.PageResult;
+import com.ruoyi.web.controller.doctor.request.DoctorCasePageRequest;
 import com.ruoyi.web.controller.doctor.request.DoctorCaseSubmitRequest;
 import com.ruoyi.web.controller.doctor.response.DoctorCaseVO;
 import com.ruoyi.web.enums.DoctorCaseStatusEnums;
@@ -12,8 +13,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
 
 /**
  * 医生病例接口
@@ -34,11 +35,9 @@ public class DoctorCaseController {
     }
 
     @RequestMapping(value = "/cases", method = RequestMethod.GET)
-    public PageResult<DoctorCaseVO> page(
-            PageParam pageParam,
-            @RequestParam(value = "status", required = false) DoctorCaseStatusEnums status) {
-        log.trace("doctor case controller page, status={}", status);
-        return doctorCaseService.page(pageParam, status);
+    public PageResult<DoctorCaseVO> page(PageParam pageParam, DoctorCasePageRequest request) {
+        log.trace("doctor case controller page, request={}", request);
+        return doctorCaseService.page(pageParam, request);
     }
 
     @RequestMapping(value = "/cases/{id}", method = RequestMethod.GET)

@@ -4,8 +4,8 @@ import com.ruoyi.mp.mybatis.BaseMapperX;
 import com.ruoyi.mp.mybatis.LambdaQueryWrapperX;
 import com.ruoyi.mp.mybatis.PageParam;
 import com.ruoyi.mp.mybatis.PageResult;
+import com.ruoyi.web.controller.doctor.request.DoctorCasePageRequest;
 import com.ruoyi.web.domain.DoctorCaseEntity;
-import com.ruoyi.web.enums.DoctorCaseStatusEnums;
 import org.apache.ibatis.annotations.Mapper;
 
 /**
@@ -16,10 +16,13 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface DoctorCaseMapper extends BaseMapperX<DoctorCaseEntity> {
     default PageResult<DoctorCaseEntity> selectDoctorCasePage(
-            Long doctorId, DoctorCaseStatusEnums status, PageParam pageParam) {
+            PageParam pageParam, Long doctorId, DoctorCasePageRequest request) {
         LambdaQueryWrapperX<DoctorCaseEntity> queryWrapper = build();
         queryWrapper.eq(DoctorCaseEntity::getDoctorId, doctorId);
-        queryWrapper.eqIfPresent(DoctorCaseEntity::getStatus, status);
+        queryWrapper.likeIfPresent(DoctorCaseEntity::getTitle, request.getTitleLike());
+        queryWrapper.eqIfPresent(DoctorCaseEntity::getStatus, request.getStatus());
+        queryWrapper.geIfPresent(DoctorCaseEntity::getCreateTime, request.getCreateTimeLowerBound());
+        queryWrapper.ltIfPresent(DoctorCaseEntity::getCreateTime, request.getCreateTimeUpperBound());
         queryWrapper.orderByDesc(DoctorCaseEntity::getCreateTime);
         return selectPage(pageParam, queryWrapper);
     }

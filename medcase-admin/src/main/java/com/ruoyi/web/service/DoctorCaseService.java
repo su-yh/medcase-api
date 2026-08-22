@@ -8,6 +8,7 @@ import com.ruoyi.mp.mybatis.PageParam;
 import com.ruoyi.mp.mybatis.PageResult;
 import com.ruoyi.mvc.constants.enums.ErrorCodeEnums;
 import com.ruoyi.mvc.exception.ExceptionUtil;
+import com.ruoyi.web.controller.doctor.request.DoctorCasePageRequest;
 import com.ruoyi.web.controller.doctor.request.DoctorCaseSubmitRequest;
 import com.ruoyi.web.controller.doctor.response.DoctorCaseVO;
 import com.ruoyi.web.domain.DoctorCaseEntity;
@@ -53,9 +54,10 @@ public class DoctorCaseService {
         log.info("doctor case submitted, doctorId={}, id={}", doctorId, entity.getId());
     }
 
-    public PageResult<DoctorCaseVO> page(PageParam pageParam, DoctorCaseStatusEnums status) {
+    public PageResult<DoctorCaseVO> page(PageParam pageParam, DoctorCasePageRequest request) {
         Long doctorId = currentDoctorId();
-        PageResult<DoctorCaseEntity> pageResult = doctorCaseMapper.selectDoctorCasePage(doctorId, status, pageParam);
+        PageResult<DoctorCaseEntity> pageResult = doctorCaseMapper.selectDoctorCasePage(
+                pageParam, doctorId, request);
         PageResult<DoctorCaseVO> result = new PageResult<>();
         result.setTotal(pageResult.getTotal());
         result.setList(pageResult.getList().stream()
