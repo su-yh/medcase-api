@@ -27,6 +27,8 @@ public enum ErrorCodeEnums implements IErrorCode {
     DOCTOR_UPDATE_REJECT(2000013, "只允许修改自己的病例"),
     DOCTOR_UPDATE_STATUS_NOT_MATCH(2000014, "只允许修改草稿病例"),
     USER_TYPE_NOT_MATCH(2000015, "禁止访问，用户类型错误"),
+    DOCTOR_DELETE_STATUS_NOT_MATCH(2000016, "只允许删除草稿病例"),
+    DOCTOR_CASE_DELETE_FAILED(2000017, "病例删除失败，请稍后重试"),
     ;
 
     private final int code;

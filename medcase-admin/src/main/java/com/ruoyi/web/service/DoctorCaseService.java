@@ -30,10 +30,16 @@ public class DoctorCaseService {
 
     public void submit(LoginUser loginUser, DoctorCaseSubmitRequest request) {
         Long doctorId = loginUser.getUserId();
-        DoctorCaseEntity historyEntity = doctorCaseMapper.selectById(request.getId());
         DoctorCaseEntity entity = new DoctorCaseEntity();
 
-        if (historyEntity != null) {
+        if (request.getId() == null) {
+            entity.setDoctorId(doctorId);
+            entity.setDoctorNickname(loginUser.getUser().getNickName());
+        } else {
+            DoctorCaseEntity historyEntity = doctorCaseMapper.selectById(request.getId());
+            if (historyEntity == null) {
+                throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_CASE_NOT_FOUND);
+            }
             if (!historyEntity.getDoctorId().equals(doctorId)) {
                 throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_UPDATE_REJECT);
             }
@@ -64,9 +70,14 @@ public class DoctorCaseService {
 
         DoctorCaseEntity entity = new DoctorCaseEntity();
 
-        DoctorCaseEntity historyEntity = request.getId() != null
-                ? doctorCaseMapper.selectById(request.getId()) : null;
-        if (historyEntity != null) {
+        if (request.getId() == null) {
+            entity.setDoctorId(doctorId);
+            entity.setDoctorNickname(loginUser.getUser().getNickName());
+        } else {
+            DoctorCaseEntity historyEntity = doctorCaseMapper.selectById(request.getId());
+            if (historyEntity == null) {
+                throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_CASE_NOT_FOUND);
+            }
             if (!historyEntity.getDoctorId().equals(doctorId)) {
                 throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_UPDATE_REJECT);
             }
@@ -76,9 +87,6 @@ public class DoctorCaseService {
             }
 
             entity.setId(request.getId());
-        } else {
-            entity.setDoctorId(doctorId);
-            entity.setDoctorNickname(loginUser.getUser().getNickName());
         }
 
         entity.setTitle(request.getTitle());
@@ -93,6 +101,28 @@ public class DoctorCaseService {
         }
 
         log.info("doctor case save draft, doctorId={}, id={}", doctorId, request.getId());
+    }
+
+    public void delete(LoginUser loginUser, Long id) {
+        Long doctorId = loginUser.getUserId();
+        DoctorCaseEntity entity = doctorCaseMapper.selectById(id);
+        if (entity == null) {
+            throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_CASE_NOT_FOUND);
+        }
+
+        if (!entity.getDoctorId().equals(doctorId)) {
+            throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_UPDATE_REJECT);
+        }
+
+        if (entity.getStatus() != DoctorCaseStatusEnums.DRAFT) {
+            throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_DELETE_STATUS_NOT_MATCH);
+        }
+
+        if (doctorCaseMapper.deleteById(id) <= 0) {
+            throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_CASE_DELETE_FAILED);
+        }
+
+        log.info("doctor case deleted, doctorId={}, id={}", doctorId, id);
     }
 
     public PageResult<DoctorCaseVO> page(

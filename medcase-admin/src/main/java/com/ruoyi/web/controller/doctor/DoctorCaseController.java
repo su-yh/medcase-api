@@ -65,5 +65,12 @@ public class DoctorCaseController {
         log.trace("doctor case controller detail, id={}", id);
         return doctorCaseService.detail(loginUser, id);
     }
-}
 
+    @RequestMapping(value = "/cases/{id}", method = RequestMethod.DELETE)
+    public void delete(
+            @CurrLoginUser(userType = UserTypeEnums.DOCTOR) LoginUser loginUser,
+            @PathVariable Long id) {
+        log.trace("doctor case controller delete, id={}", id);
+        doctorCaseService.delete(loginUser, id);
+    }
+}
