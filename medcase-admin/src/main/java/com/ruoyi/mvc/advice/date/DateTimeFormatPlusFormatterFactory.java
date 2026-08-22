@@ -21,7 +21,7 @@ import java.util.TimeZone;
  * @author suyh
  * @since 2026-08-22
  */
-public class DateTimeFormatPlusFormatterFactory implements AnnotationFormatterFactory<DateTimeFormatPlus> {
+public class DateTimeFormatPlusFormatterFactory implements AnnotationFormatterFactory<@NonNull DateTimeFormatPlus> {
 
     @Override
     @NonNull
@@ -30,7 +30,6 @@ public class DateTimeFormatPlusFormatterFactory implements AnnotationFormatterFa
     }
 
     @Override
-    // @Nullable
     @NonNull
     public Printer<?> getPrinter(@NonNull DateTimeFormatPlus annotation, @NonNull Class<?> fieldType) {
         // 只做入参解析，不做输出格式化
@@ -44,9 +43,6 @@ public class DateTimeFormatPlusFormatterFactory implements AnnotationFormatterFa
         final OffsetUnit unit = anno.unit();
 
         return (@NonNull String text, @NonNull Locale locale) -> {
-            if (!StringUtils.hasLength(text)) {
-                return null;
-            }
             TimeZone timeZone = LocaleContextHolder.getTimeZone();
 
             DateFormatter dateFormatter = new DateFormatter();
