@@ -28,43 +28,70 @@ import java.util.stream.Collectors;
 public class DoctorCaseService {
     private final DoctorCaseMapper doctorCaseMapper;
 
-    public void update(LoginUser loginUser, DoctorCaseSubmitRequest request, DoctorCaseStatusEnums status) {
+    public void submit(LoginUser loginUser, DoctorCaseSubmitRequest request) {
         Long doctorId = loginUser.getUserId();
         DoctorCaseEntity historyEntity = doctorCaseMapper.selectById(request.getId());
-        if (!historyEntity.getDoctorId().equals(doctorId)) {
-            throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_UPDATE_REJECT);
-        }
-
-        if (historyEntity.getStatus() != DoctorCaseStatusEnums.DRAFT) {
-            throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_UPDATE_STATUS_NOT_MATCH);
-        }
-
         DoctorCaseEntity entity = new DoctorCaseEntity();
-        entity.setId(request.getId());
+
+        if (historyEntity != null) {
+            if (!historyEntity.getDoctorId().equals(doctorId)) {
+                throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_UPDATE_REJECT);
+            }
+
+            if (historyEntity.getStatus() != DoctorCaseStatusEnums.DRAFT) {
+                throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_UPDATE_STATUS_NOT_MATCH);
+            }
+
+            entity.setId(historyEntity.getId());
+        }
+
         entity.setTitle(request.getTitle());
         entity.setRemark(request.getRemark());
         entity.setAttachments(request.getAttachments());
-        entity.setStatus(status);
+        entity.setStatus(DoctorCaseStatusEnums.PENDING_REVIEW);
 
-        doctorCaseMapper.updateById(entity);
+        if (entity.getId() == null) {
+            doctorCaseMapper.insert(entity);
+        } else {
+            doctorCaseMapper.updateById(entity);
+        }
+
+        log.info("doctor case submit, doctorId={}, id={}", doctorId, request.getId());
     }
 
-    public void save(LoginUser loginUser, DoctorCaseSubmitRequest request, DoctorCaseStatusEnums status) {
+    public void saveDraft(LoginUser loginUser, DoctorCaseSubmitRequest request) {
         Long doctorId = loginUser.getUserId();
+
         DoctorCaseEntity entity = new DoctorCaseEntity();
-        entity.setDoctorId(doctorId);
-        entity.setDoctorNickname(loginUser.getUser().getNickName());
+
+        DoctorCaseEntity historyEntity = doctorCaseMapper.selectById(request.getId());
+        if (historyEntity != null) {
+            if (!historyEntity.getDoctorId().equals(doctorId)) {
+                throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_UPDATE_REJECT);
+            }
+
+            if (historyEntity.getStatus() != DoctorCaseStatusEnums.DRAFT) {
+                throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_UPDATE_STATUS_NOT_MATCH);
+            }
+
+            entity.setId(request.getId());
+        } else {
+            entity.setDoctorId(doctorId);
+            entity.setDoctorNickname(loginUser.getUser().getNickName());
+        }
+
         entity.setTitle(request.getTitle());
         entity.setRemark(request.getRemark());
         entity.setAttachments(request.getAttachments());
-        entity.setStatus(status);
+        entity.setStatus(DoctorCaseStatusEnums.DRAFT);
 
-        if (doctorCaseMapper.insert(entity) <= 0) {
-            log.error("doctor case save failed, doctorId={}", doctorId);
-            throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_CASE_SUBMIT_FAILED);
+        if (entity.getId() == null) {
+            doctorCaseMapper.insert(entity);
+        } else {
+            doctorCaseMapper.updateById(entity);
         }
 
-        log.info("doctor case submitted, doctorId={}, id={}", doctorId, entity.getId());
+        log.info("doctor case save draft, doctorId={}, id={}", doctorId, request.getId());
     }
 
     public PageResult<DoctorCaseVO> page(

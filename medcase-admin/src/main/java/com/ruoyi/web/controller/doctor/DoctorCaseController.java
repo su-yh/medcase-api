@@ -8,7 +8,6 @@ import com.ruoyi.mvc.authentication.annotation.CurrLoginUser;
 import com.ruoyi.web.controller.doctor.request.DoctorCasePageRequest;
 import com.ruoyi.web.controller.doctor.request.DoctorCaseSubmitRequest;
 import com.ruoyi.web.controller.doctor.response.DoctorCaseVO;
-import com.ruoyi.web.enums.DoctorCaseStatusEnums;
 import com.ruoyi.web.service.DoctorCaseService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,11 +37,7 @@ public class DoctorCaseController {
             @CurrLoginUser(userType = UserTypeEnums.DOCTOR) LoginUser loginUser,
             @RequestBody DoctorCaseSubmitRequest request) {
         log.trace("doctor case controller submit");
-        if (request.getId() != null) {
-            doctorCaseService.update(loginUser, request, DoctorCaseStatusEnums.PENDING_REVIEW);
-        } else {
-            doctorCaseService.save(loginUser, request, DoctorCaseStatusEnums.PENDING_REVIEW);
-        }
+        doctorCaseService.submit(loginUser, request);
     }
 
     @RequestMapping(value = "/cases/draft", method = RequestMethod.POST)
@@ -50,7 +45,7 @@ public class DoctorCaseController {
             @CurrLoginUser(userType = UserTypeEnums.DOCTOR) LoginUser loginUser,
             @RequestBody DoctorCaseSubmitRequest request) {
         log.trace("doctor case controller saveDraft, request={}", request);
-        doctorCaseService.save(loginUser, request, DoctorCaseStatusEnums.DRAFT);
+        doctorCaseService.saveDraft(loginUser, request);
     }
 
     @RequestMapping(value = "/cases", method = RequestMethod.GET)
