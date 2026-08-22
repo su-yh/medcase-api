@@ -16,8 +16,9 @@ public class DoctorCasePageRequest {
 
     private DoctorCaseStatusEnums status;
 
+    @DateOffset(offsetDays = 0, description = "提交开始日期")
     private Date createTimeLowerBound;
 
-    @DateOffset
+    @DateOffset(description = "提交结束日期")
     private Date createTimeUpperBound;
 }

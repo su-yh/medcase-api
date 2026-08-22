@@ -64,7 +64,7 @@ public class DateOffsetEditor extends PropertyEditorSupport {
     private Date calculateOffset(Date inputDate) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(inputDate);
-        calendar.add(Calendar.DAY_OF_YEAR, 1);
+        calendar.add(Calendar.DAY_OF_YEAR, annotation.offsetDays());
 
         return calendar.getTime();
     }

@@ -26,4 +26,9 @@ public @interface DateOffset {
     String description() default "日期";
 
     boolean required() default false;
+
+    /**
+     * 解析日期后增加的天数，用于表达日期范围的边界。
+     */
+    int offsetDays() default 1;
 }
