@@ -9,6 +9,7 @@ import com.ruoyi.web.enums.DoctorCaseStatusEnums;
 import com.ruoyi.web.service.DoctorCaseService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,13 +26,24 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @Slf4j
 @RequestMapping(value = "/doctor")
+@Validated
 public class DoctorCaseController {
     private final DoctorCaseService doctorCaseService;
 
     @RequestMapping(value = "/cases", method = RequestMethod.POST)
     public void submit(@RequestBody DoctorCaseSubmitRequest request) {
         log.trace("doctor case controller submit");
-        doctorCaseService.submit(request);
+        if (request.getId() != null) {
+            doctorCaseService.update(request, DoctorCaseStatusEnums.PENDING_REVIEW);
+        } else {
+            doctorCaseService.save(request, DoctorCaseStatusEnums.PENDING_REVIEW);
+        }
+    }
+
+    @RequestMapping(value = "/cases/draft", method = RequestMethod.POST)
+    public void saveDraft(@RequestBody DoctorCaseSubmitRequest request) {
+        log.trace("doctor case controller saveDraft, request={}", request);
+        doctorCaseService.save(request, DoctorCaseStatusEnums.DRAFT);
     }
 
     @RequestMapping(value = "/cases", method = RequestMethod.GET)
@@ -46,3 +58,4 @@ public class DoctorCaseController {
         return doctorCaseService.detail(id);
     }
 }
+

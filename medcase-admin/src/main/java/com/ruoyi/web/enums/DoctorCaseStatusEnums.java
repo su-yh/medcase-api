@@ -12,6 +12,7 @@ import lombok.Getter;
  */
 @Getter
 public enum DoctorCaseStatusEnums implements BaseEnum {
+    DRAFT("draft", "草稿"),
     PENDING_REVIEW("pending_review", "待审核"),
     REVIEW_FAILED("review_failed", "审核失败"),
     APPROVED_PENDING_SETTLEMENT("approved_pending_settlement", "审核通过 / 待结算"),

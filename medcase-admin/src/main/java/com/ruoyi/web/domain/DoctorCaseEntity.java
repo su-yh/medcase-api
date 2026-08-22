@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
+import com.ruoyi.mp.entity.AbstractBaseEntity;
 import com.ruoyi.web.enums.DoctorCaseStatusEnums;
 import lombok.Data;
 
@@ -19,7 +20,7 @@ import java.util.List;
  */
 @Data
 @TableName(value = "medcase_doctor_case", autoResultMap = true)
-public class DoctorCaseEntity {
+public class DoctorCaseEntity extends AbstractBaseEntity {
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
@@ -42,9 +43,7 @@ public class DoctorCaseEntity {
 
     private Date settledTime;
 
-    private Date createTime;
 
-    private Date updateTime;
 
     @TableLogic
     private Boolean deleteFlag;

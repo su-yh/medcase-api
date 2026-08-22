@@ -12,6 +12,8 @@ import java.util.List;
  */
 @Data
 public class DoctorCaseSubmitRequest {
+    private Long id;
+
     private String title;
 
     private String remark;

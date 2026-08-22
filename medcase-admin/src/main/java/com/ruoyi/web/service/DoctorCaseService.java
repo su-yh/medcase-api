@@ -18,7 +18,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
 import java.util.stream.Collectors;
 
 /**
@@ -32,22 +31,30 @@ import java.util.stream.Collectors;
 public class DoctorCaseService {
     private final DoctorCaseMapper doctorCaseMapper;
 
-    public void submit(DoctorCaseSubmitRequest request) {
+    public void update(DoctorCaseSubmitRequest request, DoctorCaseStatusEnums status) {
+        DoctorCaseEntity entity = new DoctorCaseEntity();
+        entity.setId(request.getId());
+        entity.setTitle(request.getTitle());
+        entity.setRemark(request.getRemark());
+        entity.setAttachments(request.getAttachments());
+        entity.setStatus(status);
+
+        doctorCaseMapper.updateById(entity);
+    }
+
+    public void save(DoctorCaseSubmitRequest request, DoctorCaseStatusEnums status) {
         SysUser doctor = currentDoctor();
         Long doctorId = doctor.getUserId();
-        Date now = new Date();
         DoctorCaseEntity entity = new DoctorCaseEntity();
         entity.setDoctorId(doctorId);
         entity.setDoctorNickname(doctor.getNickName());
         entity.setTitle(request.getTitle());
         entity.setRemark(request.getRemark());
         entity.setAttachments(request.getAttachments());
-        entity.setStatus(DoctorCaseStatusEnums.PENDING_REVIEW);
-        entity.setCreateTime(now);
-        entity.setUpdateTime(now);
+        entity.setStatus(status);
 
         if (doctorCaseMapper.insert(entity) <= 0) {
-            log.error("doctor case submit failed, doctorId={}", doctorId);
+            log.error("doctor case save failed, doctorId={}", doctorId);
             throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_CASE_SUBMIT_FAILED);
         }
 
