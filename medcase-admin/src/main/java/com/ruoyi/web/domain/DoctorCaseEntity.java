@@ -43,8 +43,6 @@ public class DoctorCaseEntity extends AbstractBaseEntity {
 
     private Date settledTime;
 
-
-
     @TableLogic
     private Boolean deleteFlag;
 }

@@ -64,7 +64,8 @@ public class DoctorCaseService {
 
         DoctorCaseEntity entity = new DoctorCaseEntity();
 
-        DoctorCaseEntity historyEntity = doctorCaseMapper.selectById(request.getId());
+        DoctorCaseEntity historyEntity = request.getId() != null
+                ? doctorCaseMapper.selectById(request.getId()) : null;
         if (historyEntity != null) {
             if (!historyEntity.getDoctorId().equals(doctorId)) {
                 throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_UPDATE_REJECT);

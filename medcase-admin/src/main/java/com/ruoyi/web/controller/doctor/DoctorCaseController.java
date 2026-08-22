@@ -2,6 +2,7 @@ package com.ruoyi.web.controller.doctor;
 
 import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.enums.UserTypeEnums;
+import com.ruoyi.common.validation.groups.ValidationGroups;
 import com.ruoyi.mp.mybatis.PageParam;
 import com.ruoyi.mp.mybatis.PageResult;
 import com.ruoyi.mvc.authentication.annotation.CurrLoginUser;
@@ -9,6 +10,7 @@ import com.ruoyi.web.controller.doctor.request.DoctorCasePageRequest;
 import com.ruoyi.web.controller.doctor.request.DoctorCaseSubmitRequest;
 import com.ruoyi.web.controller.doctor.response.DoctorCaseVO;
 import com.ruoyi.web.service.DoctorCaseService;
+import jakarta.validation.groups.Default;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
@@ -35,7 +37,7 @@ public class DoctorCaseController {
     @RequestMapping(value = "/cases", method = RequestMethod.POST)
     public void submit(
             @CurrLoginUser(userType = UserTypeEnums.DOCTOR) LoginUser loginUser,
-            @RequestBody DoctorCaseSubmitRequest request) {
+            @RequestBody @Validated({ValidationGroups.Doctor.Submit.class, Default.class}) DoctorCaseSubmitRequest request) {
         log.trace("doctor case controller submit");
         doctorCaseService.submit(loginUser, request);
     }
