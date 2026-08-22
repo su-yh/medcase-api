@@ -9,6 +9,7 @@ import com.ruoyi.mvc.error.IErrorCode;
  * @since 2025-05-16
  */
 public enum ErrorCodeEnums implements IErrorCode {
+    USER_NOT_LOGIN(1000401, "用户未登录"),
     ACCESS_DENIED(1000403, "禁止访问"),
     NO_IMPLEMENT(1000404, "功能代码还未实现"),
     SERVICE_ERROR(1000500, "服务错误"),
@@ -23,7 +24,9 @@ public enum ErrorCodeEnums implements IErrorCode {
     DOCTOR_CASE_NOT_FOUND(2000009, "病例不存在"),
     DOCTOR_CASE_SUBMIT_FAILED(2000010, "病例提交失败，请稍后重试"),
     DOCTOR_LOGIN_FAILED(2000012, "医生登录失败，请检查账号和密码"),
-
+    DOCTOR_UPDATE_REJECT(2000013, "只允许修改自己的病例"),
+    DOCTOR_UPDATE_STATUS_NOT_MATCH(2000014, "只允许修改草稿病例"),
+    USER_TYPE_NOT_MATCH(2000015, "禁止访问，用户类型错误"),
     ;
 
     private final int code;

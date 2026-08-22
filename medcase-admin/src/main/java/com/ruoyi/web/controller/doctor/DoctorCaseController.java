@@ -1,7 +1,10 @@
 package com.ruoyi.web.controller.doctor;
 
+import com.ruoyi.common.core.domain.model.LoginUser;
+import com.ruoyi.common.enums.UserTypeEnums;
 import com.ruoyi.mp.mybatis.PageParam;
 import com.ruoyi.mp.mybatis.PageResult;
+import com.ruoyi.mvc.authentication.annotation.CurrLoginUser;
 import com.ruoyi.web.controller.doctor.request.DoctorCasePageRequest;
 import com.ruoyi.web.controller.doctor.request.DoctorCaseSubmitRequest;
 import com.ruoyi.web.controller.doctor.response.DoctorCaseVO;
@@ -31,31 +34,39 @@ public class DoctorCaseController {
     private final DoctorCaseService doctorCaseService;
 
     @RequestMapping(value = "/cases", method = RequestMethod.POST)
-    public void submit(@RequestBody DoctorCaseSubmitRequest request) {
+    public void submit(
+            @CurrLoginUser(userType = UserTypeEnums.DOCTOR) LoginUser loginUser,
+            @RequestBody DoctorCaseSubmitRequest request) {
         log.trace("doctor case controller submit");
         if (request.getId() != null) {
-            doctorCaseService.update(request, DoctorCaseStatusEnums.PENDING_REVIEW);
+            doctorCaseService.update(loginUser, request, DoctorCaseStatusEnums.PENDING_REVIEW);
         } else {
-            doctorCaseService.save(request, DoctorCaseStatusEnums.PENDING_REVIEW);
+            doctorCaseService.save(loginUser, request, DoctorCaseStatusEnums.PENDING_REVIEW);
         }
     }
 
     @RequestMapping(value = "/cases/draft", method = RequestMethod.POST)
-    public void saveDraft(@RequestBody DoctorCaseSubmitRequest request) {
+    public void saveDraft(
+            @CurrLoginUser(userType = UserTypeEnums.DOCTOR) LoginUser loginUser,
+            @RequestBody DoctorCaseSubmitRequest request) {
         log.trace("doctor case controller saveDraft, request={}", request);
-        doctorCaseService.save(request, DoctorCaseStatusEnums.DRAFT);
+        doctorCaseService.save(loginUser, request, DoctorCaseStatusEnums.DRAFT);
     }
 
     @RequestMapping(value = "/cases", method = RequestMethod.GET)
-    public PageResult<DoctorCaseVO> page(PageParam pageParam, DoctorCasePageRequest request) {
+    public PageResult<DoctorCaseVO> page(
+            @CurrLoginUser(userType = UserTypeEnums.DOCTOR) LoginUser loginUser,
+            PageParam pageParam, DoctorCasePageRequest request) {
         log.trace("doctor case controller page, request={}", request);
-        return doctorCaseService.page(pageParam, request);
+        return doctorCaseService.page(loginUser, pageParam, request);
     }
 
     @RequestMapping(value = "/cases/{id}", method = RequestMethod.GET)
-    public DoctorCaseVO detail(@PathVariable Long id) {
+    public DoctorCaseVO detail(
+            @CurrLoginUser(userType = UserTypeEnums.DOCTOR) LoginUser loginUser,
+            @PathVariable Long id) {
         log.trace("doctor case controller detail, id={}", id);
-        return doctorCaseService.detail(id);
+        return doctorCaseService.detail(loginUser, id);
     }
 }
 

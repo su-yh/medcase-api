@@ -1,9 +1,6 @@
 package com.ruoyi.web.service;
 
-import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.domain.model.LoginUser;
-import com.ruoyi.common.enums.UserTypeEnums;
-import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.mp.mybatis.PageParam;
 import com.ruoyi.mp.mybatis.PageResult;
 import com.ruoyi.mvc.constants.enums.ErrorCodeEnums;
@@ -31,7 +28,17 @@ import java.util.stream.Collectors;
 public class DoctorCaseService {
     private final DoctorCaseMapper doctorCaseMapper;
 
-    public void update(DoctorCaseSubmitRequest request, DoctorCaseStatusEnums status) {
+    public void update(LoginUser loginUser, DoctorCaseSubmitRequest request, DoctorCaseStatusEnums status) {
+        Long doctorId = loginUser.getUserId();
+        DoctorCaseEntity historyEntity = doctorCaseMapper.selectById(request.getId());
+        if (!historyEntity.getDoctorId().equals(doctorId)) {
+            throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_UPDATE_REJECT);
+        }
+
+        if (historyEntity.getStatus() != DoctorCaseStatusEnums.DRAFT) {
+            throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_UPDATE_STATUS_NOT_MATCH);
+        }
+
         DoctorCaseEntity entity = new DoctorCaseEntity();
         entity.setId(request.getId());
         entity.setTitle(request.getTitle());
@@ -42,12 +49,11 @@ public class DoctorCaseService {
         doctorCaseMapper.updateById(entity);
     }
 
-    public void save(DoctorCaseSubmitRequest request, DoctorCaseStatusEnums status) {
-        SysUser doctor = currentDoctor();
-        Long doctorId = doctor.getUserId();
+    public void save(LoginUser loginUser, DoctorCaseSubmitRequest request, DoctorCaseStatusEnums status) {
+        Long doctorId = loginUser.getUserId();
         DoctorCaseEntity entity = new DoctorCaseEntity();
         entity.setDoctorId(doctorId);
-        entity.setDoctorNickname(doctor.getNickName());
+        entity.setDoctorNickname(loginUser.getUser().getNickName());
         entity.setTitle(request.getTitle());
         entity.setRemark(request.getRemark());
         entity.setAttachments(request.getAttachments());
@@ -61,8 +67,9 @@ public class DoctorCaseService {
         log.info("doctor case submitted, doctorId={}, id={}", doctorId, entity.getId());
     }
 
-    public PageResult<DoctorCaseVO> page(PageParam pageParam, DoctorCasePageRequest request) {
-        Long doctorId = currentDoctorId();
+    public PageResult<DoctorCaseVO> page(
+            LoginUser loginUser, PageParam pageParam, DoctorCasePageRequest request) {
+        Long doctorId = loginUser.getUserId();
         PageResult<DoctorCaseEntity> pageResult = doctorCaseMapper.selectDoctorCasePage(
                 pageParam, doctorId, request);
         PageResult<DoctorCaseVO> result = new PageResult<>();
@@ -73,24 +80,12 @@ public class DoctorCaseService {
         return result;
     }
 
-    public DoctorCaseVO detail(Long id) {
-        DoctorCaseEntity entity = doctorCaseMapper.selectDoctorCaseById(currentDoctorId(), id);
+    public DoctorCaseVO detail(LoginUser loginUser, Long id) {
+        DoctorCaseEntity entity = doctorCaseMapper.selectDoctorCaseById(loginUser.getUserId(), id);
         if (entity == null) {
             throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_CASE_NOT_FOUND);
         }
         return DoctorCaseVO.fromEntity(entity);
     }
 
-    private Long currentDoctorId() {
-        return currentDoctor().getUserId();
-    }
-
-    private SysUser currentDoctor() {
-        LoginUser loginUser = SecurityUtils.getLoginUser();
-        SysUser user = loginUser.getUser();
-        if (user == null || !UserTypeEnums.DOCTOR.equals(user.getUserType())) {
-            throw ExceptionUtil.business(ErrorCodeEnums.ACCESS_DENIED);
-        }
-        return user;
-    }
 }
