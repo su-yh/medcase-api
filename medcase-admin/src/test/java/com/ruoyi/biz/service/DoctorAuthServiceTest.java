@@ -67,7 +67,7 @@ class DoctorAuthServiceTest {
     @Test
     void registerInsertsDoctorUserWithEncryptedPassword() {
         DoctorRegisterRequest registerRequest = registerRequest("doctor01", "secret123");
-        when(doctorUserMapper.usernameExists("doctor01")).thenReturn(false);
+        when(doctorUserMapper.selectDoctorByUsername("doctor01")).thenReturn(null);
         when(doctorUserMapper.insert(any(DoctorUserEntity.class))).thenReturn(1);
 
         doctorAuthService.register(registerRequest);
@@ -78,23 +78,41 @@ class DoctorAuthServiceTest {
         assertEquals("doctor01", user.getUserName());
         assertEquals("doctor01", user.getNickName());
         assertEquals(UserTypeEnums.DOCTOR, user.getUserType());
-        assertEquals(UserStatusEnums.OK.getCode(), user.getStatus());
+        assertEquals(UserStatusEnums.PENDING_REVIEW, user.getStatus());
         assertEquals(null, user.getDelFlag());
         assertNotNull(user.getPwdUpdateDate());
         assertTrue(SecurityUtils.matchesPassword("secret123", user.getPassword()));
-        verify(doctorUserMapper).usernameExists("doctor01");
+        verify(doctorUserMapper).selectDoctorByUsername("doctor01");
     }
 
     @Test
     void registerRejectsDuplicateDoctorUsername() {
         DoctorRegisterRequest registerRequest = registerRequest("doctor01", "secret123");
-        when(doctorUserMapper.usernameExists("doctor01")).thenReturn(true);
+        when(doctorUserMapper.selectDoctorByUsername("doctor01"))
+                .thenReturn(doctorUser("doctor01", "secret123", UserStatusEnums.OK));
 
         AbstractBusinessException exception = assertThrows(AbstractBusinessException.class, () -> doctorAuthService.register(registerRequest));
 
         assertEquals(ErrorCodeEnums.DOCTOR_REGISTER_USER_EXISTS, exception.getEc());
         verify(doctorUserMapper, never()).insert(any(DoctorUserEntity.class));
-        verify(doctorUserMapper).usernameExists("doctor01");
+        verify(doctorUserMapper).selectDoctorByUsername("doctor01");
+    }
+
+    @Test
+    void registerResubmitsDoctorAfterReviewFailed() {
+        DoctorRegisterRequest registerRequest = registerRequest("doctor01", "newSecret123");
+        DoctorUserEntity existingUser = doctorUser(
+                "doctor01", "oldSecret123", UserStatusEnums.REVIEW_FAILED);
+        when(doctorUserMapper.selectDoctorByUsername("doctor01")).thenReturn(existingUser);
+        when(doctorUserMapper.updateById(existingUser)).thenReturn(1);
+
+        doctorAuthService.register(registerRequest);
+
+        assertEquals(UserStatusEnums.PENDING_REVIEW, existingUser.getStatus());
+        assertTrue(SecurityUtils.matchesPassword("newSecret123", existingUser.getPassword()));
+        assertNotNull(existingUser.getPwdUpdateDate());
+        verify(doctorUserMapper).updateById(existingUser);
+        verify(doctorUserMapper, never()).insert(any(DoctorUserEntity.class));
     }
 
     @Test
@@ -140,13 +158,13 @@ class DoctorAuthServiceTest {
     @Test
     void registerRejectsInsertFailure() {
         DoctorRegisterRequest registerRequest = registerRequest("doctor01", "secret123");
-        when(doctorUserMapper.usernameExists("doctor01")).thenReturn(false);
+        when(doctorUserMapper.selectDoctorByUsername("doctor01")).thenReturn(null);
         when(doctorUserMapper.insert(any(DoctorUserEntity.class))).thenReturn(0);
 
         AbstractBusinessException exception = assertThrows(AbstractBusinessException.class, () -> doctorAuthService.register(registerRequest));
 
         assertEquals(ErrorCodeEnums.DOCTOR_REGISTER_FAILED, exception.getEc());
-        verify(doctorUserMapper).usernameExists("doctor01");
+        verify(doctorUserMapper).selectDoctorByUsername("doctor01");
     }
 
     @Test
@@ -203,6 +221,44 @@ class DoctorAuthServiceTest {
     }
 
     @Test
+    void loginRejectsDoctorPendingReview() {
+        DoctorLoginRequest loginRequest = loginRequest("doctor01", "secret123");
+        when(doctorUserMapper.selectDoctorByUsername("doctor01"))
+                .thenReturn(doctorUser("doctor01", "secret123", UserStatusEnums.PENDING_REVIEW));
+
+        AbstractBusinessException exception =
+                assertThrows(AbstractBusinessException.class, () -> doctorAuthService.login(loginRequest));
+
+        assertEquals(ErrorCodeEnums.DOCTOR_LOGIN_PENDING_REVIEW, exception.getEc());
+        verify(tokenService, never()).createToken(any(LoginUser.class));
+    }
+
+    @Test
+    void loginRejectsDisabledDoctor() {
+        DoctorLoginRequest loginRequest = loginRequest("doctor01", "secret123");
+        when(doctorUserMapper.selectDoctorByUsername("doctor01"))
+                .thenReturn(doctorUser("doctor01", "secret123", UserStatusEnums.DISABLE));
+
+        AbstractBusinessException exception =
+                assertThrows(AbstractBusinessException.class, () -> doctorAuthService.login(loginRequest));
+
+        assertEquals(ErrorCodeEnums.DOCTOR_LOGIN_FAILED, exception.getEc());
+        verify(tokenService, never()).createToken(any(LoginUser.class));
+    }
+
+    @Test
+    void loginRejectsDoctorWhoseReviewFailed() {
+        DoctorLoginRequest loginRequest = loginRequest("doctor01", "secret123");
+        when(doctorUserMapper.selectDoctorByUsername("doctor01"))
+                .thenReturn(doctorUser("doctor01", "secret123", UserStatusEnums.REVIEW_FAILED));
+
+        AbstractBusinessException exception =
+                assertThrows(AbstractBusinessException.class, () -> doctorAuthService.login(loginRequest));
+
+        assertEquals(ErrorCodeEnums.DOCTOR_LOGIN_REVIEW_FAILED, exception.getEc());
+        verify(tokenService, never()).createToken(any(LoginUser.class));
+    }
+    @Test
     void loginRejectsWrongPassword() {
         DoctorLoginRequest loginRequest = loginRequest("doctor01", "badpass");
         when(doctorUserMapper.selectDoctorByUsername("doctor01")).thenReturn(doctorUser("doctor01", "secret123"));
@@ -246,13 +302,18 @@ class DoctorAuthServiceTest {
     }
 
     private DoctorUserEntity doctorUser(String username, String rawPassword) {
+        return doctorUser(username, rawPassword, UserStatusEnums.OK);
+    }
+
+    private DoctorUserEntity doctorUser(
+            String username, String rawPassword, UserStatusEnums status) {
         DoctorUserEntity user = new DoctorUserEntity();
         user.setUserId(12L);
         user.setUserName(username);
         user.setNickName(username);
         user.setUserType(UserTypeEnums.DOCTOR);
         user.setPassword(SecurityUtils.encryptPassword(rawPassword));
-        user.setStatus(UserStatusEnums.OK);
+        user.setStatus(status);
         return user;
     }
 }

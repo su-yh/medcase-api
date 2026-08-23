@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 
 /**
- * 医生病例接口
+ * 医生端病例接口
  *
  * @author suyh
  */

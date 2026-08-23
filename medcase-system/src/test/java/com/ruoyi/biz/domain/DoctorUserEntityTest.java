@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.baomidou.mybatisplus.annotation.TableLogic;
+import com.ruoyi.common.enums.UserStatusEnums;
 import java.lang.reflect.Field;
 import org.junit.jupiter.api.Test;
 
@@ -25,5 +26,17 @@ class DoctorUserEntityTest {
     void doesNotContainDepartmentField() {
         assertThrows(NoSuchFieldException.class,
                 () -> DoctorUserEntity.class.getDeclaredField("deptId"));
+    }
+
+    @Test
+    void exposesPendingReviewStatus() {
+        assertEquals("3", UserStatusEnums.PENDING_REVIEW.getCode());
+        assertEquals("待审核", UserStatusEnums.PENDING_REVIEW.getDesc());
+    }
+
+    @Test
+    void exposesReviewFailedStatus() {
+        assertEquals("4", UserStatusEnums.REVIEW_FAILED.getCode());
+        assertEquals("审核失败", UserStatusEnums.REVIEW_FAILED.getDesc());
     }
 }

@@ -1,6 +1,7 @@
 package com.ruoyi.biz.controller;
 
 import com.ruoyi.biz.request.DoctorUserQuery;
+import com.ruoyi.biz.request.DoctorUserReviewRequest;
 import com.ruoyi.biz.response.DoctorUserVO;
 import com.ruoyi.mp.mybatis.PageResult;
 import com.ruoyi.mp.mybatis.PageParam;
@@ -19,10 +20,13 @@ class DoctorUserControllerTest {
         Method list = DoctorUserController.class.getMethod(
                 "list", PageParam.class, DoctorUserQuery.class);
         Method detail = DoctorUserController.class.getMethod("getInfo", Long.class);
+        Method review = DoctorUserController.class.getMethod(
+                "review", Long.class, DoctorUserReviewRequest.class);
 
         assertEquals("/biz/doctor-user", mapping.value()[0]);
         assertEquals(PageResult.class, list.getReturnType());
         assertEquals(DoctorUserVO.class, detail.getReturnType());
+        assertEquals(void.class, review.getReturnType());
         assertFalse(DoctorUserController.class.getSuperclass().getName()
                 .equals("com.ruoyi.common.core.controller.BaseController"));
     }

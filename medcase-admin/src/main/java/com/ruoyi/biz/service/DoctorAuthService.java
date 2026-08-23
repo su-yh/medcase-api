@@ -54,18 +54,26 @@ public class DoctorAuthService {
         } else if (password.length() < UserConstants.PASSWORD_MIN_LENGTH
                 || password.length() > UserConstants.PASSWORD_MAX_LENGTH) {
             throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_REGISTER_PASSWORD_LENGTH_INVALID);
-        } else if (existsDoctorUsername(username)) {
-            throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_REGISTER_USER_EXISTS, username);
         }
 
-        DoctorUserEntity user = new DoctorUserEntity();
-        user.setUserName(username);
+        DoctorUserEntity user = doctorUserMapper.selectDoctorByUsername(username);
+        if (user != null && user.getStatus() != UserStatusEnums.REVIEW_FAILED) {
+            throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_REGISTER_USER_EXISTS, username);
+        }
+        if (user == null) {
+            user = new DoctorUserEntity();
+            user.setUserName(username);
+            user.setUserType(UserTypeEnums.DOCTOR);
+        }
+
         user.setNickName(username);
-        user.setUserType(UserTypeEnums.DOCTOR);
-        user.setStatus(UserStatusEnums.OK);
+        user.setStatus(UserStatusEnums.PENDING_REVIEW);
         user.setPwdUpdateDate(DateUtils.getNowDate());
         user.setPassword(SecurityUtils.encryptPassword(password));
-        if (doctorUserMapper.insert(user) <= 0) {
+        int affectedRows = user.getUserId() == null
+                ? doctorUserMapper.insert(user)
+                : doctorUserMapper.updateById(user);
+        if (affectedRows <= 0) {
             throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_REGISTER_FAILED);
         }
         log.info("doctor register success, username={}", username);
@@ -81,7 +89,13 @@ public class DoctorAuthService {
         if (doctorUser == null) {
             log.warn("doctor login failed, user not exists, username={}", username);
             throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_LOGIN_USER_NOT_EXISTS);
-        } else if (UserStatusEnums.DISABLE.getCode().equals(doctorUser.getStatus())) {
+        } else if (doctorUser.getStatus() == UserStatusEnums.PENDING_REVIEW) {
+            log.warn("doctor login failed, user pending review, username={}", username);
+            throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_LOGIN_PENDING_REVIEW);
+        } else if (doctorUser.getStatus() == UserStatusEnums.REVIEW_FAILED) {
+            log.warn("doctor login failed, user review failed, username={}", username);
+            throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_LOGIN_REVIEW_FAILED);
+        } else if (doctorUser.getStatus() != UserStatusEnums.OK) {
             log.warn("doctor login failed, user disabled, username={}", username);
             throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_LOGIN_FAILED);
         } else if (!SecurityUtils.matchesPassword(loginBody.getPassword(), doctorUser.getPassword())) {
@@ -106,10 +120,6 @@ public class DoctorAuthService {
         LoginUser loginUser = SecurityUtils.getLoginUser();
         tokenService.delLoginUser(loginUser.getToken());
         log.info("doctor logout success, username={}, userId={}", loginUser.getUsername(), loginUser.getUserId());
-    }
-
-    private boolean existsDoctorUsername(String username) {
-        return doctorUserMapper.usernameExists(username);
     }
 
     private SysUser toSysUser(DoctorUserEntity doctorUser) {

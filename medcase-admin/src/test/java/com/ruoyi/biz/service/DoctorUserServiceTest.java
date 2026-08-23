@@ -2,6 +2,7 @@ package com.ruoyi.biz.service;
 
 import com.ruoyi.biz.domain.DoctorUserEntity;
 import com.ruoyi.biz.mapper.DoctorUserMapper;
+import com.ruoyi.biz.request.DoctorUserReviewRequest;
 import com.ruoyi.biz.request.DoctorUserQuery;
 import com.ruoyi.biz.response.DoctorUserVO;
 import com.ruoyi.common.enums.UserStatusEnums;
@@ -66,5 +67,41 @@ class DoctorUserServiceTest {
         when(doctorUserMapper.selectDoctorById(1L)).thenReturn(user);
 
         assertNull(doctorUserService.detail(1L));
+    }
+
+    @Test
+    void reviewApprovesPendingDoctor() {
+        DoctorUserEntity user = new DoctorUserEntity();
+        user.setUserId(1L);
+        user.setUserType(UserTypeEnums.DOCTOR);
+        user.setStatus(UserStatusEnums.PENDING_REVIEW);
+        when(doctorUserMapper.selectDoctorById(1L)).thenReturn(user);
+        when(doctorUserMapper.updateById(user)).thenReturn(1);
+
+        DoctorUserReviewRequest request = new DoctorUserReviewRequest();
+        request.setApprove(true);
+
+        doctorUserService.review(1L, request);
+
+        assertEquals(UserStatusEnums.OK, user.getStatus());
+        verify(doctorUserMapper).updateById(user);
+    }
+
+    @Test
+    void reviewRejectsPendingDoctorWithReviewFailedStatus() {
+        DoctorUserEntity user = new DoctorUserEntity();
+        user.setUserId(1L);
+        user.setUserType(UserTypeEnums.DOCTOR);
+        user.setStatus(UserStatusEnums.PENDING_REVIEW);
+        when(doctorUserMapper.selectDoctorById(1L)).thenReturn(user);
+        when(doctorUserMapper.updateById(user)).thenReturn(1);
+
+        DoctorUserReviewRequest request = new DoctorUserReviewRequest();
+        request.setApprove(false);
+
+        doctorUserService.review(1L, request);
+
+        assertEquals(UserStatusEnums.REVIEW_FAILED, user.getStatus());
+        verify(doctorUserMapper).updateById(user);
     }
 }
