@@ -4,6 +4,9 @@ import com.ruoyi.common.annotation.Anonymous;
 import com.ruoyi.biz.request.DoctorLoginRequest;
 import com.ruoyi.biz.request.DoctorRegisterRequest;
 import com.ruoyi.biz.service.DoctorAuthService;
+import com.ruoyi.common.core.domain.model.LoginUser;
+import com.ruoyi.common.enums.UserTypeEnums;
+import com.ruoyi.mvc.authentication.annotation.CurrLoginUser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -39,8 +42,8 @@ public class DoctorAuthPortalController {
     }
 
     @RequestMapping(value = "/logout", method = RequestMethod.POST)
-    public void logout() {
+    public void logout(@CurrLoginUser(userType = UserTypeEnums.DOCTOR) LoginUser doctorUser) {
         log.trace("doctor auth controller logout");
-        doctorAuthService.logout();
+        doctorAuthService.logout(doctorUser);
     }
 }
