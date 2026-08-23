@@ -43,7 +43,7 @@ public class UserDetailsServiceImpl implements UserDetailsService
             log.info("登录用户：{} 不存在.", username);
             throw new ServiceException(MessageUtils.message("user.not.exists"));
         }
-        else if (UserStatus.DELETED.getCode().equals(user.getDelFlag()))
+        else if (Boolean.TRUE.equals(user.getDelFlag()))
         {
             log.info("登录用户：{} 已被删除.", username);
             throw new ServiceException(MessageUtils.message("user.password.delete"));

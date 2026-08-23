@@ -17,7 +17,8 @@ class DoctorUserEntityTest {
 
         assertNotNull(tableLogic);
         assertEquals("0", tableLogic.value());
-        assertEquals("1", tableLogic.delval());
+        assertEquals("2", tableLogic.delval());
+        assertEquals(Boolean.class, field.getType());
     }
 
     @Test

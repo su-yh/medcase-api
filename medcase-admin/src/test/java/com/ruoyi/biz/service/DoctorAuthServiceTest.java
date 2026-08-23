@@ -152,6 +152,7 @@ class DoctorAuthServiceTest {
     void loginCreatesTokenForDoctorUserAndUpdatesLoginInfo() {
         DoctorLoginRequest loginRequest = loginRequest("doctor01", "secret123");
         DoctorUserEntity doctor = doctorUser("doctor01", "secret123");
+        doctor.setDelFlag(Boolean.FALSE);
         when(doctorUserMapper.selectDoctorByUsername("doctor01")).thenReturn(doctor);
         when(permissionService.getMenuPermission(any(SysUser.class))).thenReturn(Set.of("doctor:home"));
         when(tokenService.createToken(any(LoginUser.class))).thenReturn("doctor-token");
@@ -165,8 +166,27 @@ class DoctorAuthServiceTest {
         assertEquals(12L, loginUser.getUserId());
         assertEquals(UserTypeEnums.DOCTOR, loginUser.getUser().getUserType());
         assertEquals(Set.of("doctor:home"), loginUser.getPermissions());
+        ArgumentCaptor<SysUser> sysUserCaptor = ArgumentCaptor.forClass(SysUser.class);
+        verify(permissionService).getMenuPermission(sysUserCaptor.capture());
+        assertEquals(Boolean.FALSE, sysUserCaptor.getValue().getDelFlag());
         verify(doctorUserMapper).selectDoctorByUsername("doctor01");
         verify(doctorUserMapper).updateById(any(DoctorUserEntity.class));
+    }
+
+    @Test
+    void loginCopiesDeletedDoctorDelFlagToSysUser() {
+        DoctorLoginRequest loginRequest = loginRequest("doctor01", "secret123");
+        DoctorUserEntity doctor = doctorUser("doctor01", "secret123");
+        doctor.setDelFlag(Boolean.TRUE);
+        when(doctorUserMapper.selectDoctorByUsername("doctor01")).thenReturn(doctor);
+        when(permissionService.getMenuPermission(any(SysUser.class))).thenReturn(Set.of());
+        when(tokenService.createToken(any(LoginUser.class))).thenReturn("doctor-token");
+
+        doctorAuthService.login(loginRequest);
+
+        ArgumentCaptor<SysUser> sysUserCaptor = ArgumentCaptor.forClass(SysUser.class);
+        verify(permissionService).getMenuPermission(sysUserCaptor.capture());
+        assertEquals(Boolean.TRUE, sysUserCaptor.getValue().getDelFlag());
     }
 
     @Test
