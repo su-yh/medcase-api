@@ -18,7 +18,7 @@ public enum ErrorCodeEnums implements IErrorCode {
     DOCTOR_REGISTER_PASSWORD_EMPTY(2000002, "医生注册密码不能为空"),
     DOCTOR_REGISTER_USERNAME_LENGTH_INVALID(2000003, "医生注册用户名长度必须在2到20个字符之间"),
     DOCTOR_REGISTER_PASSWORD_LENGTH_INVALID(2000004, "医生注册密码长度必须在5到20个字符之间"),
-    DOCTOR_REGISTER_USER_EXISTS(2000005, "保存用户'{0}'失败，注册账号已存在"),
+    DOCTOR_REGISTER_USER_EXISTS(2000005, "注册失败，\"{0}\"已存在"),
     DOCTOR_REGISTER_FAILED(2000006, "医生注册失败，请联系系统管理人员"),
     DOCTOR_LOGIN_USER_NOT_EXISTS(2000007, "医生账号不存在"),
     DOCTOR_LOGIN_PENDING_REVIEW(2000008, "医生账号待管理员审核"),

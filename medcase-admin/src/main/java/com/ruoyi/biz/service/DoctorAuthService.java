@@ -57,14 +57,12 @@ public class DoctorAuthService {
         }
 
         DoctorUserEntity user = doctorUserMapper.selectDoctorByUsername(username);
-        if (user != null && user.getStatus() != UserStatusEnums.REVIEW_FAILED) {
+        if (user != null) {
             throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_REGISTER_USER_EXISTS, username);
         }
-        if (user == null) {
-            user = new DoctorUserEntity();
-            user.setUserName(username);
-            user.setUserType(UserTypeEnums.DOCTOR);
-        }
+        user = new DoctorUserEntity();
+        user.setUserName(username);
+        user.setUserType(UserTypeEnums.DOCTOR);
 
         user.setNickName(username);
         user.setStatus(UserStatusEnums.PENDING_REVIEW);
