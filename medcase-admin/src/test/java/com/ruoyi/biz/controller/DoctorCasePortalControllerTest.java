@@ -10,19 +10,19 @@ import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class DoctorCaseControllerTest {
+class DoctorCasePortalControllerTest {
     @Test
     void caseControllerUsesIndependentBizCasesRoute() {
-        RequestMapping mapping = DoctorCaseController.class.getAnnotation(RequestMapping.class);
+        RequestMapping mapping = DoctorCasePortalController.class.getAnnotation(RequestMapping.class);
 
         assertEquals("com.ruoyi.biz.controller",
-                DoctorCaseController.class.getPackageName());
+                DoctorCasePortalController.class.getPackageName());
         assertEquals("/biz/cases", mapping.value()[0]);
     }
 
     @Test
     void caseControllerUsesDoctorClientRoutes() {
-        Map<String, RequestMapping> mappings = Arrays.stream(DoctorCaseController.class.getDeclaredMethods())
+        Map<String, RequestMapping> mappings = Arrays.stream(DoctorCasePortalController.class.getDeclaredMethods())
                 .collect(Collectors.toMap(Method::getName,
                         method -> method.getAnnotation(RequestMapping.class)));
 

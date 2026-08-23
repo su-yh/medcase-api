@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/biz/case-review")
-public class DoctorCaseReviewController {
+public class DoctorCaseReviewAdminController {
     private final DoctorCaseReviewService doctorCaseReviewService;
 
     @PreAuthorize("@ss.hasPermi('biz:case:review:list')")

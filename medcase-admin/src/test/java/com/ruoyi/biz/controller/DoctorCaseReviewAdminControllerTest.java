@@ -16,20 +16,20 @@ import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
-class DoctorCaseReviewControllerTest {
+class DoctorCaseReviewAdminControllerTest {
     @Test
     void reviewControllerSharesCaseInfoPackageAndUsesNewResponseTypes() throws NoSuchMethodException {
-        RequestMapping mapping = DoctorCaseReviewController.class.getAnnotation(RequestMapping.class);
-        Method list = DoctorCaseReviewController.class.getMethod(
+        RequestMapping mapping = DoctorCaseReviewAdminController.class.getAnnotation(RequestMapping.class);
+        Method list = DoctorCaseReviewAdminController.class.getMethod(
                 "list", Integer.class, Integer.class, DoctorCaseReviewQuery.class);
-        Method detail = DoctorCaseReviewController.class.getMethod("getInfo", Long.class);
-        Method review = DoctorCaseReviewController.class.getMethod(
+        Method detail = DoctorCaseReviewAdminController.class.getMethod("getInfo", Long.class);
+        Method review = DoctorCaseReviewAdminController.class.getMethod(
                 "review", LoginUser.class, Long.class, DoctorCaseReviewRequest.class);
-        Method settle = DoctorCaseReviewController.class.getMethod(
+        Method settle = DoctorCaseReviewAdminController.class.getMethod(
                 "settle", LoginUser.class, Long.class);
 
         assertEquals("com.ruoyi.biz.controller",
-                DoctorCaseReviewController.class.getPackageName());
+                DoctorCaseReviewAdminController.class.getPackageName());
         assertEquals("/biz/case-review", mapping.value()[0]);
         assertEquals(PageResult.class, list.getReturnType());
         assertEquals(DoctorCaseReviewVO.class, detail.getReturnType());
@@ -37,7 +37,7 @@ class DoctorCaseReviewControllerTest {
         assertEquals(void.class, settle.getReturnType());
         assertEquals("/{id}/review", review.getAnnotation(PostMapping.class).value()[0]);
         assertEquals("/{id}/settle", settle.getAnnotation(PostMapping.class).value()[0]);
-        assertFalse(hasLegacyResponseType(DoctorCaseReviewController.class));
+        assertFalse(hasLegacyResponseType(DoctorCaseReviewAdminController.class));
     }
 
     private boolean hasLegacyResponseType(Class<?> controllerClass) {

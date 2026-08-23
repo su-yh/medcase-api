@@ -15,8 +15,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-class DoctorAuthControllerTest {
-    private DoctorAuthController doctorController;
+class DoctorAuthPortalControllerTest {
+    private DoctorAuthPortalController doctorController;
 
     @Mock
     private DoctorAuthService doctorAuthService;
@@ -24,12 +24,12 @@ class DoctorAuthControllerTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        doctorController = new DoctorAuthController(doctorAuthService);
+        doctorController = new DoctorAuthPortalController(doctorAuthService);
     }
 
     @Test
     void authControllerUsesBizDoctorRoute() {
-        RequestMapping mapping = DoctorAuthController.class.getAnnotation(RequestMapping.class);
+        RequestMapping mapping = DoctorAuthPortalController.class.getAnnotation(RequestMapping.class);
 
         assertNotNull(mapping);
         assertEquals("/biz/doctor-auth", mapping.value()[0]);
@@ -52,10 +52,10 @@ class DoctorAuthControllerTest {
 
     @Test
     void loginAndRegisterAreAnonymous() throws NoSuchMethodException {
-        assertNotNull(DoctorAuthController.class
+        assertNotNull(DoctorAuthPortalController.class
                 .getMethod("login", DoctorLoginRequest.class)
                 .getAnnotation(Anonymous.class));
-        assertNotNull(DoctorAuthController.class
+        assertNotNull(DoctorAuthPortalController.class
                 .getMethod("register", DoctorRegisterRequest.class)
                 .getAnnotation(Anonymous.class));
     }

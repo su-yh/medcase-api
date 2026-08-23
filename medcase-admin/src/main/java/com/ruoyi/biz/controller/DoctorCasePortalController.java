@@ -31,7 +31,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RequestMapping(value = "/biz/cases")
 @Validated
-public class DoctorCaseController {
+public class DoctorCasePortalController {
     private final DoctorCaseService doctorCaseService;
 
     @RequestMapping(method = RequestMethod.POST)

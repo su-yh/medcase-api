@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/biz/doctor-user")
-public class DoctorUserController {
+public class DoctorUserAdminController {
     private final DoctorUserService doctorUserService;
 
     @PreAuthorize("@ss.hasPermi('biz:doctor:list')")

@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @Slf4j
 @RequestMapping(value = "/biz/doctor-auth")
-public class DoctorAuthController {
+public class DoctorAuthPortalController {
     private final DoctorAuthService doctorAuthService;
 
     @Anonymous
