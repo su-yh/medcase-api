@@ -17,7 +17,9 @@ import com.ruoyi.biz.request.DoctorCaseSubmitRequest;
 import com.ruoyi.biz.domain.DoctorCaseEntity;
 import com.ruoyi.biz.enums.DoctorCaseStatusEnums;
 import com.ruoyi.biz.mapper.DoctorCaseMapper;
+import com.ruoyi.biz.response.DoctorCaseVO;
 import java.io.Serializable;
+import java.util.Date;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import org.junit.jupiter.api.BeforeEach;
@@ -161,6 +163,24 @@ class DoctorCaseServiceTest {
                 () -> doctorCaseService.delete(loginUser, 42L));
 
         assertEquals(ErrorCodeEnums.DOCTOR_CASE_DELETE_FAILED, exception.getEc());
+    }
+
+    @Test
+    void caseViewIncludesReviewAndSettlementOperators() {
+        DoctorCaseEntity entity = caseEntity(42L, 12L, DoctorCaseStatusEnums.SETTLED);
+        Date reviewTime = new Date(1_000L);
+        Date settledTime = new Date(2_000L);
+        entity.setReviewerNickname("审核员");
+        entity.setReviewTime(reviewTime);
+        entity.setSettlerNickname("结算员");
+        entity.setSettledTime(settledTime);
+
+        DoctorCaseVO result = DoctorCaseVO.fromEntity(entity);
+
+        assertEquals("审核员", result.getReviewerNickname());
+        assertEquals(reviewTime, result.getReviewTime());
+        assertEquals("结算员", result.getSettlerNickname());
+        assertEquals(settledTime, result.getSettledTime());
     }
 
     private LoginUser loginUser(Long userId) {

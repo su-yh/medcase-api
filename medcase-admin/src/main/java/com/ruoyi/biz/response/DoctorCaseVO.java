@@ -31,7 +31,11 @@ public class DoctorCaseVO {
 
     private String reviewReason;
 
+    private String reviewerNickname;
+
     private Date reviewTime;
+
+    private String settlerNickname;
 
     private Date settledTime;
 
@@ -47,7 +51,9 @@ public class DoctorCaseVO {
         result.setStatus(entity.getStatus());
         result.setStatusDesc(entity.getStatus() == null ? null : entity.getStatus().getDesc());
         result.setReviewReason(entity.getReviewReason());
+        result.setReviewerNickname(entity.getReviewerNickname());
         result.setReviewTime(entity.getReviewTime());
+        result.setSettlerNickname(entity.getSettlerNickname());
         result.setSettledTime(entity.getSettledTime());
         result.setCreateTime(entity.getCreateTime());
         return result;
