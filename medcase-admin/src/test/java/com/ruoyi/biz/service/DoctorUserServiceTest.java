@@ -1,23 +1,25 @@
 package com.ruoyi.biz.service;
 
+import com.ruoyi.biz.domain.DoctorUserEntity;
+import com.ruoyi.biz.mapper.DoctorUserMapper;
+import com.ruoyi.biz.request.DoctorUserQuery;
+import com.ruoyi.biz.response.DoctorUserVO;
+import com.ruoyi.common.enums.UserStatusEnums;
+import com.ruoyi.common.enums.UserTypeEnums;
+import com.ruoyi.mp.mybatis.PageParam;
+import com.ruoyi.mp.mybatis.PageResult;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
-import com.ruoyi.common.enums.UserTypeEnums;
-import com.ruoyi.biz.request.DoctorUserQuery;
-import com.ruoyi.biz.response.DoctorUserVO;
-import com.ruoyi.biz.domain.DoctorUserEntity;
-import com.ruoyi.biz.mapper.DoctorUserMapper;
-import com.ruoyi.mp.mybatis.PageResult;
-import com.ruoyi.mp.mybatis.PageParam;
-import java.util.List;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 
 class DoctorUserServiceTest {
     private DoctorUserService doctorUserService;
@@ -43,7 +45,7 @@ class DoctorUserServiceTest {
         user.setNickName("张医生");
         user.setUserName("doctor01");
         user.setPhonenumber("13800000000");
-        user.setStatus("0");
+        user.setStatus(UserStatusEnums.OK);
         when(doctorUserMapper.selectDoctorPage(any(PageParam.class), org.mockito.ArgumentMatchers.same(query)))
                 .thenReturn(new PageResult<>(List.of(user), 1L));
 

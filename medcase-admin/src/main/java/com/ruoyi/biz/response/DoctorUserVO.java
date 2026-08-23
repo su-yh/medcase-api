@@ -2,8 +2,9 @@ package com.ruoyi.biz.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.ruoyi.biz.domain.DoctorUserEntity;
-import java.util.Date;
 import lombok.Data;
+
+import java.util.Date;
 
 /**
  * 医生管理返回对象
@@ -31,7 +32,9 @@ public class DoctorUserVO {
         result.setName(user.getNickName());
         result.setUsername(user.getUserName());
         result.setPhone(user.getPhonenumber());
-        result.setStatus(user.getStatus());
+        if (user.getStatus() != null) {
+            result.setStatus(user.getStatus().getCode());
+        }
         result.setCreateTime(user.getCreateTime());
         return result;
     }

@@ -1,22 +1,22 @@
 package com.ruoyi.biz.service;
 
+import com.ruoyi.biz.domain.DoctorUserEntity;
+import com.ruoyi.biz.mapper.DoctorUserMapper;
+import com.ruoyi.biz.request.DoctorLoginRequest;
+import com.ruoyi.biz.request.DoctorRegisterRequest;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.domain.model.LoginUser;
-import com.ruoyi.common.enums.UserStatus;
+import com.ruoyi.common.enums.UserStatusEnums;
 import com.ruoyi.common.enums.UserTypeEnums;
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.ip.IpUtils;
-import com.ruoyi.mvc.constants.enums.ErrorCodeEnums;
-import com.ruoyi.mvc.exception.ExceptionUtil;
 import com.ruoyi.framework.web.service.SysLoginService;
 import com.ruoyi.framework.web.service.SysPermissionService;
 import com.ruoyi.framework.web.service.TokenService;
-import com.ruoyi.biz.request.DoctorLoginRequest;
-import com.ruoyi.biz.request.DoctorRegisterRequest;
-import com.ruoyi.biz.domain.DoctorUserEntity;
-import com.ruoyi.biz.mapper.DoctorUserMapper;
+import com.ruoyi.mvc.constants.enums.ErrorCodeEnums;
+import com.ruoyi.mvc.exception.ExceptionUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -62,7 +62,7 @@ public class DoctorAuthService {
         user.setUserName(username);
         user.setNickName(username);
         user.setUserType(UserTypeEnums.DOCTOR);
-        user.setStatus(UserStatus.OK.getCode());
+        user.setStatus(UserStatusEnums.OK);
         user.setPwdUpdateDate(DateUtils.getNowDate());
         user.setPassword(SecurityUtils.encryptPassword(password));
         if (doctorUserMapper.insert(user) <= 0) {
@@ -81,7 +81,7 @@ public class DoctorAuthService {
         if (doctorUser == null) {
             log.warn("doctor login failed, user not exists, username={}", username);
             throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_LOGIN_USER_NOT_EXISTS);
-        } else if (UserStatus.DISABLE.getCode().equals(doctorUser.getStatus())) {
+        } else if (UserStatusEnums.DISABLE.getCode().equals(doctorUser.getStatus())) {
             log.warn("doctor login failed, user disabled, username={}", username);
             throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_LOGIN_FAILED);
         } else if (!SecurityUtils.matchesPassword(loginBody.getPassword(), doctorUser.getPassword())) {
@@ -119,7 +119,9 @@ public class DoctorAuthService {
         sysUser.setNickName(doctorUser.getNickName());
         sysUser.setUserType(doctorUser.getUserType());
         sysUser.setPassword(doctorUser.getPassword());
-        sysUser.setStatus(doctorUser.getStatus());
+        if (doctorUser.getStatus() != null) {
+            sysUser.setStatus(doctorUser.getStatus().getCode());
+        }
         sysUser.setDelFlag(doctorUser.getDelFlag());
         sysUser.setLoginIp(doctorUser.getLoginIp());
         sysUser.setLoginDate(doctorUser.getLoginDate());

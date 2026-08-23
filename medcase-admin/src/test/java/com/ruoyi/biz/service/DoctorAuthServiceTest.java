@@ -1,5 +1,30 @@
 package com.ruoyi.biz.service;
 
+import com.ruoyi.biz.domain.DoctorUserEntity;
+import com.ruoyi.biz.mapper.DoctorUserMapper;
+import com.ruoyi.biz.request.DoctorLoginRequest;
+import com.ruoyi.biz.request.DoctorRegisterRequest;
+import com.ruoyi.common.core.domain.entity.SysUser;
+import com.ruoyi.common.core.domain.model.LoginUser;
+import com.ruoyi.common.enums.UserStatusEnums;
+import com.ruoyi.common.enums.UserTypeEnums;
+import com.ruoyi.common.utils.SecurityUtils;
+import com.ruoyi.mvc.constants.enums.ErrorCodeEnums;
+import com.ruoyi.mvc.exception.AbstractBusinessException;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+
+import java.util.Set;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -8,30 +33,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
-import com.ruoyi.common.core.domain.entity.SysUser;
-import com.ruoyi.common.core.domain.model.LoginUser;
-import com.ruoyi.common.enums.UserStatus;
-import com.ruoyi.common.enums.UserTypeEnums;
-import com.ruoyi.common.utils.SecurityUtils;
-import com.ruoyi.mvc.constants.enums.ErrorCodeEnums;
-import com.ruoyi.mvc.exception.AbstractBusinessException;
-import com.ruoyi.biz.request.DoctorLoginRequest;
-import com.ruoyi.biz.request.DoctorRegisterRequest;
-import com.ruoyi.biz.domain.DoctorUserEntity;
-import com.ruoyi.biz.mapper.DoctorUserMapper;
-import java.util.Set;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.mock.web.MockHttpServletRequest;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
 class DoctorAuthServiceTest {
     private DoctorAuthService doctorAuthService;
@@ -77,7 +78,7 @@ class DoctorAuthServiceTest {
         assertEquals("doctor01", user.getUserName());
         assertEquals("doctor01", user.getNickName());
         assertEquals(UserTypeEnums.DOCTOR, user.getUserType());
-        assertEquals(UserStatus.OK.getCode(), user.getStatus());
+        assertEquals(UserStatusEnums.OK.getCode(), user.getStatus());
         assertEquals(null, user.getDelFlag());
         assertNotNull(user.getPwdUpdateDate());
         assertTrue(SecurityUtils.matchesPassword("secret123", user.getPassword()));
@@ -251,7 +252,7 @@ class DoctorAuthServiceTest {
         user.setNickName(username);
         user.setUserType(UserTypeEnums.DOCTOR);
         user.setPassword(SecurityUtils.encryptPassword(rawPassword));
-        user.setStatus(UserStatus.OK.getCode());
+        user.setStatus(UserStatusEnums.OK);
         return user;
     }
 }
