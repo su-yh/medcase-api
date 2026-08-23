@@ -30,7 +30,8 @@ public class WrapperResponseBodyAdvice implements ResponseBodyAdvice<Object> {
     private static final Set<String> BASE_PACKAGES = new HashSet<>();
 
     static {
-        BASE_PACKAGES.add("com.ruoyi.web.controller.doctor");
+        BASE_PACKAGES.add("com.ruoyi.biz.doctor.api.controller");
+        BASE_PACKAGES.add("com.ruoyi.biz.caseinfo.api.controller");
     }
 
     public void addBasePackages(Collection<String> basePackages) {

@@ -90,27 +90,27 @@ public class GlobalExceptionHandler
         return AjaxResult.error(String.format("请求参数类型不匹配，参数[%s]要求类型为：'%s'，但输入值为：'%s'", e.getName(), e.getRequiredType().getName(), value));
     }
 
-    /**
-     * 拦截未知的运行时异常
-     */
-    @ExceptionHandler(RuntimeException.class)
-    public AjaxResult handleRuntimeException(RuntimeException e, HttpServletRequest request)
-    {
-        String requestURI = request.getRequestURI();
-        log.error("请求地址'{}',发生未知异常.", requestURI, e);
-        return AjaxResult.error(e.getMessage());
-    }
-
-    /**
-     * 系统异常
-     */
-    @ExceptionHandler(Exception.class)
-    public AjaxResult handleException(Exception e, HttpServletRequest request)
-    {
-        String requestURI = request.getRequestURI();
-        log.error("请求地址'{}',发生系统异常.", requestURI, e);
-        return AjaxResult.error(e.getMessage());
-    }
+    // /**
+    //  * 拦截未知的运行时异常
+    //  */
+    // @ExceptionHandler(RuntimeException.class)
+    // public AjaxResult handleRuntimeException(RuntimeException e, HttpServletRequest request)
+    // {
+    //     String requestURI = request.getRequestURI();
+    //     log.error("请求地址'{}',发生未知异常.", requestURI, e);
+    //     return AjaxResult.error(e.getMessage());
+    // }
+    //
+    // /**
+    //  * 系统异常
+    //  */
+    // @ExceptionHandler(Exception.class)
+    // public AjaxResult handleException(Exception e, HttpServletRequest request)
+    // {
+    //     String requestURI = request.getRequestURI();
+    //     log.error("请求地址'{}',发生系统异常.", requestURI, e);
+    //     return AjaxResult.error(e.getMessage());
+    // }
 
     /**
      * 自定义验证异常
