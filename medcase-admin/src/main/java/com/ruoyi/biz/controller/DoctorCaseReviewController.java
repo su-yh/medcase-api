@@ -53,4 +53,12 @@ public class DoctorCaseReviewController {
             @Valid @RequestBody DoctorCaseReviewRequest request) {
         doctorCaseReviewService.review(id, request, adminUser);
     }
+
+    @PreAuthorize("@ss.hasPermi('biz:case:review:settle')")
+    @PostMapping("/{id}/settle")
+    public void settle(
+            @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser adminUser,
+            @PathVariable Long id) {
+        doctorCaseReviewService.settle(id, adminUser);
+    }
 }

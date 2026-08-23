@@ -76,7 +76,7 @@ class DoctorCaseReviewServiceTest {
 
         doctorCaseReviewService.review(
                 42L,
-                reviewRequest(DoctorCaseStatusEnums.APPROVED_PENDING_SETTLEMENT, null),
+                reviewRequest(true, null),
                 adminUser);
 
         verify(doctorCaseAdminMapper).updateById(entity);
@@ -105,7 +105,7 @@ class DoctorCaseReviewServiceTest {
 
         doctorCaseReviewService.review(
                 42L,
-                reviewRequest(DoctorCaseStatusEnums.REVIEW_FAILED, "请补充检查报告"),
+                reviewRequest(false, "请补充检查报告"),
                 adminUser);
 
         verify(doctorCaseAdminMapper).updateById(entity);
@@ -124,7 +124,7 @@ class DoctorCaseReviewServiceTest {
                 AbstractBusinessException.class,
                 () -> doctorCaseReviewService.review(
                         42L,
-                        reviewRequest(DoctorCaseStatusEnums.APPROVED_PENDING_SETTLEMENT, null),
+                        reviewRequest(true, null),
                         loginUser(7L, "管理员")));
 
         assertEquals(ErrorCodeEnums.DOCTOR_CASE_REVIEW_STATUS_NOT_MATCH, exception.getEc());
@@ -138,11 +138,39 @@ class DoctorCaseReviewServiceTest {
                 AbstractBusinessException.class,
                 () -> doctorCaseReviewService.review(
                         42L,
-                        reviewRequest(DoctorCaseStatusEnums.REVIEW_FAILED, "  "),
+                        reviewRequest(false, "  "),
                         loginUser(7L, "管理员")));
 
         assertEquals(ErrorCodeEnums.DOCTOR_CASE_REVIEW_REASON_EMPTY, exception.getEc());
         verify(doctorCaseAdminMapper, never()).selectById(any());
+    }
+
+    @Test
+    void settleApprovedPendingCase() {
+        DoctorCaseEntity entity = caseEntity(42L, DoctorCaseStatusEnums.APPROVED_PENDING_SETTLEMENT);
+        LoginUser adminUser = loginUser(7L, "管理员");
+        when(doctorCaseAdminMapper.selectById(42L)).thenReturn(entity);
+        when(doctorCaseAdminMapper.updateById(entity)).thenReturn(1);
+
+        doctorCaseReviewService.settle(42L, adminUser);
+
+        verify(doctorCaseAdminMapper).updateById(entity);
+        assertEquals(DoctorCaseStatusEnums.SETTLED, entity.getStatus());
+        assertEquals(7L, entity.getSettlerId());
+        assertEquals("管理员", entity.getSettlerNickname());
+    }
+
+    @Test
+    void settleRejectsCaseWithUnexpectedStatus() {
+        DoctorCaseEntity entity = caseEntity(42L, DoctorCaseStatusEnums.PENDING_REVIEW);
+        when(doctorCaseAdminMapper.selectById(42L)).thenReturn(entity);
+
+        AbstractBusinessException exception = assertThrows(
+                AbstractBusinessException.class,
+                () -> doctorCaseReviewService.settle(42L, loginUser(7L, "管理员")));
+
+        assertEquals(ErrorCodeEnums.DOCTOR_CASE_SETTLE_STATUS_NOT_MATCH, exception.getEc());
+        verify(doctorCaseAdminMapper, never()).updateById(any(DoctorCaseEntity.class));
     }
 
     private LoginUser loginUser(Long userId, String nickname) {
@@ -155,10 +183,9 @@ class DoctorCaseReviewServiceTest {
         return loginUser;
     }
 
-    private DoctorCaseReviewRequest reviewRequest(
-            DoctorCaseStatusEnums status, String reason) {
+    private DoctorCaseReviewRequest reviewRequest(Boolean approve, String reason) {
         DoctorCaseReviewRequest request = new DoctorCaseReviewRequest();
-        request.setStatus(status);
+        request.setApprove(approve);
         request.setReason(reason);
         return request;
     }

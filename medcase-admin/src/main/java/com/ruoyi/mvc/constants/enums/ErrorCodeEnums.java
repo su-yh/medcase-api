@@ -33,6 +33,8 @@ public enum ErrorCodeEnums implements IErrorCode {
     DOCTOR_CASE_REVIEW_REASON_EMPTY(2000019, "审核拒绝原因不能为空"),
     DOCTOR_CASE_REVIEW_FAILED(2000020, "病例审核失败，请稍后重试"),
     DOCTOR_CASE_REVIEW_STATUS_INVALID(2000021, "审核状态无效"),
+    DOCTOR_CASE_SETTLE_STATUS_NOT_MATCH(2000022, "只允许结算审核通过的待结算病例"),
+    DOCTOR_CASE_SETTLE_FAILED(2000023, "病例结算失败，请稍后重试"),
     ;
 
     private final int code;

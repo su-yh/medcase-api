@@ -67,6 +67,27 @@ public class DoctorCaseReviewService {
         updateReview(id, status, reviewReason, adminUser);
     }
 
+    @Transactional(rollbackFor = Exception.class)
+    public void settle(Long id, LoginUser adminUser) {
+        DoctorCaseEntity entity = doctorCaseAdminMapper.selectById(id);
+        if (entity == null) {
+            throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_CASE_NOT_FOUND);
+        }
+        if (entity.getStatus() != DoctorCaseStatusEnums.APPROVED_PENDING_SETTLEMENT) {
+            throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_CASE_SETTLE_STATUS_NOT_MATCH);
+        }
+
+        entity.setStatus(DoctorCaseStatusEnums.SETTLED);
+        entity.setSettledTime(new Date());
+        entity.setSettlerId(adminUser.getUserId());
+        entity.setSettlerNickname(adminUser.getUser().getNickName());
+
+        int affectedRows = doctorCaseAdminMapper.updateById(entity);
+        if (affectedRows <= 0) {
+            throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_CASE_SETTLE_FAILED);
+        }
+    }
+
     private void updateReview(
             Long id, DoctorCaseStatusEnums status, String reviewReason, LoginUser adminUser) {
         DoctorCaseEntity entity = doctorCaseAdminMapper.selectById(id);
