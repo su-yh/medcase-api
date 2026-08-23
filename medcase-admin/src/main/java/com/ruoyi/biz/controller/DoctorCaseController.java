@@ -34,7 +34,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class DoctorCaseController {
     private final DoctorCaseService doctorCaseService;
 
-    @RequestMapping(value = "/cases", method = RequestMethod.POST)
+    @RequestMapping(method = RequestMethod.POST)
     public void submit(
             @CurrLoginUser(userType = UserTypeEnums.DOCTOR) LoginUser doctorUser,
             @RequestBody @Validated({ValidationGroups.Doctor.Submit.class, Default.class}) DoctorCaseSubmitRequest request) {
@@ -42,7 +42,7 @@ public class DoctorCaseController {
         doctorCaseService.submit(doctorUser, request);
     }
 
-    @RequestMapping(value = "/cases/draft", method = RequestMethod.POST)
+    @RequestMapping(value = "/draft", method = RequestMethod.POST)
     public void saveDraft(
             @CurrLoginUser(userType = UserTypeEnums.DOCTOR) LoginUser doctorUser,
             @RequestBody DoctorCaseSubmitRequest request) {
@@ -50,7 +50,7 @@ public class DoctorCaseController {
         doctorCaseService.saveDraft(doctorUser, request);
     }
 
-    @RequestMapping(value = "/cases", method = RequestMethod.GET)
+    @RequestMapping(method = RequestMethod.GET)
     public PageResult<DoctorCaseVO> page(
             @CurrLoginUser(userType = UserTypeEnums.DOCTOR) LoginUser doctorUser,
             PageParam pageParam, DoctorCasePageRequest request) {
@@ -58,7 +58,7 @@ public class DoctorCaseController {
         return doctorCaseService.page(doctorUser, pageParam, request);
     }
 
-    @RequestMapping(value = "/cases/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public DoctorCaseVO detail(
             @CurrLoginUser(userType = UserTypeEnums.DOCTOR) LoginUser doctorUser,
             @PathVariable Long id) {
@@ -66,7 +66,7 @@ public class DoctorCaseController {
         return doctorCaseService.detail(doctorUser, id);
     }
 
-    @RequestMapping(value = "/cases/{id}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     public void delete(
             @CurrLoginUser(userType = UserTypeEnums.DOCTOR) LoginUser doctorUser,
             @PathVariable Long id) {
