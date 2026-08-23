@@ -29,6 +29,10 @@ public enum ErrorCodeEnums implements IErrorCode {
     USER_TYPE_NOT_MATCH(2000015, "禁止访问，用户类型错误"),
     DOCTOR_DELETE_STATUS_NOT_MATCH(2000016, "只允许删除草稿病例"),
     DOCTOR_CASE_DELETE_FAILED(2000017, "病例删除失败，请稍后重试"),
+    DOCTOR_CASE_REVIEW_STATUS_NOT_MATCH(2000018, "只允许审核待审核病例"),
+    DOCTOR_CASE_REVIEW_REASON_EMPTY(2000019, "审核拒绝原因不能为空"),
+    DOCTOR_CASE_REVIEW_FAILED(2000020, "病例审核失败，请稍后重试"),
+    DOCTOR_CASE_REVIEW_STATUS_INVALID(2000021, "审核状态无效"),
     ;
 
     private final int code;

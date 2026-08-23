@@ -2,13 +2,21 @@ package com.ruoyi.biz.service;
 
 import com.ruoyi.mp.mybatis.PageParam;
 import com.ruoyi.mp.mybatis.PageResult;
+import com.ruoyi.common.core.domain.model.LoginUser;
+import com.ruoyi.biz.request.DoctorCaseReviewRequest;
 import com.ruoyi.biz.request.DoctorCaseReviewQuery;
 import com.ruoyi.biz.response.DoctorCaseReviewVO;
 import com.ruoyi.biz.domain.DoctorCaseEntity;
+import com.ruoyi.biz.enums.DoctorCaseStatusEnums;
 import com.ruoyi.biz.mapper.DoctorCaseAdminMapper;
+import com.ruoyi.mvc.constants.enums.ErrorCodeEnums;
+import com.ruoyi.mvc.exception.ExceptionUtil;
+import java.util.Date;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 /**
  * 病例审核业务
@@ -18,6 +26,8 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class DoctorCaseReviewService {
+    private static final String APPROVED_REVIEW_REASON = "通过";
+
     private final DoctorCaseAdminMapper doctorCaseAdminMapper;
 
     public PageResult<DoctorCaseReviewVO> page(
@@ -39,5 +49,45 @@ public class DoctorCaseReviewService {
     public DoctorCaseReviewVO detail(Long id) {
         DoctorCaseEntity entity = doctorCaseAdminMapper.selectAdminCaseById(id);
         return entity == null ? null : DoctorCaseReviewVO.fromEntity(entity);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void review(Long id, DoctorCaseReviewRequest request, LoginUser adminUser) {
+        DoctorCaseStatusEnums status = request.getStatus();
+        String reviewReason;
+        if (status == DoctorCaseStatusEnums.APPROVED_PENDING_SETTLEMENT) {
+            reviewReason = APPROVED_REVIEW_REASON;
+        } else if (status == DoctorCaseStatusEnums.REVIEW_FAILED) {
+            if (!StringUtils.hasText(request.getReason())) {
+                throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_CASE_REVIEW_REASON_EMPTY);
+            }
+            reviewReason = request.getReason().trim();
+        } else {
+            throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_CASE_REVIEW_STATUS_INVALID);
+        }
+
+        updateReview(id, status, reviewReason, adminUser);
+    }
+
+    private void updateReview(
+            Long id, DoctorCaseStatusEnums status, String reviewReason, LoginUser adminUser) {
+        DoctorCaseEntity entity = doctorCaseAdminMapper.selectById(id);
+        if (entity == null) {
+            throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_CASE_NOT_FOUND);
+        }
+        if (entity.getStatus() != DoctorCaseStatusEnums.PENDING_REVIEW) {
+            throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_CASE_REVIEW_STATUS_NOT_MATCH);
+        }
+
+        entity.setStatus(status);
+        entity.setReviewReason(reviewReason);
+        entity.setReviewTime(new Date());
+        entity.setReviewerId(adminUser.getUserId());
+        entity.setReviewerNickname(adminUser.getUser().getNickName());
+
+        int affectedRows = doctorCaseAdminMapper.updateById(entity);
+        if (affectedRows <= 0) {
+            throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_CASE_REVIEW_FAILED);
+        }
     }
 }

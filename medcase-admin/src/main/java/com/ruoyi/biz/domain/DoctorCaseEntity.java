@@ -39,6 +39,14 @@ public class DoctorCaseEntity extends AbstractBaseEntity {
 
     private String reviewReason;
 
+    private Long reviewerId;
+
+    private String reviewerNickname;
+
+    private Long settlerId;
+
+    private String settlerNickname;
+
     private Date submitTime;
 
     private Date reviewTime;
