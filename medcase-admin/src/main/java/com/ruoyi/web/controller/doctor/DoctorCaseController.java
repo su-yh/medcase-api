@@ -36,41 +36,41 @@ public class DoctorCaseController {
 
     @RequestMapping(value = "/cases", method = RequestMethod.POST)
     public void submit(
-            @CurrLoginUser(userType = UserTypeEnums.DOCTOR) LoginUser loginUser,
+            @CurrLoginUser(userType = UserTypeEnums.DOCTOR) LoginUser doctorUser,
             @RequestBody @Validated({ValidationGroups.Doctor.Submit.class, Default.class}) DoctorCaseSubmitRequest request) {
         log.trace("doctor case controller submit");
-        doctorCaseService.submit(loginUser, request);
+        doctorCaseService.submit(doctorUser, request);
     }
 
     @RequestMapping(value = "/cases/draft", method = RequestMethod.POST)
     public void saveDraft(
-            @CurrLoginUser(userType = UserTypeEnums.DOCTOR) LoginUser loginUser,
+            @CurrLoginUser(userType = UserTypeEnums.DOCTOR) LoginUser doctorUser,
             @RequestBody DoctorCaseSubmitRequest request) {
         log.trace("doctor case controller saveDraft, request={}", request);
-        doctorCaseService.saveDraft(loginUser, request);
+        doctorCaseService.saveDraft(doctorUser, request);
     }
 
     @RequestMapping(value = "/cases", method = RequestMethod.GET)
     public PageResult<DoctorCaseVO> page(
-            @CurrLoginUser(userType = UserTypeEnums.DOCTOR) LoginUser loginUser,
+            @CurrLoginUser(userType = UserTypeEnums.DOCTOR) LoginUser doctorUser,
             PageParam pageParam, DoctorCasePageRequest request) {
         log.trace("doctor case controller page, request={}", request);
-        return doctorCaseService.page(loginUser, pageParam, request);
+        return doctorCaseService.page(doctorUser, pageParam, request);
     }
 
     @RequestMapping(value = "/cases/{id}", method = RequestMethod.GET)
     public DoctorCaseVO detail(
-            @CurrLoginUser(userType = UserTypeEnums.DOCTOR) LoginUser loginUser,
+            @CurrLoginUser(userType = UserTypeEnums.DOCTOR) LoginUser doctorUser,
             @PathVariable Long id) {
         log.trace("doctor case controller detail, id={}", id);
-        return doctorCaseService.detail(loginUser, id);
+        return doctorCaseService.detail(doctorUser, id);
     }
 
     @RequestMapping(value = "/cases/{id}", method = RequestMethod.DELETE)
     public void delete(
-            @CurrLoginUser(userType = UserTypeEnums.DOCTOR) LoginUser loginUser,
+            @CurrLoginUser(userType = UserTypeEnums.DOCTOR) LoginUser doctorUser,
             @PathVariable Long id) {
         log.trace("doctor case controller delete, id={}", id);
-        doctorCaseService.delete(loginUser, id);
+        doctorCaseService.delete(doctorUser, id);
     }
 }

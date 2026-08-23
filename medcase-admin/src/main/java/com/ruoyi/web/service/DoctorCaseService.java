@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
 import java.util.stream.Collectors;
 
 /**
@@ -28,51 +29,26 @@ import java.util.stream.Collectors;
 public class DoctorCaseService {
     private final DoctorCaseMapper doctorCaseMapper;
 
-    public void submit(LoginUser loginUser, DoctorCaseSubmitRequest request) {
-        Long doctorId = loginUser.getUserId();
-        DoctorCaseEntity entity = new DoctorCaseEntity();
+    public void submit(LoginUser doctorUser, DoctorCaseSubmitRequest request) {
+        save(doctorUser, request, DoctorCaseStatusEnums.PENDING_REVIEW);
 
-        if (request.getId() == null) {
-            entity.setDoctorId(doctorId);
-            entity.setDoctorNickname(loginUser.getUser().getNickName());
-        } else {
-            DoctorCaseEntity historyEntity = doctorCaseMapper.selectById(request.getId());
-            if (historyEntity == null) {
-                throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_CASE_NOT_FOUND);
-            }
-            if (!historyEntity.getDoctorId().equals(doctorId)) {
-                throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_UPDATE_REJECT);
-            }
-
-            if (historyEntity.getStatus() != DoctorCaseStatusEnums.DRAFT) {
-                throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_UPDATE_STATUS_NOT_MATCH);
-            }
-
-            entity.setId(historyEntity.getId());
-        }
-
-        entity.setTitle(request.getTitle());
-        entity.setRemark(request.getRemark());
-        entity.setAttachments(request.getAttachments());
-        entity.setStatus(DoctorCaseStatusEnums.PENDING_REVIEW);
-
-        if (entity.getId() == null) {
-            doctorCaseMapper.insert(entity);
-        } else {
-            doctorCaseMapper.updateById(entity);
-        }
-
-        log.info("doctor case submit, doctorId={}, id={}", doctorId, request.getId());
+        log.info("doctor case submit, doctorId={}, id={}", doctorUser.getUserId(), request.getId());
     }
 
     public void saveDraft(LoginUser loginUser, DoctorCaseSubmitRequest request) {
-        Long doctorId = loginUser.getUserId();
+        save(loginUser, request, DoctorCaseStatusEnums.DRAFT);
+
+        log.info("doctor case save draft, doctorId={}, id={}", loginUser.getUserId(), request.getId());
+    }
+
+    private void save(LoginUser doctorUser, DoctorCaseSubmitRequest request, DoctorCaseStatusEnums status) {
+        Long doctorId = doctorUser.getUserId();
 
         DoctorCaseEntity entity = new DoctorCaseEntity();
 
         if (request.getId() == null) {
             entity.setDoctorId(doctorId);
-            entity.setDoctorNickname(loginUser.getUser().getNickName());
+            entity.setDoctorNickname(doctorUser.getUser().getNickName());
         } else {
             DoctorCaseEntity historyEntity = doctorCaseMapper.selectById(request.getId());
             if (historyEntity == null) {
@@ -92,15 +68,17 @@ public class DoctorCaseService {
         entity.setTitle(request.getTitle());
         entity.setRemark(request.getRemark());
         entity.setAttachments(request.getAttachments());
-        entity.setStatus(DoctorCaseStatusEnums.DRAFT);
+        entity.setStatus(status);
+
+        if (status == DoctorCaseStatusEnums.PENDING_REVIEW) {
+            entity.setSubmitTime(new Date());
+        }
 
         if (entity.getId() == null) {
             doctorCaseMapper.insert(entity);
         } else {
             doctorCaseMapper.updateById(entity);
         }
-
-        log.info("doctor case save draft, doctorId={}, id={}", doctorId, request.getId());
     }
 
     public void delete(LoginUser loginUser, Long id) {
@@ -138,8 +116,8 @@ public class DoctorCaseService {
         return result;
     }
 
-    public DoctorCaseVO detail(LoginUser loginUser, Long id) {
-        DoctorCaseEntity entity = doctorCaseMapper.selectDoctorCaseById(loginUser.getUserId(), id);
+    public DoctorCaseVO detail(LoginUser doctorUser, Long id) {
+        DoctorCaseEntity entity = doctorCaseMapper.selectDoctorCaseById(doctorUser.getUserId(), id);
         if (entity == null) {
             throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_CASE_NOT_FOUND);
         }
