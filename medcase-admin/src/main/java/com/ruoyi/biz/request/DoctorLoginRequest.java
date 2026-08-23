@@ -1,0 +1,20 @@
+package com.ruoyi.biz.request;
+
+import lombok.Data;
+
+/**
+ * 医生端登录请求
+ *
+ * @author suyh
+ * @since 2026-08-20
+ */
+@Data
+public class DoctorLoginRequest {
+    private String username;
+
+    private String password;
+
+    private String code;
+
+    private String uuid;
+}
