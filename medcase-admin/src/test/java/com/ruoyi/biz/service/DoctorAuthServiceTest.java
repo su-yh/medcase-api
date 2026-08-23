@@ -282,7 +282,7 @@ class DoctorAuthServiceTest {
         SecurityContextHolder.getContext().setAuthentication(
                 new UsernamePasswordAuthenticationToken(loginUser, null));
 
-        doctorAuthService.logout();
+        doctorAuthService.logout(loginUser);
 
         verify(tokenService).delLoginUser("doctor-login-token");
     }

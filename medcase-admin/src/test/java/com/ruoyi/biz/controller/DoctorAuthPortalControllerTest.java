@@ -4,6 +4,9 @@ import com.ruoyi.biz.request.DoctorLoginRequest;
 import com.ruoyi.biz.request.DoctorRegisterRequest;
 import com.ruoyi.biz.service.DoctorAuthService;
 import com.ruoyi.common.annotation.Anonymous;
+import com.ruoyi.common.core.domain.entity.SysUser;
+import com.ruoyi.common.core.domain.model.LoginUser;
+import com.ruoyi.common.enums.UserTypeEnums;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -36,18 +39,31 @@ class DoctorAuthPortalControllerTest {
     }
 
     @Test
-    void loginRegisterAndLogoutDelegateToService() {
+    void loginDelegatesToService() {
         DoctorLoginRequest loginRequest = new DoctorLoginRequest();
-        DoctorRegisterRequest registerRequest = new DoctorRegisterRequest();
         when(doctorAuthService.login(loginRequest)).thenReturn("doctor-token");
 
         assertEquals("doctor-token", doctorController.login(loginRequest));
-        doctorController.register(registerRequest);
-        doctorController.logout();
 
         verify(doctorAuthService).login(loginRequest);
+    }
+
+    @Test
+    void registerDelegatesToService() {
+        DoctorRegisterRequest registerRequest = new DoctorRegisterRequest();
+
+        doctorController.register(registerRequest);
+
         verify(doctorAuthService).register(registerRequest);
-        verify(doctorAuthService).logout();
+    }
+
+    @Test
+    void logoutDelegatesCurrentDoctorToService() {
+        LoginUser doctorUser = doctorLoginUser();
+
+        doctorController.logout(doctorUser);
+
+        verify(doctorAuthService).logout(doctorUser);
     }
 
     @Test
@@ -58,5 +74,17 @@ class DoctorAuthPortalControllerTest {
         assertNotNull(DoctorAuthPortalController.class
                 .getMethod("register", DoctorRegisterRequest.class)
                 .getAnnotation(Anonymous.class));
+    }
+
+    private LoginUser doctorLoginUser() {
+        SysUser user = new SysUser();
+        user.setUserId(1L);
+        user.setUserName("doctor01");
+        user.setUserType(UserTypeEnums.DOCTOR);
+
+        LoginUser doctorUser = new LoginUser();
+        doctorUser.setUser(user);
+        doctorUser.setUserId(user.getUserId());
+        return doctorUser;
     }
 }
