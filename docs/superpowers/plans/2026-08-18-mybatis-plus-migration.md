@@ -75,7 +75,7 @@ with:
 
 ```yaml
 mybatis-plus:
-  type-aliases-package: com.ruoyi.common.core.domain,com.ruoyi.framework.web.domain,com.ruoyi.generator.domain,com.ruoyi.quartz.domain,com.ruoyi.system.domain
+  type-aliases-package: com.ruoyi.common.core.domain,com.ruoyi.framework.web.domain,com.ruoyi.system.domain
   mapper-locations: classpath*:mapper/**/*Mapper.xml
   config-location: classpath:mybatis/mybatis-config.xml
   check-config-location: true
