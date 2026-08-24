@@ -10,6 +10,7 @@ import com.ruoyi.mvc.authentication.annotation.CurrLoginUser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -45,5 +46,12 @@ public class DoctorAuthPortalController {
     public void logout(@CurrLoginUser(userType = UserTypeEnums.DOCTOR) LoginUser doctorUser) {
         log.trace("doctor auth controller logout");
         doctorAuthService.logout(doctorUser);
+    }
+
+    @DeleteMapping("/account")
+    public void deleteAccount(
+            @CurrLoginUser(userType = UserTypeEnums.DOCTOR) LoginUser doctorUser) {
+        log.trace("doctor auth controller delete account, userId={}", doctorUser.getUserId());
+        doctorAuthService.deleteAccount(doctorUser);
     }
 }

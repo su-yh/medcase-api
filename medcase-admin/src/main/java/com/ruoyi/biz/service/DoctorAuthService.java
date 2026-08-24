@@ -20,6 +20,7 @@ import com.ruoyi.mvc.exception.ExceptionUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 /**
@@ -113,6 +114,27 @@ public class DoctorAuthService {
     public void logout(LoginUser doctorUser) {
         tokenService.delLoginUser(doctorUser.getToken());
         log.info("doctor logout success, username={}, userId={}", doctorUser.getUsername(), doctorUser.getUserId());
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteAccount(LoginUser doctorUser) {
+        DoctorUserEntity currentDoctor = doctorUserMapper.selectDoctorById(doctorUser.getUserId());
+        if (currentDoctor == null) {
+            throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_USER_NOT_FOUND);
+        }
+
+        UserStatusEnums status = currentDoctor.getStatus();
+        if (status == UserStatusEnums.DISABLE) {
+            throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_ACCOUNT_DELETE_STATUS_NOT_MATCH);
+        }
+
+        if (doctorUserMapper.deleteById(currentDoctor.getUserId()) <= 0) {
+            throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_ACCOUNT_DELETE_FAILED);
+        }
+
+        tokenService.delLoginUser(doctorUser.getToken());
+        log.info("doctor account deleted, username={}, userId={}",
+                currentDoctor.getUserName(), currentDoctor.getUserId());
     }
 
     private SysUser toSysUser(DoctorUserEntity doctorUser) {

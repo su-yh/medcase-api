@@ -283,6 +283,45 @@ class DoctorAuthServiceTest {
         verify(tokenService).delLoginUser("doctor-login-token");
     }
 
+    @Test
+    void deleteAccountAllowsDoctorBeforeApproval() {
+        DoctorUserEntity doctor = doctorUser(
+                "doctor01", "secret123", UserStatusEnums.REVIEW_FAILED);
+        when(doctorUserMapper.selectDoctorById(12L)).thenReturn(doctor);
+        when(doctorUserMapper.deleteById(12L)).thenReturn(1);
+
+        LoginUser loginUser = doctorLoginUser(12L, "doctor-login-token");
+        doctorAuthService.deleteAccount(loginUser);
+
+        verify(doctorUserMapper).deleteById(12L);
+        verify(tokenService).delLoginUser("doctor-login-token");
+    }
+
+    @Test
+    void deleteAccountAllowsNormalDoctor() {
+        when(doctorUserMapper.selectDoctorById(12L))
+                .thenReturn(doctorUser("doctor01", "secret123", UserStatusEnums.OK));
+        when(doctorUserMapper.deleteById(12L)).thenReturn(1);
+
+        doctorAuthService.deleteAccount(doctorLoginUser(12L, "doctor-login-token"));
+
+        verify(doctorUserMapper).deleteById(12L);
+        verify(tokenService).delLoginUser("doctor-login-token");
+    }
+
+    @Test
+    void deleteAccountRejectsDisabledDoctor() {
+        when(doctorUserMapper.selectDoctorById(12L))
+                .thenReturn(doctorUser("doctor01", "secret123", UserStatusEnums.DISABLE));
+
+        AbstractBusinessException exception = assertThrows(
+                AbstractBusinessException.class,
+                () -> doctorAuthService.deleteAccount(doctorLoginUser(12L, "doctor-login-token")));
+
+        assertEquals(ErrorCodeEnums.DOCTOR_ACCOUNT_DELETE_STATUS_NOT_MATCH, exception.getEc());
+        verify(doctorUserMapper, never()).deleteById(12L);
+    }
+
     private DoctorRegisterRequest registerRequest(String username, String password) {
         DoctorRegisterRequest registerRequest = new DoctorRegisterRequest();
         registerRequest.setUsername(username);
@@ -295,6 +334,18 @@ class DoctorAuthServiceTest {
         loginRequest.setUsername(username);
         loginRequest.setPassword(password);
         return loginRequest;
+    }
+
+    private LoginUser doctorLoginUser(Long userId, String token) {
+        SysUser user = new SysUser();
+        user.setUserId(userId);
+        user.setUserName("doctor01");
+        user.setUserType(UserTypeEnums.DOCTOR);
+        LoginUser loginUser = new LoginUser();
+        loginUser.setToken(token);
+        loginUser.setUserId(userId);
+        loginUser.setUser(user);
+        return loginUser;
     }
 
     private DoctorUserEntity doctorUser(String username, String rawPassword) {

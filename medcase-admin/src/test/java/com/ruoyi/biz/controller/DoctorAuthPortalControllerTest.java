@@ -67,6 +67,15 @@ class DoctorAuthPortalControllerTest {
     }
 
     @Test
+    void deleteAccountDelegatesCurrentDoctorToService() {
+        LoginUser doctorUser = doctorLoginUser();
+
+        doctorController.deleteAccount(doctorUser);
+
+        verify(doctorAuthService).deleteAccount(doctorUser);
+    }
+
+    @Test
     void loginAndRegisterAreAnonymous() throws NoSuchMethodException {
         assertNotNull(DoctorAuthPortalController.class
                 .getMethod("login", DoctorLoginRequest.class)

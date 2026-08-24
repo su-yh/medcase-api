@@ -42,6 +42,8 @@ public enum ErrorCodeEnums implements IErrorCode {
     DOCTOR_CASE_DOCTOR_STATUS_NOT_OK(2000028, "医生资料审核通过后才可操作病例"),
     DOCTOR_PROFILE_SUBMIT_STATUS_NOT_MATCH(2000029, "当前医生状态不允许提交资料"),
     DOCTOR_PROFILE_SUBMIT_FAILED(2000030, "医生资料提交失败，请稍后重试"),
+    DOCTOR_ACCOUNT_DELETE_STATUS_NOT_MATCH(2000031, "当前医生状态不允许删除账号"),
+    DOCTOR_ACCOUNT_DELETE_FAILED(2000032, "医生账号删除失败，请稍后重试"),
     ;
 
     private final int code;
