@@ -39,4 +39,15 @@ class DoctorUserEntityTest {
         assertEquals("4", UserStatusEnums.REVIEW_FAILED.getCode());
         assertEquals("审核失败", UserStatusEnums.REVIEW_FAILED.getDesc());
     }
+
+    @Test
+    void exposesRegisterStatus() {
+        assertEquals("5", UserStatusEnums.REGISTER.getCode());
+        assertEquals("注册", UserStatusEnums.REGISTER.getDesc());
+    }
+
+    @Test
+    void doesNotExposeDeletedStatusBecauseDeletionUsesDelFlag() {
+        assertThrows(IllegalArgumentException.class, () -> UserStatusEnums.valueOf("DELETED"));
+    }
 }

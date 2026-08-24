@@ -1,6 +1,7 @@
 package com.ruoyi.biz.controller;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.lang.reflect.Method;
@@ -23,6 +24,7 @@ class DoctorCasePortalControllerTest {
     @Test
     void caseControllerUsesDoctorClientRoutes() {
         Map<String, RequestMapping> mappings = Arrays.stream(DoctorCasePortalController.class.getDeclaredMethods())
+                .filter(method -> method.isAnnotationPresent(RequestMapping.class))
                 .collect(Collectors.toMap(Method::getName,
                         method -> method.getAnnotation(RequestMapping.class)));
 
@@ -31,6 +33,18 @@ class DoctorCasePortalControllerTest {
         assertEquals("/biz/cases", route(mappings.get("page")));
         assertEquals("/biz/cases/{id}", route(mappings.get("detail")));
         assertEquals("/biz/cases/{id}", route(mappings.get("delete")));
+    }
+
+    @Test
+    void caseControllerRequiresApprovedDoctor() {
+        Arrays.stream(DoctorCasePortalController.class.getDeclaredMethods())
+                .filter(method -> method.isAnnotationPresent(RequestMapping.class))
+                .forEach(method -> {
+                    PreAuthorize preAuthorize = method.getAnnotation(PreAuthorize.class);
+                    assertEquals(
+                            "@dp.hasAnyStatus(#doctorUser, T(com.ruoyi.common.enums.UserStatusEnums).OK)",
+                            preAuthorize.value());
+                });
     }
 
     private String route(RequestMapping mapping) {

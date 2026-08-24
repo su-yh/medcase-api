@@ -21,7 +21,6 @@ public enum ErrorCodeEnums implements IErrorCode {
     DOCTOR_REGISTER_USER_EXISTS(2000005, "注册失败，\"{0}\"已存在"),
     DOCTOR_REGISTER_FAILED(2000006, "医生注册失败，请联系系统管理人员"),
     DOCTOR_LOGIN_USER_NOT_EXISTS(2000007, "医生账号不存在"),
-    DOCTOR_LOGIN_PENDING_REVIEW(2000008, "医生账号待管理员审核"),
     DOCTOR_CASE_NOT_FOUND(2000009, "病例不存在"),
     DOCTOR_CASE_SUBMIT_FAILED(2000010, "病例提交失败，请稍后重试"),
     DOCTOR_LOGIN_FAILED(2000012, "医生登录失败，请检查账号和密码"),
@@ -40,6 +39,9 @@ public enum ErrorCodeEnums implements IErrorCode {
     DOCTOR_USER_REVIEW_STATUS_NOT_MATCH(2000025, "只允许审核待审核医生"),
     DOCTOR_USER_REVIEW_FAILED(2000026, "医生审核失败，请稍后重试"),
     DOCTOR_LOGIN_REVIEW_FAILED(2000027, "医生审核未通过，请使用原账号重新提交审核"),
+    DOCTOR_CASE_DOCTOR_STATUS_NOT_OK(2000028, "医生资料审核通过后才可操作病例"),
+    DOCTOR_PROFILE_SUBMIT_STATUS_NOT_MATCH(2000029, "当前医生状态不允许提交资料"),
+    DOCTOR_PROFILE_SUBMIT_FAILED(2000030, "医生资料提交失败，请稍后重试"),
     ;
 
     private final int code;

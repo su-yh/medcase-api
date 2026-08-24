@@ -78,7 +78,7 @@ class DoctorAuthServiceTest {
         assertEquals("doctor01", user.getUserName());
         assertEquals("doctor01", user.getNickName());
         assertEquals(UserTypeEnums.DOCTOR, user.getUserType());
-        assertEquals(UserStatusEnums.PENDING_REVIEW, user.getStatus());
+        assertEquals(UserStatusEnums.REGISTER, user.getStatus());
         assertEquals(null, user.getDelFlag());
         assertNotNull(user.getPwdUpdateDate());
         assertTrue(SecurityUtils.matchesPassword("secret123", user.getPassword()));
@@ -96,23 +96,6 @@ class DoctorAuthServiceTest {
         assertEquals(ErrorCodeEnums.DOCTOR_REGISTER_USER_EXISTS, exception.getEc());
         verify(doctorUserMapper, never()).insert(any(DoctorUserEntity.class));
         verify(doctorUserMapper).selectDoctorByUsername("doctor01");
-    }
-
-    @Test
-    void registerResubmitsDoctorAfterReviewFailed() {
-        DoctorRegisterRequest registerRequest = registerRequest("doctor01", "newSecret123");
-        DoctorUserEntity existingUser = doctorUser(
-                "doctor01", "oldSecret123", UserStatusEnums.REVIEW_FAILED);
-        when(doctorUserMapper.selectDoctorByUsername("doctor01")).thenReturn(existingUser);
-        when(doctorUserMapper.updateById(existingUser)).thenReturn(1);
-
-        doctorAuthService.register(registerRequest);
-
-        assertEquals(UserStatusEnums.PENDING_REVIEW, existingUser.getStatus());
-        assertTrue(SecurityUtils.matchesPassword("newSecret123", existingUser.getPassword()));
-        assertNotNull(existingUser.getPwdUpdateDate());
-        verify(doctorUserMapper).updateById(existingUser);
-        verify(doctorUserMapper, never()).insert(any(DoctorUserEntity.class));
     }
 
     @Test
@@ -221,16 +204,29 @@ class DoctorAuthServiceTest {
     }
 
     @Test
-    void loginRejectsDoctorPendingReview() {
+    void loginCreatesTokenForPendingReviewDoctor() {
         DoctorLoginRequest loginRequest = loginRequest("doctor01", "secret123");
         when(doctorUserMapper.selectDoctorByUsername("doctor01"))
                 .thenReturn(doctorUser("doctor01", "secret123", UserStatusEnums.PENDING_REVIEW));
+        when(permissionService.getMenuPermission(any(SysUser.class))).thenReturn(Set.of());
+        when(tokenService.createToken(any(LoginUser.class))).thenReturn("doctor-token");
 
-        AbstractBusinessException exception =
-                assertThrows(AbstractBusinessException.class, () -> doctorAuthService.login(loginRequest));
+        assertEquals("doctor-token", doctorAuthService.login(loginRequest));
+        verify(tokenService).createToken(any(LoginUser.class));
+    }
 
-        assertEquals(ErrorCodeEnums.DOCTOR_LOGIN_PENDING_REVIEW, exception.getEc());
-        verify(tokenService, never()).createToken(any(LoginUser.class));
+    @Test
+    void loginCreatesTokenForRegisteredDoctor() {
+        DoctorLoginRequest loginRequest = loginRequest("doctor01", "secret123");
+        DoctorUserEntity doctor = doctorUser(
+                "doctor01", "secret123", UserStatusEnums.REGISTER);
+        when(doctorUserMapper.selectDoctorByUsername("doctor01")).thenReturn(doctor);
+        when(permissionService.getMenuPermission(any(SysUser.class))).thenReturn(Set.of());
+        when(tokenService.createToken(any(LoginUser.class))).thenReturn("doctor-token");
+
+        assertEquals("doctor-token", doctorAuthService.login(loginRequest));
+
+        verify(tokenService).createToken(any(LoginUser.class));
     }
 
     @Test
@@ -247,16 +243,16 @@ class DoctorAuthServiceTest {
     }
 
     @Test
-    void loginRejectsDoctorWhoseReviewFailed() {
+    void loginCreatesTokenForDoctorWhoseReviewFailed() {
         DoctorLoginRequest loginRequest = loginRequest("doctor01", "secret123");
         when(doctorUserMapper.selectDoctorByUsername("doctor01"))
                 .thenReturn(doctorUser("doctor01", "secret123", UserStatusEnums.REVIEW_FAILED));
+        when(permissionService.getMenuPermission(any(SysUser.class))).thenReturn(Set.of());
+        when(tokenService.createToken(any(LoginUser.class))).thenReturn("doctor-token");
 
-        AbstractBusinessException exception =
-                assertThrows(AbstractBusinessException.class, () -> doctorAuthService.login(loginRequest));
+        assertEquals("doctor-token", doctorAuthService.login(loginRequest));
 
-        assertEquals(ErrorCodeEnums.DOCTOR_LOGIN_REVIEW_FAILED, exception.getEc());
-        verify(tokenService, never()).createToken(any(LoginUser.class));
+        verify(tokenService).createToken(any(LoginUser.class));
     }
     @Test
     void loginRejectsWrongPassword() {

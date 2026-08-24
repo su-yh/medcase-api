@@ -8,16 +8,16 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.ruoyi.biz.domain.DoctorCaseEntity;
+import com.ruoyi.biz.enums.DoctorCaseStatusEnums;
+import com.ruoyi.biz.mapper.DoctorCaseMapper;
+import com.ruoyi.biz.request.DoctorCaseSubmitRequest;
+import com.ruoyi.biz.response.DoctorCaseVO;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.validation.groups.ValidationGroups;
 import com.ruoyi.mvc.constants.enums.ErrorCodeEnums;
 import com.ruoyi.mvc.exception.AbstractBusinessException;
-import com.ruoyi.biz.request.DoctorCaseSubmitRequest;
-import com.ruoyi.biz.domain.DoctorCaseEntity;
-import com.ruoyi.biz.enums.DoctorCaseStatusEnums;
-import com.ruoyi.biz.mapper.DoctorCaseMapper;
-import com.ruoyi.biz.response.DoctorCaseVO;
 import java.io.Serializable;
 import java.util.Date;
 import jakarta.validation.Validation;
@@ -207,4 +207,5 @@ class DoctorCaseServiceTest {
         entity.setStatus(status);
         return entity;
     }
+
 }

@@ -65,7 +65,7 @@ public class DoctorAuthService {
         user.setUserType(UserTypeEnums.DOCTOR);
 
         user.setNickName(username);
-        user.setStatus(UserStatusEnums.PENDING_REVIEW);
+        user.setStatus(UserStatusEnums.REGISTER);
         user.setPwdUpdateDate(DateUtils.getNowDate());
         user.setPassword(SecurityUtils.encryptPassword(password));
         int affectedRows = user.getUserId() == null
@@ -87,17 +87,13 @@ public class DoctorAuthService {
         if (doctorUser == null) {
             log.warn("doctor login failed, user not exists, username={}", username);
             throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_LOGIN_USER_NOT_EXISTS);
-        } else if (doctorUser.getStatus() == UserStatusEnums.PENDING_REVIEW) {
-            log.warn("doctor login failed, user pending review, username={}", username);
-            throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_LOGIN_PENDING_REVIEW);
-        } else if (doctorUser.getStatus() == UserStatusEnums.REVIEW_FAILED) {
-            log.warn("doctor login failed, user review failed, username={}", username);
-            throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_LOGIN_REVIEW_FAILED);
-        } else if (doctorUser.getStatus() != UserStatusEnums.OK) {
-            log.warn("doctor login failed, user disabled, username={}", username);
-            throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_LOGIN_FAILED);
         } else if (!SecurityUtils.matchesPassword(loginBody.getPassword(), doctorUser.getPassword())) {
             log.warn("doctor login failed, password mismatch, username={}", username);
+            throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_LOGIN_FAILED);
+        }
+        if (doctorUser.getStatus() == UserStatusEnums.DISABLE) {
+            log.warn("doctor login failed, user disabled, username={}",
+                    username);
             throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_LOGIN_FAILED);
         }
 
@@ -126,9 +122,7 @@ public class DoctorAuthService {
         sysUser.setNickName(doctorUser.getNickName());
         sysUser.setUserType(doctorUser.getUserType());
         sysUser.setPassword(doctorUser.getPassword());
-        if (doctorUser.getStatus() != null) {
-            sysUser.setStatus(doctorUser.getStatus().getCode());
-        }
+        sysUser.setStatus(doctorUser.getStatus().getCode());
         sysUser.setDelFlag(doctorUser.getDelFlag());
         sysUser.setLoginIp(doctorUser.getLoginIp());
         sysUser.setLoginDate(doctorUser.getLoginDate());
