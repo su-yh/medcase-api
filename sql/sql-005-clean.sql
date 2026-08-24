@@ -46,4 +46,16 @@ WHERE menu_id = 115;
 DELETE FROM sys_menu
 WHERE menu_id = 115;
 
+DELETE FROM sys_role_menu
+WHERE menu_id = 3;
+
+DELETE FROM sys_menu
+WHERE menu_id = 3;
+
+-- 菜单排序预留空间
+UPDATE sys_menu
+SET order_num = order_num * 1000
+WHERE order_num < 100
+  AND menu_type IN ('M', 'C');
+
 
