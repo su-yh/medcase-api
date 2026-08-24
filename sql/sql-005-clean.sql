@@ -59,3 +59,12 @@ WHERE order_num < 100
   AND menu_type IN ('M', 'C');
 
 
+-- 删除普通角色与“数据监控”菜单的关联
+DELETE FROM sys_role_menu
+WHERE menu_id = 111;
+
+-- 删除“系统监控 / 数据监控”菜单
+DELETE FROM sys_menu
+WHERE menu_id = 111;
+
+
