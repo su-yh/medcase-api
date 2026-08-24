@@ -28,20 +28,20 @@ import org.springframework.web.bind.annotation.RestController;
 public class DoctorUserAdminController {
     private final DoctorUserService doctorUserService;
 
-    @PreAuthorize("@ss.hasPermi('biz:doctor:list')")
+    @PreAuthorize("@ss.hasPermi('doctor:user:list')")
     @GetMapping("/list")
     public PageResult<DoctorUserVO> list(
             PageParam pageParam, @NonNull DoctorUserQuery query) {
         return doctorUserService.page(pageParam, query);
     }
 
-    @PreAuthorize("@ss.hasPermi('biz:doctor:query')")
+    @PreAuthorize("@ss.hasPermi('doctor:user:list')")
     @GetMapping("/{userId}")
     public DoctorUserVO getInfo(@PathVariable Long userId) {
         return doctorUserService.detail(userId);
     }
 
-    @PreAuthorize("@ss.hasPermi('biz:doctor:review')")
+    @PreAuthorize("@ss.hasPermi('doctor:user:list')")
     @PostMapping("/{userId}/review")
     public void review(
             @PathVariable Long userId,

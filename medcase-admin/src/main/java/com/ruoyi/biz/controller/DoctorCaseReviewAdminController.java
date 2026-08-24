@@ -30,7 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class DoctorCaseReviewAdminController {
     private final DoctorCaseReviewService doctorCaseReviewService;
 
-    @PreAuthorize("@ss.hasPermi('biz:case:review:list')")
+    @PreAuthorize("@ss.hasPermi('case:review:list')")
     @GetMapping("/list")
     public PageResult<DoctorCaseReviewVO> list(
             @RequestParam(required = false) Integer pageNum,
@@ -39,13 +39,13 @@ public class DoctorCaseReviewAdminController {
         return doctorCaseReviewService.page(pageNum, pageSize, query);
     }
 
-    @PreAuthorize("@ss.hasPermi('biz:case:review:query')")
+    @PreAuthorize("@ss.hasPermi('case:review:list')")
     @GetMapping("/{id}")
     public DoctorCaseReviewVO getInfo(@PathVariable Long id) {
         return doctorCaseReviewService.detail(id);
     }
 
-    @PreAuthorize("@ss.hasPermi('biz:case:review:review')")
+    @PreAuthorize("@ss.hasPermi('case:review:list')")
     @PostMapping("/{id}/review")
     public void review(
             @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser adminUser,
@@ -54,7 +54,7 @@ public class DoctorCaseReviewAdminController {
         doctorCaseReviewService.review(id, request, adminUser);
     }
 
-    @PreAuthorize("@ss.hasPermi('biz:case:review:settle')")
+    @PreAuthorize("@ss.hasPermi('case:review:list')")
     @PostMapping("/{id}/settle")
     public void settle(
             @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser adminUser,
