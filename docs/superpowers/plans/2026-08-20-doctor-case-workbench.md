@@ -13,7 +13,7 @@
 ### Task 1: Add the doctor case persistence model
 
 **Files:**
-- Create: `sql/doctor_case.sql`
+- Create: `sql/sql-003-doctor_case.sql`
 - Create: `medcase-system/src/main/java/com/ruoyi/system/enums/DoctorCaseStatusEnums.java`
 - Create: `medcase-system/src/main/java/com/ruoyi/system/domain/DoctorCaseEntity.java`
 - Create: `medcase-system/src/main/java/com/ruoyi/system/mapper/DoctorCaseMapper.java`

@@ -1,10 +1,4 @@
--- ----------------------------
--- 业务菜单初始化
--- 说明：
--- 1. 本文件依赖 sql/ry_20260417.sql 已创建 sys_menu 表。
--- 2. 使用固定菜单 ID，保证各环境的父子菜单关系一致。
--- 3. 不初始化 sys_role_menu，角色授权由管理端角色管理完成。
--- ----------------------------
+
 
 insert into sys_menu
     (menu_id, menu_name, parent_id, order_num, path, component, query, route_name,
