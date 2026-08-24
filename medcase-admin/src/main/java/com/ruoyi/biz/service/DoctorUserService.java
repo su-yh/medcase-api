@@ -60,7 +60,8 @@ public class DoctorUserService {
         if (user == null) {
             throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_USER_NOT_FOUND);
         }
-        if (user.getStatus() != UserStatusEnums.PENDING_REVIEW) {
+        if (user.getStatus() != UserStatusEnums.REGISTER
+                && user.getStatus() != UserStatusEnums.PENDING_REVIEW) {
             throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_USER_REVIEW_STATUS_NOT_MATCH);
         }
 

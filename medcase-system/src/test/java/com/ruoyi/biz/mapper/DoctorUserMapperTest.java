@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import java.lang.reflect.Method;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class DoctorUserMapperTest {
@@ -27,6 +28,14 @@ class DoctorUserMapperTest {
 
         assertNotNull(method.getParameters()[1].getAnnotatedType()
                 .getAnnotation(NonNull.class));
+    }
+
+    @Test
+    void exposesPhoneDuplicateQueryForDoctor() throws NoSuchMethodException {
+        Method method = DoctorUserMapper.class.getMethod(
+                "phoneExists", String.class);
+
+        assertEquals(boolean.class, method.getReturnType());
     }
 
 }

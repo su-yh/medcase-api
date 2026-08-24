@@ -30,6 +30,18 @@ public interface DoctorUserMapper extends BaseMapperX<DoctorUserEntity> {
         return exists(queryWrapper);
     }
 
+    default boolean phoneExists(String phone) {
+        if (!StringUtils.hasText(phone)) {
+            return false;
+        }
+
+        LambdaQueryWrapperX<DoctorUserEntity> queryWrapper = build();
+        queryWrapper.eq(DoctorUserEntity::getPhonenumber, phone);
+        queryWrapper.eq(DoctorUserEntity::getUserType, UserTypeEnums.DOCTOR);
+
+        return exists(queryWrapper);
+    }
+
     default DoctorUserEntity selectDoctorByUsername(String username) {
         if (!StringUtils.hasText(username)) {
             return null;

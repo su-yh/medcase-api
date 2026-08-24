@@ -66,8 +66,10 @@ class DoctorAuthServiceTest {
 
     @Test
     void registerInsertsDoctorUserWithEncryptedPassword() {
-        DoctorRegisterRequest registerRequest = registerRequest("doctor01", "secret123");
-        when(doctorUserMapper.selectDoctorByUsername("doctor01")).thenReturn(null);
+        DoctorRegisterRequest registerRequest = registerRequest(
+                "doctor01", "secret123", "13800000000", "9999");
+        when(doctorUserMapper.usernameExists("doctor01")).thenReturn(false);
+        when(doctorUserMapper.phoneExists("13800000000")).thenReturn(false);
         when(doctorUserMapper.insert(any(DoctorUserEntity.class))).thenReturn(1);
 
         doctorAuthService.register(registerRequest);
@@ -78,29 +80,31 @@ class DoctorAuthServiceTest {
         assertEquals("doctor01", user.getUserName());
         assertEquals("doctor01", user.getNickName());
         assertEquals(UserTypeEnums.DOCTOR, user.getUserType());
+        assertEquals("13800000000", user.getPhonenumber());
         assertEquals(UserStatusEnums.REGISTER, user.getStatus());
         assertEquals(null, user.getDelFlag());
         assertNotNull(user.getPwdUpdateDate());
         assertTrue(SecurityUtils.matchesPassword("secret123", user.getPassword()));
-        verify(doctorUserMapper).selectDoctorByUsername("doctor01");
+        verify(doctorUserMapper).usernameExists("doctor01");
     }
 
     @Test
     void registerRejectsDuplicateDoctorUsername() {
-        DoctorRegisterRequest registerRequest = registerRequest("doctor01", "secret123");
-        when(doctorUserMapper.selectDoctorByUsername("doctor01"))
-                .thenReturn(doctorUser("doctor01", "secret123", UserStatusEnums.OK));
+        DoctorRegisterRequest registerRequest = registerRequest(
+                "doctor01", "secret123", "13800000000", "9999");
+        when(doctorUserMapper.usernameExists("doctor01")).thenReturn(true);
 
         AbstractBusinessException exception = assertThrows(AbstractBusinessException.class, () -> doctorAuthService.register(registerRequest));
 
         assertEquals(ErrorCodeEnums.DOCTOR_REGISTER_USER_EXISTS, exception.getEc());
         verify(doctorUserMapper, never()).insert(any(DoctorUserEntity.class));
-        verify(doctorUserMapper).selectDoctorByUsername("doctor01");
+        verify(doctorUserMapper).usernameExists("doctor01");
     }
 
     @Test
     void registerRejectsEmptyUsername() {
-        DoctorRegisterRequest registerRequest = registerRequest("", "secret123");
+        DoctorRegisterRequest registerRequest = registerRequest(
+                "", "secret123", "13800000000", "9999");
 
         AbstractBusinessException exception = assertThrows(AbstractBusinessException.class, () -> doctorAuthService.register(registerRequest));
 
@@ -110,7 +114,8 @@ class DoctorAuthServiceTest {
 
     @Test
     void registerRejectsEmptyPassword() {
-        DoctorRegisterRequest registerRequest = registerRequest("doctor01", "");
+        DoctorRegisterRequest registerRequest = registerRequest(
+                "doctor01", "", "13800000000", "9999");
 
         AbstractBusinessException exception = assertThrows(AbstractBusinessException.class, () -> doctorAuthService.register(registerRequest));
 
@@ -120,7 +125,8 @@ class DoctorAuthServiceTest {
 
     @Test
     void registerRejectsInvalidUsernameLength() {
-        DoctorRegisterRequest registerRequest = registerRequest("d", "secret123");
+        DoctorRegisterRequest registerRequest = registerRequest(
+                "d", "secret123", "13800000000", "9999");
 
         AbstractBusinessException exception = assertThrows(AbstractBusinessException.class, () -> doctorAuthService.register(registerRequest));
 
@@ -130,7 +136,8 @@ class DoctorAuthServiceTest {
 
     @Test
     void registerRejectsInvalidPasswordLength() {
-        DoctorRegisterRequest registerRequest = registerRequest("doctor01", "1234");
+        DoctorRegisterRequest registerRequest = registerRequest(
+                "doctor01", "1234", "13800000000", "9999");
 
         AbstractBusinessException exception = assertThrows(AbstractBusinessException.class, () -> doctorAuthService.register(registerRequest));
 
@@ -140,14 +147,57 @@ class DoctorAuthServiceTest {
 
     @Test
     void registerRejectsInsertFailure() {
-        DoctorRegisterRequest registerRequest = registerRequest("doctor01", "secret123");
-        when(doctorUserMapper.selectDoctorByUsername("doctor01")).thenReturn(null);
+        DoctorRegisterRequest registerRequest = registerRequest(
+                "doctor01", "secret123", "13800000000", "9999");
+        when(doctorUserMapper.usernameExists("doctor01")).thenReturn(false);
+        when(doctorUserMapper.phoneExists("13800000000")).thenReturn(false);
         when(doctorUserMapper.insert(any(DoctorUserEntity.class))).thenReturn(0);
 
         AbstractBusinessException exception = assertThrows(AbstractBusinessException.class, () -> doctorAuthService.register(registerRequest));
 
         assertEquals(ErrorCodeEnums.DOCTOR_REGISTER_FAILED, exception.getEc());
-        verify(doctorUserMapper).selectDoctorByUsername("doctor01");
+        verify(doctorUserMapper).usernameExists("doctor01");
+    }
+
+    @Test
+    void registerRejectsEmptyPhone() {
+        DoctorRegisterRequest registerRequest = registerRequest(
+                "doctor01", "secret123", "", "9999");
+
+        AbstractBusinessException exception = assertThrows(
+                AbstractBusinessException.class,
+                () -> doctorAuthService.register(registerRequest));
+
+        assertEquals(ErrorCodeEnums.DOCTOR_REGISTER_PHONE_EMPTY, exception.getEc());
+        verify(doctorUserMapper, never()).insert(any(DoctorUserEntity.class));
+    }
+
+    @Test
+    void registerRejectsInvalidVerificationCode() {
+        DoctorRegisterRequest registerRequest = registerRequest(
+                "doctor01", "secret123", "13800000000", "1234");
+
+        AbstractBusinessException exception = assertThrows(
+                AbstractBusinessException.class,
+                () -> doctorAuthService.register(registerRequest));
+
+        assertEquals(ErrorCodeEnums.DOCTOR_REGISTER_CODE_INVALID, exception.getEc());
+        verify(doctorUserMapper, never()).insert(any(DoctorUserEntity.class));
+    }
+
+    @Test
+    void registerRejectsDuplicateDoctorPhone() {
+        DoctorRegisterRequest registerRequest = registerRequest(
+                "doctor01", "secret123", "13800000000", "9999");
+        when(doctorUserMapper.usernameExists("doctor01")).thenReturn(false);
+        when(doctorUserMapper.phoneExists("13800000000")).thenReturn(true);
+
+        AbstractBusinessException exception = assertThrows(
+                AbstractBusinessException.class,
+                () -> doctorAuthService.register(registerRequest));
+
+        assertEquals(ErrorCodeEnums.DOCTOR_REGISTER_PHONE_EXISTS, exception.getEc());
+        verify(doctorUserMapper, never()).insert(any(DoctorUserEntity.class));
     }
 
     @Test
@@ -322,10 +372,13 @@ class DoctorAuthServiceTest {
         verify(doctorUserMapper, never()).deleteById(12L);
     }
 
-    private DoctorRegisterRequest registerRequest(String username, String password) {
+    private DoctorRegisterRequest registerRequest(
+            String username, String password, String phone, String code) {
         DoctorRegisterRequest registerRequest = new DoctorRegisterRequest();
         registerRequest.setUsername(username);
         registerRequest.setPassword(password);
+        registerRequest.setPhone(phone);
+        registerRequest.setCode(code);
         return registerRequest;
     }
 

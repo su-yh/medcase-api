@@ -32,6 +32,8 @@ import org.springframework.util.StringUtils;
 @RequiredArgsConstructor
 @Slf4j
 public class DoctorAuthService {
+    private static final String REGISTER_CODE = "9999";
+
     private final DoctorUserMapper doctorUserMapper;
 
     private final SysLoginService loginService;
@@ -43,12 +45,18 @@ public class DoctorAuthService {
     public void register(DoctorRegisterRequest registerBody) {
         String username = registerBody.getUsername();
         String password = registerBody.getPassword();
+        String phone = registerBody.getPhone();
+        String code = registerBody.getCode();
         log.info("doctor register request, username={}", username);
 
         if (!StringUtils.hasText(username)) {
             throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_REGISTER_USERNAME_EMPTY);
         } else if (!StringUtils.hasText(password)) {
             throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_REGISTER_PASSWORD_EMPTY);
+        } else if (!StringUtils.hasText(phone)) {
+            throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_REGISTER_PHONE_EMPTY);
+        } else if (!REGISTER_CODE.equals(code)) {
+            throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_REGISTER_CODE_INVALID);
         } else if (username.length() < UserConstants.USERNAME_MIN_LENGTH
                 || username.length() > UserConstants.USERNAME_MAX_LENGTH) {
             throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_REGISTER_USERNAME_LENGTH_INVALID);
@@ -57,13 +65,16 @@ public class DoctorAuthService {
             throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_REGISTER_PASSWORD_LENGTH_INVALID);
         }
 
-        DoctorUserEntity user = doctorUserMapper.selectDoctorByUsername(username);
-        if (user != null) {
+        if (doctorUserMapper.usernameExists(username)) {
             throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_REGISTER_USER_EXISTS, username);
         }
-        user = new DoctorUserEntity();
+        if (doctorUserMapper.phoneExists(phone)) {
+            throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_REGISTER_PHONE_EXISTS);
+        }
+        DoctorUserEntity user = new DoctorUserEntity();
         user.setUserName(username);
         user.setUserType(UserTypeEnums.DOCTOR);
+        user.setPhonenumber(phone);
 
         user.setNickName(username);
         user.setStatus(UserStatusEnums.REGISTER);

@@ -13,4 +13,8 @@ public class DoctorRegisterRequest {
     private String username;
 
     private String password;
+
+    private String phone;
+
+    private String code;
 }
