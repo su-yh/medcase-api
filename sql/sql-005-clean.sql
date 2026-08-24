@@ -39,3 +39,11 @@ WHERE menu_id IN (4, 117);
 
 DELETE FROM sys_menu
 WHERE menu_id IN (4, 117);
+
+DELETE FROM sys_role_menu
+WHERE menu_id = 115;
+
+DELETE FROM sys_menu
+WHERE menu_id = 115;
+
+
