@@ -13,5 +13,5 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 @ConditionalOnProperty(prefix = DynamicDataSourceProperties.PREFIX, name = "enabled", havingValue = "true", matchIfMissing = true)
 @EnableConfigurationProperties(DynamicDataSourceProviderProperties.class)
 @AutoConfiguration
-public class BaseDynamicDataSourceAutoConfiguration {
+public class AdminDynamicDataSourceAutoConfiguration {
 }
