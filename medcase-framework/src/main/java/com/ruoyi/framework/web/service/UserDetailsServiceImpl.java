@@ -2,6 +2,7 @@ package com.ruoyi.framework.web.service;
 
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.domain.model.LoginUser;
+import com.ruoyi.common.enums.UserTypeEnums;
 import com.ruoyi.common.enums.UserStatusEnums;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.MessageUtils;
@@ -34,7 +35,7 @@ public class UserDetailsServiceImpl implements UserDetailsService
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException
     {
-        SysUser user = userService.selectUserByUserName(username);
+        SysUser user = userService.selectUserByUserName(username, UserTypeEnums.ADMIN.getCode());
         if (StringUtils.isNull(user))
         {
             log.info("登录用户：{} 不存在.", username);

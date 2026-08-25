@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ruoyi.common.config.RuoYiConfig;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.domain.entity.SysUser;
+import com.ruoyi.common.enums.UserTypeEnums;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.system.service.ISysUserService;
@@ -49,7 +50,7 @@ public class SysIndexController
             return AjaxResult.error("密码不能为空");
         }
         String username = SecurityUtils.getUsername();
-        SysUser user = userService.selectUserByUserName(username);
+        SysUser user = userService.selectUserByUserName(username, UserTypeEnums.ADMIN.getCode());
         if (user == null)
         {
             return AjaxResult.error("服务器超时，请重新登录");

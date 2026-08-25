@@ -119,9 +119,9 @@ public class SysUserServiceImpl implements ISysUserService
      * @return 用户对象信息
      */
     @Override
-    public SysUser selectUserByUserName(String userName)
+    public SysUser selectUserByUserName(String userName, String userType)
     {
-        return userMapper.selectUserByUserName(userName);
+        return userMapper.selectUserByUserName(userName, userType);
     }
 
     /**
@@ -516,7 +516,7 @@ public class SysUserServiceImpl implements ISysUserService
             try
             {
                 // 验证是否存在这个用户
-                SysUser u = userMapper.selectUserByUserName(user.getUserName());
+                SysUser u = userMapper.selectUserByUserName(user.getUserName(), UserTypeEnums.ADMIN.getCode());
                 if (StringUtils.isNull(u))
                 {
                     BeanValidators.validateWithException(validator, user);

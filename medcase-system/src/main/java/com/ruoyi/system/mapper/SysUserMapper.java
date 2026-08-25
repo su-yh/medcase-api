@@ -40,9 +40,10 @@ public interface SysUserMapper
      * 通过用户名查询用户
      * 
      * @param userName 用户名
+     * @param userType 用户类型
      * @return 用户对象信息
      */
-    public SysUser selectUserByUserName(String userName);
+    public SysUser selectUserByUserName(@Param("userName") String userName, @Param("userType") String userType);
 
     /**
      * 通过用户ID查询用户
