@@ -1,16 +1,6 @@
 package com.ruoyi.web.controller.system;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
 import com.ruoyi.common.annotation.Anonymous;
-import com.ruoyi.common.constant.Constants;
-import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.domain.entity.SysMenu;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.domain.model.LoginBody;
@@ -22,8 +12,21 @@ import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.framework.web.service.SysLoginService;
 import com.ruoyi.framework.web.service.SysPermissionService;
 import com.ruoyi.framework.web.service.TokenService;
+import com.ruoyi.mvc.response.dto.R;
+import com.ruoyi.system.domain.vo.RouterVo;
 import com.ruoyi.system.service.ISysConfigService;
 import com.ruoyi.system.service.ISysMenuService;
+import com.ruoyi.web.controller.system.dto.LoginResponse;
+import com.ruoyi.web.controller.system.dto.LoginUserInfoResponse;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
 
 /**
  * 登录验证
@@ -56,14 +59,12 @@ public class SysLoginController
      */
     @Anonymous
     @PostMapping("/login")
-    public AjaxResult login(@RequestBody LoginBody loginBody)
+    public R<LoginResponse> login(@RequestBody LoginBody loginBody)
     {
-        AjaxResult ajax = AjaxResult.success();
         // 生成令牌
         String token = loginService.login(loginBody.getUsername(), loginBody.getPassword(), loginBody.getCode(),
                 loginBody.getUuid());
-        ajax.put(Constants.TOKEN, token);
-        return ajax;
+        return R.ofSuccess(new LoginResponse(token));
     }
 
     /**
@@ -72,7 +73,7 @@ public class SysLoginController
      * @return 用户信息
      */
     @GetMapping("getInfo")
-    public AjaxResult getInfo()
+    public R<LoginUserInfoResponse> getInfo()
     {
         LoginUser loginUser = SecurityUtils.getLoginUser();
         SysUser user = loginUser.getUser();
@@ -85,14 +86,14 @@ public class SysLoginController
             loginUser.setPermissions(permissions);
             tokenService.refreshToken(loginUser);
         }
-        AjaxResult ajax = AjaxResult.success();
-        ajax.put("user", user);
-        ajax.put("roles", roles);
-        ajax.put("permissions", permissions);
-        ajax.put("pwdChrtype", getSysAccountChrtype());
-        ajax.put("isDefaultModifyPwd", initPasswordIsModify(user.getPwdUpdateDate()));
-        ajax.put("isPasswordExpired", passwordIsExpiration(user.getPwdUpdateDate()));
-        return ajax;
+        LoginUserInfoResponse data = new LoginUserInfoResponse(
+                user,
+                roles,
+                permissions,
+                getSysAccountChrtype(),
+                initPasswordIsModify(user.getPwdUpdateDate()),
+                passwordIsExpiration(user.getPwdUpdateDate()));
+        return R.ofSuccess(data);
     }
 
     /**
@@ -101,11 +102,11 @@ public class SysLoginController
      * @return 路由信息
      */
     @GetMapping("getRouters")
-    public AjaxResult getRouters()
+    public R<List<RouterVo>> getRouters()
     {
         Long userId = SecurityUtils.getUserId();
         List<SysMenu> menus = menuService.selectMenuTreeByUserId(userId);
-        return AjaxResult.success(menuService.buildMenus(menus));
+        return R.ofSuccess(menuService.buildMenus(menus));
     }
 
     // 获取用户密码自定义配置规则

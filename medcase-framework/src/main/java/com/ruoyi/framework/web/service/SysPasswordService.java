@@ -6,7 +6,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import com.ruoyi.common.constant.CacheConstants;
 import com.ruoyi.common.core.redis.RedisCache;
-import com.ruoyi.common.exception.user.UserPasswordRetryLimitExceedException;
+import com.ruoyi.mvc.constants.enums.ErrorCodeEnums;
+import com.ruoyi.mvc.exception.ExceptionUtil;
 
 /**
  * 登录密码方法
@@ -47,7 +48,8 @@ public class SysPasswordService
 
         if (retryCount >= maxRetryCount)
         {
-            throw new UserPasswordRetryLimitExceedException(maxRetryCount, lockTime);
+            throw ExceptionUtil.business(
+                    ErrorCodeEnums.ADMIN_LOGIN_RETRY_LIMIT_EXCEEDED, maxRetryCount, lockTime);
         }
     }
 

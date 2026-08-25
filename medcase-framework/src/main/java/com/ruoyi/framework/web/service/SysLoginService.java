@@ -4,6 +4,7 @@ import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
@@ -12,18 +13,14 @@ import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.core.redis.RedisCache;
-import com.ruoyi.common.exception.ServiceException;
-import com.ruoyi.common.exception.user.BlackListException;
-import com.ruoyi.common.exception.user.CaptchaException;
-import com.ruoyi.common.exception.user.CaptchaExpireException;
-import com.ruoyi.common.exception.user.UserNotExistsException;
-import com.ruoyi.common.exception.user.UserPasswordNotMatchException;
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.MessageUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.ip.IpUtils;
 import com.ruoyi.framework.manager.AsyncManager;
 import com.ruoyi.framework.manager.factory.AsyncFactory;
+import com.ruoyi.mvc.constants.enums.ErrorCodeEnums;
+import com.ruoyi.mvc.exception.ExceptionUtil;
 import com.ruoyi.system.service.ISysConfigService;
 import com.ruoyi.system.service.ISysUserService;
 
@@ -78,19 +75,23 @@ public class SysLoginService
             // 该方法会去调用UserDetailsServiceImpl.loadUserByUsername
             authentication = authenticationManager.authenticate(authenticationToken);
         }
-        catch (Exception e)
+        catch (AuthenticationException e)
         {
             if (e instanceof BadCredentialsException)
             {
                 passwordService.recordLoginFailure(username);
                 AsyncManager.me().execute(AsyncFactory.recordLogininfor(username, Constants.LOGIN_FAIL, MessageUtils.message("user.password.not.match")));
-                throw new UserPasswordNotMatchException();
+                throw ExceptionUtil.business(ErrorCodeEnums.ADMIN_LOGIN_FAILED);
             }
-            else
-            {
-                AsyncManager.me().execute(AsyncFactory.recordLogininfor(username, Constants.LOGIN_FAIL, e.getMessage()));
-                throw new ServiceException(e.getMessage());
-            }
+            String message = resolveExceptionMessage(e);
+            AsyncManager.me().execute(AsyncFactory.recordLogininfor(username, Constants.LOGIN_FAIL, message));
+            throw ExceptionUtil.business(ErrorCodeEnums.ADMIN_LOGIN_AUTHENTICATION_ERROR, message);
+        }
+        catch (Exception e)
+        {
+            String message = resolveExceptionMessage(e);
+            AsyncManager.me().execute(AsyncFactory.recordLogininfor(username, Constants.LOGIN_FAIL, message));
+            throw ExceptionUtil.business(ErrorCodeEnums.ADMIN_LOGIN_AUTHENTICATION_ERROR, message);
         }
         passwordService.clearLoginRecordCache(username);
         AsyncManager.me().execute(AsyncFactory.recordLogininfor(username, Constants.LOGIN_SUCCESS, MessageUtils.message("user.login.success")));
@@ -118,13 +119,13 @@ public class SysLoginService
             if (captcha == null)
             {
                 AsyncManager.me().execute(AsyncFactory.recordLogininfor(username, Constants.LOGIN_FAIL, MessageUtils.message("user.jcaptcha.expire")));
-                throw new CaptchaExpireException();
+                throw ExceptionUtil.business(ErrorCodeEnums.ADMIN_LOGIN_CAPTCHA_EXPIRED);
             }
             redisCache.deleteObject(verifyKey);
             if (!code.equalsIgnoreCase(captcha))
             {
                 AsyncManager.me().execute(AsyncFactory.recordLogininfor(username, Constants.LOGIN_FAIL, MessageUtils.message("user.jcaptcha.error")));
-                throw new CaptchaException();
+                throw ExceptionUtil.business(ErrorCodeEnums.ADMIN_LOGIN_CAPTCHA_INVALID);
             }
         }
     }
@@ -140,28 +141,28 @@ public class SysLoginService
         if (StringUtils.isEmpty(username) || StringUtils.isEmpty(password))
         {
             AsyncManager.me().execute(AsyncFactory.recordLogininfor(username, Constants.LOGIN_FAIL, MessageUtils.message("not.null")));
-            throw new UserNotExistsException();
+            throw ExceptionUtil.business(ErrorCodeEnums.ADMIN_LOGIN_PARAMETER_EMPTY);
         }
         // 密码如果不在指定范围内 错误
         if (password.length() < UserConstants.PASSWORD_MIN_LENGTH
                 || password.length() > UserConstants.PASSWORD_MAX_LENGTH)
         {
             AsyncManager.me().execute(AsyncFactory.recordLogininfor(username, Constants.LOGIN_FAIL, MessageUtils.message("user.password.not.match")));
-            throw new UserPasswordNotMatchException();
+            throw ExceptionUtil.business(ErrorCodeEnums.ADMIN_LOGIN_FAILED);
         }
         // 用户名不在指定范围内 错误
         if (username.length() < UserConstants.USERNAME_MIN_LENGTH
                 || username.length() > UserConstants.USERNAME_MAX_LENGTH)
         {
             AsyncManager.me().execute(AsyncFactory.recordLogininfor(username, Constants.LOGIN_FAIL, MessageUtils.message("user.password.not.match")));
-            throw new UserPasswordNotMatchException();
+            throw ExceptionUtil.business(ErrorCodeEnums.ADMIN_LOGIN_FAILED);
         }
         // IP黑名单校验
         String blackStr = configService.selectConfigByKey("sys.login.blackIPList");
         if (IpUtils.isMatchedIp(blackStr, IpUtils.getIpAddr()))
         {
             AsyncManager.me().execute(AsyncFactory.recordLogininfor(username, Constants.LOGIN_FAIL, MessageUtils.message("login.blocked")));
-            throw new BlackListException();
+            throw ExceptionUtil.business(ErrorCodeEnums.ADMIN_LOGIN_IP_BLOCKED);
         }
     }
 
@@ -173,5 +174,14 @@ public class SysLoginService
     public void recordLoginInfo(Long userId)
     {
         userService.updateLoginInfo(userId, IpUtils.getIpAddr(), DateUtils.getNowDate());
+    }
+
+    private String resolveExceptionMessage(Throwable throwable)
+    {
+        if (StringUtils.isNotEmpty(throwable.getMessage()))
+        {
+            return throwable.getMessage();
+        }
+        return throwable.getClass().getSimpleName();
     }
 }
