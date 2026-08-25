@@ -24,7 +24,6 @@ import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.ip.IpUtils;
 import com.ruoyi.framework.manager.AsyncManager;
 import com.ruoyi.framework.manager.factory.AsyncFactory;
-import com.ruoyi.framework.security.context.AuthenticationContextHolder;
 import com.ruoyi.system.service.ISysConfigService;
 import com.ruoyi.system.service.ISysUserService;
 
@@ -51,6 +50,9 @@ public class SysLoginService
     @Autowired
     private ISysConfigService configService;
 
+    @Autowired
+    private SysPasswordService passwordService;
+
     /**
      * 登录验证
      * 
@@ -66,12 +68,13 @@ public class SysLoginService
         validateCaptcha(username, code, uuid);
         // 登录前置校验
         loginPreCheck(username, password);
+        // 登录失败次数校验
+        passwordService.validateLoginRetryCount(username);
         // 用户验证
         Authentication authentication = null;
         try
         {
             UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username, password);
-            AuthenticationContextHolder.setContext(authenticationToken);
             // 该方法会去调用UserDetailsServiceImpl.loadUserByUsername
             authentication = authenticationManager.authenticate(authenticationToken);
         }
@@ -79,6 +82,7 @@ public class SysLoginService
         {
             if (e instanceof BadCredentialsException)
             {
+                passwordService.recordLoginFailure(username);
                 AsyncManager.me().execute(AsyncFactory.recordLogininfor(username, Constants.LOGIN_FAIL, MessageUtils.message("user.password.not.match")));
                 throw new UserPasswordNotMatchException();
             }
@@ -88,10 +92,7 @@ public class SysLoginService
                 throw new ServiceException(e.getMessage());
             }
         }
-        finally
-        {
-            AuthenticationContextHolder.clearContext();
-        }
+        passwordService.clearLoginRecordCache(username);
         AsyncManager.me().execute(AsyncFactory.recordLogininfor(username, Constants.LOGIN_SUCCESS, MessageUtils.message("user.login.success")));
         LoginUser loginUser = (LoginUser) authentication.getPrincipal();
         recordLoginInfo(loginUser.getUserId());
