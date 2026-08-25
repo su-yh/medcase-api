@@ -1,9 +1,9 @@
 package com.ruoyi.datasource.hikari;
 
 import com.zaxxer.hikari.HikariDataSource;
-import jakarta.validation.Valid;
 import lombok.Data;
 import org.springframework.boot.context.properties.NestedConfigurationProperty;
+import org.springframework.boot.flyway.autoconfigure.FlywayProperties;
 
 /**
  * @author suyh
@@ -12,6 +12,5 @@ import org.springframework.boot.context.properties.NestedConfigurationProperty;
 @Data
 public class HikariDataSourcePlus extends HikariDataSource {
     @NestedConfigurationProperty
-    @Valid
     private final FlywayProperties flyway = new FlywayProperties();
 }

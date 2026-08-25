@@ -20,6 +20,7 @@
         <spring-boot.version>4.1.0</spring-boot.version>
         <mybatis-plus.version>3.5.17</mybatis-plus.version>
         <mybatis-plus-jsqlparser.version>3.5.17</mybatis-plus-jsqlparser.version>
+        <dynamic-datasource.version>4.5.0</dynamic-datasource.version>
         <yauaa.version>8.2.0</yauaa.version>
         <kaptcha.version>2.3.3</kaptcha.version>
         <pagehelper.boot.version>4.1.1</pagehelper.boot.version>
@@ -129,6 +130,12 @@
                 <groupId>com.medcase</groupId>
                 <artifactId>medcase-common</artifactId>
                 <version>${medcase.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>dynamic-datasource-spring-boot4-starter</artifactId>
+                <version>${dynamic-datasource.version}</version>
             </dependency>
 
         </dependencies>

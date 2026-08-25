@@ -15,10 +15,6 @@
         web服务入口
     </description>
 
-    <properties>
-        <dynamic-datasource.version>3.6.1</dynamic-datasource.version>
-    </properties>
-
     <dependencies>
 
         <!-- 单元测试 -->
@@ -42,8 +38,18 @@
 
         <dependency>
             <groupId>com.baomidou</groupId>
-            <artifactId>dynamic-datasource-spring-boot-starter</artifactId>
-            <version>${dynamic-datasource.version}</version>
+            <artifactId>dynamic-datasource-spring-boot4-starter</artifactId>
+        </dependency>
+
+        <!-- Flyway 配置模型和自动配置；版本由 Spring Boot BOM 管理 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-flyway</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-mysql</artifactId>
         </dependency>
 
     </dependencies>
