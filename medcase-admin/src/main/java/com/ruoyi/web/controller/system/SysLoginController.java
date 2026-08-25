@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import com.ruoyi.common.annotation.Anonymous;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.domain.entity.SysMenu;
@@ -53,6 +54,7 @@ public class SysLoginController
      * @param loginBody 登录信息
      * @return 结果
      */
+    @Anonymous
     @PostMapping("/login")
     public AjaxResult login(@RequestBody LoginBody loginBody)
     {
