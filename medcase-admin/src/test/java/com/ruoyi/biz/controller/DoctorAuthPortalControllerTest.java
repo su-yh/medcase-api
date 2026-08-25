@@ -12,7 +12,9 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.verify;
@@ -77,12 +79,14 @@ class DoctorAuthPortalControllerTest {
 
     @Test
     void loginAndRegisterAreAnonymous() throws NoSuchMethodException {
-        assertNotNull(DoctorAuthPortalController.class
-                .getMethod("login", DoctorLoginRequest.class)
-                .getAnnotation(Anonymous.class));
-        assertNotNull(DoctorAuthPortalController.class
-                .getMethod("register", DoctorRegisterRequest.class)
-                .getAnnotation(Anonymous.class));
+        assertArrayEquals(new RequestMethod[] {RequestMethod.POST},
+                DoctorAuthPortalController.class.getMethod("login", DoctorLoginRequest.class)
+                        .getAnnotation(RequestMapping.class).method());
+        assertArrayEquals(new RequestMethod[] {RequestMethod.POST},
+                DoctorAuthPortalController.class.getMethod("register", DoctorRegisterRequest.class)
+                        .getAnnotation(RequestMapping.class).method());
+        assertNotNull(DoctorAuthPortalController.class.getMethod("login", DoctorLoginRequest.class).getAnnotation(Anonymous.class));
+        assertNotNull(DoctorAuthPortalController.class.getMethod("register", DoctorRegisterRequest.class).getAnnotation(Anonymous.class));
     }
 
     private LoginUser doctorLoginUser() {

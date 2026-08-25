@@ -11,8 +11,8 @@ import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.HttpMethod;
 import com.ruoyi.common.utils.StringUtils;
-import com.ruoyi.common.enums.HttpMethod;
 
 /**
  * 防止XSS攻击的过滤器
@@ -60,7 +60,7 @@ public class XssFilter implements Filter
         String url = request.getServletPath();
         String method = request.getMethod();
         // GET DELETE 不过滤
-        if (method == null || HttpMethod.GET.matches(method) || HttpMethod.DELETE.matches(method))
+        if (method == null || StringUtils.equalsAny(method, HttpMethod.GET.name(), HttpMethod.DELETE.name()))
         {
             return true;
         }

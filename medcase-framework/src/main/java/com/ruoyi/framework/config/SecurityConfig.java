@@ -1,5 +1,9 @@
 package com.ruoyi.framework.config;
 
+import com.ruoyi.framework.config.properties.PermitAllUrlProperties;
+import com.ruoyi.framework.security.filter.JwtAuthenticationTokenFilter;
+import com.ruoyi.framework.security.handle.AuthenticationEntryPointImpl;
+import com.ruoyi.framework.security.handle.LogoutSuccessHandlerImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,20 +16,15 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import com.ruoyi.framework.config.properties.PermitAllUrlProperties;
-import com.ruoyi.framework.security.filter.JwtAuthenticationTokenFilter;
-import com.ruoyi.framework.security.handle.AuthenticationEntryPointImpl;
-import com.ruoyi.framework.security.handle.LogoutSuccessHandlerImpl;
 
 /**
  * spring security配置
- * 
+ *
  * @author ruoyi
  */
 @EnableMethodSecurity(prePostEnabled = true, securedEnabled = true)
 @Configuration
-public class SecurityConfig
-{
+public class SecurityConfig {
     static final String ERROR_PATH = "/error";
 
     /**
@@ -45,21 +44,21 @@ public class SecurityConfig
      */
     @Autowired
     private JwtAuthenticationTokenFilter authenticationTokenFilter;
-    
+
     /**
      * 允许匿名访问的地址
      */
     @Autowired
     private PermitAllUrlProperties permitAllUrl;
 
-	/**
-	 * 身份验证实现
-	 */
-	@Bean
-	public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception 
-	{
-		return authenticationConfiguration.getAuthenticationManager();
-	}
+    /**
+     * 身份验证实现
+     */
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration)
+            throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
+    }
 
     /**
      * anyRequest          |   匹配所有请求路径
@@ -77,43 +76,43 @@ public class SecurityConfig
      * authenticated       |   用户登录后可访问
      */
     @Bean
-    protected SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception
-    {
+    protected SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
-            // CSRF禁用，因为不使用session
-            .csrf(csrf -> csrf.disable())
-            // 禁用HTTP响应标头
-            .headers((headersCustomizer) -> {
-                headersCustomizer.cacheControl(cache -> cache.disable()).frameOptions(options -> options.sameOrigin());
-            })
-            // 认证失败处理类
-            .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
-            // 基于token，所以不需要session
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            // 注解标记允许匿名访问的url
-            .authorizeHttpRequests((requests) -> {
-                permitAllUrl.getUrls().forEach(url -> requests.requestMatchers(url).permitAll());
-                // 对于登录login 注册register 验证码captchaImage 允许匿名访问
-                requests.requestMatchers("/login", "/register", "/captchaImage").permitAll()
-                    .requestMatchers(ERROR_PATH).permitAll()
-                    // 静态资源，可匿名访问
-                    .requestMatchers(HttpMethod.GET, "/", "/*.html", "/**.html", "/**.css", "/**.js", "/profile/**").permitAll()
-                    // 除上面外的所有请求全部需要鉴权认证
-                    .anyRequest().authenticated();
-            })
-            // 添加Logout filter
-            .logout(logout -> logout.logoutUrl("/logout").logoutSuccessHandler(logoutSuccessHandler))
-            // 添加JWT filter
-            .addFilterBefore(authenticationTokenFilter, UsernamePasswordAuthenticationFilter.class)
-            .build();
+                // CSRF禁用，因为不使用session
+                .csrf(csrf -> csrf.disable())
+                // 禁用HTTP响应标头
+                .headers(headersCustomizer -> {
+                    headersCustomizer.cacheControl(cache -> cache.disable()).frameOptions(options -> options.sameOrigin());
+                })
+                // 认证失败处理类
+                .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
+                // 基于token，所以不需要session
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                // 注解标记允许匿名访问的url
+                .authorizeHttpRequests(requests -> {
+                    permitAllUrl.getMethodUrls().forEach((method, urls) -> requests
+                            .requestMatchers(HttpMethod.valueOf(method.name()), urls.toArray(String[]::new)).permitAll());
+                    // 对于登录login 注册register 验证码captchaImage 允许匿名访问
+                    requests.requestMatchers("/login", "/register", "/captchaImage").permitAll()
+                            .requestMatchers(ERROR_PATH).permitAll()
+                            // 静态资源，可匿名访问
+                            .requestMatchers(HttpMethod.GET, "/", "/*.html", "/**.html", "/**.css", "/**.js", "/profile/**")
+                            .permitAll()
+                            // 除上面外的所有请求全部需要鉴权认证
+                            .anyRequest().authenticated();
+                })
+                // 添加Logout filter
+                .logout(logout -> logout.logoutUrl("/logout").logoutSuccessHandler(logoutSuccessHandler))
+                // 添加JWT filter
+                .addFilterBefore(authenticationTokenFilter, UsernamePasswordAuthenticationFilter.class)
+                .build();
     }
 
     /**
      * 强散列哈希加密实现
      */
     @Bean
-    public BCryptPasswordEncoder bCryptPasswordEncoder()
-    {
+    public BCryptPasswordEncoder bCryptPasswordEncoder() {
         return new BCryptPasswordEncoder();
     }
 }
