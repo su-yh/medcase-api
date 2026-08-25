@@ -1,0 +1,37 @@
+spring:
+  flyway:
+    # Flyway 由自定义多数据源逻辑按数据源分别执行
+    enabled: false
+  datasource:
+    dynamic:
+      # 是否启用动态数据源
+      enabled: true
+      # 默认数据源
+      primary: master
+      # 严格模式下未匹配到数据源直接报错
+      strict: true
+      hikari:
+        master:
+          # JDBC连接地址
+          jdbc-url: jdbc:mysql://qu-yun.isuyh.com/suyh_medcase?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=UTC&connectTimeout=30000&socketTimeout=60000
+          # 数据源用户名
+          username: suyh_medcase
+          # 数据源密码
+          password: suyh_medcase
+          # 数据库驱动
+          driver-class-name: com.mysql.cj.jdbc.Driver
+          # Hikari连接池最小空闲数
+          minimum-idle: 10
+          # Hikari连接池最大连接数
+          maximum-pool-size: 20
+          # 连接超时时间
+          connection-timeout: 60000
+          # 空闲超时时间
+          idle-timeout: 300000
+          # 连接最大生命周期
+          max-lifetime: 900000
+          flyway:
+            # 是否启用该数据源的Flyway
+            enabled: false
+            # 是否在空库上自动基线
+            baseline-on-migrate: true

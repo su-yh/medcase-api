@@ -1,0 +1,10 @@
+# MyBatis-Plus配置
+mybatis-plus:
+  # 搜索指定包别名
+  type-aliases-package: com.ruoyi.**.domain
+  # 配置mapper的扫描，找到所有的mapper.xml映射文件
+  mapper-locations: classpath*:mapper/**/*Mapper.xml
+  configuration:
+    # 保留原 mybatis-config.xml 中的有效行为
+    use-generated-keys: true
+    log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl

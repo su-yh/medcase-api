@@ -1,0 +1,6 @@
+spring:
+  jackson:
+    # 时区
+    time-zone: GMT+8
+    # 日期格式
+    date-format: yyyy-MM-dd HH:mm:ss
