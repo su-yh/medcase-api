@@ -1,0 +1,70 @@
+-- Quartz 表
+DROP TABLE IF EXISTS QRTZ_FIRED_TRIGGERS;
+DROP TABLE IF EXISTS QRTZ_PAUSED_TRIGGER_GRPS;
+DROP TABLE IF EXISTS QRTZ_SCHEDULER_STATE;
+DROP TABLE IF EXISTS QRTZ_LOCKS;
+DROP TABLE IF EXISTS QRTZ_SIMPLE_TRIGGERS;
+DROP TABLE IF EXISTS QRTZ_SIMPROP_TRIGGERS;
+DROP TABLE IF EXISTS QRTZ_CRON_TRIGGERS;
+DROP TABLE IF EXISTS QRTZ_BLOB_TRIGGERS;
+DROP TABLE IF EXISTS QRTZ_TRIGGERS;
+DROP TABLE IF EXISTS QRTZ_JOB_DETAILS;
+DROP TABLE IF EXISTS QRTZ_CALENDARS;
+
+-- 业务定时任务表
+DROP TABLE IF EXISTS sys_job_log;
+DROP TABLE IF EXISTS sys_job;
+
+-- 代码生成表
+DROP TABLE IF EXISTS gen_table_column;
+DROP TABLE IF EXISTS gen_table;
+
+-- 删除角色与相关菜单按钮的关联
+DELETE FROM sys_role_menu
+WHERE menu_id IN (110, 116, 1049, 1050, 1051, 1052, 1053, 1054, 1055, 1056, 1057, 1058, 1059, 1060);
+
+-- 删除定时任务、代码生成菜单及按钮权限
+DELETE FROM sys_menu
+WHERE menu_id IN (110, 116, 1049, 1050, 1051, 1052, 1053, 1054, 1055, 1056, 1057, 1058, 1059, 1060);
+
+-- 删除相关字典数据
+DELETE FROM sys_dict_data
+WHERE dict_type IN ('sys_job_status', 'sys_job_group');
+
+DELETE FROM sys_dict_type
+WHERE dict_type IN ('sys_job_status', 'sys_job_group');
+
+DELETE FROM sys_role_menu
+WHERE menu_id IN (4, 117);
+
+DELETE FROM sys_menu
+WHERE menu_id IN (4, 117);
+
+DELETE FROM sys_role_menu
+WHERE menu_id = 115;
+
+DELETE FROM sys_menu
+WHERE menu_id = 115;
+
+DELETE FROM sys_role_menu
+WHERE menu_id = 3;
+
+DELETE FROM sys_menu
+WHERE menu_id = 3;
+
+-- 菜单排序预留空间
+UPDATE sys_menu
+SET order_num = order_num * 1000
+WHERE order_num < 100
+  AND menu_type IN ('M', 'C');
+
+
+-- 删除普通角色与“数据监控”菜单的关联
+DELETE FROM sys_role_menu
+WHERE menu_id = 111;
+
+-- 删除“系统监控 / 数据监控”菜单
+DELETE FROM sys_menu
+WHERE menu_id = 111;
+
+

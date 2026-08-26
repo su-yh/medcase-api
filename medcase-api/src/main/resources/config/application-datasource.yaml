@@ -1,6 +1,6 @@
 spring:
   flyway:
-    # Flyway 由自定义多数据源逻辑按数据源分别执行
+    # Flyway 由自定义多数据源逻辑按数据源分别执行，这里是固定值false，不可以修改为true
     enabled: false
   datasource:
     dynamic:
@@ -13,11 +13,11 @@ spring:
       hikari:
         master:
           # JDBC连接地址
-          jdbc-url: jdbc:mysql://qu-yun.isuyh.com/suyh_medcase?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=UTC&connectTimeout=30000&socketTimeout=60000
+          jdbc-url: jdbc:mysql://qu-yun.isuyh.com/suyh_medcase_test?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=UTC&connectTimeout=30000&socketTimeout=60000
           # 数据源用户名
-          username: suyh_medcase
+          username: suyh_medcase_test
           # 数据源密码
-          password: suyh_medcase
+          password: suyh_medcase_test
           # 数据库驱动
           driver-class-name: com.mysql.cj.jdbc.Driver
           # Hikari连接池最小空闲数
@@ -32,6 +32,8 @@ spring:
           max-lifetime: 900000
           flyway:
             # 是否启用该数据源的Flyway
-            enabled: false
+            enabled: true
             # 是否在空库上自动基线
             baseline-on-migrate: true
+            locations:
+              - classpath:db/migration/master
