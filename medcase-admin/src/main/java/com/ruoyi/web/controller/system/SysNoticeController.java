@@ -15,13 +15,14 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.core.controller.BaseController;
-import com.ruoyi.common.core.domain.AjaxResult;
+import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.core.text.Convert;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.system.domain.SysNotice;
 import com.ruoyi.system.service.ISysNoticeReadService;
 import com.ruoyi.system.service.ISysNoticeService;
+import com.ruoyi.web.controller.system.dto.NoticeTopResponse;
 
 /**
  * 公告 信息操作处理
@@ -54,9 +55,9 @@ public class SysNoticeController extends BaseController
      * 根据通知公告编号获取详细信息
      */
     @GetMapping(value = "/{noticeId}")
-    public AjaxResult getInfo(@PathVariable Long noticeId)
+    public R<SysNotice> getInfo(@PathVariable Long noticeId)
     {
-        return success(noticeService.selectNoticeById(noticeId));
+        return R.ofSuccess(noticeService.selectNoticeById(noticeId));
     }
 
     /**
@@ -65,10 +66,10 @@ public class SysNoticeController extends BaseController
     @PreAuthorize("@ss.hasPermi('system:notice:add')")
     @Log(title = "通知公告", businessType = BusinessType.INSERT)
     @PostMapping
-    public AjaxResult add(@Validated @RequestBody SysNotice notice)
+    public R<Void> add(@Validated @RequestBody SysNotice notice)
     {
         notice.setCreateBy(getUsername());
-        return toAjax(noticeService.insertNotice(notice));
+        return noticeService.insertNotice(notice) > 0 ? R.ofSuccess() : R.ofFail("操作失败");
     }
 
     /**
@@ -77,10 +78,10 @@ public class SysNoticeController extends BaseController
     @PreAuthorize("@ss.hasPermi('system:notice:edit')")
     @Log(title = "通知公告", businessType = BusinessType.UPDATE)
     @PutMapping
-    public AjaxResult edit(@Validated @RequestBody SysNotice notice)
+    public R<Void> edit(@Validated @RequestBody SysNotice notice)
     {
         notice.setUpdateBy(getUsername());
-        return toAjax(noticeService.updateNotice(notice));
+        return noticeService.updateNotice(notice) > 0 ? R.ofSuccess() : R.ofFail("操作失败");
     }
 
     /**
@@ -88,14 +89,12 @@ public class SysNoticeController extends BaseController
      */
     @GetMapping("/listTop")
     @ResponseBody
-    public AjaxResult listTop()
+    public R<NoticeTopResponse> listTop()
     {
         Long userId = getUserId();
         List<SysNotice> list = noticeReadService.selectNoticeListWithReadStatus(userId, 5);
         long unreadCount = list.stream().filter(n -> !n.getIsRead()).count();
-        AjaxResult result = AjaxResult.success(list);
-        result.put("unreadCount", unreadCount);
-        return result;
+        return R.ofSuccess(new NoticeTopResponse(list, unreadCount));
     }
 
     /**
@@ -103,11 +102,11 @@ public class SysNoticeController extends BaseController
      */
     @PostMapping("/markRead")
     @ResponseBody
-    public AjaxResult markRead(Long noticeId)
+    public R<Void> markRead(Long noticeId)
     {
         Long userId = getUserId();
         noticeReadService.markRead(noticeId, userId);
-        return success();
+        return R.ofSuccess();
     }
 
     /**
@@ -115,12 +114,12 @@ public class SysNoticeController extends BaseController
      */
     @PostMapping("/markReadAll")
     @ResponseBody
-    public AjaxResult markReadAll(String ids)
+    public R<Void> markReadAll(String ids)
     {
         Long userId = getUserId();
         Long[] noticeIds = Convert.toLongArray(ids);
         noticeReadService.markReadBatch(userId, noticeIds);
-        return success();
+        return R.ofSuccess();
     }
 
     /**
@@ -142,9 +141,9 @@ public class SysNoticeController extends BaseController
     @PreAuthorize("@ss.hasPermi('system:notice:remove')")
     @Log(title = "通知公告", businessType = BusinessType.DELETE)
     @DeleteMapping("/{noticeIds}")
-    public AjaxResult remove(@PathVariable Long[] noticeIds)
+    public R<Void> remove(@PathVariable Long[] noticeIds)
     {
         noticeReadService.deleteByNoticeIds(noticeIds);
-        return toAjax(noticeService.deleteNoticeByIds(noticeIds));
+        return noticeService.deleteNoticeByIds(noticeIds) > 0 ? R.ofSuccess() : R.ofFail("操作失败");
     }
 }

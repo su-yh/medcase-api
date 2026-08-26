@@ -12,7 +12,7 @@ import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.framework.web.service.SysLoginService;
 import com.ruoyi.framework.web.service.SysPermissionService;
 import com.ruoyi.framework.web.service.TokenService;
-import com.ruoyi.mvc.response.dto.R;
+import com.ruoyi.common.core.domain.R;
 import com.ruoyi.system.domain.vo.RouterVo;
 import com.ruoyi.system.service.ISysConfigService;
 import com.ruoyi.system.service.ISysMenuService;

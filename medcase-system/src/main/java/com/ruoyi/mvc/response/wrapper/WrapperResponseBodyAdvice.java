@@ -2,7 +2,7 @@ package com.ruoyi.mvc.response.wrapper;
 
 import com.ruoyi.common.utils.json.JsonUtils;
 import com.ruoyi.mvc.response.annotation.WrapperResponseAdvice;
-import com.ruoyi.mvc.response.dto.R;
+import com.ruoyi.common.core.domain.R;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.MediaType;

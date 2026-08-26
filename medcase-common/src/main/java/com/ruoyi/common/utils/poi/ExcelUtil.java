@@ -74,7 +74,7 @@ import com.ruoyi.common.annotation.Excel;
 import com.ruoyi.common.annotation.Excel.ColumnType;
 import com.ruoyi.common.annotation.Excel.Type;
 import com.ruoyi.common.annotation.Excels;
-import com.ruoyi.common.core.domain.AjaxResult;
+import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.core.text.Convert;
 import com.ruoyi.common.exception.UtilException;
 import com.ruoyi.common.utils.DateUtils;
@@ -547,7 +547,7 @@ public class ExcelUtil<T>
      * @param sheetName 工作表的名称
      * @return 结果
      */
-    public AjaxResult exportExcel(List<T> list, String sheetName)
+    public R<String> exportExcel(List<T> list, String sheetName)
     {
         return exportExcel(list, sheetName, StringUtils.EMPTY);
     }
@@ -560,7 +560,7 @@ public class ExcelUtil<T>
      * @param title 标题
      * @return 结果
      */
-    public AjaxResult exportExcel(List<T> list, String sheetName, String title)
+    public R<String> exportExcel(List<T> list, String sheetName, String title)
     {
         this.init(list, sheetName, title, Type.EXPORT);
         return exportExcel();
@@ -629,14 +629,14 @@ public class ExcelUtil<T>
      * 多 Sheet 导出 —— 将多个不同类型的数据集合写入同一 Excel，生成文件并返回下载地址
      *
      * @param sheets Sheet 描述列表
-     * @return AjaxResult（含文件下载地址）
+     * @return R<String>（含文件下载地址）
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    public static AjaxResult exportMultiSheet(List<ExcelSheet<?>> sheets)
+    public static R<String> exportMultiSheet(List<ExcelSheet<?>> sheets)
     {
         if (sheets == null || sheets.isEmpty())
         {
-            return AjaxResult.error("导出数据不能为空");
+            return R.ofFail("导出数据不能为空");
         }
         SXSSFWorkbook wb = buildWorkbook(sheets);
         OutputStream out = null;
@@ -646,7 +646,7 @@ public class ExcelUtil<T>
             String filename = firstUtil.encodingFilename(sheets.get(0).getSheetName());
             out = new FileOutputStream(firstUtil.getAbsoluteFile(filename));
             wb.write(out);
-            return AjaxResult.success(filename);
+            return R.ofSuccess(filename);
         }
         catch (Exception e)
         {
@@ -713,7 +713,7 @@ public class ExcelUtil<T>
      * @param sheetName 工作表的名称
      * @return 结果
      */
-    public AjaxResult importTemplateExcel(String sheetName)
+    public R<String> importTemplateExcel(String sheetName)
     {
         return importTemplateExcel(sheetName, StringUtils.EMPTY);
     }
@@ -725,7 +725,7 @@ public class ExcelUtil<T>
      * @param title 标题
      * @return 结果
      */
-    public AjaxResult importTemplateExcel(String sheetName, String title)
+    public R<String> importTemplateExcel(String sheetName, String title)
     {
         this.init(null, sheetName, title, Type.IMPORT);
         return exportExcel();
@@ -784,7 +784,7 @@ public class ExcelUtil<T>
      *
      * @return 结果
      */
-    public AjaxResult exportExcel()
+    public R<String> exportExcel()
     {
         OutputStream out = null;
         try
@@ -793,7 +793,7 @@ public class ExcelUtil<T>
             String filename = encodingFilename(sheetName);
             out = new FileOutputStream(getAbsoluteFile(filename));
             wb.write(out);
-            return AjaxResult.success(filename);
+            return R.ofSuccess(filename);
         }
         catch (Exception e)
         {
