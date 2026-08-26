@@ -15,9 +15,11 @@ import org.springframework.data.redis.core.script.RedisScript;
 import org.springframework.stereotype.Component;
 import com.ruoyi.common.annotation.RateLimiter;
 import com.ruoyi.common.enums.LimitType;
-import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.ip.IpUtils;
+import com.ruoyi.mvc.constants.enums.ErrorCodeEnums;
+import com.ruoyi.mvc.exception.AbstractBusinessException;
+import com.ruoyi.mvc.exception.ExceptionUtil;
 
 /**
  * 限流处理
@@ -59,11 +61,11 @@ public class RateLimiterAspect
             Long number = redisTemplate.execute(limitScript, keys, count, time);
             if (StringUtils.isNull(number) || number.intValue() > count)
             {
-                throw new ServiceException("访问过于频繁，请稍候再试");
+                throw ExceptionUtil.business(ErrorCodeEnums.RATE_LIMIT_EXCEEDED);
             }
             log.info("限制请求'{}',当前请求'{}',缓存key'{}'", count, number.intValue(), combineKey);
         }
-        catch (ServiceException e)
+        catch (AbstractBusinessException e)
         {
             throw e;
         }

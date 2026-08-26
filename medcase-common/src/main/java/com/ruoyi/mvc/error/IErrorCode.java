@@ -12,5 +12,6 @@ public interface IErrorCode {
      * 业务相关的错误码范围：[2000_000, +∞)
      */
     int getCode();
+
     String getMsg();
 }

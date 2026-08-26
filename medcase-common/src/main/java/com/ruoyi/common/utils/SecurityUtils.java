@@ -8,10 +8,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.util.PatternMatchUtils;
 import com.ruoyi.common.constant.Constants;
-import com.ruoyi.common.constant.HttpStatus;
 import com.ruoyi.common.core.domain.entity.SysRole;
 import com.ruoyi.common.core.domain.model.LoginUser;
-import com.ruoyi.common.exception.ServiceException;
+import com.ruoyi.mvc.constants.enums.ErrorCodeEnums;
+import com.ruoyi.mvc.exception.ExceptionUtil;
 
 /**
  * 安全服务工具类
@@ -32,7 +32,7 @@ public class SecurityUtils
         }
         catch (Exception e)
         {
-            throw new ServiceException("获取用户ID异常", HttpStatus.UNAUTHORIZED);
+            throw ExceptionUtil.business(ErrorCodeEnums.USER_ID_RESOLVE_FAILED);
         }
     }
 
@@ -47,7 +47,7 @@ public class SecurityUtils
         }
         catch (Exception e)
         {
-            throw new ServiceException("获取部门ID异常", HttpStatus.UNAUTHORIZED);
+            throw ExceptionUtil.business(ErrorCodeEnums.DEPT_ID_RESOLVE_FAILED);
         }
     }
 
@@ -62,7 +62,7 @@ public class SecurityUtils
         }
         catch (Exception e)
         {
-            throw new ServiceException("获取用户账户异常", HttpStatus.UNAUTHORIZED);
+            throw ExceptionUtil.business(ErrorCodeEnums.USERNAME_RESOLVE_FAILED);
         }
     }
 
@@ -77,7 +77,7 @@ public class SecurityUtils
         }
         catch (Exception e)
         {
-            throw new ServiceException("获取用户信息异常", HttpStatus.UNAUTHORIZED);
+            throw ExceptionUtil.business(ErrorCodeEnums.LOGIN_USER_RESOLVE_FAILED);
         }
     }
 

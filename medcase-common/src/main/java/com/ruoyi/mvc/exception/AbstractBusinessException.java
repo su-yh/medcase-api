@@ -49,25 +49,5 @@ public abstract class AbstractBusinessException extends RuntimeException {
         if (!cls.isEnum()) {
             log.warn("NO ENUM Class: {}", cls.getName());
         }
-
-//        CLASS_MAP.computeIfAbsent(cls, c -> {
-//            if (!c.isEnum()) {
-//                log.warn("NO ENUM Class: {}", c.getName());
-//                return 0;
-//            }
-//
-//            // 获取枚举的所有实例（返回 Object[]）
-//            IErrorCode[] enumConstants = c.getEnumConstants();
-//            for (IErrorCode errorCode : enumConstants) {
-//                // 如果枚举实现了特定接口，可以进一步转换
-//
-//                // FIXME: suyh - 并发问题，暂时不管
-//                if (!CODE_SET.add(errorCode.getCode())) {
-//                    log.error("CODE DUPLICATION: {}", errorCode.getCode());
-//                }
-//            }
-//
-//            return 0;
-//        });
     }
 }

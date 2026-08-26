@@ -13,13 +13,14 @@ import com.ruoyi.common.core.domain.TreeSelect;
 import com.ruoyi.common.core.domain.entity.SysDept;
 import com.ruoyi.common.core.domain.entity.SysRole;
 import com.ruoyi.common.core.text.Convert;
-import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.spring.SpringUtils;
 import com.ruoyi.system.mapper.SysDeptMapper;
 import com.ruoyi.system.mapper.SysRoleMapper;
 import com.ruoyi.system.service.ISysDeptService;
+import com.ruoyi.mvc.constants.enums.ErrorCodeEnums;
+import com.ruoyi.mvc.exception.ExceptionUtil;
 
 /**
  * 部门管理 服务实现
@@ -197,7 +198,7 @@ public class SysDeptServiceImpl implements ISysDeptService
             List<SysDept> depts = SpringUtils.getAopProxy(this).selectDeptList(dept);
             if (StringUtils.isEmpty(depts))
             {
-                throw new ServiceException("没有权限访问部门数据！");
+                throw ExceptionUtil.business(ErrorCodeEnums.DEPT_DATA_SCOPE_DENIED);
             }
         }
     }
@@ -215,7 +216,7 @@ public class SysDeptServiceImpl implements ISysDeptService
         // 如果父节点不为正常状态,则不允许新增子节点
         if (!UserConstants.DEPT_NORMAL.equals(info.getStatus()))
         {
-            throw new ServiceException("部门停用，不允许新增");
+            throw ExceptionUtil.business(ErrorCodeEnums.DEPT_DISABLED);
         }
         dept.setAncestors(info.getAncestors() + "," + dept.getParentId());
         return deptMapper.insertDept(dept);
@@ -303,7 +304,7 @@ public class SysDeptServiceImpl implements ISysDeptService
         }
         catch (Exception e)
         {
-            throw new ServiceException("保存排序异常，请联系管理员");
+            throw ExceptionUtil.business(ErrorCodeEnums.DEPT_SORT_SAVE_FAILED);
         }
     }
 

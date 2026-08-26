@@ -4,9 +4,9 @@ import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.enums.UserTypeEnums;
 import com.ruoyi.common.enums.UserStatusEnums;
-import com.ruoyi.common.exception.ServiceException;
-import com.ruoyi.common.utils.MessageUtils;
 import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.mvc.constants.enums.ErrorCodeEnums;
+import com.ruoyi.mvc.exception.ExceptionUtil;
 import com.ruoyi.system.service.ISysUserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,17 +39,17 @@ public class UserDetailsServiceImpl implements UserDetailsService
         if (StringUtils.isNull(user))
         {
             log.info("登录用户：{} 不存在.", username);
-            throw new ServiceException(MessageUtils.message("user.not.exists"));
+            throw ExceptionUtil.business(ErrorCodeEnums.ADMIN_LOGIN_FAILED);
         }
         else if (Boolean.TRUE.equals(user.getDelFlag()))
         {
             log.info("登录用户：{} 已被删除.", username);
-            throw new ServiceException(MessageUtils.message("user.password.delete"));
+            throw ExceptionUtil.business(ErrorCodeEnums.USER_DELETED);
         }
         else if (UserStatusEnums.DISABLE.getCode().equals(user.getStatus()))
         {
             log.info("登录用户：{} 已被停用.", username);
-            throw new ServiceException(MessageUtils.message("user.blocked"));
+            throw ExceptionUtil.business(ErrorCodeEnums.USER_BLOCKED);
         }
 
         return createLoginUser(user);
