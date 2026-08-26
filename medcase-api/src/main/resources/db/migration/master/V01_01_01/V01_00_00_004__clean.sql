@@ -1,4 +1,6 @@
 -- Quartz 表
+SET @old_sql_notes=@@sql_notes, sql_notes=0;
+
 DROP TABLE IF EXISTS QRTZ_FIRED_TRIGGERS;
 DROP TABLE IF EXISTS QRTZ_PAUSED_TRIGGER_GRPS;
 DROP TABLE IF EXISTS QRTZ_SCHEDULER_STATE;
@@ -18,6 +20,8 @@ DROP TABLE IF EXISTS sys_job;
 -- 代码生成表
 DROP TABLE IF EXISTS gen_table_column;
 DROP TABLE IF EXISTS gen_table;
+
+SET sql_notes=@old_sql_notes;
 
 -- 删除角色与相关菜单按钮的关联
 DELETE FROM sys_role_menu
@@ -66,5 +70,4 @@ WHERE menu_id = 111;
 -- 删除“系统监控 / 数据监控”菜单
 DELETE FROM sys_menu
 WHERE menu_id = 111;
-
 
