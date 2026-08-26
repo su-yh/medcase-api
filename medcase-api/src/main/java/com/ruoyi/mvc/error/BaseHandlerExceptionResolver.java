@@ -75,7 +75,7 @@ public class BaseHandlerExceptionResolver extends DefaultHandlerExceptionResolve
         if (ex instanceof AbstractBusinessException) {
             AbstractBusinessException businessException = (AbstractBusinessException) ex;
             IErrorCode ec = businessException.getEc();
-            return String.format("Resolved [error code: %d, msg: %s]", ec.getCode(), ec.getMsg());
+            return String.format("Resolved [error code: %s, msg: %s]", ec.getCode(), ec.getMsg());
         }
 
         return super.buildLogMessage(ex, request);

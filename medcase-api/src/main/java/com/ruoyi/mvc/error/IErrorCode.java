@@ -5,13 +5,10 @@ package com.ruoyi.mvc.error;
  * @since 2025-05-16
  */
 public interface IErrorCode {
-    String ERROR_CODE_PREFIX = "error.code";
-
     /**
-     * 留给系统的错误码范围：[1000_000, 2000_000)
-     * 业务相关的错误码范围：[2000_000, +∞)
+     * 直接对应 i18n 资源文件中的消息 key。
      */
-    int getCode();
+    String getCode();
 
     String getMsg();
 }

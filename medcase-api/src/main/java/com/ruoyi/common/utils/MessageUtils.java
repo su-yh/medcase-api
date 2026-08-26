@@ -8,7 +8,10 @@ import com.ruoyi.common.utils.spring.SpringUtils;
  * 获取i18n资源文件
  * 
  * @author ruoyi
+ * @deprecated 新的异常国际化统一由 {@code IErrorCode}、{@code ExceptionUtil}
+ *             和 {@code BaseErrorAttributes} 处理，不再新增使用。
  */
+@Deprecated(since = "2026-08-26")
 public class MessageUtils
 {
     /**

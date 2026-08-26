@@ -7,10 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 
 import java.io.Serial;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author suyh
@@ -22,10 +18,6 @@ import java.util.concurrent.ConcurrentHashMap;
 public abstract class AbstractBusinessException extends RuntimeException {
     @Serial
     private static final long serialVersionUID = -4365987799788427525L;
-
-    // 这里使用map 主要是懒得处理并发问题
-    private static final Map<Class<? extends IErrorCode>, Integer> CLASS_MAP = new ConcurrentHashMap<>();
-    private static final Set<Integer> CODE_SET = new HashSet<>();
 
     private final IErrorCode ec;
 

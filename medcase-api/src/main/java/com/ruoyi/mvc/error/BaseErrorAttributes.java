@@ -76,9 +76,8 @@ public class BaseErrorAttributes extends DefaultErrorAttributes {
                 ec = ErrorCodeEnums.ACCESS_DENIED;
             }
 
-            String messageSourceCode = IErrorCode.ERROR_CODE_PREFIX + "." + ec.getCode();
             Locale locale = webRequest.getLocale();
-            String message = messageSource.getMessage(messageSourceCode, params, ec.getMsg(), locale);
+            String message = messageSource.getMessage(ec.getCode(), params, ec.getMsg(), locale);
             errorAttributes.put("code", ec.getCode());
             errorAttributes.put("msg", message);
         }
