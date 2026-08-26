@@ -7,6 +7,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.stereotype.Component;
 import com.ruoyi.common.constant.CacheConstants;
 import com.ruoyi.common.constant.Constants;
@@ -36,7 +37,7 @@ public class SysLoginService
     private TokenService tokenService;
 
     @Resource
-    private AuthenticationManager authenticationManager;
+    private AuthenticationConfiguration authenticationConfiguration;
 
     @Autowired
     private RedisCache redisCache;
@@ -71,6 +72,7 @@ public class SysLoginService
         Authentication authentication = null;
         try
         {
+            AuthenticationManager authenticationManager = authenticationConfiguration.getAuthenticationManager();
             UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username, password);
             // 该方法会去调用UserDetailsServiceImpl.loadUserByUsername
             authentication = authenticationManager.authenticate(authenticationToken);

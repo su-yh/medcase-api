@@ -2,14 +2,11 @@ package com.ruoyi.framework.config;
 
 import com.ruoyi.framework.config.properties.PermitAllUrlProperties;
 import com.ruoyi.framework.security.filter.JwtAuthenticationTokenFilter;
-import com.ruoyi.framework.security.handle.AuthenticationEntryPointImpl;
 import com.ruoyi.framework.security.handle.LogoutSuccessHandlerImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -30,12 +27,6 @@ public class SecurityConfig {
     static final String ERROR_PATH = "/error";
 
     /**
-     * 认证失败处理类
-     */
-    @Autowired
-    private AuthenticationEntryPointImpl unauthorizedHandler;
-
-    /**
      * 退出处理类
      */
     @Autowired
@@ -52,15 +43,6 @@ public class SecurityConfig {
      */
     @Autowired
     private PermitAllUrlProperties permitAllUrl;
-
-    /**
-     * 身份验证实现
-     */
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration)
-            throws Exception {
-        return authenticationConfiguration.getAuthenticationManager();
-    }
 
     /**
      * anyRequest          |   匹配所有请求路径
@@ -85,8 +67,6 @@ public class SecurityConfig {
                 // 禁用HTTP响应标头
                 .headers(headersCustomizer -> headersCustomizer.cacheControl(HeadersConfigurer.CacheControlConfig::disable)
                         .frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin))
-                // 认证失败处理类
-                .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
                 // 基于token，所以不需要session
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 // 注解标记允许匿名访问的url
