@@ -13,6 +13,8 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
+import java.util.Arrays;
+
 /**
  * 自定义参数解析器的实现，该实现针对在Controller 的handler 接口方法中的参数做匹配。
  * 匹配上的参数，则会为该参数绑定上一个值，然后在handler 方法中就可以直接得到该值使用了。
@@ -45,14 +47,17 @@ public class LoginUserArgumentResolver implements HandlerMethodArgumentResolver 
                 throw ExceptionUtil.business(ErrorCodeEnums.USER_NOT_LOGIN);
             }
         } else {
-            UserTypeEnums userType = currUser.getUser().getUserType();
-            if (userType != ann.userType()) {
-                throw ExceptionUtil.business(ErrorCodeEnums.USER_TYPE_NOT_MATCH);
+            if (ann.userType().length > 0) {
+                UserTypeEnums userType = currUser.getUser().getUserType();
+                boolean matched = Arrays.stream(ann.userType())
+                        .anyMatch(allowedType -> allowedType == userType);
+                if (!matched) {
+                    throw ExceptionUtil.business(ErrorCodeEnums.USER_TYPE_NOT_MATCH);
+                }
             }
         }
 
         return currUser;
     }
 }
-
 

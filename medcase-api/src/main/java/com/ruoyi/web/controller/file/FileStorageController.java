@@ -37,7 +37,7 @@ public class FileStorageController {
 
     @PostMapping("/upload/case")
     public R<FileAttachment> uploadCaseAttachment(
-            @CurrLoginUser(userType = UserTypeEnums.DOCTOR) LoginUser doctorUser,
+            @CurrLoginUser LoginUser doctorUser,
             @RequestParam("file") MultipartFile file) {
         UserTypeEnums userType = doctorUser.getUser().getUserType();
         return R.ofSuccess(fileStorageService.upload(
