@@ -1,0 +1,12 @@
+
+attachment:
+  storage:
+    minio:
+      # MinIO 服务地址，例如 https://minio.example.com
+      endpoint: ${MINIO_ENDPOINT:}
+      # 建议通过环境变量提供密钥，不要写入仓库
+      access-key: ${MINIO_ACCESS_KEY:}
+      secret-key: ${MINIO_SECRET_KEY:}
+      bucket: ${MINIO_BUCKET:}
+      # 可选的对象前缀
+      object-prefix: ${MINIO_OBJECT_PREFIX:}

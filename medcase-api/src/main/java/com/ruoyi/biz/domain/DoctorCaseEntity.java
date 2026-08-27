@@ -6,8 +6,9 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
-import com.ruoyi.mp.entity.AbstractBaseEntity;
 import com.ruoyi.biz.enums.DoctorCaseStatusEnums;
+import com.ruoyi.mp.entity.AbstractBaseEntity;
+import com.ruoyi.storage.pojo.FileAttachment;
 import lombok.Data;
 
 import java.util.Date;

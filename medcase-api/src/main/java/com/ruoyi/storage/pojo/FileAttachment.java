@@ -1,4 +1,4 @@
-package com.ruoyi.biz.domain;
+package com.ruoyi.storage.pojo;
 
 import lombok.Data;
 
@@ -9,9 +9,11 @@ import lombok.Data;
  */
 @Data
 public class FileAttachment {
-    private String fileName;
+    private String filePath;
 
     private String originalFilename;
 
-    private String url;
+    private String contentType;
+
+    private Long size;
 }

@@ -2,7 +2,7 @@ package com.ruoyi.biz.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.ruoyi.biz.domain.DoctorCaseEntity;
-import com.ruoyi.biz.domain.FileAttachment;
+import com.ruoyi.storage.pojo.FileAttachment;
 import com.ruoyi.biz.enums.DoctorCaseStatusEnums;
 import java.util.Date;
 import java.util.List;

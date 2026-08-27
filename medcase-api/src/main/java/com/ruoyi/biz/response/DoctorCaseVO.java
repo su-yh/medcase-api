@@ -1,6 +1,6 @@
 package com.ruoyi.biz.response;
 
-import com.ruoyi.biz.domain.FileAttachment;
+import com.ruoyi.storage.pojo.FileAttachment;
 import com.ruoyi.biz.domain.DoctorCaseEntity;
 import com.ruoyi.biz.enums.DoctorCaseStatusEnums;
 import lombok.Data;

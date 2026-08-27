@@ -5,7 +5,20 @@ ruoyi:
 
 # 日志配置
 logging:
+  level:
+    root: info
+    com.ruoyi: debug
   file:
     path: /Users/suyunhong/suyh-develop/medcase/logs
 
-
+attachment:
+  storage:
+    minio:
+      # MinIO 服务地址，例如 https://minio.example.com
+      endpoint: http://ali-yun.isuyh.com:9000
+      # 建议通过环境变量提供密钥，不要写入仓库
+      access-key: "ECjXT8yJQM3wTRNTEzYR"
+      secret-key: "JaFTj7HCsvlt7Vvvkl6pvDriwX87q6SrzcqcP5qu"
+      bucket: "medcase-dev"
+      # 可选的对象前缀
+      object-prefix: ${MINIO_OBJECT_PREFIX:}

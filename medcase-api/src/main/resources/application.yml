@@ -3,6 +3,7 @@ spring:
     import:
       - classpath:config/application-autoconfigure.yaml
       - classpath:config/application-datasource.yaml
+      - classpath:config/application-attachment.yaml
       - classpath:config/application-jackson.yaml
       - classpath:config/application-logging.yaml
       - classpath:config/application-messages.yaml

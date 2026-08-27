@@ -1,6 +1,6 @@
 package com.ruoyi.biz.request;
 
-import com.ruoyi.biz.domain.FileAttachment;
+import com.ruoyi.storage.pojo.FileAttachment;
 import lombok.Data;
 
 import java.util.List;
