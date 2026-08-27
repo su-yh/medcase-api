@@ -31,20 +31,26 @@ import java.nio.charset.StandardCharsets;
 @RequiredArgsConstructor
 public class FileStorageController {
     private static final String DEFAULT_BUSINESS = "common";
+    private static final String CASE_BUSINESS = "case";
 
     private final FileStorageService fileStorageService;
+
+    @PostMapping("/upload/case")
+    public R<FileAttachment> uploadCaseAttachment(
+            @CurrLoginUser(userType = UserTypeEnums.DOCTOR) LoginUser doctorUser,
+            @RequestParam("file") MultipartFile file) {
+        UserTypeEnums userType = doctorUser.getUser().getUserType();
+        return R.ofSuccess(fileStorageService.upload(
+                file, CASE_BUSINESS, userType, doctorUser.getUserId()));
+    }
 
     @PostMapping("/upload")
     public R<FileAttachment> upload(
             @CurrLoginUser(userType = UserTypeEnums.DOCTOR) LoginUser doctorUser,
-            @RequestParam("file") MultipartFile file,
-            @RequestParam(value = "business", required = false) String business) {
+            @RequestParam("file") MultipartFile file) {
         UserTypeEnums userType = doctorUser.getUser().getUserType();
-        String actualBusiness = business == null || business.isBlank()
-                ? DEFAULT_BUSINESS
-                : business;
         return R.ofSuccess(fileStorageService.upload(
-                file, actualBusiness, userType, doctorUser.getUserId()));
+                file, DEFAULT_BUSINESS, userType, doctorUser.getUserId()));
     }
 
     @GetMapping("/download")
