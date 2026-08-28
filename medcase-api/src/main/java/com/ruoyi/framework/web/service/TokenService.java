@@ -19,10 +19,12 @@ import com.ruoyi.common.utils.http.UserAgentUtils;
 import com.ruoyi.common.utils.ip.AddressUtils;
 import com.ruoyi.common.utils.ip.IpUtils;
 import com.ruoyi.common.utils.uuid.IdUtils;
+import com.ruoyi.system.event.UserAvatarUploadedEvent;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.context.event.EventListener;
 
 /**
  * token验证处理
@@ -92,6 +94,15 @@ public class TokenService
         {
             refreshToken(loginUser);
         }
+    }
+
+    /**
+     * 处理用户头像上传事件，更新当前登录用户缓存。
+     */
+    @EventListener
+    public void handleUserAvatarUploaded(UserAvatarUploadedEvent event) {
+        event.getLoginUser().getUser().setAvatar(event.getFilePath());
+        setLoginUser(event.getLoginUser());
     }
 
     /**

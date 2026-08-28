@@ -21,6 +21,7 @@ public enum ErrorCodeEnums implements IErrorCode {
     ATTACHMENT_BUCKET_NOT_CONFIGURED("error.code.attachment.bucket.not.configured", "附件存储桶未配置"),
     ATTACHMENT_INVALID_PATH("error.code.attachment.invalid.path", "非法附件文件路径：{0}"),
     ATTACHMENT_CONFIG_MISSING("error.code.attachment.config.missing", "附件存储配置缺失：{0}"),
+    USER_AVATAR_UPDATE_FAILED("error.code.user.avatar.update.failed", "用户头像更新失败"),
     USER_DELETED("error.code.user.deleted", "对不起，您的账号已被删除"),
     USER_BLOCKED("error.code.user.blocked", "用户已封禁，请联系管理员"),
     USER_ID_RESOLVE_FAILED("error.code.user.id.resolve.failed", "获取用户ID异常"),
