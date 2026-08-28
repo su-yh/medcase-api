@@ -101,7 +101,7 @@ public class TokenService
      */
     @EventListener
     public void handleUserAvatarUploaded(UserAvatarUploadedEvent event) {
-        event.getLoginUser().getUser().setAvatar(event.getFilePath());
+        event.getLoginUser().getUser().setAvatar(event.getAttachment());
         setLoginUser(event.getLoginUser());
     }
 

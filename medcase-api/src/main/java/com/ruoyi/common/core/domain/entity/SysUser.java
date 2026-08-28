@@ -15,6 +15,7 @@ import com.ruoyi.common.core.domain.BaseEntity;
 import com.ruoyi.common.enums.UserTypeEnums;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.xss.Xss;
+import com.ruoyi.storage.pojo.FileAttachment;
 
 /**
  * 用户对象 sys_user
@@ -58,7 +59,7 @@ public class SysUser extends BaseEntity
     private String sex;
 
     /** 用户头像 */
-    private String avatar;
+    private FileAttachment avatar;
 
     /** 密码 */
     private String password;
@@ -204,12 +205,12 @@ public class SysUser extends BaseEntity
         this.sex = sex;
     }
 
-    public String getAvatar()
+    public FileAttachment getAvatar()
     {
         return avatar;
     }
 
-    public void setAvatar(String avatar)
+    public void setAvatar(FileAttachment avatar)
     {
         this.avatar = avatar;
     }

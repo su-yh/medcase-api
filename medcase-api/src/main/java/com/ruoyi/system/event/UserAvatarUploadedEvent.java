@@ -1,6 +1,7 @@
 package com.ruoyi.system.event;
 
 import com.ruoyi.common.core.domain.model.LoginUser;
+import com.ruoyi.storage.pojo.FileAttachment;
 import lombok.Getter;
 import org.springframework.context.ApplicationEvent;
 
@@ -12,11 +13,11 @@ import org.springframework.context.ApplicationEvent;
 @Getter
 public class UserAvatarUploadedEvent extends ApplicationEvent {
     private final LoginUser loginUser;
-    private final String filePath;
+    private final FileAttachment attachment;
 
-    public UserAvatarUploadedEvent(Object source, LoginUser loginUser, String filePath) {
+    public UserAvatarUploadedEvent(Object source, LoginUser loginUser, FileAttachment attachment) {
         super(source);
         this.loginUser = loginUser;
-        this.filePath = filePath;
+        this.attachment = attachment;
     }
 }

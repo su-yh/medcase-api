@@ -4,6 +4,7 @@ import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.enums.UserTypeEnums;
+import com.ruoyi.storage.enums.FileBusinessEnums;
 import com.ruoyi.storage.pojo.FileAttachment;
 import com.ruoyi.storage.service.FileStorageService;
 import com.ruoyi.system.event.UserAvatarUploadedEvent;
@@ -11,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.context.ApplicationContext;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.lang.reflect.Method;
 import java.util.Set;
@@ -25,31 +27,35 @@ import static org.mockito.Mockito.verify;
 
 class FileStorageControllerTest {
     @Test
-    void caseUploadUsesFixedCaseBusiness() throws Exception {
+    void uploadUsesCaseBusinessFromQueryParameter() throws Exception {
         FileStorageService fileStorageService = mock(FileStorageService.class);
         FileStorageController controller = controller(fileStorageService);
         MockMultipartFile file = new MockMultipartFile(
                 "file", "report.pdf", "application/pdf", "content".getBytes());
         FileAttachment attachment = new FileAttachment();
         attachment.setFilePath("case/20260827-01-12/generated-report.pdf");
-        when(fileStorageService.upload(file, "case", UserTypeEnums.DOCTOR, 12L))
+        when(fileStorageService.upload(file, FileBusinessEnums.CASE, UserTypeEnums.DOCTOR, 12L))
                 .thenReturn(attachment);
 
         Method method = FileStorageController.class.getDeclaredMethod(
-                "uploadCaseAttachment", LoginUser.class, org.springframework.web.multipart.MultipartFile.class);
+                "upload", LoginUser.class, FileBusinessEnums.class,
+                org.springframework.web.multipart.MultipartFile.class);
         PostMapping postMapping = method.getAnnotation(PostMapping.class);
         assertNotNull(postMapping);
-        assertEquals("/upload/case", postMapping.value()[0]);
+        assertEquals("/upload", postMapping.value()[0]);
+        RequestParam business = method.getParameters()[1].getAnnotation(RequestParam.class);
+        assertNotNull(business);
+        assertEquals("business", business.value());
 
         R<FileAttachment> result = (R<FileAttachment>) method.invoke(
-                controller, doctorLoginUser(), file);
+                controller, doctorLoginUser(), FileBusinessEnums.CASE, file);
 
         assertEquals(attachment, result.getData());
-        verify(fileStorageService).upload(file, "case", UserTypeEnums.DOCTOR, 12L);
+        verify(fileStorageService).upload(file, FileBusinessEnums.CASE, UserTypeEnums.DOCTOR, 12L);
     }
 
     @Test
-    void avatarUploadUsesFixedAvatarBusinessAndUpdatesCurrentUser() throws Exception {
+    void uploadUsesAvatarBusinessAndUpdatesCurrentUser() throws Exception {
         FileStorageService fileStorageService = mock(FileStorageService.class);
         ApplicationContext applicationContext = mock(ApplicationContext.class);
         FileStorageController controller = new FileStorageController(
@@ -58,50 +64,74 @@ class FileStorageControllerTest {
                 "file", "avatar.png", "image/png", "content".getBytes());
         FileAttachment attachment = new FileAttachment();
         attachment.setFilePath("avatar/20260827-00-12/generated-avatar.png");
-        when(fileStorageService.upload(file, "avatar", UserTypeEnums.ADMIN, 12L))
+        when(fileStorageService.upload(file, FileBusinessEnums.AVATAR, UserTypeEnums.ADMIN, 12L))
                 .thenReturn(attachment);
         LoginUser adminUser = adminLoginUser();
 
         Method method = FileStorageController.class.getDeclaredMethod(
-                "uploadAvatar", LoginUser.class, org.springframework.web.multipart.MultipartFile.class);
+                "upload", LoginUser.class, FileBusinessEnums.class,
+                org.springframework.web.multipart.MultipartFile.class);
         PostMapping postMapping = method.getAnnotation(PostMapping.class);
         assertNotNull(postMapping);
-        assertEquals("/upload/avatar", postMapping.value()[0]);
+        assertEquals("/upload", postMapping.value()[0]);
 
-        R<FileAttachment> result = (R<FileAttachment>) method.invoke(controller, adminUser, file);
+        R<FileAttachment> result = (R<FileAttachment>) method.invoke(
+                controller, adminUser, FileBusinessEnums.AVATAR, file);
 
         assertEquals(attachment, result.getData());
-        verify(fileStorageService).upload(file, "avatar", UserTypeEnums.ADMIN, 12L);
+        verify(fileStorageService).upload(file, FileBusinessEnums.AVATAR, UserTypeEnums.ADMIN, 12L);
         var eventCaptor = forClass(UserAvatarUploadedEvent.class);
         verify(applicationContext).publishEvent(eventCaptor.capture());
         UserAvatarUploadedEvent event = eventCaptor.getValue();
         assertInstanceOf(org.springframework.context.ApplicationEvent.class, event);
         assertEquals(adminUser, event.getLoginUser());
-        assertEquals(attachment.getFilePath(), event.getFilePath());
+        assertEquals(attachment, event.getAttachment());
     }
 
     @Test
-    void noticeUploadUsesFixedNoticeBusiness() throws Exception {
+    void uploadUsesNoticeBusiness() throws Exception {
         FileStorageService fileStorageService = mock(FileStorageService.class);
         FileStorageController controller = controller(fileStorageService);
         MockMultipartFile file = new MockMultipartFile(
                 "file", "notice.png", "image/png", "content".getBytes());
         FileAttachment attachment = new FileAttachment();
         attachment.setFilePath("notice/20260827-00-12/notice.png");
-        when(fileStorageService.upload(file, "notice", UserTypeEnums.ADMIN, 12L))
+        when(fileStorageService.upload(file, FileBusinessEnums.NOTICE, UserTypeEnums.ADMIN, 12L))
                 .thenReturn(attachment);
 
         Method method = FileStorageController.class.getDeclaredMethod(
-                "uploadNoticeImage", LoginUser.class, org.springframework.web.multipart.MultipartFile.class);
+                "upload", LoginUser.class, FileBusinessEnums.class,
+                org.springframework.web.multipart.MultipartFile.class);
         PostMapping postMapping = method.getAnnotation(PostMapping.class);
         assertNotNull(postMapping);
-        assertEquals("/upload/notice", postMapping.value()[0]);
+        assertEquals("/upload", postMapping.value()[0]);
 
         R<FileAttachment> result = (R<FileAttachment>) method.invoke(
-                controller, adminLoginUser(), file);
+                controller, adminLoginUser(), FileBusinessEnums.NOTICE, file);
 
         assertEquals(attachment, result.getData());
-        verify(fileStorageService).upload(file, "notice", UserTypeEnums.ADMIN, 12L);
+        verify(fileStorageService).upload(file, FileBusinessEnums.NOTICE, UserTypeEnums.ADMIN, 12L);
+    }
+
+    @Test
+    void uploadAllowsKnownBusinessForAnyUserType() throws Exception {
+        FileStorageService fileStorageService = mock(FileStorageService.class);
+        FileStorageController controller = controller(fileStorageService);
+        MockMultipartFile file = new MockMultipartFile(
+                "file", "avatar.png", "image/png", new byte[] {1});
+        FileAttachment attachment = new FileAttachment();
+        attachment.setFilePath("avatar/20260827-01-12/avatar.png");
+        when(fileStorageService.upload(file, FileBusinessEnums.AVATAR, UserTypeEnums.DOCTOR, 12L))
+                .thenReturn(attachment);
+        Method method = FileStorageController.class.getDeclaredMethod(
+                "upload", LoginUser.class, FileBusinessEnums.class,
+                org.springframework.web.multipart.MultipartFile.class);
+
+        R<FileAttachment> result = (R<FileAttachment>) method.invoke(
+                controller, doctorLoginUser(), FileBusinessEnums.AVATAR, file);
+
+        assertEquals(attachment, result.getData());
+        verify(fileStorageService).upload(file, FileBusinessEnums.AVATAR, UserTypeEnums.DOCTOR, 12L);
     }
 
     private FileStorageController controller(FileStorageService fileStorageService) {

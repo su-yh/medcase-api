@@ -3,6 +3,7 @@ package com.ruoyi.system.service;
 import java.util.Date;
 import java.util.List;
 import com.ruoyi.common.core.domain.entity.SysUser;
+import com.ruoyi.storage.pojo.FileAttachment;
 
 /**
  * 用户 业务层
@@ -161,7 +162,7 @@ public interface ISysUserService
      * @param avatar 头像地址
      * @return 结果
      */
-    public boolean updateUserAvatar(Long userId, String avatar);
+    public boolean updateUserAvatar(Long userId, FileAttachment avatar);
 
     /**
      * 更新用户登录信息（IP和登录时间）

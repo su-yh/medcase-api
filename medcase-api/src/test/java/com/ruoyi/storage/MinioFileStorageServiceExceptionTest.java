@@ -3,6 +3,7 @@ package com.ruoyi.storage;
 import com.ruoyi.mvc.constants.enums.ErrorCodeEnums;
 import com.ruoyi.mvc.exception.AbstractBusinessException;
 import com.ruoyi.storage.pojo.FileAttachment;
+import com.ruoyi.storage.enums.FileBusinessEnums;
 import com.ruoyi.common.enums.UserTypeEnums;
 import com.ruoyi.storage.config.FileStorageProperties;
 import com.ruoyi.storage.service.impl.MinioFileStorageService;
@@ -35,7 +36,7 @@ class MinioFileStorageServiceExceptionTest {
         RuntimeException exception = org.junit.jupiter.api.Assertions.assertThrows(
                 RuntimeException.class,
                 () -> service.upload(new MockMultipartFile("file", new byte[0]),
-                        "case",
+                        FileBusinessEnums.CASE,
                         UserTypeEnums.DOCTOR, 12L));
 
         AbstractBusinessException businessException = assertInstanceOf(
@@ -57,7 +58,7 @@ class MinioFileStorageServiceExceptionTest {
                 AbstractBusinessException.class,
                 () -> service.upload(new MockMultipartFile(
                         "file", "report.txt", "text/plain", "content".getBytes()),
-                        "case",
+                        FileBusinessEnums.CASE,
                         UserTypeEnums.DOCTOR, 12L));
 
         assertEquals(ErrorCodeEnums.ATTACHMENT_UPLOAD_FAILED, exception.getEc());
@@ -73,7 +74,7 @@ class MinioFileStorageServiceExceptionTest {
 
         FileAttachment attachment = service.upload(new MockMultipartFile(
                 "file", "report.txt", "text/plain", "content".getBytes()),
-                "case",
+                FileBusinessEnums.CASE,
                 UserTypeEnums.DOCTOR, 12L);
 
         org.mockito.ArgumentCaptor<PutObjectArgs> captor =

@@ -3,6 +3,7 @@ package com.ruoyi.system.event;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.framework.web.service.TokenService;
+import com.ruoyi.storage.pojo.FileAttachment;
 import com.ruoyi.system.mapper.SysUserMapper;
 import com.ruoyi.system.service.impl.SysUserServiceImpl;
 import org.junit.jupiter.api.Test;
@@ -24,11 +25,11 @@ class UserAvatarUploadedEventListenerTest {
         SysUserServiceImpl userService = new SysUserServiceImpl();
         ReflectionTestUtils.setField(userService, "userMapper", userMapper);
         UserAvatarUploadedEvent event = event();
-        when(userMapper.updateUserAvatar(12L, "avatar/20260827/avatar.png")).thenReturn(1);
+        when(userMapper.updateUserAvatar(12L, event.getAttachment())).thenReturn(1);
 
         userService.handleUserAvatarUploaded(event);
 
-        verify(userMapper).updateUserAvatar(12L, "avatar/20260827/avatar.png");
+        verify(userMapper).updateUserAvatar(12L, event.getAttachment());
     }
 
     @Test
@@ -39,7 +40,7 @@ class UserAvatarUploadedEventListenerTest {
 
         tokenService.handleUserAvatarUploaded(event);
 
-        assertEquals("avatar/20260827/avatar.png", event.getLoginUser().getUser().getAvatar());
+        assertEquals(event.getAttachment(), event.getLoginUser().getUser().getAvatar());
         verify(tokenService).setLoginUser(event.getLoginUser());
     }
 
@@ -48,7 +49,10 @@ class UserAvatarUploadedEventListenerTest {
         user.setUserId(12L);
         LoginUser loginUser = new LoginUser(user, Set.of());
         loginUser.setUserId(12L);
+        FileAttachment attachment = new FileAttachment();
+        attachment.setFilePath("avatar/20260827/avatar.png");
+        attachment.setOriginalFilename("avatar.png");
         return new UserAvatarUploadedEvent(
-                this, loginUser, "avatar/20260827/avatar.png");
+                this, loginUser, attachment);
     }
 }

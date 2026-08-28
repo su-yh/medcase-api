@@ -1,7 +1,8 @@
 package com.ruoyi.storage.service;
 
-import com.ruoyi.storage.pojo.FileAttachment;
 import com.ruoyi.common.enums.UserTypeEnums;
+import com.ruoyi.storage.enums.FileBusinessEnums;
+import com.ruoyi.storage.pojo.FileAttachment;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -14,7 +15,7 @@ public interface FileStorageService {
      * 上传文件并返回文件元数据。
      */
     FileAttachment upload(
-            MultipartFile file, String business, UserTypeEnums userType, Long userId);
+            MultipartFile file, FileBusinessEnums business, UserTypeEnums userType, Long userId);
 
     /**
      * 根据文件相对路径读取文件内容。

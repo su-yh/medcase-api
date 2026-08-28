@@ -4,6 +4,7 @@ import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.enums.UserTypeEnums;
 import com.ruoyi.mvc.authentication.annotation.CurrLoginUser;
+import com.ruoyi.storage.enums.FileBusinessEnums;
 import com.ruoyi.storage.pojo.FileAttachment;
 import com.ruoyi.storage.service.FileStorageService;
 import com.ruoyi.storage.service.StoredFileContent;
@@ -32,49 +33,22 @@ import java.nio.charset.StandardCharsets;
 @RequestMapping("/file")
 @RequiredArgsConstructor
 public class FileStorageController {
-    private static final String DEFAULT_BUSINESS = "common";
-    private static final String CASE_BUSINESS = "case";
-    private static final String AVATAR_BUSINESS = "avatar";
-    private static final String NOTICE_BUSINESS = "notice";
-
     private final FileStorageService fileStorageService;
     private final ApplicationContext applicationContext;
 
-    @PostMapping("/upload/case")
-    public R<FileAttachment> uploadCaseAttachment(
-            @CurrLoginUser LoginUser doctorUser,
-            @RequestParam("file") MultipartFile file) {
-        UserTypeEnums userType = doctorUser.getUser().getUserType();
-        return R.ofSuccess(fileStorageService.upload(
-                file, CASE_BUSINESS, userType, doctorUser.getUserId()));
-    }
-
-    @PostMapping("/upload/avatar")
-    public R<FileAttachment> uploadAvatar(
-            @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser adminUser,
-            @RequestParam("file") MultipartFile file) {
-        FileAttachment attachment = fileStorageService.upload(
-                file, AVATAR_BUSINESS, UserTypeEnums.ADMIN, adminUser.getUserId());
-        applicationContext.publishEvent(new UserAvatarUploadedEvent(
-                this, adminUser, attachment.getFilePath()));
-        return R.ofSuccess(attachment);
-    }
-
-    @PostMapping("/upload/notice")
-    public R<FileAttachment> uploadNoticeImage(
-            @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser adminUser,
-            @RequestParam("file") MultipartFile file) {
-        return R.ofSuccess(fileStorageService.upload(
-                file, NOTICE_BUSINESS, UserTypeEnums.ADMIN, adminUser.getUserId()));
-    }
-
     @PostMapping("/upload")
     public R<FileAttachment> upload(
-            @CurrLoginUser(userType = UserTypeEnums.DOCTOR) LoginUser doctorUser,
+            @CurrLoginUser LoginUser loginUser,
+            @RequestParam("business") FileBusinessEnums business,
             @RequestParam("file") MultipartFile file) {
-        UserTypeEnums userType = doctorUser.getUser().getUserType();
-        return R.ofSuccess(fileStorageService.upload(
-                file, DEFAULT_BUSINESS, userType, doctorUser.getUserId()));
+        UserTypeEnums userType = loginUser.getUser().getUserType();
+        FileAttachment attachment = fileStorageService.upload(
+                file, business, userType, loginUser.getUserId());
+        if (business == FileBusinessEnums.AVATAR) {
+            applicationContext.publishEvent(new UserAvatarUploadedEvent(
+                    this, loginUser, attachment));
+        }
+        return R.ofSuccess(attachment);
     }
 
     @GetMapping("/download")

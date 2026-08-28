@@ -4,6 +4,7 @@ import com.ruoyi.common.enums.UserTypeEnums;
 import com.ruoyi.mvc.constants.enums.ErrorCodeEnums;
 import com.ruoyi.mvc.exception.ExceptionUtil;
 import com.ruoyi.storage.config.FileStorageProperties;
+import com.ruoyi.storage.enums.FileBusinessEnums;
 import com.ruoyi.storage.pojo.FileAttachment;
 import com.ruoyi.storage.service.FileStorageService;
 import com.ruoyi.storage.service.StoredFileContent;
@@ -33,7 +34,7 @@ public class MinioFileStorageService implements FileStorageService {
 
     @Override
     public FileAttachment upload(
-            MultipartFile file, String business, UserTypeEnums userType, Long userId) {
+            MultipartFile file, FileBusinessEnums business, UserTypeEnums userType, Long userId) {
         if (file == null || file.isEmpty()) {
             throw ExceptionUtil.business(ErrorCodeEnums.ATTACHMENT_EMPTY);
         }
@@ -42,7 +43,7 @@ public class MinioFileStorageService implements FileStorageService {
         }
 
         String filePath = FileStoragePathUtils.createPath(
-                business, userType, userId, file.getOriginalFilename());
+                business.getCode(), userType, userId, file.getOriginalFilename());
         String objectName = objectName(filePath);
         String contentType = contentType(file.getContentType());
         String bucket = bucket();

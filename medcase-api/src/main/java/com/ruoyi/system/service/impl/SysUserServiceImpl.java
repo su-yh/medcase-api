@@ -23,6 +23,7 @@ import com.ruoyi.system.mapper.SysUserRoleMapper;
 import com.ruoyi.system.service.ISysConfigService;
 import com.ruoyi.system.service.ISysDeptService;
 import com.ruoyi.system.service.ISysUserService;
+import com.ruoyi.storage.pojo.FileAttachment;
 import jakarta.validation.Validator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -358,7 +359,7 @@ public class SysUserServiceImpl implements ISysUserService
      * @return 结果
      */
     @Override
-    public boolean updateUserAvatar(Long userId, String avatar)
+    public boolean updateUserAvatar(Long userId, FileAttachment avatar)
     {
         return userMapper.updateUserAvatar(userId, avatar) > 0;
     }
@@ -368,7 +369,7 @@ public class SysUserServiceImpl implements ISysUserService
      */
     @EventListener
     public void handleUserAvatarUploaded(UserAvatarUploadedEvent event) {
-        if (!updateUserAvatar(event.getLoginUser().getUserId(), event.getFilePath())) {
+        if (!updateUserAvatar(event.getLoginUser().getUserId(), event.getAttachment())) {
             throw ExceptionUtil.business(ErrorCodeEnums.USER_AVATAR_UPDATE_FAILED);
         }
     }
