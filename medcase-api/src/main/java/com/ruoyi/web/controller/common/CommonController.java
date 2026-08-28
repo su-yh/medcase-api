@@ -2,10 +2,7 @@ package com.ruoyi.web.controller.common;
 
 import com.ruoyi.common.config.RuoYiConfig;
 import com.ruoyi.common.utils.StringUtils;
-import com.ruoyi.common.utils.file.FileUploadUtils;
 import com.ruoyi.common.utils.file.FileUtils;
-import com.ruoyi.framework.config.ServerConfig;
-import com.ruoyi.common.core.domain.R;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
@@ -13,13 +10,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * 通用请求处理
@@ -31,9 +23,6 @@ import java.util.List;
 public class CommonController
 {
     private static final Logger log = LoggerFactory.getLogger(CommonController.class);
-
-    @Autowired
-    private ServerConfig serverConfig;
 
     @Autowired
     private RuoYiConfig ruoYiConfig;
@@ -67,58 +56,6 @@ public class CommonController
         catch (Exception e)
         {
             log.error("下载文件失败", e);
-        }
-    }
-
-    /**
-     * 通用上传请求（单个）
-     */
-    @PostMapping("/upload")
-    public R<UploadResponse> uploadFile(MultipartFile file) throws Exception
-    {
-        try
-        {
-            // 上传文件路径
-            String filePath = ruoYiConfig.getUploadPath();
-            // 上传并返回新文件名称
-            String fileName = FileUploadUtils.upload(filePath, file);
-            String url = serverConfig.getUrl() + fileName;
-            UploadResponse response = new UploadResponse();
-            response.setUrl(url);
-            response.setNewFileName(FileUtils.getName(fileName));
-            response.setOriginalFilename(file.getOriginalFilename());
-            return R.ofSuccess(response);
-        }
-        catch (Exception e)
-        {
-            return R.ofFail(500, e.getMessage());
-        }
-    }
-
-    /**
-     * 通用上传请求（多个）
-     */
-    @PostMapping("/uploads")
-    public R<List<UploadResponse>> uploadFiles(List<MultipartFile> files) throws Exception
-    {
-        try
-        {
-            String filePath = ruoYiConfig.getUploadPath();
-            List<UploadResponse> responses = new ArrayList<>();
-            for (MultipartFile file : files)
-            {
-                String fileName = FileUploadUtils.upload(filePath, file);
-                UploadResponse response = new UploadResponse();
-                response.setUrl(serverConfig.getUrl() + fileName);
-                response.setNewFileName(FileUtils.getName(fileName));
-                response.setOriginalFilename(file.getOriginalFilename());
-                responses.add(response);
-            }
-            return R.ofSuccess(responses);
-        }
-        catch (Exception e)
-        {
-            return R.ofFail(500, e.getMessage());
         }
     }
 

@@ -122,11 +122,4 @@ public class RuoYiConfig
         return getProfile() + "/download/";
     }
 
-    /**
-     * 获取上传路径
-     */
-    public String getUploadPath()
-    {
-        return getProfile() + "/upload";
-    }
 }
