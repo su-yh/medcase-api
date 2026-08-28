@@ -114,12 +114,4 @@ public class RuoYiConfig
         return getProfile() + "/avatar";
     }
 
-    /**
-     * 获取下载路径
-     */
-    public String getDownloadPath()
-    {
-        return getProfile() + "/download/";
-    }
-
 }
