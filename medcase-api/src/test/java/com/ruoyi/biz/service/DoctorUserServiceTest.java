@@ -9,6 +9,7 @@ import com.ruoyi.common.enums.UserStatusEnums;
 import com.ruoyi.common.enums.UserTypeEnums;
 import com.ruoyi.mp.mybatis.PageParam;
 import com.ruoyi.mp.mybatis.PageResult;
+import com.ruoyi.storage.pojo.FileAttachment;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -38,7 +39,7 @@ class DoctorUserServiceTest {
     @Test
     void pagePassesQueryToMapperAndMapsDoctorFields() {
         DoctorUserQuery query = new DoctorUserQuery();
-        query.setName("张医生");
+        query.setNickName("张医生");
         query.setPhone("13800000000");
         query.setStatus("0");
 
@@ -47,6 +48,11 @@ class DoctorUserServiceTest {
         user.setNickName("张医生");
         user.setUserName("doctor01");
         user.setPhonenumber("13800000000");
+        user.setIdCardNumber("110101199001011234");
+        user.setTitle("主治医师");
+        user.setIdCardFront(attachment("front"));
+        user.setIdCardBack(attachment("back"));
+        user.setQualificationCertificate(attachment("qualification"));
         user.setStatus(UserStatusEnums.OK);
         when(doctorUserMapper.selectDoctorPage(any(PageParam.class), org.mockito.ArgumentMatchers.same(query)))
                 .thenReturn(new PageResult<>(List.of(user), 1L));
@@ -57,7 +63,9 @@ class DoctorUserServiceTest {
                 any(PageParam.class), org.mockito.ArgumentMatchers.same(query));
         assertEquals(1L, result.getTotal());
         assertEquals(1L, result.getList().get(0).getId());
-        assertEquals("张医生", result.getList().get(0).getName());
+        assertEquals("张医生", result.getList().get(0).getNickName());
+        assertEquals("110101199001011234", result.getList().get(0).getIdCardNumber());
+        assertEquals("主治医师", result.getList().get(0).getTitle());
     }
 
     @Test
@@ -68,6 +76,25 @@ class DoctorUserServiceTest {
         when(doctorUserMapper.selectDoctorById(1L)).thenReturn(user);
 
         assertNull(doctorUserService.detail(1L));
+    }
+
+    @Test
+    void detailMapsDoctorAttachments() {
+        DoctorUserEntity user = new DoctorUserEntity();
+        user.setUserId(1L);
+        user.setUserType(UserTypeEnums.DOCTOR);
+        user.setNickName("张医生");
+        user.setIdCardNumber("110101199001011234");
+        user.setTitle("主治医师");
+        user.setIdCardFront(attachment("front"));
+        user.setIdCardBack(attachment("back"));
+        user.setQualificationCertificate(attachment("qualification"));
+        when(doctorUserMapper.selectDoctorById(1L)).thenReturn(user);
+
+        DoctorUserVO result = doctorUserService.detail(1L);
+
+        assertEquals("front", result.getIdCardFront().getOriginalFilename());
+        assertEquals("qualification", result.getQualificationCertificate().getOriginalFilename());
     }
 
     @Test
@@ -160,5 +187,12 @@ class DoctorUserServiceTest {
 
         assertEquals(UserStatusEnums.REVIEW_FAILED, user.getStatus());
         verify(doctorUserMapper).updateById(user);
+    }
+
+    private FileAttachment attachment(String filename) {
+        FileAttachment attachment = new FileAttachment();
+        attachment.setFilePath("doctor/" + filename);
+        attachment.setOriginalFilename(filename);
+        return attachment;
     }
 }

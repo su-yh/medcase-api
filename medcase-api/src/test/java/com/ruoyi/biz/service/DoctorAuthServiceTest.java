@@ -11,6 +11,7 @@ import com.ruoyi.common.enums.UserTypeEnums;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.mvc.constants.enums.ErrorCodeEnums;
 import com.ruoyi.mvc.exception.AbstractBusinessException;
+import com.ruoyi.storage.pojo.FileAttachment;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -30,6 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -52,7 +54,8 @@ class DoctorAuthServiceTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        doctorAuthService = new DoctorAuthService(doctorUserMapper, loginService, permissionService, tokenService);
+        doctorAuthService = new DoctorAuthService(
+                doctorUserMapper, loginService, permissionService, tokenService);
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.setRemoteAddr("127.0.0.1");
         RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
@@ -71,6 +74,7 @@ class DoctorAuthServiceTest {
         when(doctorUserMapper.usernameExists("doctor01")).thenReturn(false);
         when(doctorUserMapper.phoneExists("13800000000")).thenReturn(false);
         when(doctorUserMapper.insert(any(DoctorUserEntity.class))).thenReturn(1);
+        when(doctorUserMapper.updateById(any(DoctorUserEntity.class))).thenReturn(1);
 
         doctorAuthService.register(registerRequest);
 
@@ -78,7 +82,7 @@ class DoctorAuthServiceTest {
         verify(doctorUserMapper).insert(captor.capture());
         DoctorUserEntity user = captor.getValue();
         assertEquals("doctor01", user.getUserName());
-        assertEquals("doctor01", user.getNickName());
+        assertEquals("张医生", user.getNickName());
         assertEquals(UserTypeEnums.DOCTOR, user.getUserType());
         assertEquals("13800000000", user.getPhonenumber());
         assertEquals(UserStatusEnums.REGISTER, user.getStatus());
@@ -173,7 +177,7 @@ class DoctorAuthServiceTest {
     }
 
     @Test
-    void registerRejectsInvalidVerificationCode() {
+    void registerRejectsInvalidInviteCode() {
         DoctorRegisterRequest registerRequest = registerRequest(
                 "doctor01", "secret123", "13800000000", "1234");
 
@@ -181,7 +185,34 @@ class DoctorAuthServiceTest {
                 AbstractBusinessException.class,
                 () -> doctorAuthService.register(registerRequest));
 
-        assertEquals(ErrorCodeEnums.DOCTOR_REGISTER_CODE_INVALID, exception.getEc());
+        assertEquals(ErrorCodeEnums.DOCTOR_REGISTER_INVITE_CODE_INVALID, exception.getEc());
+        verify(doctorUserMapper, never()).insert(any(DoctorUserEntity.class));
+    }
+
+    @Test
+    void registerRejectsEmptyInviteCode() {
+        DoctorRegisterRequest registerRequest = registerRequest(
+                "doctor01", "secret123", "13800000000", "");
+
+        AbstractBusinessException exception = assertThrows(
+                AbstractBusinessException.class,
+                () -> doctorAuthService.register(registerRequest));
+
+        assertEquals(ErrorCodeEnums.DOCTOR_REGISTER_INVITE_CODE_EMPTY, exception.getEc());
+        verify(doctorUserMapper, never()).insert(any(DoctorUserEntity.class));
+    }
+
+    @Test
+    void registerRejectsMissingRegistrationAttachment() {
+        DoctorRegisterRequest registerRequest = registerRequest(
+                "doctor01", "secret123", "13800000000", "9999");
+        registerRequest.setIdCardFront(null);
+
+        AbstractBusinessException exception = assertThrows(
+                AbstractBusinessException.class,
+                () -> doctorAuthService.register(registerRequest));
+
+        assertEquals(ErrorCodeEnums.DOCTOR_REGISTER_ID_CARD_FRONT_EMPTY, exception.getEc());
         verify(doctorUserMapper, never()).insert(any(DoctorUserEntity.class));
     }
 
@@ -239,6 +270,33 @@ class DoctorAuthServiceTest {
         ArgumentCaptor<SysUser> sysUserCaptor = ArgumentCaptor.forClass(SysUser.class);
         verify(permissionService).getMenuPermission(sysUserCaptor.capture());
         assertEquals(Boolean.TRUE, sysUserCaptor.getValue().getDelFlag());
+    }
+
+    @Test
+    void registerStoresDoctorProfileAndRegistrationAttachments() {
+        DoctorRegisterRequest registerRequest = registerRequest(
+                "doctor01", "secret123", "13800000000", "9999");
+        registerRequest.setNickName("张医生");
+        registerRequest.setIdCardNumber("110101199001011234");
+        registerRequest.setTitle("主治医师");
+        when(doctorUserMapper.usernameExists("doctor01")).thenReturn(false);
+        when(doctorUserMapper.phoneExists("13800000000")).thenReturn(false);
+        when(doctorUserMapper.insert(any(DoctorUserEntity.class))).thenAnswer(invocation -> {
+            invocation.getArgument(0, DoctorUserEntity.class).setUserId(12L);
+            return 1;
+        });
+        doctorAuthService.register(registerRequest);
+
+        ArgumentCaptor<DoctorUserEntity> captor = ArgumentCaptor.forClass(DoctorUserEntity.class);
+        verify(doctorUserMapper).insert(captor.capture());
+        DoctorUserEntity user = captor.getValue();
+        assertEquals("张医生", user.getNickName());
+        assertEquals("110101199001011234", user.getIdCardNumber());
+        assertEquals("主治医师", user.getTitle());
+        assertEquals("id-card-front.png", user.getIdCardFront().getOriginalFilename());
+        assertEquals("id-card-back.png", user.getIdCardBack().getOriginalFilename());
+        assertEquals("qualification.png",
+                user.getQualificationCertificate().getOriginalFilename());
     }
 
     @Test
@@ -373,13 +431,26 @@ class DoctorAuthServiceTest {
     }
 
     private DoctorRegisterRequest registerRequest(
-            String username, String password, String phone, String code) {
+            String username, String password, String phone, String inviteCode) {
         DoctorRegisterRequest registerRequest = new DoctorRegisterRequest();
         registerRequest.setUsername(username);
         registerRequest.setPassword(password);
         registerRequest.setPhone(phone);
-        registerRequest.setCode(code);
+        registerRequest.setInviteCode(inviteCode);
+        registerRequest.setNickName("张医生");
+        registerRequest.setIdCardNumber("110101199001011234");
+        registerRequest.setTitle("主治医师");
+        registerRequest.setIdCardFront(attachment("id-card-front.png"));
+        registerRequest.setIdCardBack(attachment("id-card-back.png"));
+        registerRequest.setQualificationCertificate(attachment("qualification.png"));
         return registerRequest;
+    }
+
+    private FileAttachment attachment(String filename) {
+        FileAttachment attachment = new FileAttachment();
+        attachment.setOriginalFilename(filename);
+        attachment.setFilePath("doctor/" + filename);
+        return attachment;
     }
 
     private DoctorLoginRequest loginRequest(String username, String password) {

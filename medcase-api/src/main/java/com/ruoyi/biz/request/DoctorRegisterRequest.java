@@ -1,5 +1,6 @@
 package com.ruoyi.biz.request;
 
+import com.ruoyi.storage.pojo.FileAttachment;
 import lombok.Data;
 
 /**
@@ -16,5 +17,17 @@ public class DoctorRegisterRequest {
 
     private String phone;
 
-    private String code;
+    private String nickName;
+
+    private String idCardNumber;
+
+    private String title;
+
+    private String inviteCode;
+
+    private FileAttachment idCardFront;
+
+    private FileAttachment idCardBack;
+
+    private FileAttachment qualificationCertificate;
 }

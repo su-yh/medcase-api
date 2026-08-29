@@ -11,8 +11,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+
+import java.lang.reflect.Method;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -87,6 +90,16 @@ class DoctorAuthPortalControllerTest {
                         .getAnnotation(RequestMapping.class).method());
         assertNotNull(DoctorAuthPortalController.class.getMethod("login", DoctorLoginRequest.class).getAnnotation(Anonymous.class));
         assertNotNull(DoctorAuthPortalController.class.getMethod("register", DoctorRegisterRequest.class).getAnnotation(Anonymous.class));
+    }
+
+    @Test
+    void registerBindsJsonRequestBody() throws NoSuchMethodException {
+        Method register = DoctorAuthPortalController.class.getMethod(
+                "register", DoctorRegisterRequest.class);
+
+        assertNotNull(register.getParameterAnnotations()[0][0]);
+        assertEquals(RequestBody.class,
+                register.getParameterAnnotations()[0][0].annotationType());
     }
 
     private LoginUser doctorLoginUser() {

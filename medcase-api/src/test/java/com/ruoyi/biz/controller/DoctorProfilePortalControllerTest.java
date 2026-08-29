@@ -41,6 +41,7 @@ class DoctorProfilePortalControllerTest {
     void profileEndpointsDelegateToServiceForCurrentDoctor() {
         LoginUser doctorUser = doctorLoginUser();
         DoctorProfileVO profile = new DoctorProfileVO();
+        profile.setNickName("张医生");
         DoctorProfileSubmitRequest request = new DoctorProfileSubmitRequest();
         when(doctorProfileService.me(doctorUser)).thenReturn(profile);
 

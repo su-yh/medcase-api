@@ -2,6 +2,7 @@ package com.ruoyi.biz.response;
 
 import com.ruoyi.biz.domain.DoctorUserEntity;
 import com.ruoyi.common.enums.UserStatusEnums;
+import com.ruoyi.storage.pojo.FileAttachment;
 import lombok.Data;
 
 /**
@@ -13,17 +14,32 @@ import lombok.Data;
 public class DoctorProfileVO {
     private Long id;
 
-    private String name;
+    private String nickName;
 
     private String phone;
+
+    private String idCardNumber;
+
+    private String title;
+
+    private FileAttachment idCardFront;
+
+    private FileAttachment idCardBack;
+
+    private FileAttachment qualificationCertificate;
 
     private UserStatusEnums status;
 
     public static DoctorProfileVO fromEntity(DoctorUserEntity doctor) {
         DoctorProfileVO result = new DoctorProfileVO();
         result.setId(doctor.getUserId());
-        result.setName(doctor.getNickName());
+        result.setNickName(doctor.getNickName());
         result.setPhone(doctor.getPhonenumber());
+        result.setIdCardNumber(doctor.getIdCardNumber());
+        result.setTitle(doctor.getTitle());
+        result.setIdCardFront(doctor.getIdCardFront());
+        result.setIdCardBack(doctor.getIdCardBack());
+        result.setQualificationCertificate(doctor.getQualificationCertificate());
         result.setStatus(doctor.getStatus());
         return result;
     }

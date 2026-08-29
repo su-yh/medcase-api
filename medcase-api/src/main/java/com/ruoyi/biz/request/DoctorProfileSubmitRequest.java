@@ -1,7 +1,9 @@
 package com.ruoyi.biz.request;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import com.ruoyi.storage.pojo.FileAttachment;
 import lombok.Data;
 
 /**
@@ -13,9 +15,26 @@ import lombok.Data;
 public class DoctorProfileSubmitRequest {
     @NotBlank(message = "姓名不能为空")
     @Size(max = 30, message = "姓名不能超过30个字符")
-    private String name;
+    private String nickName;
 
     @NotBlank(message = "手机号不能为空")
     @Size(max = 20, message = "手机号不能超过20个字符")
     private String phone;
+
+    @NotBlank(message = "身份证号码不能为空")
+    @Size(max = 30, message = "身份证号码不能超过30个字符")
+    private String idCardNumber;
+
+    @NotBlank(message = "职称不能为空")
+    @Size(max = 50, message = "职称不能超过50个字符")
+    private String title;
+
+    @NotNull(message = "身份证正面图片不能为空")
+    private FileAttachment idCardFront;
+
+    @NotNull(message = "身份证反面图片不能为空")
+    private FileAttachment idCardBack;
+
+    @NotNull(message = "医师职业资格证图片不能为空")
+    private FileAttachment qualificationCertificate;
 }

@@ -2,6 +2,7 @@ package com.ruoyi.biz.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.ruoyi.biz.domain.DoctorUserEntity;
+import com.ruoyi.storage.pojo.FileAttachment;
 import lombok.Data;
 
 import java.util.Date;
@@ -15,7 +16,17 @@ import java.util.Date;
 public class DoctorUserVO {
     private Long id;
 
-    private String name;
+    private String nickName;
+
+    private String idCardNumber;
+
+    private String title;
+
+    private FileAttachment idCardFront;
+
+    private FileAttachment idCardBack;
+
+    private FileAttachment qualificationCertificate;
 
     private String username;
 
@@ -29,7 +40,12 @@ public class DoctorUserVO {
     public static DoctorUserVO fromEntity(DoctorUserEntity user) {
         DoctorUserVO result = new DoctorUserVO();
         result.setId(user.getUserId());
-        result.setName(user.getNickName());
+        result.setNickName(user.getNickName());
+        result.setIdCardNumber(user.getIdCardNumber());
+        result.setTitle(user.getTitle());
+        result.setIdCardFront(user.getIdCardFront());
+        result.setIdCardBack(user.getIdCardBack());
+        result.setQualificationCertificate(user.getQualificationCertificate());
         result.setUsername(user.getUserName());
         result.setPhone(user.getPhonenumber());
         if (user.getStatus() != null) {

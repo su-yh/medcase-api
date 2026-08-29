@@ -5,7 +5,10 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.baomidou.mybatisplus.annotation.TableLogic;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import com.ruoyi.common.enums.UserStatusEnums;
+import com.ruoyi.storage.pojo.FileAttachment;
 import java.lang.reflect.Field;
 import org.junit.jupiter.api.Test;
 
@@ -49,5 +52,33 @@ class DoctorUserEntityTest {
     @Test
     void doesNotExposeDeletedStatusBecauseDeletionUsesDelFlag() {
         assertThrows(IllegalArgumentException.class, () -> UserStatusEnums.valueOf("DELETED"));
+    }
+
+    @Test
+    void exposesDoctorRegistrationProfileFields() throws NoSuchFieldException {
+        assertEquals(String.class, DoctorUserEntity.class
+                .getDeclaredField("idCardNumber").getType());
+        assertEquals(String.class, DoctorUserEntity.class
+                .getDeclaredField("title").getType());
+        assertEquals(FileAttachment.class, DoctorUserEntity.class
+                .getDeclaredField("idCardFront").getType());
+        assertEquals(FileAttachment.class, DoctorUserEntity.class
+                .getDeclaredField("idCardBack").getType());
+        assertEquals(FileAttachment.class, DoctorUserEntity.class
+                .getDeclaredField("qualificationCertificate").getType());
+    }
+
+    @Test
+    void doctorAttachmentFieldsUseJacksonTypeHandler() throws NoSuchFieldException {
+        assertJacksonTypeHandler("idCardFront");
+        assertJacksonTypeHandler("idCardBack");
+        assertJacksonTypeHandler("qualificationCertificate");
+    }
+
+    private void assertJacksonTypeHandler(String fieldName) throws NoSuchFieldException {
+        TableField tableField = DoctorUserEntity.class
+                .getDeclaredField(fieldName).getAnnotation(TableField.class);
+        assertNotNull(tableField);
+        assertEquals(JacksonTypeHandler.class, tableField.typeHandler());
     }
 }

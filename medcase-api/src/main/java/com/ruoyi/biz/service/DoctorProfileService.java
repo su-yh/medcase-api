@@ -34,8 +34,13 @@ public class DoctorProfileService {
             throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_PROFILE_SUBMIT_STATUS_NOT_MATCH);
         }
 
-        doctor.setNickName(request.getName().trim());
+        doctor.setNickName(request.getNickName().trim());
         doctor.setPhonenumber(request.getPhone().trim());
+        doctor.setIdCardNumber(request.getIdCardNumber().trim());
+        doctor.setTitle(request.getTitle().trim());
+        doctor.setIdCardFront(request.getIdCardFront());
+        doctor.setIdCardBack(request.getIdCardBack());
+        doctor.setQualificationCertificate(request.getQualificationCertificate());
         doctor.setStatus(UserStatusEnums.PENDING_REVIEW);
         if (doctorUserMapper.updateById(doctor) <= 0) {
             throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_PROFILE_SUBMIT_FAILED);

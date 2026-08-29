@@ -8,6 +8,7 @@ import com.ruoyi.storage.enums.FileBusinessEnums;
 import com.ruoyi.storage.pojo.FileAttachment;
 import com.ruoyi.storage.service.FileStorageService;
 import com.ruoyi.system.event.UserAvatarUploadedEvent;
+import com.ruoyi.common.annotation.Anonymous;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.ApplicationContext;
 import org.springframework.mock.web.MockMultipartFile;
@@ -26,6 +27,36 @@ import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
 
 class FileStorageControllerTest {
+    @Test
+    void doctorRegistrationUploadIsAnonymousAndUsesFixedUserIdentity() throws Exception {
+        FileStorageService fileStorageService = mock(FileStorageService.class);
+        FileStorageController controller = controller(fileStorageService);
+        MockMultipartFile file = new MockMultipartFile(
+                "file", "id-card.png", "image/png", "content".getBytes());
+        FileAttachment attachment = new FileAttachment();
+        attachment.setFilePath("doctor-register/20260829-01-0/id-card.png");
+        when(fileStorageService.upload(
+                file, FileBusinessEnums.DOCTOR_REGISTER, UserTypeEnums.DOCTOR, 0L))
+                .thenReturn(attachment);
+
+        Method method = FileStorageController.class.getDeclaredMethod(
+                "uploadDoctorRegistration", org.springframework.web.multipart.MultipartFile.class);
+
+        assertNotNull(method.getAnnotation(Anonymous.class));
+        PostMapping postMapping = method.getAnnotation(PostMapping.class);
+        assertNotNull(postMapping);
+        assertEquals("/upload/doctor-register", postMapping.value()[0]);
+        RequestParam fileParameter = method.getParameters()[0].getAnnotation(RequestParam.class);
+        assertNotNull(fileParameter);
+        assertEquals("file", fileParameter.value());
+
+        R<FileAttachment> result = (R<FileAttachment>) method.invoke(controller, file);
+
+        assertEquals(attachment, result.getData());
+        verify(fileStorageService).upload(
+                file, FileBusinessEnums.DOCTOR_REGISTER, UserTypeEnums.DOCTOR, 0L);
+    }
+
     @Test
     void uploadUsesCaseBusinessFromQueryParameter() throws Exception {
         FileStorageService fileStorageService = mock(FileStorageService.class);

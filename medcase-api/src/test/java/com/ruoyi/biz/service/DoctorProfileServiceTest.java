@@ -17,6 +17,7 @@ import com.ruoyi.common.enums.UserStatusEnums;
 import com.ruoyi.common.enums.UserTypeEnums;
 import com.ruoyi.mvc.constants.enums.ErrorCodeEnums;
 import com.ruoyi.mvc.exception.AbstractBusinessException;
+import com.ruoyi.storage.pojo.FileAttachment;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -39,13 +40,21 @@ class DoctorProfileServiceTest {
         DoctorUserEntity doctor = doctor(UserStatusEnums.REGISTER);
         doctor.setNickName("张医生");
         doctor.setPhonenumber("13800000000");
+        doctor.setIdCardNumber("110101199001011234");
+        doctor.setTitle("主治医师");
+        doctor.setIdCardFront(attachment("front"));
+        doctor.setIdCardBack(attachment("back"));
+        doctor.setQualificationCertificate(attachment("qualification"));
         when(doctorUserMapper.selectDoctorById(12L)).thenReturn(doctor);
 
         DoctorProfileVO result = doctorProfileService.me(loginUser());
 
         assertEquals(12L, result.getId());
-        assertEquals("张医生", result.getName());
+        assertEquals("张医生", result.getNickName());
         assertEquals("13800000000", result.getPhone());
+        assertEquals("110101199001011234", result.getIdCardNumber());
+        assertEquals("主治医师", result.getTitle());
+        assertEquals("front", result.getIdCardFront().getOriginalFilename());
         assertEquals(UserStatusEnums.REGISTER, result.getStatus());
     }
 
@@ -89,11 +98,23 @@ class DoctorProfileServiceTest {
         verify(doctorUserMapper, never()).updateById(any(DoctorUserEntity.class));
     }
 
-    private DoctorProfileSubmitRequest request(String name, String phone) {
+    private DoctorProfileSubmitRequest request(String nickName, String phone) {
         DoctorProfileSubmitRequest request = new DoctorProfileSubmitRequest();
-        request.setName(name);
+        request.setNickName(nickName);
         request.setPhone(phone);
+        request.setIdCardNumber("110101199001011234");
+        request.setTitle("主治医师");
+        request.setIdCardFront(attachment("front"));
+        request.setIdCardBack(attachment("back"));
+        request.setQualificationCertificate(attachment("qualification"));
         return request;
+    }
+
+    private FileAttachment attachment(String filename) {
+        FileAttachment attachment = new FileAttachment();
+        attachment.setFilePath("doctor/" + filename);
+        attachment.setOriginalFilename(filename);
+        return attachment;
     }
 
     private LoginUser loginUser() {

@@ -9,7 +9,7 @@ import lombok.Data;
  */
 @Data
 public class DoctorUserQuery {
-    private String name;
+    private String nickName;
 
     private String phone;
 

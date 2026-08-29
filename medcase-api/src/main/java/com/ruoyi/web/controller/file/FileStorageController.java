@@ -1,5 +1,6 @@
 package com.ruoyi.web.controller.file;
 
+import com.ruoyi.common.annotation.Anonymous;
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.enums.UserTypeEnums;
@@ -48,6 +49,15 @@ public class FileStorageController {
             applicationContext.publishEvent(new UserAvatarUploadedEvent(
                     this, loginUser, attachment));
         }
+        return R.ofSuccess(attachment);
+    }
+
+    @Anonymous
+    @PostMapping("/upload/doctor-register")
+    public R<FileAttachment> uploadDoctorRegistration(
+            @RequestParam("file") MultipartFile file) {
+        FileAttachment attachment = fileStorageService.upload(
+                file, FileBusinessEnums.DOCTOR_REGISTER, UserTypeEnums.DOCTOR, 0L);
         return R.ofSuccess(attachment);
     }
 

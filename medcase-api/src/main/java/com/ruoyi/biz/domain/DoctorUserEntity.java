@@ -1,14 +1,17 @@
 package com.ruoyi.biz.domain;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ruoyi.common.enums.UserStatusEnums;
 import com.ruoyi.common.enums.UserTypeEnums;
 import com.ruoyi.mp.entity.AbstractBaseEntity;
+import com.ruoyi.storage.pojo.FileAttachment;
 import lombok.Data;
 
 import java.util.Date;
@@ -27,6 +30,19 @@ public class DoctorUserEntity extends AbstractBaseEntity {
     private String userName;
 
     private String nickName;
+
+    private String idCardNumber;
+
+    private String title;
+
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private FileAttachment idCardFront;
+
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private FileAttachment idCardBack;
+
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private FileAttachment qualificationCertificate;
 
     private UserTypeEnums userType;
 

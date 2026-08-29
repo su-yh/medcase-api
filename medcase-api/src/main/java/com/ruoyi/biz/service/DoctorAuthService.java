@@ -17,6 +17,7 @@ import com.ruoyi.framework.web.service.SysPermissionService;
 import com.ruoyi.framework.web.service.TokenService;
 import com.ruoyi.mvc.constants.enums.ErrorCodeEnums;
 import com.ruoyi.mvc.exception.ExceptionUtil;
+import com.ruoyi.storage.pojo.FileAttachment;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -32,7 +33,7 @@ import org.springframework.util.StringUtils;
 @RequiredArgsConstructor
 @Slf4j
 public class DoctorAuthService {
-    private static final String REGISTER_CODE = "9999";
+    private static final String REGISTER_INVITE_CODE = "9999";
 
     private final DoctorUserMapper doctorUserMapper;
 
@@ -42,11 +43,11 @@ public class DoctorAuthService {
 
     private final TokenService tokenService;
 
+    @Transactional(rollbackFor = Exception.class)
     public void register(DoctorRegisterRequest registerBody) {
         String username = registerBody.getUsername();
         String password = registerBody.getPassword();
         String phone = registerBody.getPhone();
-        String code = registerBody.getCode();
         log.info("doctor register request, username={}", username);
 
         if (!StringUtils.hasText(username)) {
@@ -55,8 +56,16 @@ public class DoctorAuthService {
             throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_REGISTER_PASSWORD_EMPTY);
         } else if (!StringUtils.hasText(phone)) {
             throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_REGISTER_PHONE_EMPTY);
-        } else if (!REGISTER_CODE.equals(code)) {
-            throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_REGISTER_CODE_INVALID);
+        } else if (!StringUtils.hasText(registerBody.getNickName())) {
+            throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_REGISTER_NICKNAME_EMPTY);
+        } else if (!StringUtils.hasText(registerBody.getIdCardNumber())) {
+            throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_REGISTER_ID_CARD_NUMBER_EMPTY);
+        } else if (!StringUtils.hasText(registerBody.getTitle())) {
+            throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_REGISTER_TITLE_EMPTY);
+        } else if (!StringUtils.hasText(registerBody.getInviteCode())) {
+            throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_REGISTER_INVITE_CODE_EMPTY);
+        } else if (!REGISTER_INVITE_CODE.equals(registerBody.getInviteCode())) {
+            throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_REGISTER_INVITE_CODE_INVALID);
         } else if (username.length() < UserConstants.USERNAME_MIN_LENGTH
                 || username.length() > UserConstants.USERNAME_MAX_LENGTH) {
             throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_REGISTER_USERNAME_LENGTH_INVALID);
@@ -64,6 +73,12 @@ public class DoctorAuthService {
                 || password.length() > UserConstants.PASSWORD_MAX_LENGTH) {
             throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_REGISTER_PASSWORD_LENGTH_INVALID);
         }
+        requireUploadFile(registerBody.getIdCardFront(),
+                ErrorCodeEnums.DOCTOR_REGISTER_ID_CARD_FRONT_EMPTY);
+        requireUploadFile(registerBody.getIdCardBack(),
+                ErrorCodeEnums.DOCTOR_REGISTER_ID_CARD_BACK_EMPTY);
+        requireUploadFile(registerBody.getQualificationCertificate(),
+                ErrorCodeEnums.DOCTOR_REGISTER_QUALIFICATION_CERTIFICATE_EMPTY);
 
         if (doctorUserMapper.usernameExists(username)) {
             throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_REGISTER_USER_EXISTS, username);
@@ -76,17 +91,25 @@ public class DoctorAuthService {
         user.setUserType(UserTypeEnums.DOCTOR);
         user.setPhonenumber(phone);
 
-        user.setNickName(username);
+        user.setNickName(registerBody.getNickName().trim());
+        user.setIdCardNumber(registerBody.getIdCardNumber().trim());
+        user.setTitle(registerBody.getTitle().trim());
+        user.setIdCardFront(registerBody.getIdCardFront());
+        user.setIdCardBack(registerBody.getIdCardBack());
+        user.setQualificationCertificate(registerBody.getQualificationCertificate());
         user.setStatus(UserStatusEnums.REGISTER);
         user.setPwdUpdateDate(DateUtils.getNowDate());
         user.setPassword(SecurityUtils.encryptPassword(password));
-        int affectedRows = user.getUserId() == null
-                ? doctorUserMapper.insert(user)
-                : doctorUserMapper.updateById(user);
-        if (affectedRows <= 0) {
+        if (doctorUserMapper.insert(user) <= 0) {
             throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_REGISTER_FAILED);
         }
         log.info("doctor register success, username={}", username);
+    }
+
+    private void requireUploadFile(FileAttachment file, ErrorCodeEnums errorCode) {
+        if (file == null || !StringUtils.hasText(file.getFilePath())) {
+            throw ExceptionUtil.business(errorCode);
+        }
     }
 
     public String login(DoctorLoginRequest loginBody) {

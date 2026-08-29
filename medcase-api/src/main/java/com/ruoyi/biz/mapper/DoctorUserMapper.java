@@ -58,7 +58,7 @@ public interface DoctorUserMapper extends BaseMapperX<DoctorUserEntity> {
             PageParam pageParam, @NonNull DoctorUserQuery query) {
         LambdaQueryWrapperX<DoctorUserEntity> queryWrapper = build();
         queryWrapper.eq(DoctorUserEntity::getUserType, UserTypeEnums.DOCTOR);
-        queryWrapper.likeIfPresent(DoctorUserEntity::getNickName, query.getName());
+        queryWrapper.likeIfPresent(DoctorUserEntity::getNickName, query.getNickName());
         queryWrapper.likeIfPresent(DoctorUserEntity::getPhonenumber, query.getPhone());
         queryWrapper.eqIfPresent(DoctorUserEntity::getStatus, query.getStatus());
         queryWrapper.orderByDesc(DoctorUserEntity::getCreateTime);
