@@ -4,6 +4,9 @@ mybatis-plus:
   type-aliases-package: com.ruoyi.**.domain
   # 配置mapper的扫描，找到所有的mapper.xml映射文件
   mapper-locations: classpath*:mapper/**/*Mapper.xml
+  global-config:
+    # 关闭 MyBatis-Plus 内置 Banner，避免启动日志中出现无法解析的版本号。
+    banner: false
   configuration:
     # 保留原 mybatis-config.xml 中的有效行为
     use-generated-keys: true

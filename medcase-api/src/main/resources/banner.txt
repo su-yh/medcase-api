@@ -9,4 +9,3 @@
 ╚════════════════════════════════════════╝
 :: Spring Boot Version : ${spring-boot.version}
 :: Active Profile      : ${spring.profiles.active}
-:: Project Version     : ${application.version}
