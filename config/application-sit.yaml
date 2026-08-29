@@ -1,0 +1,31 @@
+
+server:
+  port: 7807
+
+# 日志配置
+logging:
+  level:
+    root: info
+    com.ruoyi: debug
+  file:
+    path:  /home/medcase/medcase-api/logs/medcase-api
+
+
+
+spring:
+  datasource:
+    dynamic:
+      hikari:
+        master:
+          # JDBC连接地址
+          jdbc-url: jdbc:mysql://qu-yun.isuyh.com/suyh_medcase_test?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=UTC&connectTimeout=30000&socketTimeout=60000
+          # 数据源用户名
+          username: suyh_medcase_test
+          # 数据源密码
+          password: suyh_medcase_test
+          flyway:
+            # 是否启用该数据源的Flyway
+            enabled: true
+
+
+
