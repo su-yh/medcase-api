@@ -177,6 +177,20 @@ class DoctorAuthServiceTest {
     }
 
     @Test
+    void registerRejectsEmptySex() {
+        DoctorRegisterRequest registerRequest = registerRequest(
+                "doctor01", "secret123", "13800000000", "9999");
+        registerRequest.setSex("");
+
+        AbstractBusinessException exception = assertThrows(
+                AbstractBusinessException.class,
+                () -> doctorAuthService.register(registerRequest));
+
+        assertEquals(ErrorCodeEnums.DOCTOR_REGISTER_SEX_EMPTY, exception.getEc());
+        verify(doctorUserMapper, never()).insert(any(DoctorUserEntity.class));
+    }
+
+    @Test
     void registerRejectsInvalidInviteCode() {
         DoctorRegisterRequest registerRequest = registerRequest(
                 "doctor01", "secret123", "13800000000", "1234");
@@ -277,6 +291,7 @@ class DoctorAuthServiceTest {
         DoctorRegisterRequest registerRequest = registerRequest(
                 "doctor01", "secret123", "13800000000", "9999");
         registerRequest.setNickName("张医生");
+        registerRequest.setSex("1");
         registerRequest.setIdCardNumber("110101199001011234");
         registerRequest.setTitle("主治医师");
         when(doctorUserMapper.usernameExists("doctor01")).thenReturn(false);
@@ -291,6 +306,7 @@ class DoctorAuthServiceTest {
         verify(doctorUserMapper).insert(captor.capture());
         DoctorUserEntity user = captor.getValue();
         assertEquals("张医生", user.getNickName());
+        assertEquals("1", user.getSex());
         assertEquals("110101199001011234", user.getIdCardNumber());
         assertEquals("主治医师", user.getTitle());
         assertEquals("id-card-front.png", user.getIdCardFront().getOriginalFilename());
@@ -438,6 +454,7 @@ class DoctorAuthServiceTest {
         registerRequest.setPhone(phone);
         registerRequest.setInviteCode(inviteCode);
         registerRequest.setNickName("张医生");
+        registerRequest.setSex("1");
         registerRequest.setIdCardNumber("110101199001011234");
         registerRequest.setTitle("主治医师");
         registerRequest.setIdCardFront(attachment("id-card-front.png"));

@@ -19,6 +19,8 @@ public class DoctorRegisterRequest {
 
     private String nickName;
 
+    private String sex;
+
     private String idCardNumber;
 
     private String title;

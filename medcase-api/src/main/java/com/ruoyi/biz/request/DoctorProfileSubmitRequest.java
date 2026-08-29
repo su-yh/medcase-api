@@ -17,6 +17,9 @@ public class DoctorProfileSubmitRequest {
     @Size(max = 30, message = "姓名不能超过30个字符")
     private String nickName;
 
+    @NotBlank(message = "性别不能为空")
+    private String sex;
+
     @NotBlank(message = "手机号不能为空")
     @Size(max = 20, message = "手机号不能超过20个字符")
     private String phone;

@@ -18,6 +18,8 @@ public class DoctorUserVO {
 
     private String nickName;
 
+    private String sex;
+
     private String idCardNumber;
 
     private String title;
@@ -34,6 +36,8 @@ public class DoctorUserVO {
 
     private String status;
 
+    private String reviewReason;
+
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date createTime;
 
@@ -41,6 +45,7 @@ public class DoctorUserVO {
         DoctorUserVO result = new DoctorUserVO();
         result.setId(user.getUserId());
         result.setNickName(user.getNickName());
+        result.setSex(user.getSex());
         result.setIdCardNumber(user.getIdCardNumber());
         result.setTitle(user.getTitle());
         result.setIdCardFront(user.getIdCardFront());
@@ -51,6 +56,7 @@ public class DoctorUserVO {
         if (user.getStatus() != null) {
             result.setStatus(user.getStatus().getCode());
         }
+        result.setReviewReason(user.getReviewReason());
         result.setCreateTime(user.getCreateTime());
         return result;
     }

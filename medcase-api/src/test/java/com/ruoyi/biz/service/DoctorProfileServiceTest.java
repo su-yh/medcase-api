@@ -39,6 +39,7 @@ class DoctorProfileServiceTest {
     void meReturnsCurrentDoctorProfile() {
         DoctorUserEntity doctor = doctor(UserStatusEnums.REGISTER);
         doctor.setNickName("张医生");
+        doctor.setSex("1");
         doctor.setPhonenumber("13800000000");
         doctor.setIdCardNumber("110101199001011234");
         doctor.setTitle("主治医师");
@@ -51,6 +52,7 @@ class DoctorProfileServiceTest {
 
         assertEquals(12L, result.getId());
         assertEquals("张医生", result.getNickName());
+        assertEquals("1", result.getSex());
         assertEquals("13800000000", result.getPhone());
         assertEquals("110101199001011234", result.getIdCardNumber());
         assertEquals("主治医师", result.getTitle());
@@ -64,10 +66,12 @@ class DoctorProfileServiceTest {
         when(doctorUserMapper.selectDoctorById(12L)).thenReturn(doctor);
         when(doctorUserMapper.updateById(doctor)).thenReturn(1);
         DoctorProfileSubmitRequest request = request("张医生", "13800000000");
+        request.setSex("1");
 
         doctorProfileService.submit(loginUser(), request);
 
         assertEquals("张医生", doctor.getNickName());
+        assertEquals("1", doctor.getSex());
         assertEquals("13800000000", doctor.getPhonenumber());
         assertEquals(UserStatusEnums.PENDING_REVIEW, doctor.getStatus());
         verify(doctorUserMapper).updateById(doctor);
@@ -101,6 +105,7 @@ class DoctorProfileServiceTest {
     private DoctorProfileSubmitRequest request(String nickName, String phone) {
         DoctorProfileSubmitRequest request = new DoctorProfileSubmitRequest();
         request.setNickName(nickName);
+        request.setSex("1");
         request.setPhone(phone);
         request.setIdCardNumber("110101199001011234");
         request.setTitle("主治医师");

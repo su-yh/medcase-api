@@ -16,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.util.stream.Collectors;
 
@@ -65,9 +66,13 @@ public class DoctorUserService {
             throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_USER_REVIEW_STATUS_NOT_MATCH);
         }
 
-        user.setStatus(Boolean.TRUE.equals(request.getApprove())
-                ? UserStatusEnums.OK
-                : UserStatusEnums.REVIEW_FAILED);
+        boolean approve = Boolean.TRUE.equals(request.getApprove());
+        if (!approve && !StringUtils.hasText(request.getReason())) {
+            throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_USER_REVIEW_REASON_EMPTY);
+        }
+
+        user.setStatus(approve ? UserStatusEnums.OK : UserStatusEnums.REVIEW_FAILED);
+        user.setReviewReason(approve ? null : request.getReason().trim());
         if (doctorUserMapper.updateById(user) <= 0) {
             throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_USER_REVIEW_FAILED);
         }

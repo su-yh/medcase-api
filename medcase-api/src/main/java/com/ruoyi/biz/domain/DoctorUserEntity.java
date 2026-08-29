@@ -31,6 +31,8 @@ public class DoctorUserEntity extends AbstractBaseEntity {
 
     private String nickName;
 
+    private String sex;
+
     private String idCardNumber;
 
     private String title;
@@ -52,6 +54,8 @@ public class DoctorUserEntity extends AbstractBaseEntity {
     private String password;
 
     private UserStatusEnums status;
+
+    private String reviewReason;
 
     @TableLogic(value = "0", delval = "2")
     @JsonIgnore

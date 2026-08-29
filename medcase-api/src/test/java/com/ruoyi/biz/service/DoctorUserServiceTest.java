@@ -9,6 +9,8 @@ import com.ruoyi.common.enums.UserStatusEnums;
 import com.ruoyi.common.enums.UserTypeEnums;
 import com.ruoyi.mp.mybatis.PageParam;
 import com.ruoyi.mp.mybatis.PageResult;
+import com.ruoyi.mvc.constants.enums.ErrorCodeEnums;
+import com.ruoyi.mvc.exception.AbstractBusinessException;
 import com.ruoyi.storage.pojo.FileAttachment;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,7 +20,9 @@ import org.mockito.MockitoAnnotations;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -34,6 +38,12 @@ class DoctorUserServiceTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
         doctorUserService = new DoctorUserService(doctorUserMapper);
+    }
+
+    @Test
+    void doctorUserModelExposesReviewReason() {
+        assertDoesNotThrow(() -> DoctorUserEntity.class.getDeclaredField("reviewReason"));
+        assertDoesNotThrow(() -> DoctorUserVO.class.getDeclaredField("reviewReason"));
     }
 
     @Test
@@ -144,12 +154,34 @@ class DoctorUserServiceTest {
 
         DoctorUserReviewRequest request = new DoctorUserReviewRequest();
         request.setApprove(false);
+        request.setReason("身份证照片不清晰");
 
         doctorUserService.review(1L, request);
 
         assertEquals(UserStatusEnums.REVIEW_FAILED, user.getStatus());
+        assertEquals("身份证照片不清晰", user.getReviewReason());
         verify(doctorUserMapper).updateById(user);
         verify(doctorUserMapper, never()).phoneExists(any());
+    }
+
+    @Test
+    void reviewRejectsWithoutReason() {
+        DoctorUserEntity user = new DoctorUserEntity();
+        user.setUserId(1L);
+        user.setUserType(UserTypeEnums.DOCTOR);
+        user.setStatus(UserStatusEnums.PENDING_REVIEW);
+        when(doctorUserMapper.selectDoctorById(1L)).thenReturn(user);
+
+        DoctorUserReviewRequest request = new DoctorUserReviewRequest();
+        request.setApprove(false);
+
+        AbstractBusinessException exception = assertThrows(
+                AbstractBusinessException.class,
+                () -> doctorUserService.review(1L, request));
+
+        assertEquals(ErrorCodeEnums.DOCTOR_USER_REVIEW_REASON_EMPTY, exception.getEc());
+        assertEquals(UserStatusEnums.PENDING_REVIEW, user.getStatus());
+        verify(doctorUserMapper, never()).updateById(any(DoctorUserEntity.class));
     }
 
     @Test
@@ -182,10 +214,32 @@ class DoctorUserServiceTest {
 
         DoctorUserReviewRequest request = new DoctorUserReviewRequest();
         request.setApprove(false);
+        request.setReason("资格证信息不完整");
 
         doctorUserService.review(1L, request);
 
         assertEquals(UserStatusEnums.REVIEW_FAILED, user.getStatus());
+        assertEquals("资格证信息不完整", user.getReviewReason());
+        verify(doctorUserMapper).updateById(user);
+    }
+
+    @Test
+    void reviewApprovesDoctorAndClearsPreviousReviewReason() {
+        DoctorUserEntity user = new DoctorUserEntity();
+        user.setUserId(1L);
+        user.setUserType(UserTypeEnums.DOCTOR);
+        user.setStatus(UserStatusEnums.PENDING_REVIEW);
+        user.setReviewReason("历史拒绝原因");
+        when(doctorUserMapper.selectDoctorById(1L)).thenReturn(user);
+        when(doctorUserMapper.updateById(user)).thenReturn(1);
+
+        DoctorUserReviewRequest request = new DoctorUserReviewRequest();
+        request.setApprove(true);
+
+        doctorUserService.review(1L, request);
+
+        assertEquals(UserStatusEnums.OK, user.getStatus());
+        assertNull(user.getReviewReason());
         verify(doctorUserMapper).updateById(user);
     }
 

@@ -58,6 +58,8 @@ public class DoctorAuthService {
             throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_REGISTER_PHONE_EMPTY);
         } else if (!StringUtils.hasText(registerBody.getNickName())) {
             throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_REGISTER_NICKNAME_EMPTY);
+        } else if (!StringUtils.hasText(registerBody.getSex())) {
+            throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_REGISTER_SEX_EMPTY);
         } else if (!StringUtils.hasText(registerBody.getIdCardNumber())) {
             throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_REGISTER_ID_CARD_NUMBER_EMPTY);
         } else if (!StringUtils.hasText(registerBody.getTitle())) {
@@ -92,11 +94,13 @@ public class DoctorAuthService {
         user.setPhonenumber(phone);
 
         user.setNickName(registerBody.getNickName().trim());
+        user.setSex(registerBody.getSex().trim());
         user.setIdCardNumber(registerBody.getIdCardNumber().trim());
         user.setTitle(registerBody.getTitle().trim());
         user.setIdCardFront(registerBody.getIdCardFront());
         user.setIdCardBack(registerBody.getIdCardBack());
         user.setQualificationCertificate(registerBody.getQualificationCertificate());
+        user.setReviewReason(null);
         user.setStatus(UserStatusEnums.REGISTER);
         user.setPwdUpdateDate(DateUtils.getNowDate());
         user.setPassword(SecurityUtils.encryptPassword(password));
@@ -176,6 +180,7 @@ public class DoctorAuthService {
         sysUser.setUserId(doctorUser.getUserId());
         sysUser.setUserName(doctorUser.getUserName());
         sysUser.setNickName(doctorUser.getNickName());
+        sysUser.setSex(doctorUser.getSex());
         sysUser.setUserType(doctorUser.getUserType());
         sysUser.setPassword(doctorUser.getPassword());
         sysUser.setStatus(doctorUser.getStatus().getCode());

@@ -16,6 +16,8 @@ public class DoctorProfileVO {
 
     private String nickName;
 
+    private String sex;
+
     private String phone;
 
     private String idCardNumber;
@@ -30,10 +32,13 @@ public class DoctorProfileVO {
 
     private UserStatusEnums status;
 
+    private String reviewReason;
+
     public static DoctorProfileVO fromEntity(DoctorUserEntity doctor) {
         DoctorProfileVO result = new DoctorProfileVO();
         result.setId(doctor.getUserId());
         result.setNickName(doctor.getNickName());
+        result.setSex(doctor.getSex());
         result.setPhone(doctor.getPhonenumber());
         result.setIdCardNumber(doctor.getIdCardNumber());
         result.setTitle(doctor.getTitle());
@@ -41,6 +46,7 @@ public class DoctorProfileVO {
         result.setIdCardBack(doctor.getIdCardBack());
         result.setQualificationCertificate(doctor.getQualificationCertificate());
         result.setStatus(doctor.getStatus());
+        result.setReviewReason(doctor.getReviewReason());
         return result;
     }
 }
