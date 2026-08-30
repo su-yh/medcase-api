@@ -14,7 +14,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.medcase.common.annotation.Log;
 import com.medcase.common.core.controller.BaseController;
-import com.medcase.mvc.response.R;
+import com.medcase.mvc.response.annotation.WrapperResponseAdvice;
+import com.medcase.mvc.constants.enums.ErrorCodeEnums;
+import com.medcase.mvc.exception.ExceptionUtil;
 import com.medcase.common.core.page.TableDataInfo;
 import com.medcase.common.enums.BusinessType;
 import com.medcase.system.domain.SysPost;
@@ -36,6 +38,7 @@ public class SysPostController extends BaseController {
      */
     @PreAuthorize("@ss.hasPermi('system:post:list')")
     @GetMapping("/list")
+    @WrapperResponseAdvice(enable = false)
     public TableDataInfo list(SysPost post) {
 
         startPage();
@@ -48,9 +51,9 @@ public class SysPostController extends BaseController {
      */
     @PreAuthorize("@ss.hasPermi('system:post:query')")
     @GetMapping(value = "/{postId}")
-    public R<SysPost> getInfo(@PathVariable Long postId) {
+    public SysPost getInfo(@PathVariable Long postId) {
 
-        return R.ofSuccess(postService.selectPostById(postId));
+        return postService.selectPostById(postId);
     }
 
     /**
@@ -59,18 +62,18 @@ public class SysPostController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:post:add')")
     @Log(title = "岗位管理", businessType = BusinessType.INSERT)
     @PostMapping
-    public R<Void> add(@Validated @RequestBody SysPost post) {
+    public void add(@Validated @RequestBody SysPost post) {
 
         if (!postService.checkPostNameUnique(post)) {
-
-            return R.ofFail("新增岗位'" + post.getPostName() + "'失败，岗位名称已存在");
+            throw ExceptionUtil.business(ErrorCodeEnums.POST_NAME_EXISTS);
         }
         else if (!postService.checkPostCodeUnique(post)) {
-
-            return R.ofFail("新增岗位'" + post.getPostName() + "'失败，岗位编码已存在");
+            throw ExceptionUtil.business(ErrorCodeEnums.POST_CODE_EXISTS);
         }
         post.setCreateBy(getUsername());
-        return postService.insertPost(post) > 0 ? R.ofSuccess() : R.ofFail("操作失败");
+        if (postService.insertPost(post) <= 0) {
+            throw ExceptionUtil.business(ErrorCodeEnums.POST_OPERATION_FAILED);
+        }
     }
 
     /**
@@ -79,18 +82,18 @@ public class SysPostController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:post:edit')")
     @Log(title = "岗位管理", businessType = BusinessType.UPDATE)
     @PutMapping
-    public R<Void> edit(@Validated @RequestBody SysPost post) {
+    public void edit(@Validated @RequestBody SysPost post) {
 
         if (!postService.checkPostNameUnique(post)) {
-
-            return R.ofFail("修改岗位'" + post.getPostName() + "'失败，岗位名称已存在");
+            throw ExceptionUtil.business(ErrorCodeEnums.POST_NAME_EXISTS);
         }
         else if (!postService.checkPostCodeUnique(post)) {
-
-            return R.ofFail("修改岗位'" + post.getPostName() + "'失败，岗位编码已存在");
+            throw ExceptionUtil.business(ErrorCodeEnums.POST_CODE_EXISTS);
         }
         post.setUpdateBy(getUsername());
-        return postService.updatePost(post) > 0 ? R.ofSuccess() : R.ofFail("操作失败");
+        if (postService.updatePost(post) <= 0) {
+            throw ExceptionUtil.business(ErrorCodeEnums.POST_OPERATION_FAILED);
+        }
     }
 
     /**
@@ -99,18 +102,20 @@ public class SysPostController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:post:remove')")
     @Log(title = "岗位管理", businessType = BusinessType.DELETE)
     @DeleteMapping("/{postIds}")
-    public R<Void> remove(@PathVariable Long[] postIds) {
+    public void remove(@PathVariable Long[] postIds) {
 
-        return postService.deletePostByIds(postIds) > 0 ? R.ofSuccess() : R.ofFail("操作失败");
+        if (postService.deletePostByIds(postIds) <= 0) {
+            throw ExceptionUtil.business(ErrorCodeEnums.POST_OPERATION_FAILED);
+        }
     }
 
     /**
      * 获取岗位选择框列表
      */
     @GetMapping("/optionselect")
-    public R<List<SysPost>> optionselect() {
+    public List<SysPost> optionselect() {
 
         List<SysPost> posts = postService.selectPostAll();
-        return R.ofSuccess(posts);
+        return posts;
     }
 }

@@ -1,6 +1,5 @@
 package com.medcase.mvc.response;
 
-import com.medcase.common.constant.HttpStatus;
 import lombok.Getter;
 
 /**
@@ -35,18 +34,4 @@ public class R<T> {
         return new R<>(SUCCESS_CODE, SUCCESS_MSG, data);
     }
 
-    public static <T> R<T> ofSuccess() {
-
-        return new R<>(SUCCESS_CODE, SUCCESS_MSG, null);
-    }
-
-    public static <T> R<T> ofFail(int code, String message) {
-
-        return new R<>(code, message, null);
-    }
-
-    public static <T> R<T> ofFail(String message) {
-
-        return ofFail(HttpStatus.ERROR, message);
-    }
 }

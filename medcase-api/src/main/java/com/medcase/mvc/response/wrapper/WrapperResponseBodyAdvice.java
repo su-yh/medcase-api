@@ -30,7 +30,7 @@ public class WrapperResponseBodyAdvice implements ResponseBodyAdvice<Object> {
     private static final Set<String> BASE_PACKAGES = new HashSet<>();
 
     static {
-        BASE_PACKAGES.add("com.medcase.biz.controller");
+        BASE_PACKAGES.add("com.medcase");
     }
 
     public void addBasePackages(Collection<String> basePackages) {
@@ -104,7 +104,7 @@ public class WrapperResponseBodyAdvice implements ResponseBodyAdvice<Object> {
             }
         }
 
-        if (wrapperResponseAdvice != null && !wrapperResponseAdvice.enabled()) {
+        if (wrapperResponseAdvice != null && !wrapperResponseAdvice.enable()) {
             return false;
         }
 

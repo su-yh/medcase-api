@@ -15,7 +15,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import com.medcase.common.annotation.Log;
 import com.medcase.common.core.controller.BaseController;
-import com.medcase.mvc.response.R;
+import com.medcase.mvc.response.annotation.WrapperResponseAdvice;
+import com.medcase.mvc.constants.enums.ErrorCodeEnums;
+import com.medcase.mvc.exception.ExceptionUtil;
 import com.medcase.common.core.page.TableDataInfo;
 import com.medcase.common.core.text.Convert;
 import com.medcase.common.enums.BusinessType;
@@ -43,6 +45,7 @@ public class SysNoticeController extends BaseController {
      */
     @PreAuthorize("@ss.hasPermi('system:notice:list')")
     @GetMapping("/list")
+    @WrapperResponseAdvice(enable = false)
     public TableDataInfo list(SysNotice notice) {
 
         startPage();
@@ -54,9 +57,9 @@ public class SysNoticeController extends BaseController {
      * 根据通知公告编号获取详细信息
      */
     @GetMapping(value = "/{noticeId}")
-    public R<SysNotice> getInfo(@PathVariable Long noticeId) {
+    public SysNotice getInfo(@PathVariable Long noticeId) {
 
-        return R.ofSuccess(noticeService.selectNoticeById(noticeId));
+        return noticeService.selectNoticeById(noticeId);
     }
 
     /**
@@ -65,10 +68,12 @@ public class SysNoticeController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:notice:add')")
     @Log(title = "通知公告", businessType = BusinessType.INSERT)
     @PostMapping
-    public R<Void> add(@Validated @RequestBody SysNotice notice) {
+    public void add(@Validated @RequestBody SysNotice notice) {
 
         notice.setCreateBy(getUsername());
-        return noticeService.insertNotice(notice) > 0 ? R.ofSuccess() : R.ofFail("操作失败");
+        if (noticeService.insertNotice(notice) <= 0) {
+            throw ExceptionUtil.business(ErrorCodeEnums.NOTICE_OPERATION_FAILED);
+        }
     }
 
     /**
@@ -77,10 +82,12 @@ public class SysNoticeController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:notice:edit')")
     @Log(title = "通知公告", businessType = BusinessType.UPDATE)
     @PutMapping
-    public R<Void> edit(@Validated @RequestBody SysNotice notice) {
+    public void edit(@Validated @RequestBody SysNotice notice) {
 
         notice.setUpdateBy(getUsername());
-        return noticeService.updateNotice(notice) > 0 ? R.ofSuccess() : R.ofFail("操作失败");
+        if (noticeService.updateNotice(notice) <= 0) {
+            throw ExceptionUtil.business(ErrorCodeEnums.NOTICE_OPERATION_FAILED);
+        }
     }
 
     /**
@@ -88,12 +95,12 @@ public class SysNoticeController extends BaseController {
      */
     @GetMapping("/listTop")
     @ResponseBody
-    public R<NoticeTopResponse> listTop() {
+    public NoticeTopResponse listTop() {
 
         Long userId = getUserId();
         List<SysNotice> list = noticeReadService.selectNoticeListWithReadStatus(userId, 5);
         long unreadCount = list.stream().filter(n -> !n.getIsRead()).count();
-        return R.ofSuccess(new NoticeTopResponse(list, unreadCount));
+        return new NoticeTopResponse(list, unreadCount);
     }
 
     /**
@@ -101,11 +108,10 @@ public class SysNoticeController extends BaseController {
      */
     @PostMapping("/markRead")
     @ResponseBody
-    public R<Void> markRead(Long noticeId) {
+    public void markRead(Long noticeId) {
 
         Long userId = getUserId();
         noticeReadService.markRead(noticeId, userId);
-        return R.ofSuccess();
     }
 
     /**
@@ -113,12 +119,11 @@ public class SysNoticeController extends BaseController {
      */
     @PostMapping("/markReadAll")
     @ResponseBody
-    public R<Void> markReadAll(String ids) {
+    public void markReadAll(String ids) {
 
         Long userId = getUserId();
         Long[] noticeIds = Convert.toLongArray(ids);
         noticeReadService.markReadBatch(userId, noticeIds);
-        return R.ofSuccess();
     }
 
     /**
@@ -127,6 +132,7 @@ public class SysNoticeController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:notice:list')")
     @GetMapping("/readUsers/list")
     @ResponseBody
+    @WrapperResponseAdvice(enable = false)
     public TableDataInfo readUsersList(Long noticeId, String searchValue) {
 
         startPage();
@@ -140,9 +146,11 @@ public class SysNoticeController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:notice:remove')")
     @Log(title = "通知公告", businessType = BusinessType.DELETE)
     @DeleteMapping("/{noticeIds}")
-    public R<Void> remove(@PathVariable Long[] noticeIds) {
+    public void remove(@PathVariable Long[] noticeIds) {
 
         noticeReadService.deleteByNoticeIds(noticeIds);
-        return noticeService.deleteNoticeByIds(noticeIds) > 0 ? R.ofSuccess() : R.ofFail("操作失败");
+        if (noticeService.deleteNoticeByIds(noticeIds) <= 0) {
+            throw ExceptionUtil.business(ErrorCodeEnums.NOTICE_OPERATION_FAILED);
+        }
     }
 }

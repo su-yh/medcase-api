@@ -4,7 +4,9 @@ import com.medcase.common.annotation.Log;
 import com.medcase.common.core.controller.BaseController;
 import com.medcase.common.core.page.TableDataInfo;
 import com.medcase.common.enums.BusinessType;
-import com.medcase.mvc.response.R;
+import com.medcase.mvc.response.annotation.WrapperResponseAdvice;
+import com.medcase.mvc.constants.enums.ErrorCodeEnums;
+import com.medcase.mvc.exception.ExceptionUtil;
 import com.medcase.system.domain.SysConfig;
 import com.medcase.system.service.ISysConfigService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +39,7 @@ public class SysConfigController extends BaseController {
      */
     @PreAuthorize("@ss.hasPermi('system:config:list')")
     @GetMapping("/list")
+    @WrapperResponseAdvice(enable = false)
     public TableDataInfo list(SysConfig config) {
 
         startPage();
@@ -49,18 +52,18 @@ public class SysConfigController extends BaseController {
      */
     @PreAuthorize("@ss.hasPermi('system:config:query')")
     @GetMapping(value = "/{configId}")
-    public R<SysConfig> getInfo(@PathVariable Long configId) {
+    public SysConfig getInfo(@PathVariable Long configId) {
 
-        return R.ofSuccess(configService.selectConfigById(configId));
+        return configService.selectConfigById(configId);
     }
 
     /**
      * 根据参数键名查询参数值
      */
     @GetMapping(value = "/configKey/{configKey}")
-    public R<String> getConfigKey(@PathVariable String configKey) {
+    public String getConfigKey(@PathVariable String configKey) {
 
-        return R.ofSuccess(configService.selectConfigByKey(configKey));
+        return configService.selectConfigByKey(configKey);
     }
 
     /**
@@ -69,14 +72,15 @@ public class SysConfigController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:config:add')")
     @Log(title = "参数管理", businessType = BusinessType.INSERT)
     @PostMapping
-    public R<Void> add(@Validated @RequestBody SysConfig config) {
+    public void add(@Validated @RequestBody SysConfig config) {
 
         if (!configService.checkConfigKeyUnique(config)) {
-
-            return R.ofFail("新增参数'" + config.getConfigName() + "'失败，参数键名已存在");
+            throw ExceptionUtil.business(ErrorCodeEnums.CONFIG_KEY_EXISTS);
         }
         config.setCreateBy(getUsername());
-        return configService.insertConfig(config) > 0 ? R.ofSuccess() : R.ofFail("操作失败");
+        if (configService.insertConfig(config) <= 0) {
+            throw ExceptionUtil.business(ErrorCodeEnums.CONFIG_OPERATION_FAILED);
+        }
     }
 
     /**
@@ -85,14 +89,15 @@ public class SysConfigController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:config:edit')")
     @Log(title = "参数管理", businessType = BusinessType.UPDATE)
     @PutMapping
-    public R<Void> edit(@Validated @RequestBody SysConfig config) {
+    public void edit(@Validated @RequestBody SysConfig config) {
 
         if (!configService.checkConfigKeyUnique(config)) {
-
-            return R.ofFail("修改参数'" + config.getConfigName() + "'失败，参数键名已存在");
+            throw ExceptionUtil.business(ErrorCodeEnums.CONFIG_KEY_EXISTS);
         }
         config.setUpdateBy(getUsername());
-        return configService.updateConfig(config) > 0 ? R.ofSuccess() : R.ofFail("操作失败");
+        if (configService.updateConfig(config) <= 0) {
+            throw ExceptionUtil.business(ErrorCodeEnums.CONFIG_OPERATION_FAILED);
+        }
     }
 
     /**
@@ -101,10 +106,9 @@ public class SysConfigController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:config:remove')")
     @Log(title = "参数管理", businessType = BusinessType.DELETE)
     @DeleteMapping("/{configIds}")
-    public R<Void> remove(@PathVariable Long[] configIds) {
+    public void remove(@PathVariable Long[] configIds) {
 
         configService.deleteConfigByIds(configIds);
-        return R.ofSuccess();
     }
 
     /**
@@ -113,9 +117,8 @@ public class SysConfigController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:config:remove')")
     @Log(title = "参数管理", businessType = BusinessType.CLEAN)
     @DeleteMapping("/refreshCache")
-    public R<Void> refreshCache() {
+    public void refreshCache() {
 
         configService.resetConfigCache();
-        return R.ofSuccess();
     }
 }

@@ -1,6 +1,5 @@
 package com.medcase.web.controller.file;
 
-import com.medcase.mvc.response.R;
 import com.medcase.common.core.domain.entity.SysUser;
 import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.common.enums.UserTypeEnums;
@@ -50,9 +49,9 @@ class FileStorageControllerTest {
         assertNotNull(fileParameter);
         assertEquals("file", fileParameter.value());
 
-        R<FileAttachment> result = (R<FileAttachment>) method.invoke(controller, file);
+        FileAttachment result = (FileAttachment) method.invoke(controller, file);
 
-        assertEquals(attachment, result.getData());
+        assertEquals(attachment, result);
         verify(fileStorageService).upload(
                 file, FileBusinessEnums.DOCTOR_REGISTER, UserTypeEnums.DOCTOR, 0L);
     }
@@ -78,10 +77,10 @@ class FileStorageControllerTest {
         assertNotNull(business);
         assertEquals("business", business.value());
 
-        R<FileAttachment> result = (R<FileAttachment>) method.invoke(
+        FileAttachment result = (FileAttachment) method.invoke(
                 controller, doctorLoginUser(), FileBusinessEnums.CASE, file);
 
-        assertEquals(attachment, result.getData());
+        assertEquals(attachment, result);
         verify(fileStorageService).upload(file, FileBusinessEnums.CASE, UserTypeEnums.DOCTOR, 12L);
     }
 
@@ -106,10 +105,10 @@ class FileStorageControllerTest {
         assertNotNull(postMapping);
         assertEquals("/upload", postMapping.value()[0]);
 
-        R<FileAttachment> result = (R<FileAttachment>) method.invoke(
+        FileAttachment result = (FileAttachment) method.invoke(
                 controller, adminUser, FileBusinessEnums.AVATAR, file);
 
-        assertEquals(attachment, result.getData());
+        assertEquals(attachment, result);
         verify(fileStorageService).upload(file, FileBusinessEnums.AVATAR, UserTypeEnums.ADMIN, 12L);
         var eventCaptor = forClass(UserAvatarUploadedEvent.class);
         verify(applicationContext).publishEvent(eventCaptor.capture());
@@ -137,10 +136,10 @@ class FileStorageControllerTest {
         assertNotNull(postMapping);
         assertEquals("/upload", postMapping.value()[0]);
 
-        R<FileAttachment> result = (R<FileAttachment>) method.invoke(
+        FileAttachment result = (FileAttachment) method.invoke(
                 controller, adminLoginUser(), FileBusinessEnums.NOTICE, file);
 
-        assertEquals(attachment, result.getData());
+        assertEquals(attachment, result);
         verify(fileStorageService).upload(file, FileBusinessEnums.NOTICE, UserTypeEnums.ADMIN, 12L);
     }
 
@@ -158,10 +157,10 @@ class FileStorageControllerTest {
                 "upload", LoginUser.class, FileBusinessEnums.class,
                 org.springframework.web.multipart.MultipartFile.class);
 
-        R<FileAttachment> result = (R<FileAttachment>) method.invoke(
+        FileAttachment result = (FileAttachment) method.invoke(
                 controller, doctorLoginUser(), FileBusinessEnums.AVATAR, file);
 
-        assertEquals(attachment, result.getData());
+        assertEquals(attachment, result);
         verify(fileStorageService).upload(file, FileBusinessEnums.AVATAR, UserTypeEnums.DOCTOR, 12L);
     }
 

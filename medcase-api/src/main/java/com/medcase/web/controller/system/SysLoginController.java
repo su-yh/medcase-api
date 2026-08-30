@@ -12,7 +12,6 @@ import com.medcase.common.utils.StringUtils;
 import com.medcase.framework.web.service.SysLoginService;
 import com.medcase.framework.web.service.SysPermissionService;
 import com.medcase.framework.web.service.TokenService;
-import com.medcase.mvc.response.R;
 import com.medcase.system.domain.vo.RouterVo;
 import com.medcase.system.service.ISysConfigService;
 import com.medcase.system.service.ISysMenuService;
@@ -57,12 +56,12 @@ public class SysLoginController {
      */
     @Anonymous
     @PostMapping("/login")
-    public R<LoginResponse> login(@RequestBody LoginBody loginBody) {
+    public LoginResponse login(@RequestBody LoginBody loginBody) {
 
         // 生成令牌
         String token = loginService.login(loginBody.getUsername(), loginBody.getPassword(), loginBody.getCode(),
                 loginBody.getUuid());
-        return R.ofSuccess(new LoginResponse(token));
+        return new LoginResponse(token);
     }
 
     /**
@@ -71,7 +70,7 @@ public class SysLoginController {
      * @return 用户信息
      */
     @GetMapping("getInfo")
-    public R<LoginUserInfoResponse> getInfo() {
+    public LoginUserInfoResponse getInfo() {
 
         LoginUser loginUser = SecurityUtils.getLoginUser();
         SysUser user = loginUser.getUser();
@@ -91,7 +90,7 @@ public class SysLoginController {
                 getSysAccountChrtype(),
                 initPasswordIsModify(user.getPwdUpdateDate()),
                 passwordIsExpiration(user.getPwdUpdateDate()));
-        return R.ofSuccess(data);
+        return data;
     }
 
     /**
@@ -100,11 +99,11 @@ public class SysLoginController {
      * @return 路由信息
      */
     @GetMapping("getRouters")
-    public R<List<RouterVo>> getRouters() {
+    public List<RouterVo> getRouters() {
 
         Long userId = SecurityUtils.getUserId();
         List<SysMenu> menus = menuService.selectMenuTreeByUserId(userId);
-        return R.ofSuccess(menuService.buildMenus(menus));
+        return menuService.buildMenus(menus);
     }
 
     // 获取用户密码自定义配置规则

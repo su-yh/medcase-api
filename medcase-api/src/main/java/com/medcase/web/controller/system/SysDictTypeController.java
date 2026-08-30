@@ -14,7 +14,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.medcase.common.annotation.Log;
 import com.medcase.common.core.controller.BaseController;
-import com.medcase.mvc.response.R;
+import com.medcase.mvc.response.annotation.WrapperResponseAdvice;
+import com.medcase.mvc.constants.enums.ErrorCodeEnums;
+import com.medcase.mvc.exception.ExceptionUtil;
 import com.medcase.common.core.domain.entity.SysDictType;
 import com.medcase.common.core.page.TableDataInfo;
 import com.medcase.common.enums.BusinessType;
@@ -33,6 +35,7 @@ public class SysDictTypeController extends BaseController {
 
     @PreAuthorize("@ss.hasPermi('system:dict:list')")
     @GetMapping("/list")
+    @WrapperResponseAdvice(enable = false)
     public TableDataInfo list(SysDictType dictType) {
 
         startPage();
@@ -45,9 +48,9 @@ public class SysDictTypeController extends BaseController {
      */
     @PreAuthorize("@ss.hasPermi('system:dict:query')")
     @GetMapping(value = "/{dictId}")
-    public R<SysDictType> getInfo(@PathVariable Long dictId) {
+    public SysDictType getInfo(@PathVariable Long dictId) {
 
-        return R.ofSuccess(dictTypeService.selectDictTypeById(dictId));
+        return dictTypeService.selectDictTypeById(dictId);
     }
 
     /**
@@ -56,14 +59,15 @@ public class SysDictTypeController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:dict:add')")
     @Log(title = "字典类型", businessType = BusinessType.INSERT)
     @PostMapping
-    public R<Void> add(@Validated @RequestBody SysDictType dict) {
+    public void add(@Validated @RequestBody SysDictType dict) {
 
         if (!dictTypeService.checkDictTypeUnique(dict)) {
-
-            return R.ofFail("新增字典'" + dict.getDictName() + "'失败，字典类型已存在");
+            throw ExceptionUtil.business(ErrorCodeEnums.DICT_TYPE_EXISTS);
         }
         dict.setCreateBy(getUsername());
-        return dictTypeService.insertDictType(dict) > 0 ? R.ofSuccess() : R.ofFail("操作失败");
+        if (dictTypeService.insertDictType(dict) <= 0) {
+            throw ExceptionUtil.business(ErrorCodeEnums.DICT_OPERATION_FAILED);
+        }
     }
 
     /**
@@ -72,14 +76,15 @@ public class SysDictTypeController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:dict:edit')")
     @Log(title = "字典类型", businessType = BusinessType.UPDATE)
     @PutMapping
-    public R<Void> edit(@Validated @RequestBody SysDictType dict) {
+    public void edit(@Validated @RequestBody SysDictType dict) {
 
         if (!dictTypeService.checkDictTypeUnique(dict)) {
-
-            return R.ofFail("修改字典'" + dict.getDictName() + "'失败，字典类型已存在");
+            throw ExceptionUtil.business(ErrorCodeEnums.DICT_TYPE_EXISTS);
         }
         dict.setUpdateBy(getUsername());
-        return dictTypeService.updateDictType(dict) > 0 ? R.ofSuccess() : R.ofFail("操作失败");
+        if (dictTypeService.updateDictType(dict) <= 0) {
+            throw ExceptionUtil.business(ErrorCodeEnums.DICT_OPERATION_FAILED);
+        }
     }
 
     /**
@@ -88,10 +93,9 @@ public class SysDictTypeController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:dict:remove')")
     @Log(title = "字典类型", businessType = BusinessType.DELETE)
     @DeleteMapping("/{dictIds}")
-    public R<Void> remove(@PathVariable Long[] dictIds) {
+    public void remove(@PathVariable Long[] dictIds) {
 
         dictTypeService.deleteDictTypeByIds(dictIds);
-        return R.ofSuccess();
     }
 
     /**
@@ -100,19 +104,18 @@ public class SysDictTypeController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:dict:remove')")
     @Log(title = "字典类型", businessType = BusinessType.CLEAN)
     @DeleteMapping("/refreshCache")
-    public R<Void> refreshCache() {
+    public void refreshCache() {
 
         dictTypeService.resetDictCache();
-        return R.ofSuccess();
     }
 
     /**
      * 获取字典选择框列表
      */
     @GetMapping("/optionselect")
-    public R<List<SysDictType>> optionselect() {
+    public List<SysDictType> optionselect() {
 
         List<SysDictType> dictTypes = dictTypeService.selectDictTypeAll();
-        return R.ofSuccess(dictTypes);
+        return dictTypes;
     }
 }

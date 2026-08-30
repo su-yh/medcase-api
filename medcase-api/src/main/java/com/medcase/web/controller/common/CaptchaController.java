@@ -4,7 +4,8 @@ import com.google.code.kaptcha.Producer;
 import com.medcase.common.annotation.Anonymous;
 import com.medcase.common.constant.CacheConstants;
 import com.medcase.common.constant.Constants;
-import com.medcase.mvc.response.R;
+import com.medcase.mvc.constants.enums.ErrorCodeEnums;
+import com.medcase.mvc.exception.ExceptionUtil;
 import com.medcase.common.core.redis.RedisCache;
 import com.medcase.common.utils.sign.Base64;
 import com.medcase.common.utils.uuid.IdUtils;
@@ -45,12 +46,12 @@ public class CaptchaController {
      */
     @Anonymous
     @GetMapping("/captchaImage")
-    public R<CaptchaResponse> getCode() throws IOException {
+    public CaptchaResponse getCode() throws IOException {
 
         boolean captchaEnabled = configService.selectCaptchaEnabled();
         if (!captchaEnabled) {
 
-            return R.ofSuccess(new CaptchaResponse(false, null, null));
+            return new CaptchaResponse(false, null, null);
         }
 
         // 保存验证码信息
@@ -82,10 +83,9 @@ public class CaptchaController {
             ImageIO.write(image, "jpg", os);
         }
         catch (IOException e) {
-
-            return R.ofFail(e.getMessage());
+            throw ExceptionUtil.business(ErrorCodeEnums.CAPTCHA_IMAGE_GENERATION_FAILED);
         }
 
-        return R.ofSuccess(new CaptchaResponse(true, uuid, Base64.encode(os.toByteArray())));
+        return new CaptchaResponse(true, uuid, Base64.encode(os.toByteArray()));
     }
 }

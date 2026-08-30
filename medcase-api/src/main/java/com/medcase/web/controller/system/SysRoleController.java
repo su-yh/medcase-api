@@ -14,7 +14,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.medcase.common.annotation.Log;
 import com.medcase.common.core.controller.BaseController;
-import com.medcase.mvc.response.R;
+import com.medcase.mvc.response.annotation.WrapperResponseAdvice;
+import com.medcase.mvc.constants.enums.ErrorCodeEnums;
+import com.medcase.mvc.exception.ExceptionUtil;
 import com.medcase.common.core.domain.entity.SysDept;
 import com.medcase.common.core.domain.entity.SysRole;
 import com.medcase.common.core.domain.entity.SysUser;
@@ -53,6 +55,7 @@ public class SysRoleController extends BaseController {
 
     @PreAuthorize("@ss.hasPermi('system:role:list')")
     @GetMapping("/list")
+    @WrapperResponseAdvice(enable = false)
     public TableDataInfo list(SysRole role) {
 
         startPage();
@@ -65,10 +68,10 @@ public class SysRoleController extends BaseController {
      */
     @PreAuthorize("@ss.hasPermi('system:role:query')")
     @GetMapping(value = "/{roleId}")
-    public R<SysRole> getInfo(@PathVariable Long roleId) {
+    public SysRole getInfo(@PathVariable Long roleId) {
 
         roleService.checkRoleDataScope(roleId);
-        return R.ofSuccess(roleService.selectRoleById(roleId));
+        return roleService.selectRoleById(roleId);
     }
 
     /**
@@ -77,18 +80,18 @@ public class SysRoleController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:role:add')")
     @Log(title = "角色管理", businessType = BusinessType.INSERT)
     @PostMapping
-    public R<Void> add(@Validated @RequestBody SysRole role) {
+    public void add(@Validated @RequestBody SysRole role) {
 
         if (!roleService.checkRoleNameUnique(role)) {
-
-            return R.ofFail("新增角色'" + role.getRoleName() + "'失败，角色名称已存在");
+            throw ExceptionUtil.business(ErrorCodeEnums.ROLE_NAME_EXISTS);
         }
         else if (!roleService.checkRoleKeyUnique(role)) {
-
-            return R.ofFail("新增角色'" + role.getRoleName() + "'失败，角色权限已存在");
+            throw ExceptionUtil.business(ErrorCodeEnums.ROLE_KEY_EXISTS);
         }
         role.setCreateBy(getUsername());
-        return roleService.insertRole(role) > 0 ? R.ofSuccess() : R.ofFail("操作失败");
+        if (roleService.insertRole(role) <= 0) {
+            throw ExceptionUtil.business(ErrorCodeEnums.OPERATION_FAILED);
+        }
 
     }
 
@@ -98,17 +101,15 @@ public class SysRoleController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:role:edit')")
     @Log(title = "角色管理", businessType = BusinessType.UPDATE)
     @PutMapping
-    public R<Void> edit(@Validated @RequestBody SysRole role) {
+    public void edit(@Validated @RequestBody SysRole role) {
 
         roleService.checkRoleAllowed(role);
         roleService.checkRoleDataScope(role.getRoleId());
         if (!roleService.checkRoleNameUnique(role)) {
-
-            return R.ofFail("修改角色'" + role.getRoleName() + "'失败，角色名称已存在");
+            throw ExceptionUtil.business(ErrorCodeEnums.ROLE_NAME_EXISTS);
         }
         else if (!roleService.checkRoleKeyUnique(role)) {
-
-            return R.ofFail("修改角色'" + role.getRoleName() + "'失败，角色权限已存在");
+            throw ExceptionUtil.business(ErrorCodeEnums.ROLE_KEY_EXISTS);
         }
         role.setUpdateBy(getUsername());
         
@@ -116,9 +117,9 @@ public class SysRoleController extends BaseController {
 
             // 刷新所有持有该角色的在线用户权限
             tokenService.refreshPermissionByRoleId(role.getRoleId(), permissionService);
-            return R.ofSuccess();
+            return;
         }
-        return R.ofFail("修改角色'" + role.getRoleName() + "'失败，请联系管理员");
+        throw ExceptionUtil.business(ErrorCodeEnums.ROLE_UPDATE_FAILED);
     }
 
     /**
@@ -127,11 +128,13 @@ public class SysRoleController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:role:edit')")
     @Log(title = "角色管理", businessType = BusinessType.UPDATE)
     @PutMapping("/dataScope")
-    public R<Void> dataScope(@RequestBody SysRole role) {
+    public void dataScope(@RequestBody SysRole role) {
 
         roleService.checkRoleAllowed(role);
         roleService.checkRoleDataScope(role.getRoleId());
-        return roleService.authDataScope(role) > 0 ? R.ofSuccess() : R.ofFail("操作失败");
+        if (roleService.authDataScope(role) <= 0) {
+            throw ExceptionUtil.business(ErrorCodeEnums.ROLE_DATA_SCOPE_UPDATE_FAILED);
+        }
     }
 
     /**
@@ -140,12 +143,14 @@ public class SysRoleController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:role:edit')")
     @Log(title = "角色管理", businessType = BusinessType.UPDATE)
     @PutMapping("/changeStatus")
-    public R<Void> changeStatus(@RequestBody SysRole role) {
+    public void changeStatus(@RequestBody SysRole role) {
 
         roleService.checkRoleAllowed(role);
         roleService.checkRoleDataScope(role.getRoleId());
         role.setUpdateBy(getUsername());
-        return roleService.updateRoleStatus(role) > 0 ? R.ofSuccess() : R.ofFail("操作失败");
+        if (roleService.updateRoleStatus(role) <= 0) {
+            throw ExceptionUtil.business(ErrorCodeEnums.ROLE_STATUS_UPDATE_FAILED);
+        }
     }
 
     /**
@@ -154,9 +159,11 @@ public class SysRoleController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:role:remove')")
     @Log(title = "角色管理", businessType = BusinessType.DELETE)
     @DeleteMapping("/{roleIds}")
-    public R<Void> remove(@PathVariable Long[] roleIds) {
+    public void remove(@PathVariable Long[] roleIds) {
 
-        return roleService.deleteRoleByIds(roleIds) > 0 ? R.ofSuccess() : R.ofFail("操作失败");
+        if (roleService.deleteRoleByIds(roleIds) <= 0) {
+            throw ExceptionUtil.business(ErrorCodeEnums.ROLE_DELETE_FAILED);
+        }
     }
 
     /**
@@ -164,9 +171,9 @@ public class SysRoleController extends BaseController {
      */
     @PreAuthorize("@ss.hasPermi('system:role:query')")
     @GetMapping("/optionselect")
-    public R<List<SysRole>> optionselect() {
+    public List<SysRole> optionselect() {
 
-        return R.ofSuccess(roleService.selectRoleAll());
+        return roleService.selectRoleAll();
     }
 
     /**
@@ -174,6 +181,7 @@ public class SysRoleController extends BaseController {
      */
     @PreAuthorize("@ss.hasPermi('system:role:list')")
     @GetMapping("/authUser/allocatedList")
+    @WrapperResponseAdvice(enable = false)
     public TableDataInfo allocatedList(SysUser user) {
 
         startPage();
@@ -186,6 +194,7 @@ public class SysRoleController extends BaseController {
      */
     @PreAuthorize("@ss.hasPermi('system:role:list')")
     @GetMapping("/authUser/unallocatedList")
+    @WrapperResponseAdvice(enable = false)
     public TableDataInfo unallocatedList(SysUser user) {
 
         startPage();
@@ -199,9 +208,11 @@ public class SysRoleController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:role:edit')")
     @Log(title = "角色管理", businessType = BusinessType.GRANT)
     @PutMapping("/authUser/cancel")
-    public R<Void> cancelAuthUser(@RequestBody SysUserRole userRole) {
+    public void cancelAuthUser(@RequestBody SysUserRole userRole) {
 
-        return roleService.deleteAuthUser(userRole) > 0 ? R.ofSuccess() : R.ofFail("操作失败");
+        if (roleService.deleteAuthUser(userRole) <= 0) {
+            throw ExceptionUtil.business(ErrorCodeEnums.ROLE_AUTH_USER_DELETE_FAILED);
+        }
     }
 
     /**
@@ -210,9 +221,11 @@ public class SysRoleController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:role:edit')")
     @Log(title = "角色管理", businessType = BusinessType.GRANT)
     @PutMapping("/authUser/cancelAll")
-    public R<Void> cancelAuthUserAll(Long roleId, Long[] userIds) {
+    public void cancelAuthUserAll(Long roleId, Long[] userIds) {
 
-        return roleService.deleteAuthUsers(roleId, userIds) > 0 ? R.ofSuccess() : R.ofFail("操作失败");
+        if (roleService.deleteAuthUsers(roleId, userIds) <= 0) {
+            throw ExceptionUtil.business(ErrorCodeEnums.ROLE_AUTH_USER_DELETE_FAILED);
+        }
     }
 
     /**
@@ -221,10 +234,12 @@ public class SysRoleController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:role:edit')")
     @Log(title = "角色管理", businessType = BusinessType.GRANT)
     @PutMapping("/authUser/selectAll")
-    public R<Void> selectAuthUserAll(Long roleId, Long[] userIds) {
+    public void selectAuthUserAll(Long roleId, Long[] userIds) {
 
         roleService.checkRoleDataScope(roleId);
-        return roleService.insertAuthUsers(roleId, userIds) > 0 ? R.ofSuccess() : R.ofFail("操作失败");
+        if (roleService.insertAuthUsers(roleId, userIds) <= 0) {
+            throw ExceptionUtil.business(ErrorCodeEnums.ROLE_AUTH_USER_SELECT_FAILED);
+        }
     }
 
     /**
@@ -232,10 +247,10 @@ public class SysRoleController extends BaseController {
      */
     @PreAuthorize("@ss.hasPermi('system:role:query')")
     @GetMapping(value = "/deptTree/{roleId}")
-    public R<RoleDeptTreeResponse> deptTree(@PathVariable("roleId") Long roleId) {
+    public RoleDeptTreeResponse deptTree(@PathVariable("roleId") Long roleId) {
 
-        return R.ofSuccess(new RoleDeptTreeResponse(
+        return new RoleDeptTreeResponse(
                 deptService.selectDeptListByRoleId(roleId),
-                deptService.selectDeptTreeList(new SysDept())));
+                deptService.selectDeptTreeList(new SysDept()));
     }
 }

@@ -9,7 +9,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.medcase.common.annotation.Log;
 import com.medcase.common.core.controller.BaseController;
-import com.medcase.mvc.response.R;
+import com.medcase.mvc.constants.enums.ErrorCodeEnums;
+import com.medcase.mvc.exception.ExceptionUtil;
 import com.medcase.common.core.domain.entity.SysUser;
 import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.common.enums.BusinessType;
@@ -38,14 +39,14 @@ public class SysProfileController extends BaseController {
      * 个人信息
      */
     @GetMapping
-    public R<ProfileResponse> profile() {
+    public ProfileResponse profile() {
 
         LoginUser loginUser = getLoginUser();
         SysUser user = loginUser.getUser();
-        return R.ofSuccess(new ProfileResponse(
+        return new ProfileResponse(
                 user,
                 userService.selectUserRoleGroup(loginUser.getUsername()),
-                userService.selectUserPostGroup(loginUser.getUsername())));
+                userService.selectUserPostGroup(loginUser.getUsername()));
     }
 
     /**
@@ -53,7 +54,7 @@ public class SysProfileController extends BaseController {
      */
     @Log(title = "个人信息", businessType = BusinessType.UPDATE)
     @PutMapping
-    public R<Void> updateProfile(@RequestBody SysUser user) {
+    public void updateProfile(@RequestBody SysUser user) {
 
         LoginUser loginUser = getLoginUser();
         SysUser currentUser = loginUser.getUser();
@@ -62,20 +63,18 @@ public class SysProfileController extends BaseController {
         currentUser.setPhonenumber(user.getPhonenumber());
         currentUser.setSex(user.getSex());
         if (StringUtils.isNotEmpty(user.getPhonenumber()) && !userService.checkPhoneUnique(currentUser)) {
-
-            return R.ofFail("修改用户'" + loginUser.getUsername() + "'失败，手机号码已存在");
+            throw ExceptionUtil.business(ErrorCodeEnums.PROFILE_PHONE_EXISTS, loginUser.getUsername());
         }
         if (StringUtils.isNotEmpty(user.getEmail()) && !userService.checkEmailUnique(currentUser)) {
-
-            return R.ofFail("修改用户'" + loginUser.getUsername() + "'失败，邮箱账号已存在");
+            throw ExceptionUtil.business(ErrorCodeEnums.PROFILE_EMAIL_EXISTS, loginUser.getUsername());
         }
         if (userService.updateUserProfile(currentUser) > 0) {
 
             // 更新缓存用户信息
             tokenService.setLoginUser(loginUser);
-            return R.ofSuccess();
+            return;
         }
-        return R.ofFail("修改个人信息异常，请联系管理员");
+        throw ExceptionUtil.business(ErrorCodeEnums.PROFILE_UPDATE_FAILED);
     }
 
     /**
@@ -83,7 +82,7 @@ public class SysProfileController extends BaseController {
      */
     @Log(title = "个人信息", businessType = BusinessType.UPDATE)
     @PutMapping("/updatePwd")
-    public R<Void> updatePwd(@RequestBody Map<String, String> params) {
+    public void updatePwd(@RequestBody Map<String, String> params) {
 
         String oldPassword = params.get("oldPassword");
         String newPassword = params.get("newPassword");
@@ -92,12 +91,10 @@ public class SysProfileController extends BaseController {
         SysUser user = userService.selectUserById(userId);
         String password = user.getPassword();
         if (!SecurityUtils.matchesPassword(oldPassword, password)) {
-
-            return R.ofFail("修改密码失败，旧密码错误");
+            throw ExceptionUtil.business(ErrorCodeEnums.PROFILE_OLD_PASSWORD_INVALID);
         }
         if (SecurityUtils.matchesPassword(newPassword, password)) {
-
-            return R.ofFail("新密码不能与旧密码相同");
+            throw ExceptionUtil.business(ErrorCodeEnums.PROFILE_PASSWORD_SAME);
         }
         newPassword = SecurityUtils.encryptPassword(newPassword);
         if (userService.resetUserPwd(userId, newPassword) > 0) {
@@ -106,9 +103,9 @@ public class SysProfileController extends BaseController {
             loginUser.getUser().setPwdUpdateDate(DateUtils.getNowDate());
             loginUser.getUser().setPassword(newPassword);
             tokenService.setLoginUser(loginUser);
-            return R.ofSuccess();
+            return;
         }
-        return R.ofFail("修改密码异常，请联系管理员");
+        throw ExceptionUtil.business(ErrorCodeEnums.PROFILE_PASSWORD_UPDATE_FAILED);
     }
 
 }

@@ -45,7 +45,8 @@ class DoctorProfilePortalControllerTest {
         DoctorProfileSubmitRequest request = new DoctorProfileSubmitRequest();
         when(doctorProfileService.me(doctorUser)).thenReturn(profile);
 
-        assertEquals(profile, doctorProfileController.me(doctorUser));
+        DoctorProfileVO response = doctorProfileController.me(doctorUser);
+        assertEquals(profile, response);
         doctorProfileController.submit(doctorUser, request);
 
         verify(doctorProfileService).me(doctorUser);

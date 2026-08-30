@@ -15,7 +15,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.medcase.common.annotation.Log;
 import com.medcase.common.core.controller.BaseController;
-import com.medcase.mvc.response.R;
+import com.medcase.mvc.response.annotation.WrapperResponseAdvice;
+import com.medcase.mvc.constants.enums.ErrorCodeEnums;
+import com.medcase.mvc.exception.ExceptionUtil;
 import com.medcase.common.core.domain.entity.SysDictData;
 import com.medcase.common.core.page.TableDataInfo;
 import com.medcase.common.enums.BusinessType;
@@ -39,6 +41,7 @@ public class SysDictDataController extends BaseController {
 
     @PreAuthorize("@ss.hasPermi('system:dict:list')")
     @GetMapping("/list")
+    @WrapperResponseAdvice(enable = false)
     public TableDataInfo list(SysDictData dictData) {
 
         startPage();
@@ -51,23 +54,23 @@ public class SysDictDataController extends BaseController {
      */
     @PreAuthorize("@ss.hasPermi('system:dict:query')")
     @GetMapping(value = "/{dictCode}")
-    public R<SysDictData> getInfo(@PathVariable Long dictCode) {
+    public SysDictData getInfo(@PathVariable Long dictCode) {
 
-        return R.ofSuccess(dictDataService.selectDictDataById(dictCode));
+        return dictDataService.selectDictDataById(dictCode);
     }
 
     /**
      * 根据字典类型查询字典数据信息
      */
     @GetMapping(value = "/type/{dictType}")
-    public R<List<SysDictData>> dictType(@PathVariable String dictType) {
+    public List<SysDictData> dictType(@PathVariable String dictType) {
 
         List<SysDictData> data = dictTypeService.selectDictDataByType(dictType);
         if (StringUtils.isNull(data)) {
 
             data = new ArrayList<SysDictData>();
         }
-        return R.ofSuccess(data);
+        return data;
     }
 
     /**
@@ -76,10 +79,12 @@ public class SysDictDataController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:dict:add')")
     @Log(title = "字典数据", businessType = BusinessType.INSERT)
     @PostMapping
-    public R<Void> add(@Validated @RequestBody SysDictData dict) {
+    public void add(@Validated @RequestBody SysDictData dict) {
 
         dict.setCreateBy(getUsername());
-        return dictDataService.insertDictData(dict) > 0 ? R.ofSuccess() : R.ofFail("操作失败");
+        if (dictDataService.insertDictData(dict) <= 0) {
+            throw ExceptionUtil.business(ErrorCodeEnums.DICT_OPERATION_FAILED);
+        }
     }
 
     /**
@@ -88,10 +93,12 @@ public class SysDictDataController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:dict:edit')")
     @Log(title = "字典数据", businessType = BusinessType.UPDATE)
     @PutMapping
-    public R<Void> edit(@Validated @RequestBody SysDictData dict) {
+    public void edit(@Validated @RequestBody SysDictData dict) {
 
         dict.setUpdateBy(getUsername());
-        return dictDataService.updateDictData(dict) > 0 ? R.ofSuccess() : R.ofFail("操作失败");
+        if (dictDataService.updateDictData(dict) <= 0) {
+            throw ExceptionUtil.business(ErrorCodeEnums.DICT_OPERATION_FAILED);
+        }
     }
 
     /**
@@ -100,9 +107,8 @@ public class SysDictDataController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:dict:remove')")
     @Log(title = "字典类型", businessType = BusinessType.DELETE)
     @DeleteMapping("/{dictCodes}")
-    public R<Void> remove(@PathVariable Long[] dictCodes) {
+    public void remove(@PathVariable Long[] dictCodes) {
 
         dictDataService.deleteDictDataByIds(dictCodes);
-        return R.ofSuccess();
     }
 }

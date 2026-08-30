@@ -1,7 +1,7 @@
 package com.medcase.web.controller.file;
 
 import com.medcase.common.annotation.Anonymous;
-import com.medcase.mvc.response.R;
+import com.medcase.mvc.response.annotation.WrapperResponseAdvice;
 import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.common.enums.UserTypeEnums;
 import com.medcase.mvc.authentication.annotation.CurrLoginUser;
@@ -38,7 +38,7 @@ public class FileStorageController {
     private final ApplicationContext applicationContext;
 
     @PostMapping("/upload")
-    public R<FileAttachment> upload(
+    public FileAttachment upload(
             @CurrLoginUser LoginUser loginUser,
             @RequestParam("business") FileBusinessEnums business,
             @RequestParam("file") MultipartFile file) {
@@ -49,19 +49,20 @@ public class FileStorageController {
             applicationContext.publishEvent(new UserAvatarUploadedEvent(
                     this, loginUser, attachment));
         }
-        return R.ofSuccess(attachment);
+        return attachment;
     }
 
     @Anonymous
     @PostMapping("/upload/doctor-register")
-    public R<FileAttachment> uploadDoctorRegistration(
+    public FileAttachment uploadDoctorRegistration(
             @RequestParam("file") MultipartFile file) {
         FileAttachment attachment = fileStorageService.upload(
                 file, FileBusinessEnums.DOCTOR_REGISTER, UserTypeEnums.DOCTOR, 0L);
-        return R.ofSuccess(attachment);
+        return attachment;
     }
 
     @GetMapping("/download")
+    @WrapperResponseAdvice(enable = false)
     public void download(
             @RequestParam("filePath") String filePath,
             @RequestParam(value = "originalFilename", required = false) String originalFilename,

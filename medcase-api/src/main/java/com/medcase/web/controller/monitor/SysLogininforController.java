@@ -10,7 +10,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.medcase.common.annotation.Log;
 import com.medcase.common.core.controller.BaseController;
-import com.medcase.mvc.response.R;
+import com.medcase.mvc.response.annotation.WrapperResponseAdvice;
+import com.medcase.mvc.constants.enums.ErrorCodeEnums;
+import com.medcase.mvc.exception.ExceptionUtil;
 import com.medcase.common.core.page.TableDataInfo;
 import com.medcase.common.enums.BusinessType;
 import com.medcase.framework.web.service.SysPasswordService;
@@ -33,6 +35,7 @@ public class SysLogininforController extends BaseController {
 
     @PreAuthorize("@ss.hasPermi('monitor:logininfor:list')")
     @GetMapping("/list")
+    @WrapperResponseAdvice(enable = false)
     public TableDataInfo list(SysLogininfor logininfor) {
 
         startPage();
@@ -43,26 +46,26 @@ public class SysLogininforController extends BaseController {
     @PreAuthorize("@ss.hasPermi('monitor:logininfor:remove')")
     @Log(title = "登录日志", businessType = BusinessType.DELETE)
     @DeleteMapping("/{infoIds}")
-    public R<Void> remove(@PathVariable Long[] infoIds) {
+    public void remove(@PathVariable Long[] infoIds) {
 
-        return logininforService.deleteLogininforByIds(infoIds) > 0 ? R.ofSuccess() : R.ofFail("操作失败");
+        if (logininforService.deleteLogininforByIds(infoIds) <= 0) {
+            throw ExceptionUtil.business(ErrorCodeEnums.OPERATION_FAILED);
+        }
     }
 
     @PreAuthorize("@ss.hasPermi('monitor:logininfor:remove')")
     @Log(title = "登录日志", businessType = BusinessType.CLEAN)
     @DeleteMapping("/clean")
-    public R<Void> clean() {
+    public void clean() {
 
         logininforService.cleanLogininfor();
-        return R.ofSuccess();
     }
 
     @PreAuthorize("@ss.hasPermi('monitor:logininfor:unlock')")
     @Log(title = "账户解锁", businessType = BusinessType.OTHER)
     @GetMapping("/unlock/{userName}")
-    public R<Void> unlock(@PathVariable("userName") String userName) {
+    public void unlock(@PathVariable("userName") String userName) {
 
         passwordService.clearLoginRecordCache(userName);
-        return R.ofSuccess();
     }
 }

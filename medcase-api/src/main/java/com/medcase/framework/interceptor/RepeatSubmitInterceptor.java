@@ -7,9 +7,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 import com.medcase.common.annotation.RepeatSubmit;
-import com.medcase.mvc.response.R;
-import com.medcase.common.utils.ServletUtils;
-import com.medcase.common.utils.json.JsonUtils;
+import com.medcase.mvc.constants.enums.ErrorCodeEnums;
+import com.medcase.mvc.exception.ExceptionUtil;
 
 /**
  * 防止重复提交拦截器
@@ -29,10 +28,7 @@ public abstract class RepeatSubmitInterceptor implements HandlerInterceptor {
             if (annotation != null) {
 
                 if (this.isRepeatSubmit(request, annotation)) {
-
-                    R<Void> result = R.ofFail(annotation.message());
-                    ServletUtils.renderString(response, JsonUtils.toJSONString(result));
-                    return false;
+                    throw ExceptionUtil.business(ErrorCodeEnums.REPEAT_SUBMIT, annotation.message());
                 }
             }
             return true;

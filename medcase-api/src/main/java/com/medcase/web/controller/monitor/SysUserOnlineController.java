@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.medcase.common.annotation.Log;
 import com.medcase.common.constant.CacheConstants;
 import com.medcase.common.core.controller.BaseController;
-import com.medcase.mvc.response.R;
+import com.medcase.mvc.response.annotation.WrapperResponseAdvice;
 import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.common.core.page.TableDataInfo;
 import com.medcase.common.core.redis.RedisCache;
@@ -39,6 +39,7 @@ public class SysUserOnlineController extends BaseController {
 
     @PreAuthorize("@ss.hasPermi('monitor:online:list')")
     @GetMapping("/list")
+    @WrapperResponseAdvice(enable = false)
     public TableDataInfo list(String ipaddr, String userName) {
 
         Collection<String> keys = redisCache.keys(CacheConstants.LOGIN_TOKEN_KEY + "*");
@@ -74,9 +75,8 @@ public class SysUserOnlineController extends BaseController {
     @PreAuthorize("@ss.hasPermi('monitor:online:forceLogout')")
     @Log(title = "在线用户", businessType = BusinessType.FORCE)
     @DeleteMapping("/{tokenId}")
-    public R<Void> forceLogout(@PathVariable String tokenId) {
+    public void forceLogout(@PathVariable String tokenId) {
 
         redisCache.deleteObject(CacheConstants.LOGIN_TOKEN_KEY + tokenId);
-        return R.ofSuccess();
     }
 }

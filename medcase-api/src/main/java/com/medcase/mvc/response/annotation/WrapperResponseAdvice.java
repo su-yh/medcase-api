@@ -7,12 +7,11 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * @author suyh
- * @since 2023-09-19
+ * 控制接口是否参与统一响应包装。
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface WrapperResponseAdvice {
-    boolean enabled() default true;
+    boolean enable() default true;
 }
