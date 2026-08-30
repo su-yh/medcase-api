@@ -6,8 +6,6 @@ user:
     maxRetryCount: 50
 
 
-ruoyi:
-  profile: /Users/suyunhong/suyh-develop/medcase/attachmes
 
 # 日志配置
 logging:

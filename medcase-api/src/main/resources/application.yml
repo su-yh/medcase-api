@@ -11,7 +11,6 @@ spring:
       - classpath:config/application-pagehelper.yaml
       - classpath:config/application-redis.yaml
       - classpath:config/application-referer.yaml
-      - classpath:config/application-ruoyi.yaml
       - classpath:config/application-server.yaml
       - classpath:config/application-servlet.yaml
       - classpath:config/application-sms.yaml

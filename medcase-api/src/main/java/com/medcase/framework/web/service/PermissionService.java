@@ -11,9 +11,6 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.Set;
 
-/**
- * RuoYi首创 自定义权限实现，ss取自SpringSecurity首字母
- */
 @Service("ss")
 @SuppressWarnings("unused")
 public class PermissionService {

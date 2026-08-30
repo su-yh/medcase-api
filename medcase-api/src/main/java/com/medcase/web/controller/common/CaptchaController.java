@@ -1,18 +1,7 @@
 package com.medcase.web.controller.common;
 
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.util.concurrent.TimeUnit;
-import jakarta.annotation.Resource;
-import javax.imageio.ImageIO;
-import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.FastByteArrayOutputStream;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
-import com.medcase.common.annotation.Anonymous;
 import com.google.code.kaptcha.Producer;
-import com.medcase.common.config.RuoYiConfig;
+import com.medcase.common.annotation.Anonymous;
 import com.medcase.common.constant.CacheConstants;
 import com.medcase.common.constant.Constants;
 import com.medcase.common.core.domain.R;
@@ -20,6 +9,16 @@ import com.medcase.common.core.redis.RedisCache;
 import com.medcase.common.utils.sign.Base64;
 import com.medcase.common.utils.uuid.IdUtils;
 import com.medcase.system.service.ISysConfigService;
+import jakarta.annotation.Resource;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.FastByteArrayOutputStream;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 验证码操作处理
@@ -27,6 +26,7 @@ import com.medcase.system.service.ISysConfigService;
  */
 @RestController
 public class CaptchaController {
+    private static final String CAPTCHA_TYPE = "math";
 
     @Resource(name = "captchaProducer")
     private Producer captchaProducer;
@@ -40,14 +40,12 @@ public class CaptchaController {
     @Autowired
     private ISysConfigService configService;
 
-    @Autowired
-    private RuoYiConfig ruoYiConfig;
     /**
      * 生成验证码
      */
     @Anonymous
     @GetMapping("/captchaImage")
-    public R<CaptchaResponse> getCode(HttpServletResponse response) throws IOException {
+    public R<CaptchaResponse> getCode() throws IOException {
 
         boolean captchaEnabled = configService.selectCaptchaEnabled();
         if (!captchaEnabled) {
@@ -63,15 +61,14 @@ public class CaptchaController {
         BufferedImage image = null;
 
         // 生成验证码
-        String captchaType = ruoYiConfig.getCaptchaType();
-        if ("math".equals(captchaType)) {
+        if ("math".equals(CAPTCHA_TYPE)) {
 
             String capText = captchaProducerMath.createText();
             capStr = capText.substring(0, capText.lastIndexOf("@"));
             code = capText.substring(capText.lastIndexOf("@") + 1);
             image = captchaProducerMath.createImage(capStr);
         }
-        else if ("char".equals(captchaType)) {
+        else if ("char".equals(CAPTCHA_TYPE)) {
 
             capStr = code = captchaProducer.createText();
             image = captchaProducer.createImage(capStr);
