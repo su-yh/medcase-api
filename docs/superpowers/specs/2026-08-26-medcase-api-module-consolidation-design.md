@@ -19,7 +19,7 @@ medcase-api/
         └── test/
 ```
 
-新模块坐标为 `com.medcase:medcase-api`，保留 `com.ruoyi.RuoYiApplication` 作为 Spring Boot 启动类。原四个模块目录移除，前端工程不改动。
+新模块坐标为 `com.medcase:medcase-api`，保留 `com.medcase.MedcaseApplication` 作为 Spring Boot 启动类。原四个模块目录移除，前端工程不改动。
 
 ## Migration Rules
 

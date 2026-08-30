@@ -6,7 +6,7 @@ server:
 logging:
   level:
     root: info
-    com.ruoyi: debug
+    com.medcase: debug
   file:
     path:  /home/medcase/medcase-api/logs/medcase-api
 

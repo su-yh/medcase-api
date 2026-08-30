@@ -2,7 +2,7 @@
 
 > **For agentic workers:** Execute this plan inline in the current workspace. Do not commit changes; the user will commit manually.
 
-**Goal:** Move doctor authentication/user management into `com.ruoyi.biz.doctor`, move case business into `com.ruoyi.biz.caseinfo`, add `/biz` to doctor REST APIs, and synchronize the doctor frontend.
+**Goal:** Move doctor authentication/user management into `com.medcase.biz.doctor`, move case business into `com.medcase.biz.caseinfo`, add `/biz` to doctor REST APIs, and synchronize the doctor frontend.
 
 **Architecture:** Package boundaries follow business ownership rather than client role. Doctor user/auth code remains under `biz.doctor`; case submission, case querying, and case review code share `biz.caseinfo`. Existing management routes remain stable except for the doctor-facing routes changing from `/doctor/**` to `/biz/doctor/**`.
 
@@ -57,7 +57,7 @@
 
 - [ ] Change `DoctorCaseController` mapping from `/doctor` to `/biz/doctor`.
 - [ ] Preserve all case submission, draft, pagination, detail, delete, and review behavior.
-- [ ] Ensure no case production code remains under `com.ruoyi.web` except unrelated web infrastructure.
+- [ ] Ensure no case production code remains under `com.medcase.web` except unrelated web infrastructure.
 - [ ] Run focused case tests and verify they pass.
 
 ### Task 4: Synchronize the doctor frontend

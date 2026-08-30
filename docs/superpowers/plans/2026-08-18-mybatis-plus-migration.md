@@ -66,7 +66,7 @@ Replace:
 
 ```yaml
 mybatis:
-  typeAliasesPackage: com.ruoyi.**.domain
+  typeAliasesPackage: com.medcase.**.domain
   mapperLocations: classpath*:mapper/**/*Mapper.xml
   configLocation: classpath:mybatis/mybatis-config.xml
 ```
@@ -75,7 +75,7 @@ with:
 
 ```yaml
 mybatis-plus:
-  type-aliases-package: com.ruoyi.common.core.domain,com.ruoyi.framework.web.domain,com.ruoyi.system.domain
+  type-aliases-package: com.medcase.common.core.domain,com.medcase.framework.web.domain,com.medcase.system.domain
   mapper-locations: classpath*:mapper/**/*Mapper.xml
   config-location: classpath:mybatis/mybatis-config.xml
   check-config-location: true
@@ -96,7 +96,7 @@ Remove the class that creates `SqlSessionFactoryBean` manually.
 Create:
 
 ```java
-package com.ruoyi.framework.config;
+package com.medcase.framework.config;
 
 import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
@@ -105,11 +105,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class MybatisPlusConfig
-{
+public class MybatisPlusConfig {
     @Bean
-    public MybatisPlusInterceptor mybatisPlusInterceptor()
-    {
+    public MybatisPlusInterceptor mybatisPlusInterceptor() {
         MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();
         interceptor.addInnerInterceptor(new PaginationInnerInterceptor(DbType.MYSQL));
         return interceptor;

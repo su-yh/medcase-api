@@ -4,7 +4,7 @@
 
 **Goal:** 将四个现有后端 Maven 模块合并为一个包路径和运行行为不变的 `medcase-api` 应用模块。
 
-**Architecture:** 根工程保留为 Maven 父工程并改用 `medcase-api-parent` 坐标；新的 `medcase-api` 子模块承载全部 Java 源码、资源和测试，直接声明合并后的依赖。所有 `com.ruoyi...` 包路径保持不变。
+**Architecture:** 根工程保留为 Maven 父工程并改用 `medcase-api-parent` 坐标；新的 `medcase-api` 子模块承载全部 Java 源码、资源和测试，直接声明合并后的依赖。所有 `com.medcase...` 包路径保持不变。
 
 **Tech Stack:** Java 17, Spring Boot 4.1.0, Maven, MyBatis-Plus, Dynamic Datasource, Flyway, Redis, JUnit 5.
 
@@ -49,7 +49,7 @@
 
 - [ ] Confirm every original Java package declaration is unchanged.
 - [ ] Confirm Mapper XML locations and application configuration imports remain unchanged.
-- [ ] Confirm `com.ruoyi.RuoYiApplication` remains the executable entry point.
+- [ ] Confirm `com.medcase.MedcaseApplication` remains the executable entry point.
 
 ### Task 4: Build and test
 

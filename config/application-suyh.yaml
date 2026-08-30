@@ -7,7 +7,7 @@ ruoyi:
 logging:
   level:
     root: info
-    com.ruoyi: debug
+    com.medcase: debug
   file:
     path: /Users/suyunhong/suyh-develop/medcase/logs
 
