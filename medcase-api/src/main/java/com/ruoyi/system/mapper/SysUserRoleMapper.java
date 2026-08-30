@@ -8,8 +8,8 @@ import com.ruoyi.system.domain.SysUserRole;
  * 用户与角色关联表 数据层
  * 
  */
-public interface SysUserRoleMapper
-{
+public interface SysUserRoleMapper {
+
     /**
      * 通过用户ID删除用户和角色关联
      * 

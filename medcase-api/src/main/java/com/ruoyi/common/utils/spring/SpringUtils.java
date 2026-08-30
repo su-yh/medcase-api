@@ -16,22 +16,22 @@ import com.ruoyi.common.utils.StringUtils;
  * 
  */
 @Component
-public final class SpringUtils implements BeanFactoryPostProcessor, ApplicationContextAware 
-{
+public final class SpringUtils implements BeanFactoryPostProcessor, ApplicationContextAware {
+
     /** Spring应用上下文环境 */
     private static ConfigurableListableBeanFactory beanFactory;
 
     private static ApplicationContext applicationContext;
 
     @Override
-    public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException 
-    {
+    public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
+
         SpringUtils.beanFactory = beanFactory;
     }
 
     @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException 
-    {
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+
         SpringUtils.applicationContext = applicationContext;
     }
 
@@ -44,8 +44,8 @@ public final class SpringUtils implements BeanFactoryPostProcessor, ApplicationC
      *
      */
     @SuppressWarnings("unchecked")
-    public static <T> T getBean(String name) throws BeansException
-    {
+    public static <T> T getBean(String name) throws BeansException {
+
         return (T) beanFactory.getBean(name);
     }
 
@@ -57,8 +57,8 @@ public final class SpringUtils implements BeanFactoryPostProcessor, ApplicationC
      * @throws org.springframework.beans.BeansException
      *
      */
-    public static <T> T getBean(Class<T> clz) throws BeansException
-    {
+    public static <T> T getBean(Class<T> clz) throws BeansException {
+
         T result = (T) beanFactory.getBean(clz);
         return result;
     }
@@ -69,8 +69,8 @@ public final class SpringUtils implements BeanFactoryPostProcessor, ApplicationC
      * @param name
      * @return boolean
      */
-    public static boolean containsBean(String name)
-    {
+    public static boolean containsBean(String name) {
+
         return beanFactory.containsBean(name);
     }
 
@@ -82,8 +82,8 @@ public final class SpringUtils implements BeanFactoryPostProcessor, ApplicationC
      * @throws org.springframework.beans.factory.NoSuchBeanDefinitionException
      *
      */
-    public static boolean isSingleton(String name) throws NoSuchBeanDefinitionException
-    {
+    public static boolean isSingleton(String name) throws NoSuchBeanDefinitionException {
+
         return beanFactory.isSingleton(name);
     }
 
@@ -93,8 +93,8 @@ public final class SpringUtils implements BeanFactoryPostProcessor, ApplicationC
      * @throws org.springframework.beans.factory.NoSuchBeanDefinitionException
      *
      */
-    public static Class<?> getType(String name) throws NoSuchBeanDefinitionException
-    {
+    public static Class<?> getType(String name) throws NoSuchBeanDefinitionException {
+
         return beanFactory.getType(name);
     }
 
@@ -106,8 +106,8 @@ public final class SpringUtils implements BeanFactoryPostProcessor, ApplicationC
      * @throws org.springframework.beans.factory.NoSuchBeanDefinitionException
      *
      */
-    public static String[] getAliases(String name) throws NoSuchBeanDefinitionException
-    {
+    public static String[] getAliases(String name) throws NoSuchBeanDefinitionException {
+
         return beanFactory.getAliases(name);
     }
 
@@ -118,11 +118,11 @@ public final class SpringUtils implements BeanFactoryPostProcessor, ApplicationC
      * @return
      */
     @SuppressWarnings("unchecked")
-    public static <T> T getAopProxy(T invoker)
-    {
+    public static <T> T getAopProxy(T invoker) {
+
         Object proxy = AopContext.currentProxy();
-        if (((Advised) proxy).getTargetSource().getTargetClass() == invoker.getClass())
-        {
+        if (((Advised) proxy).getTargetSource().getTargetClass() == invoker.getClass()) {
+
             return (T) proxy;
         }
         return invoker;
@@ -133,8 +133,8 @@ public final class SpringUtils implements BeanFactoryPostProcessor, ApplicationC
      *
      * @return 当前的环境配置
      */
-    public static String[] getActiveProfiles()
-    {
+    public static String[] getActiveProfiles() {
+
         return applicationContext.getEnvironment().getActiveProfiles();
     }
 
@@ -143,8 +143,8 @@ public final class SpringUtils implements BeanFactoryPostProcessor, ApplicationC
      *
      * @return 当前的环境配置
      */
-    public static String getActiveProfile()
-    {
+    public static String getActiveProfile() {
+
         final String[] activeProfiles = getActiveProfiles();
         return StringUtils.isNotEmpty(activeProfiles) ? activeProfiles[0] : null;
     }
@@ -156,8 +156,8 @@ public final class SpringUtils implements BeanFactoryPostProcessor, ApplicationC
      * @return 当前的配置文件的值
      *
      */
-    public static String getRequiredProperty(String key)
-    {
+    public static String getRequiredProperty(String key) {
+
         return applicationContext.getEnvironment().getRequiredProperty(key);
     }
 }

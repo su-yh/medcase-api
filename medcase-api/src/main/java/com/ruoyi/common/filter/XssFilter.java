@@ -18,22 +18,22 @@ import com.ruoyi.common.utils.StringUtils;
  * 防止XSS攻击的过滤器
  * 
  */
-public class XssFilter implements Filter
-{
+public class XssFilter implements Filter {
+
     /**
      * 排除链接
      */
     public List<String> excludes = new ArrayList<>();
 
     @Override
-    public void init(FilterConfig filterConfig) throws ServletException
-    {
+    public void init(FilterConfig filterConfig) throws ServletException {
+
         String tempExcludes = filterConfig.getInitParameter("excludes");
-        if (StringUtils.isNotEmpty(tempExcludes))
-        {
+        if (StringUtils.isNotEmpty(tempExcludes)) {
+
             String[] urls = tempExcludes.split(",");
-            for (String url : urls)
-            {
+            for (String url : urls) {
+
                 excludes.add(url);
             }
         }
@@ -41,12 +41,12 @@ public class XssFilter implements Filter
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
-            throws IOException, ServletException
-    {
+            throws IOException, ServletException {
+
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse resp = (HttpServletResponse) response;
-        if (handleExcludeURL(req, resp))
-        {
+        if (handleExcludeURL(req, resp)) {
+
             chain.doFilter(request, response);
             return;
         }
@@ -54,21 +54,21 @@ public class XssFilter implements Filter
         chain.doFilter(xssRequest, response);
     }
 
-    private boolean handleExcludeURL(HttpServletRequest request, HttpServletResponse response)
-    {
+    private boolean handleExcludeURL(HttpServletRequest request, HttpServletResponse response) {
+
         String url = request.getServletPath();
         String method = request.getMethod();
         // GET DELETE 不过滤
-        if (method == null || StringUtils.equalsAny(method, HttpMethod.GET.name(), HttpMethod.DELETE.name()))
-        {
+        if (method == null || StringUtils.equalsAny(method, HttpMethod.GET.name(), HttpMethod.DELETE.name())) {
+
             return true;
         }
         return StringUtils.matches(url, excludes);
     }
 
     @Override
-    public void destroy()
-    {
+    public void destroy() {
+
 
     }
 }

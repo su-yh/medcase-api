@@ -10,8 +10,8 @@ import lombok.Getter;
  */
 @Getter
 @AllArgsConstructor
-public class RoleDeptTreeResponse
-{
+public class RoleDeptTreeResponse {
+
     private List<Long> checkedKeys;
     private List<TreeSelect> depts;
 }

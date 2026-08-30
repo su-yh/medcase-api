@@ -6,8 +6,8 @@ import com.ruoyi.common.utils.StringUtils;
 
 /**
  */
-public class Seq
-{
+public class Seq {
+
     // 通用序列类型
     public static final String commSeqType = "COMMON";
 
@@ -28,8 +28,8 @@ public class Seq
      * 
      * @return 序列值
      */
-    public static String getId()
-    {
+    public static String getId() {
+
         return getId(commSeqType);
     }
     
@@ -38,11 +38,11 @@ public class Seq
      * 
      * @return 序列值
      */
-    public static String getId(String type)
-    {
+    public static String getId(String type) {
+
         AtomicInteger atomicInt = commSeq;
-        if (uploadSeqType.equals(type))
-        {
+        if (uploadSeqType.equals(type)) {
+
             atomicInt = uploadSeq;
         }
         return getId(atomicInt, 3);
@@ -55,8 +55,8 @@ public class Seq
      * @param length 数值长度
      * @return 序列值
      */
-    public static String getId(AtomicInteger atomicInt, int length)
-    {
+    public static String getId(AtomicInteger atomicInt, int length) {
+
         String result = DateUtils.dateTimeNow();
         result += machineCode;
         result += getSeq(atomicInt, length);
@@ -68,15 +68,15 @@ public class Seq
      * 
      * @return 序列值
      */
-    private synchronized static String getSeq(AtomicInteger atomicInt, int length)
-    {
+    private synchronized static String getSeq(AtomicInteger atomicInt, int length) {
+
         // 先取值再+1
         int value = atomicInt.getAndIncrement();
 
         // 如果更新后值>=10 的 (length)幂次方则重置为1
         int maxSeq = (int) Math.pow(10, length);
-        if (atomicInt.get() >= maxSeq)
-        {
+        if (atomicInt.get() >= maxSeq) {
+
             atomicInt.set(1);
         }
         // 转字符串，用0左补齐

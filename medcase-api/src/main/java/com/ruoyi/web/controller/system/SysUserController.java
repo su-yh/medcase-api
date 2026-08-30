@@ -41,8 +41,8 @@ import com.ruoyi.web.controller.system.dto.UserDetailResponse;
  */
 @RestController
 @RequestMapping("/system/user")
-public class SysUserController extends BaseController
-{
+public class SysUserController extends BaseController {
+
     @Autowired
     private ISysUserService userService;
 
@@ -60,8 +60,8 @@ public class SysUserController extends BaseController
      */
     @PreAuthorize("@ss.hasPermi('system:user:list')")
     @GetMapping("/list")
-    public TableDataInfo list(SysUser user)
-    {
+    public TableDataInfo list(SysUser user) {
+
         startPage();
         List<SysUser> list = userService.selectUserList(user);
         return getDataTable(list);
@@ -70,8 +70,8 @@ public class SysUserController extends BaseController
     @Log(title = "用户管理", businessType = BusinessType.EXPORT)
     @PreAuthorize("@ss.hasPermi('system:user:export')")
     @PostMapping("/export")
-    public void export(HttpServletResponse response, SysUser user)
-    {
+    public void export(HttpServletResponse response, SysUser user) {
+
         List<SysUser> list = userService.selectUserList(user);
         ExcelUtil<SysUser> util = new ExcelUtil<SysUser>(SysUser.class);
         util.exportExcel(response, list, "用户数据");
@@ -80,8 +80,8 @@ public class SysUserController extends BaseController
     @Log(title = "用户管理", businessType = BusinessType.IMPORT)
     @PreAuthorize("@ss.hasPermi('system:user:import')")
     @PostMapping("/importData")
-    public R<Void> importData(MultipartFile file, boolean updateSupport) throws Exception
-    {
+    public R<Void> importData(MultipartFile file, boolean updateSupport) throws Exception {
+
         ExcelUtil<SysUser> util = new ExcelUtil<SysUser>(SysUser.class);
         List<SysUser> userList = util.importExcel(file.getInputStream());
         String operName = getUsername();
@@ -90,8 +90,8 @@ public class SysUserController extends BaseController
     }
 
     @PostMapping("/importTemplate")
-    public void importTemplate(HttpServletResponse response)
-    {
+    public void importTemplate(HttpServletResponse response) {
+
         ExcelUtil<SysUser> util = new ExcelUtil<SysUser>(SysUser.class);
         util.importTemplateExcel(response, "用户数据");
     }
@@ -101,13 +101,13 @@ public class SysUserController extends BaseController
      */
     @PreAuthorize("@ss.hasPermi('system:user:query')")
     @GetMapping(value = { "/", "/{userId}" })
-    public R<UserDetailResponse> getInfo(@PathVariable(value = "userId", required = false) Long userId)
-    {
+    public R<UserDetailResponse> getInfo(@PathVariable(value = "userId", required = false) Long userId) {
+
         SysUser sysUser = null;
         List<Long> postIds = null;
         List<Long> roleIds = null;
-        if (StringUtils.isNotNull(userId))
-        {
+        if (StringUtils.isNotNull(userId)) {
+
             userService.checkUserDataScope(userId);
             sysUser = userService.selectUserById(userId);
             postIds = postService.selectPostListByUserId(userId);
@@ -131,20 +131,20 @@ public class SysUserController extends BaseController
     @PreAuthorize("@ss.hasPermi('system:user:add')")
     @Log(title = "用户管理", businessType = BusinessType.INSERT)
     @PostMapping
-    public R<Void> add(@Validated @RequestBody SysUser user)
-    {
+    public R<Void> add(@Validated @RequestBody SysUser user) {
+
         deptService.checkDeptDataScope(user.getDeptId());
         roleService.checkRoleDataScope(user.getRoleIds());
-        if (!userService.checkUserNameUnique(user))
-        {
+        if (!userService.checkUserNameUnique(user)) {
+
             return R.ofFail("新增用户'" + user.getUserName() + "'失败，登录账号已存在");
         }
-        else if (StringUtils.isNotEmpty(user.getPhonenumber()) && !userService.checkPhoneUnique(user))
-        {
+        else if (StringUtils.isNotEmpty(user.getPhonenumber()) && !userService.checkPhoneUnique(user)) {
+
             return R.ofFail("新增用户'" + user.getUserName() + "'失败，手机号码已存在");
         }
-        else if (StringUtils.isNotEmpty(user.getEmail()) && !userService.checkEmailUnique(user))
-        {
+        else if (StringUtils.isNotEmpty(user.getEmail()) && !userService.checkEmailUnique(user)) {
+
             return R.ofFail("新增用户'" + user.getUserName() + "'失败，邮箱账号已存在");
         }
         user.setCreateBy(getUsername());
@@ -158,22 +158,22 @@ public class SysUserController extends BaseController
     @PreAuthorize("@ss.hasPermi('system:user:edit')")
     @Log(title = "用户管理", businessType = BusinessType.UPDATE)
     @PutMapping
-    public R<Void> edit(@Validated @RequestBody SysUser user)
-    {
+    public R<Void> edit(@Validated @RequestBody SysUser user) {
+
         userService.checkUserAllowed(user);
         userService.checkUserDataScope(user.getUserId());
         deptService.checkDeptDataScope(user.getDeptId());
         roleService.checkRoleDataScope(user.getRoleIds());
-        if (!userService.checkUserNameUnique(user))
-        {
+        if (!userService.checkUserNameUnique(user)) {
+
             return R.ofFail("修改用户'" + user.getUserName() + "'失败，登录账号已存在");
         }
-        else if (StringUtils.isNotEmpty(user.getPhonenumber()) && !userService.checkPhoneUnique(user))
-        {
+        else if (StringUtils.isNotEmpty(user.getPhonenumber()) && !userService.checkPhoneUnique(user)) {
+
             return R.ofFail("修改用户'" + user.getUserName() + "'失败，手机号码已存在");
         }
-        else if (StringUtils.isNotEmpty(user.getEmail()) && !userService.checkEmailUnique(user))
-        {
+        else if (StringUtils.isNotEmpty(user.getEmail()) && !userService.checkEmailUnique(user)) {
+
             return R.ofFail("修改用户'" + user.getUserName() + "'失败，邮箱账号已存在");
         }
         user.setUpdateBy(getUsername());
@@ -186,10 +186,10 @@ public class SysUserController extends BaseController
     @PreAuthorize("@ss.hasPermi('system:user:remove')")
     @Log(title = "用户管理", businessType = BusinessType.DELETE)
     @DeleteMapping("/{userIds}")
-    public R<Void> remove(@PathVariable Long[] userIds)
-    {
-        if (ArrayUtils.contains(userIds, getUserId()))
-        {
+    public R<Void> remove(@PathVariable Long[] userIds) {
+
+        if (ArrayUtils.contains(userIds, getUserId())) {
+
             return R.ofFail("当前用户不能删除");
         }
         return userService.deleteUserByIds(userIds) > 0 ? R.ofSuccess() : R.ofFail("操作失败");
@@ -201,8 +201,8 @@ public class SysUserController extends BaseController
     @PreAuthorize("@ss.hasPermi('system:user:resetPwd')")
     @Log(title = "用户管理", businessType = BusinessType.UPDATE)
     @PutMapping("/resetPwd")
-    public R<Void> resetPwd(@RequestBody SysUser user)
-    {
+    public R<Void> resetPwd(@RequestBody SysUser user) {
+
         userService.checkUserAllowed(user);
         userService.checkUserDataScope(user.getUserId());
         user.setPassword(SecurityUtils.encryptPassword(user.getPassword()));
@@ -216,8 +216,8 @@ public class SysUserController extends BaseController
     @PreAuthorize("@ss.hasPermi('system:user:edit')")
     @Log(title = "用户管理", businessType = BusinessType.UPDATE)
     @PutMapping("/changeStatus")
-    public R<Void> changeStatus(@RequestBody SysUser user)
-    {
+    public R<Void> changeStatus(@RequestBody SysUser user) {
+
         userService.checkUserAllowed(user);
         userService.checkUserDataScope(user.getUserId());
         user.setUpdateBy(getUsername());
@@ -229,8 +229,8 @@ public class SysUserController extends BaseController
      */
     @PreAuthorize("@ss.hasPermi('system:user:query')")
     @GetMapping("/authRole/{userId}")
-    public R<UserAuthRoleResponse> authRole(@PathVariable("userId") Long userId)
-    {
+    public R<UserAuthRoleResponse> authRole(@PathVariable("userId") Long userId) {
+
         SysUser user = userService.selectUserById(userId);
         List<SysRole> roles = roleService.selectRolesByUserId(userId);
         List<SysRole> availableRoles = SecurityUtils.isAdmin(userId)
@@ -245,8 +245,8 @@ public class SysUserController extends BaseController
     @PreAuthorize("@ss.hasPermi('system:user:edit')")
     @Log(title = "用户管理", businessType = BusinessType.GRANT)
     @PutMapping("/authRole")
-    public R<Void> insertAuthRole(Long userId, Long[] roleIds)
-    {
+    public R<Void> insertAuthRole(Long userId, Long[] roleIds) {
+
         userService.checkUserDataScope(userId);
         roleService.checkRoleDataScope(roleIds);
         userService.insertUserAuth(userId, roleIds);
@@ -258,8 +258,8 @@ public class SysUserController extends BaseController
      */
     @PreAuthorize("@ss.hasPermi('system:user:list')")
     @GetMapping("/deptTree")
-    public R<List<com.ruoyi.common.core.domain.TreeSelect>> deptTree(SysDept dept)
-    {
+    public R<List<com.ruoyi.common.core.domain.TreeSelect>> deptTree(SysDept dept) {
+
         return R.ofSuccess(deptService.selectDeptTreeList(dept));
     }
 }

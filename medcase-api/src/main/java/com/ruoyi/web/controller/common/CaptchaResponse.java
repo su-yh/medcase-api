@@ -8,8 +8,8 @@ import lombok.Getter;
  */
 @Getter
 @AllArgsConstructor
-public class CaptchaResponse
-{
+public class CaptchaResponse {
+
     private boolean captchaEnabled;
     private String uuid;
     private String img;

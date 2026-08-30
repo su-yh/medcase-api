@@ -12,8 +12,8 @@ import lombok.Getter;
  */
 @Getter
 @AllArgsConstructor
-public class UserDetailResponse
-{
+public class UserDetailResponse {
+
     private SysUser data;
     private List<Long> postIds;
     private List<Long> roleIds;

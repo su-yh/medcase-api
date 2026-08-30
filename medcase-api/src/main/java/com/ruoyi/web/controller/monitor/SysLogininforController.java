@@ -26,8 +26,8 @@ import com.ruoyi.system.service.ISysLogininforService;
  */
 @RestController
 @RequestMapping("/monitor/logininfor")
-public class SysLogininforController extends BaseController
-{
+public class SysLogininforController extends BaseController {
+
     @Autowired
     private ISysLogininforService logininforService;
 
@@ -36,8 +36,8 @@ public class SysLogininforController extends BaseController
 
     @PreAuthorize("@ss.hasPermi('monitor:logininfor:list')")
     @GetMapping("/list")
-    public TableDataInfo list(SysLogininfor logininfor)
-    {
+    public TableDataInfo list(SysLogininfor logininfor) {
+
         startPage();
         List<SysLogininfor> list = logininforService.selectLogininforList(logininfor);
         return getDataTable(list);
@@ -46,8 +46,8 @@ public class SysLogininforController extends BaseController
     @Log(title = "登录日志", businessType = BusinessType.EXPORT)
     @PreAuthorize("@ss.hasPermi('monitor:logininfor:export')")
     @PostMapping("/export")
-    public void export(HttpServletResponse response, SysLogininfor logininfor)
-    {
+    public void export(HttpServletResponse response, SysLogininfor logininfor) {
+
         List<SysLogininfor> list = logininforService.selectLogininforList(logininfor);
         ExcelUtil<SysLogininfor> util = new ExcelUtil<SysLogininfor>(SysLogininfor.class);
         util.exportExcel(response, list, "登录日志");
@@ -56,16 +56,16 @@ public class SysLogininforController extends BaseController
     @PreAuthorize("@ss.hasPermi('monitor:logininfor:remove')")
     @Log(title = "登录日志", businessType = BusinessType.DELETE)
     @DeleteMapping("/{infoIds}")
-    public R<Void> remove(@PathVariable Long[] infoIds)
-    {
+    public R<Void> remove(@PathVariable Long[] infoIds) {
+
         return logininforService.deleteLogininforByIds(infoIds) > 0 ? R.ofSuccess() : R.ofFail("操作失败");
     }
 
     @PreAuthorize("@ss.hasPermi('monitor:logininfor:remove')")
     @Log(title = "登录日志", businessType = BusinessType.CLEAN)
     @DeleteMapping("/clean")
-    public R<Void> clean()
-    {
+    public R<Void> clean() {
+
         logininforService.cleanLogininfor();
         return R.ofSuccess();
     }
@@ -73,8 +73,8 @@ public class SysLogininforController extends BaseController
     @PreAuthorize("@ss.hasPermi('monitor:logininfor:unlock')")
     @Log(title = "账户解锁", businessType = BusinessType.OTHER)
     @GetMapping("/unlock/{userName}")
-    public R<Void> unlock(@PathVariable("userName") String userName)
-    {
+    public R<Void> unlock(@PathVariable("userName") String userName) {
+
         passwordService.clearLoginRecordCache(userName);
         return R.ofSuccess();
     }

@@ -10,8 +10,8 @@ import lombok.Getter;
  */
 @Getter
 @AllArgsConstructor
-public class CacheInfoResponse
-{
+public class CacheInfoResponse {
+
     private Properties info;
     private Object dbSize;
     private List<CacheCommandStat> commandStats;

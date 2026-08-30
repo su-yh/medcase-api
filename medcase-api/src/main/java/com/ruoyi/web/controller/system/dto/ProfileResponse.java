@@ -9,8 +9,8 @@ import lombok.Getter;
  */
 @Getter
 @AllArgsConstructor
-public class ProfileResponse
-{
+public class ProfileResponse {
+
     private SysUser data;
     private String roleGroup;
     private String postGroup;

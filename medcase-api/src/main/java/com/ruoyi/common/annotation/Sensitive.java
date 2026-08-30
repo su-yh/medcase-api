@@ -16,7 +16,7 @@ import com.ruoyi.common.enums.DesensitizedType;
 @Target({ ElementType.FIELD, ElementType.METHOD })
 @JacksonAnnotationsInside
 @JsonSerialize(using = SensitiveJsonSerializer.class)
-public @interface Sensitive
-{
+public @interface Sensitive {
+
     DesensitizedType desensitizedType();
 }

@@ -7,8 +7,8 @@ import org.apache.poi.ss.usermodel.Workbook;
  * Excel数据格式处理适配器
  * 
  */
-public interface ExcelHandlerAdapter
-{
+public interface ExcelHandlerAdapter {
+
     /**
      * 格式化
      * 

@@ -25,15 +25,15 @@ import com.ruoyi.system.service.ISysOperLogService;
  */
 @RestController
 @RequestMapping("/monitor/operlog")
-public class SysOperlogController extends BaseController
-{
+public class SysOperlogController extends BaseController {
+
     @Autowired
     private ISysOperLogService operLogService;
 
     @PreAuthorize("@ss.hasPermi('monitor:operlog:list')")
     @GetMapping("/list")
-    public TableDataInfo list(SysOperLog operLog)
-    {
+    public TableDataInfo list(SysOperLog operLog) {
+
         startPage();
         List<SysOperLog> list = operLogService.selectOperLogList(operLog);
         return getDataTable(list);
@@ -42,8 +42,8 @@ public class SysOperlogController extends BaseController
     @Log(title = "操作日志", businessType = BusinessType.EXPORT)
     @PreAuthorize("@ss.hasPermi('monitor:operlog:export')")
     @PostMapping("/export")
-    public void export(HttpServletResponse response, SysOperLog operLog)
-    {
+    public void export(HttpServletResponse response, SysOperLog operLog) {
+
         List<SysOperLog> list = operLogService.selectOperLogList(operLog);
         ExcelUtil<SysOperLog> util = new ExcelUtil<SysOperLog>(SysOperLog.class);
         util.exportExcel(response, list, "操作日志");
@@ -52,16 +52,16 @@ public class SysOperlogController extends BaseController
     @Log(title = "操作日志", businessType = BusinessType.DELETE)
     @PreAuthorize("@ss.hasPermi('monitor:operlog:remove')")
     @DeleteMapping("/{operIds}")
-    public R<Void> remove(@PathVariable Long[] operIds)
-    {
+    public R<Void> remove(@PathVariable Long[] operIds) {
+
         return operLogService.deleteOperLogByIds(operIds) > 0 ? R.ofSuccess() : R.ofFail("操作失败");
     }
 
     @Log(title = "操作日志", businessType = BusinessType.CLEAN)
     @PreAuthorize("@ss.hasPermi('monitor:operlog:remove')")
     @DeleteMapping("/clean")
-    public R<Void> clean()
-    {
+    public R<Void> clean() {
+
         operLogService.cleanOperLog();
         return R.ofSuccess();
     }

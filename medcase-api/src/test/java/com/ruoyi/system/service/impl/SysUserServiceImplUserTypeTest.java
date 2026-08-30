@@ -15,24 +15,24 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.test.util.ReflectionTestUtils;
 
-class SysUserServiceImplUserTypeTest
-{
+class SysUserServiceImplUserTypeTest {
+
     private SysUserServiceImpl userService;
 
     @Mock
     private SysUserMapper userMapper;
 
     @BeforeEach
-    void setUp()
-    {
+    void setUp() {
+
         MockitoAnnotations.openMocks(this);
         userService = new SysUserServiceImpl();
         ReflectionTestUtils.setField(userService, "userMapper", userMapper);
     }
 
     @Test
-    void checkUserNameUniqueDefaultsToAdminUserType()
-    {
+    void checkUserNameUniqueDefaultsToAdminUserType() {
+
         when(userMapper.checkUserNameUnique(any(SysUser.class))).thenReturn(null);
         SysUser user = new SysUser();
         user.setUserName("same-name");
@@ -45,8 +45,8 @@ class SysUserServiceImplUserTypeTest
     }
 
     @Test
-    void checkPhoneUniquePreservesExplicitDoctorUserType()
-    {
+    void checkPhoneUniquePreservesExplicitDoctorUserType() {
+
         when(userMapper.checkPhoneUnique(any(SysUser.class))).thenReturn(null);
         SysUser user = new SysUser();
         user.setPhonenumber("15888888888");
@@ -60,8 +60,8 @@ class SysUserServiceImplUserTypeTest
     }
 
     @Test
-    void checkEmailUniqueDefaultsToAdminUserType()
-    {
+    void checkEmailUniqueDefaultsToAdminUserType() {
+
         when(userMapper.checkEmailUnique(any(SysUser.class))).thenReturn(null);
         SysUser user = new SysUser();
         user.setEmail("same@example.com");

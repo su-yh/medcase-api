@@ -8,8 +8,8 @@ import lombok.Getter;
  */
 @Getter
 @AllArgsConstructor
-public class CacheCommandStat
-{
+public class CacheCommandStat {
+
     private String name;
     private String value;
 }

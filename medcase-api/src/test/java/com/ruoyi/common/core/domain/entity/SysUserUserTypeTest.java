@@ -6,19 +6,19 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import com.ruoyi.common.enums.UserTypeEnums;
 import org.junit.jupiter.api.Test;
 
-class SysUserUserTypeTest
-{
+class SysUserUserTypeTest {
+
     @Test
-    void newUserShouldNotHideMissingUserType()
-    {
+    void newUserShouldNotHideMissingUserType() {
+
         SysUser user = new SysUser();
 
         assertNull(user.getUserType());
     }
 
     @Test
-    void userTypeShouldBeWritableForFutureUserTypes()
-    {
+    void userTypeShouldBeWritableForFutureUserTypes() {
+
         SysUser user = new SysUser();
 
         user.setUserType(UserTypeEnums.DOCTOR);

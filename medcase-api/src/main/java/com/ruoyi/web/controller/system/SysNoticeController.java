@@ -30,8 +30,8 @@ import com.ruoyi.web.controller.system.dto.NoticeTopResponse;
  */
 @RestController
 @RequestMapping("/system/notice")
-public class SysNoticeController extends BaseController
-{
+public class SysNoticeController extends BaseController {
+
     @Autowired
     private ISysNoticeService noticeService;
 
@@ -43,8 +43,8 @@ public class SysNoticeController extends BaseController
      */
     @PreAuthorize("@ss.hasPermi('system:notice:list')")
     @GetMapping("/list")
-    public TableDataInfo list(SysNotice notice)
-    {
+    public TableDataInfo list(SysNotice notice) {
+
         startPage();
         List<SysNotice> list = noticeService.selectNoticeList(notice);
         return getDataTable(list);
@@ -54,8 +54,8 @@ public class SysNoticeController extends BaseController
      * 根据通知公告编号获取详细信息
      */
     @GetMapping(value = "/{noticeId}")
-    public R<SysNotice> getInfo(@PathVariable Long noticeId)
-    {
+    public R<SysNotice> getInfo(@PathVariable Long noticeId) {
+
         return R.ofSuccess(noticeService.selectNoticeById(noticeId));
     }
 
@@ -65,8 +65,8 @@ public class SysNoticeController extends BaseController
     @PreAuthorize("@ss.hasPermi('system:notice:add')")
     @Log(title = "通知公告", businessType = BusinessType.INSERT)
     @PostMapping
-    public R<Void> add(@Validated @RequestBody SysNotice notice)
-    {
+    public R<Void> add(@Validated @RequestBody SysNotice notice) {
+
         notice.setCreateBy(getUsername());
         return noticeService.insertNotice(notice) > 0 ? R.ofSuccess() : R.ofFail("操作失败");
     }
@@ -77,8 +77,8 @@ public class SysNoticeController extends BaseController
     @PreAuthorize("@ss.hasPermi('system:notice:edit')")
     @Log(title = "通知公告", businessType = BusinessType.UPDATE)
     @PutMapping
-    public R<Void> edit(@Validated @RequestBody SysNotice notice)
-    {
+    public R<Void> edit(@Validated @RequestBody SysNotice notice) {
+
         notice.setUpdateBy(getUsername());
         return noticeService.updateNotice(notice) > 0 ? R.ofSuccess() : R.ofFail("操作失败");
     }
@@ -88,8 +88,8 @@ public class SysNoticeController extends BaseController
      */
     @GetMapping("/listTop")
     @ResponseBody
-    public R<NoticeTopResponse> listTop()
-    {
+    public R<NoticeTopResponse> listTop() {
+
         Long userId = getUserId();
         List<SysNotice> list = noticeReadService.selectNoticeListWithReadStatus(userId, 5);
         long unreadCount = list.stream().filter(n -> !n.getIsRead()).count();
@@ -101,8 +101,8 @@ public class SysNoticeController extends BaseController
      */
     @PostMapping("/markRead")
     @ResponseBody
-    public R<Void> markRead(Long noticeId)
-    {
+    public R<Void> markRead(Long noticeId) {
+
         Long userId = getUserId();
         noticeReadService.markRead(noticeId, userId);
         return R.ofSuccess();
@@ -113,8 +113,8 @@ public class SysNoticeController extends BaseController
      */
     @PostMapping("/markReadAll")
     @ResponseBody
-    public R<Void> markReadAll(String ids)
-    {
+    public R<Void> markReadAll(String ids) {
+
         Long userId = getUserId();
         Long[] noticeIds = Convert.toLongArray(ids);
         noticeReadService.markReadBatch(userId, noticeIds);
@@ -127,8 +127,8 @@ public class SysNoticeController extends BaseController
     @PreAuthorize("@ss.hasPermi('system:notice:list')")
     @GetMapping("/readUsers/list")
     @ResponseBody
-    public TableDataInfo readUsersList(Long noticeId, String searchValue)
-    {
+    public TableDataInfo readUsersList(Long noticeId, String searchValue) {
+
         startPage();
         List<?> list = noticeReadService.selectReadUsersByNoticeId(noticeId, searchValue);
         return getDataTable(list);
@@ -140,8 +140,8 @@ public class SysNoticeController extends BaseController
     @PreAuthorize("@ss.hasPermi('system:notice:remove')")
     @Log(title = "通知公告", businessType = BusinessType.DELETE)
     @DeleteMapping("/{noticeIds}")
-    public R<Void> remove(@PathVariable Long[] noticeIds)
-    {
+    public R<Void> remove(@PathVariable Long[] noticeIds) {
+
         noticeReadService.deleteByNoticeIds(noticeIds);
         return noticeService.deleteNoticeByIds(noticeIds) > 0 ? R.ofSuccess() : R.ofFail("操作失败");
     }

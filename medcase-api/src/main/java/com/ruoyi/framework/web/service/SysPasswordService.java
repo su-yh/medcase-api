@@ -13,8 +13,8 @@ import com.ruoyi.mvc.exception.ExceptionUtil;
  * 登录密码方法
  */
 @Component
-public class SysPasswordService
-{
+public class SysPasswordService {
+
     @Autowired
     private RedisCache redisCache;
 
@@ -30,42 +30,42 @@ public class SysPasswordService
      * @param username 用户名
      * @return 缓存键key
      */
-    private String getCacheKey(String username)
-    {
+    private String getCacheKey(String username) {
+
         return CacheConstants.PWD_ERR_CNT_KEY + username;
     }
 
-    public void validateLoginRetryCount(String username)
-    {
+    public void validateLoginRetryCount(String username) {
+
         Integer retryCount = redisCache.getCacheObject(getCacheKey(username));
 
-        if (retryCount == null)
-        {
+        if (retryCount == null) {
+
             retryCount = 0;
         }
 
-        if (retryCount >= maxRetryCount)
-        {
+        if (retryCount >= maxRetryCount) {
+
             throw ExceptionUtil.business(
                     ErrorCodeEnums.ADMIN_LOGIN_RETRY_LIMIT_EXCEEDED, maxRetryCount, lockTime);
         }
     }
 
-    public void recordLoginFailure(String username)
-    {
+    public void recordLoginFailure(String username) {
+
         Integer retryCount = redisCache.getCacheObject(getCacheKey(username));
-        if (retryCount == null)
-        {
+        if (retryCount == null) {
+
             retryCount = 0;
         }
         retryCount = retryCount + 1;
         redisCache.setCacheObject(getCacheKey(username), retryCount, lockTime, TimeUnit.MINUTES);
     }
 
-    public void clearLoginRecordCache(String loginName)
-    {
-        if (redisCache.hasKey(getCacheKey(loginName)))
-        {
+    public void clearLoginRecordCache(String loginName) {
+
+        if (redisCache.hasKey(getCacheKey(loginName))) {
+
             redisCache.deleteObject(getCacheKey(loginName));
         }
     }

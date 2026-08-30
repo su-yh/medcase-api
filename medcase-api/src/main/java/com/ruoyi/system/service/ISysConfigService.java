@@ -7,8 +7,8 @@ import com.ruoyi.system.domain.SysConfig;
  * 参数配置 服务层
  * 
  */
-public interface ISysConfigService
-{
+public interface ISysConfigService {
+
     /**
      * 查询参数配置信息
      * 

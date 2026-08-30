@@ -17,8 +17,8 @@ import java.util.Date;
  * 
  */
 @SuppressWarnings("deprecation")
-public class DateUtils extends org.apache.commons.lang3.time.DateUtils
-{
+public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
+
     public static String YYYY_MM_DD = "yyyy-MM-dd";
 
     public static String YYYYMMDDHHMMSS = "yyyyMMddHHmmss";
@@ -35,8 +35,8 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils
      * 
      * @return Date() 当前日期
      */
-    public static Date getNowDate()
-    {
+    public static Date getNowDate() {
+
         return new Date();
     }
 
@@ -45,36 +45,36 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils
      * 
      * @return String
      */
-    public static String getDate()
-    {
+    public static String getDate() {
+
         return dateTimeNow(YYYY_MM_DD);
     }
 
-    public static final String getTime()
-    {
+    public static final String getTime() {
+
         return dateTimeNow(YYYY_MM_DD_HH_MM_SS);
     }
 
-    public static final String dateTimeNow()
-    {
+    public static final String dateTimeNow() {
+
         return dateTimeNow(YYYYMMDDHHMMSS);
     }
 
-    public static final String dateTimeNow(final String format)
-    {
+    public static final String dateTimeNow(final String format) {
+
         return parseDateToStr(format, new Date());
     }
 
-    public static final String parseDateToStr(final String format, final Date date)
-    {
+    public static final String parseDateToStr(final String format, final Date date) {
+
         return new SimpleDateFormat(format).format(date);
     }
 
     /**
      * 日期路径 即年/月/日 如20180808
      */
-    public static final String dateTime()
-    {
+    public static final String dateTime() {
+
         Date now = new Date();
         return DateFormatUtils.format(now, "yyyyMMdd");
     }
@@ -82,18 +82,18 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils
     /**
      * 日期型字符串转化为日期 格式
      */
-    public static Date parseDate(Object str)
-    {
-        if (str == null)
-        {
+    public static Date parseDate(Object str) {
+
+        if (str == null) {
+
             return null;
         }
-        try
-        {
+        try {
+
             return parseDate(str.toString(), parsePatterns);
         }
-        catch (ParseException e)
-        {
+        catch (ParseException e) {
+
             return null;
         }
     }
@@ -101,8 +101,8 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils
     /**
      * 获取服务器启动时间
      */
-    public static Date getServerStartDate()
-    {
+    public static Date getServerStartDate() {
+
         long time = ManagementFactory.getRuntimeMXBean().getStartTime();
         return new Date(time);
     }
@@ -110,8 +110,8 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils
     /**
      * 计算相差天数
      */
-    public static int differentDaysByMillisecond(Date date1, Date date2)
-    {
+    public static int differentDaysByMillisecond(Date date1, Date date2) {
+
         return Math.abs((int) ((date2.getTime() - date1.getTime()) / (1000 * 3600 * 24)));
     }
 
@@ -122,8 +122,8 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils
      * @param startTime 开始时间
      * @return 时间差（天/小时/分钟）
      */
-    public static String timeDistance(Date endDate, Date startTime)
-    {
+    public static String timeDistance(Date endDate, Date startTime) {
+
         long nd = 1000 * 24 * 60 * 60;
         long nh = 1000 * 60 * 60;
         long nm = 1000 * 60;
@@ -144,8 +144,8 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils
     /**
      * 增加 LocalDateTime ==> Date
      */
-    public static Date toDate(LocalDateTime temporalAccessor)
-    {
+    public static Date toDate(LocalDateTime temporalAccessor) {
+
         ZonedDateTime zdt = temporalAccessor.atZone(ZoneId.systemDefault());
         return Date.from(zdt.toInstant());
     }
@@ -153,8 +153,8 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils
     /**
      * 增加 LocalDate ==> Date
      */
-    public static Date toDate(LocalDate temporalAccessor)
-    {
+    public static Date toDate(LocalDate temporalAccessor) {
+
         LocalDateTime localDateTime = LocalDateTime.of(temporalAccessor, LocalTime.of(0, 0, 0));
         ZonedDateTime zdt = localDateTime.atZone(ZoneId.systemDefault());
         return Date.from(zdt.toInstant());

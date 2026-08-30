@@ -9,8 +9,8 @@ import com.ruoyi.system.domain.SysNoticeRead;
 /**
  * 公告已读记录 数据层
  */
-public interface SysNoticeReadMapper
-{
+public interface SysNoticeReadMapper {
+
     /**
      * 新增已读记录（忽略重复）
      * @param noticeRead 已读记录

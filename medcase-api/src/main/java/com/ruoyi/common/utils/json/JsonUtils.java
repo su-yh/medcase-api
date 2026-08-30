@@ -17,106 +17,106 @@ import tools.jackson.databind.type.CollectionType;
 /**
  * Jackson JSON工具类
  */
-public final class JsonUtils
-{
+public final class JsonUtils {
+
     private static final ObjectMapper MAPPER = new ObjectMapper().rebuild()
         .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
         .defaultDateFormat(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"))
         .defaultTimeZone(TimeZone.getTimeZone("GMT+8"))
         .build();
 
-    private JsonUtils()
-    {
+    private JsonUtils() {
+
     }
 
-    public static String toJSONString(Object value)
-    {
+    public static String toJSONString(Object value) {
+
         return toJSONString(value, Set.of());
     }
 
-    public static String toJSONString(Object value, Collection<String> excludes)
-    {
-        try
-        {
+    public static String toJSONString(Object value, Collection<String> excludes) {
+
+        try {
+
             JsonNode node = MAPPER.valueToTree(value);
             prune(node, excludes == null ? Set.of() : new HashSet<>(excludes));
             return MAPPER.writeValueAsString(node);
         }
-        catch (JacksonException e)
-        {
+        catch (JacksonException e) {
+
             throw new IllegalStateException("JSON serialization failed", e);
         }
     }
 
-    public static JsonNode readTree(String json)
-    {
-        try
-        {
+    public static JsonNode readTree(String json) {
+
+        try {
+
             return MAPPER.readTree(json);
         }
-        catch (JacksonException e)
-        {
+        catch (JacksonException e) {
+
             throw new IllegalStateException("JSON parse failed", e);
         }
     }
 
-    public static JsonNode toTree(Object value)
-    {
+    public static JsonNode toTree(Object value) {
+
         return MAPPER.valueToTree(value);
     }
 
-    public static <T> T parseObject(String json, Class<T> clazz)
-    {
-        try
-        {
+    public static <T> T parseObject(String json, Class<T> clazz) {
+
+        try {
+
             return MAPPER.readValue(json, clazz);
         }
-        catch (JacksonException e)
-        {
+        catch (JacksonException e) {
+
             throw new IllegalStateException("JSON parse failed", e);
         }
     }
 
-    public static <T> List<T> parseArray(String json, Class<T> elementType)
-    {
-        try
-        {
+    public static <T> List<T> parseArray(String json, Class<T> elementType) {
+
+        try {
+
             CollectionType collectionType = MAPPER.getTypeFactory().constructCollectionType(ArrayList.class, elementType);
             return MAPPER.readValue(json, collectionType);
         }
-        catch (JacksonException e)
-        {
+        catch (JacksonException e) {
+
             throw new IllegalStateException("JSON parse failed", e);
         }
     }
 
-    private static void prune(JsonNode node, Set<String> excludes)
-    {
-        if (node == null || excludes.isEmpty())
-        {
+    private static void prune(JsonNode node, Set<String> excludes) {
+
+        if (node == null || excludes.isEmpty()) {
+
             return;
         }
-        if (node.isObject())
-        {
+        if (node.isObject()) {
+
             ObjectNode objectNode = (ObjectNode) node;
             List<String> removeKeys = new ArrayList<>();
-            for (java.util.Map.Entry<String, JsonNode> field : objectNode.properties())
-            {
-                if (excludes.contains(field.getKey()))
-                {
+            for (java.util.Map.Entry<String, JsonNode> field : objectNode.properties()) {
+
+                if (excludes.contains(field.getKey())) {
+
                     removeKeys.add(field.getKey());
                 }
-                else
-                {
+                else {
+
                     prune(field.getValue(), excludes);
                 }
             }
             removeKeys.forEach(objectNode::remove);
         }
-        else if (node.isArray())
-        {
-            for (JsonNode child : node)
-            {
+        else if (node.isArray()) {
+
+            for (JsonNode child : node) {
+
                 prune(child, excludes);
             }
         }

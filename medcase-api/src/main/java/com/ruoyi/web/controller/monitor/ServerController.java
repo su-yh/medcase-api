@@ -13,12 +13,12 @@ import com.ruoyi.framework.web.domain.Server;
  */
 @RestController
 @RequestMapping("/monitor/server")
-public class ServerController
-{
+public class ServerController {
+
     @PreAuthorize("@ss.hasPermi('monitor:server:list')")
     @GetMapping()
-    public R<Server> getInfo() throws Exception
-    {
+    public R<Server> getInfo() throws Exception {
+
         Server server = new Server();
         server.copyTo();
         return R.ofSuccess(server);

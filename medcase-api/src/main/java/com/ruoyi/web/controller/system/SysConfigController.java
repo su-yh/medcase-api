@@ -28,8 +28,8 @@ import com.ruoyi.system.service.ISysConfigService;
  */
 @RestController
 @RequestMapping("/system/config")
-public class SysConfigController extends BaseController
-{
+public class SysConfigController extends BaseController {
+
     @Autowired
     private ISysConfigService configService;
 
@@ -38,8 +38,8 @@ public class SysConfigController extends BaseController
      */
     @PreAuthorize("@ss.hasPermi('system:config:list')")
     @GetMapping("/list")
-    public TableDataInfo list(SysConfig config)
-    {
+    public TableDataInfo list(SysConfig config) {
+
         startPage();
         List<SysConfig> list = configService.selectConfigList(config);
         return getDataTable(list);
@@ -48,8 +48,8 @@ public class SysConfigController extends BaseController
     @Log(title = "参数管理", businessType = BusinessType.EXPORT)
     @PreAuthorize("@ss.hasPermi('system:config:export')")
     @PostMapping("/export")
-    public void export(HttpServletResponse response, SysConfig config)
-    {
+    public void export(HttpServletResponse response, SysConfig config) {
+
         List<SysConfig> list = configService.selectConfigList(config);
         ExcelUtil<SysConfig> util = new ExcelUtil<SysConfig>(SysConfig.class);
         util.exportExcel(response, list, "参数数据");
@@ -60,8 +60,8 @@ public class SysConfigController extends BaseController
      */
     @PreAuthorize("@ss.hasPermi('system:config:query')")
     @GetMapping(value = "/{configId}")
-    public R<SysConfig> getInfo(@PathVariable Long configId)
-    {
+    public R<SysConfig> getInfo(@PathVariable Long configId) {
+
         return R.ofSuccess(configService.selectConfigById(configId));
     }
 
@@ -69,8 +69,8 @@ public class SysConfigController extends BaseController
      * 根据参数键名查询参数值
      */
     @GetMapping(value = "/configKey/{configKey}")
-    public R<String> getConfigKey(@PathVariable String configKey)
-    {
+    public R<String> getConfigKey(@PathVariable String configKey) {
+
         return R.ofSuccess(configService.selectConfigByKey(configKey));
     }
 
@@ -80,10 +80,10 @@ public class SysConfigController extends BaseController
     @PreAuthorize("@ss.hasPermi('system:config:add')")
     @Log(title = "参数管理", businessType = BusinessType.INSERT)
     @PostMapping
-    public R<Void> add(@Validated @RequestBody SysConfig config)
-    {
-        if (!configService.checkConfigKeyUnique(config))
-        {
+    public R<Void> add(@Validated @RequestBody SysConfig config) {
+
+        if (!configService.checkConfigKeyUnique(config)) {
+
             return R.ofFail("新增参数'" + config.getConfigName() + "'失败，参数键名已存在");
         }
         config.setCreateBy(getUsername());
@@ -96,10 +96,10 @@ public class SysConfigController extends BaseController
     @PreAuthorize("@ss.hasPermi('system:config:edit')")
     @Log(title = "参数管理", businessType = BusinessType.UPDATE)
     @PutMapping
-    public R<Void> edit(@Validated @RequestBody SysConfig config)
-    {
-        if (!configService.checkConfigKeyUnique(config))
-        {
+    public R<Void> edit(@Validated @RequestBody SysConfig config) {
+
+        if (!configService.checkConfigKeyUnique(config)) {
+
             return R.ofFail("修改参数'" + config.getConfigName() + "'失败，参数键名已存在");
         }
         config.setUpdateBy(getUsername());
@@ -112,8 +112,8 @@ public class SysConfigController extends BaseController
     @PreAuthorize("@ss.hasPermi('system:config:remove')")
     @Log(title = "参数管理", businessType = BusinessType.DELETE)
     @DeleteMapping("/{configIds}")
-    public R<Void> remove(@PathVariable Long[] configIds)
-    {
+    public R<Void> remove(@PathVariable Long[] configIds) {
+
         configService.deleteConfigByIds(configIds);
         return R.ofSuccess();
     }
@@ -124,8 +124,8 @@ public class SysConfigController extends BaseController
     @PreAuthorize("@ss.hasPermi('system:config:remove')")
     @Log(title = "参数管理", businessType = BusinessType.CLEAN)
     @DeleteMapping("/refreshCache")
-    public R<Void> refreshCache()
-    {
+    public R<Void> refreshCache() {
+
         configService.resetConfigCache();
         return R.ofSuccess();
     }

@@ -12,17 +12,17 @@ import java.io.IOException;
 /**
  * 文件处理工具类
  */
-public class FileUtils
-{
+public class FileUtils {
+
     private static String importPath;
 
-    public static void setImportPath(String importPath)
-    {
+    public static void setImportPath(String importPath) {
+
         FileUtils.importPath = importPath;
     }
 
-    public static String getImportPath()
-    {
+    public static String getImportPath() {
+
         return importPath;
     }
 
@@ -32,8 +32,8 @@ public class FileUtils
      * @return 目标文件
      * @throws IOException IO异常
      */
-    public static String writeImportBytes(byte[] data) throws IOException
-    {
+    public static String writeImportBytes(byte[] data) throws IOException {
+
         return writeBytes(data, getImportPath());
     }
 
@@ -44,20 +44,20 @@ public class FileUtils
      * @return 目标文件
      * @throws IOException IO异常
      */
-    public static String writeBytes(byte[] data, String uploadDir) throws IOException
-    {
+    public static String writeBytes(byte[] data, String uploadDir) throws IOException {
+
         FileOutputStream fos = null;
         String pathName = "";
-        try
-        {
+        try {
+
             String extension = getFileExtendName(data);
             pathName = DateUtils.dateTime() + "/" + IdUtils.fastUUID() + "." + extension;
             File file = FileUploadUtils.getAbsoluteFile(uploadDir, pathName);
             fos = new FileOutputStream(file);
             fos.write(data);
         }
-        finally
-        {
+        finally {
+
             IOUtils.close(fos);
         }
         return FileUploadUtils.getPathFileName(uploadDir, pathName);
@@ -68,24 +68,24 @@ public class FileUtils
      * @param photoByte 图像数据
      * @return 后缀名
      */
-    public static String getFileExtendName(byte[] photoByte)
-    {
+    public static String getFileExtendName(byte[] photoByte) {
+
         String strFileExtendName = "jpg";
         if ((photoByte[0] == 71) && (photoByte[1] == 73) && (photoByte[2] == 70) && (photoByte[3] == 56)
-                && ((photoByte[4] == 55) || (photoByte[4] == 57)) && (photoByte[5] == 97))
-        {
+                && ((photoByte[4] == 55) || (photoByte[4] == 57)) && (photoByte[5] == 97)) {
+
             strFileExtendName = "gif";
         }
-        else if ((photoByte[6] == 74) && (photoByte[7] == 70) && (photoByte[8] == 73) && (photoByte[9] == 70))
-        {
+        else if ((photoByte[6] == 74) && (photoByte[7] == 70) && (photoByte[8] == 73) && (photoByte[9] == 70)) {
+
             strFileExtendName = "jpg";
         }
-        else if ((photoByte[0] == 66) && (photoByte[1] == 77))
-        {
+        else if ((photoByte[0] == 66) && (photoByte[1] == 77)) {
+
             strFileExtendName = "bmp";
         }
-        else if ((photoByte[1] == 80) && (photoByte[2] == 78) && (photoByte[3] == 71))
-        {
+        else if ((photoByte[1] == 80) && (photoByte[2] == 78) && (photoByte[3] == 71)) {
+
             strFileExtendName = "png";
         }
         return strFileExtendName;
@@ -96,10 +96,10 @@ public class FileUtils
      * @param fileName 路径名称
      * @return 没有文件路径的名称
      */
-    public static String getName(String fileName)
-    {
-        if (fileName == null)
-        {
+    public static String getName(String fileName) {
+
+        if (fileName == null) {
+
             return null;
         }
         int lastUnixPos = fileName.lastIndexOf('/');
@@ -113,10 +113,10 @@ public class FileUtils
      * @param fileName 路径名称
      * @return 没有文件路径和后缀的名称
      */
-    public static String getNameNotSuffix(String fileName)
-    {
-        if (fileName == null)
-        {
+    public static String getNameNotSuffix(String fileName) {
+
+        if (fileName == null) {
+
             return null;
         }
         String baseName = FilenameUtils.getBaseName(fileName);

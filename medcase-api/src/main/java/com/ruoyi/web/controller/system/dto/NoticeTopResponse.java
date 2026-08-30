@@ -10,8 +10,8 @@ import lombok.Getter;
  */
 @Getter
 @AllArgsConstructor
-public class NoticeTopResponse
-{
+public class NoticeTopResponse {
+
     private List<SysNotice> data;
     private long unreadCount;
 }

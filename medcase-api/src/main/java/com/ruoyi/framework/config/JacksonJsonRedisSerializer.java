@@ -11,30 +11,30 @@ import org.springframework.data.redis.serializer.SerializationException;
 /**
  * Redis使用Jackson序列化
  */
-public class JacksonJsonRedisSerializer<T> implements RedisSerializer<T>
-{
+public class JacksonJsonRedisSerializer<T> implements RedisSerializer<T> {
+
     public static final Charset DEFAULT_CHARSET = Charset.forName("UTF-8");
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     private final Class<T> clazz;
 
-    public JacksonJsonRedisSerializer(Class<T> clazz)
-    {
+    public JacksonJsonRedisSerializer(Class<T> clazz) {
+
         this.clazz = clazz;
     }
 
     @Override
-    public byte[] serialize(T value) throws SerializationException
-    {
-        if (value == null)
-        {
+    public byte[] serialize(T value) throws SerializationException {
+
+        if (value == null) {
+
             return new byte[0];
         }
-        try
-        {
-            if (clazz != null && !Object.class.equals(clazz))
-            {
+        try {
+
+            if (clazz != null && !Object.class.equals(clazz)) {
+
                 return MAPPER.writeValueAsString(value).getBytes(DEFAULT_CHARSET);
             }
             ObjectNode wrapper = MAPPER.createObjectNode();
@@ -42,37 +42,37 @@ public class JacksonJsonRedisSerializer<T> implements RedisSerializer<T>
             wrapper.set("value", MAPPER.valueToTree(value));
             return MAPPER.writeValueAsString(wrapper).getBytes(DEFAULT_CHARSET);
         }
-        catch (JacksonException e)
-        {
+        catch (JacksonException e) {
+
             throw new SerializationException("Jackson serialize error", e);
         }
     }
 
     @Override
-    public T deserialize(byte[] bytes) throws SerializationException
-    {
-        if (bytes == null || bytes.length == 0)
-        {
+    public T deserialize(byte[] bytes) throws SerializationException {
+
+        if (bytes == null || bytes.length == 0) {
+
             return null;
         }
-        try
-        {
+        try {
+
             String str = new String(bytes, DEFAULT_CHARSET);
-            if (clazz != null && !Object.class.equals(clazz))
-            {
+            if (clazz != null && !Object.class.equals(clazz)) {
+
                 return MAPPER.readValue(str, clazz);
             }
             JsonNode root = MAPPER.readTree(str);
-            if (root != null && root.isObject())
-            {
+            if (root != null && root.isObject()) {
+
                 String className = root.path("@class").asText(null);
-                if (className != null && !className.isEmpty())
-                {
+                if (className != null && !className.isEmpty()) {
+
                     return (T) MAPPER.readValue(root.path("value").toString(), resolveClass(className));
                 }
                 className = root.path("@type").asText(null);
-                if (className != null && !className.isEmpty())
-                {
+                if (className != null && !className.isEmpty()) {
+
                     ObjectNode objectNode = (ObjectNode) root;
                     objectNode.remove("@type");
                     return (T) MAPPER.readValue(objectNode.toString(), resolveClass(className));
@@ -80,28 +80,28 @@ public class JacksonJsonRedisSerializer<T> implements RedisSerializer<T>
             }
             return MAPPER.readValue(str, clazz);
         }
-        catch (JacksonException e)
-        {
+        catch (JacksonException e) {
+
             throw new SerializationException("Jackson deserialize error", e);
         }
     }
 
-    private Class<?> resolveClass(String className)
-    {
+    private Class<?> resolveClass(String className) {
+
         if (!(className.startsWith("com.ruoyi.")
                 || className.startsWith("java.lang.")
                 || className.startsWith("java.util.")
                 || className.startsWith("java.math.")
-                || className.startsWith("java.time.")))
-        {
+                || className.startsWith("java.time."))) {
+
             throw new SerializationException("Disallowed redis type: " + className);
         }
-        try
-        {
+        try {
+
             return MAPPER.getTypeFactory().findClass(className);
         }
-        catch (ClassNotFoundException e)
-        {
+        catch (ClassNotFoundException e) {
+
             throw new SerializationException("Unknown redis type: " + className, e);
         }
     }

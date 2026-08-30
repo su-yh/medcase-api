@@ -7,11 +7,11 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class JacksonJsonRedisSerializerTest
-{
+class JacksonJsonRedisSerializerTest {
+
     @Test
-    void serializeAndDeserializeLoginUser() throws Exception
-    {
+    void serializeAndDeserializeLoginUser() throws Exception {
+
         JacksonJsonRedisSerializer<Object> serializer = new JacksonJsonRedisSerializer<>(Object.class);
 
         SysUser user = new SysUser();

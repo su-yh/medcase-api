@@ -26,8 +26,8 @@ import com.ruoyi.system.service.ISysConfigService;
  * 
  */
 @RestController
-public class CaptchaController
-{
+public class CaptchaController {
+
     @Resource(name = "captchaProducer")
     private Producer captchaProducer;
 
@@ -47,11 +47,11 @@ public class CaptchaController
      */
     @Anonymous
     @GetMapping("/captchaImage")
-    public R<CaptchaResponse> getCode(HttpServletResponse response) throws IOException
-    {
+    public R<CaptchaResponse> getCode(HttpServletResponse response) throws IOException {
+
         boolean captchaEnabled = configService.selectCaptchaEnabled();
-        if (!captchaEnabled)
-        {
+        if (!captchaEnabled) {
+
             return R.ofSuccess(new CaptchaResponse(false, null, null));
         }
 
@@ -64,15 +64,15 @@ public class CaptchaController
 
         // 生成验证码
         String captchaType = ruoYiConfig.getCaptchaType();
-        if ("math".equals(captchaType))
-        {
+        if ("math".equals(captchaType)) {
+
             String capText = captchaProducerMath.createText();
             capStr = capText.substring(0, capText.lastIndexOf("@"));
             code = capText.substring(capText.lastIndexOf("@") + 1);
             image = captchaProducerMath.createImage(capStr);
         }
-        else if ("char".equals(captchaType))
-        {
+        else if ("char".equals(captchaType)) {
+
             capStr = code = captchaProducer.createText();
             image = captchaProducer.createImage(capStr);
         }
@@ -80,12 +80,12 @@ public class CaptchaController
         redisCache.setCacheObject(verifyKey, code, Constants.CAPTCHA_EXPIRATION, TimeUnit.MINUTES);
         // 转换流信息写出
         FastByteArrayOutputStream os = new FastByteArrayOutputStream();
-        try
-        {
+        try {
+
             ImageIO.write(image, "jpg", os);
         }
-        catch (IOException e)
-        {
+        catch (IOException e) {
+
             return R.ofFail(e.getMessage());
         }
 

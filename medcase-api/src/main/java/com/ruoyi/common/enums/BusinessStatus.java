@@ -6,8 +6,8 @@ package com.ruoyi.common.enums;
 
  *
  */
-public enum BusinessStatus
-{
+public enum BusinessStatus {
+
     /**
      * 成功
      */

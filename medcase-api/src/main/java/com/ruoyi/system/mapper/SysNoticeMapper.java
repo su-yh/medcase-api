@@ -7,8 +7,8 @@ import com.ruoyi.system.domain.SysNotice;
  * 通知公告表 数据层
  * 
  */
-public interface SysNoticeMapper
-{
+public interface SysNoticeMapper {
+
     /**
      * 查询公告信息
      * 

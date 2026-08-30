@@ -29,13 +29,13 @@ import com.ruoyi.web.controller.monitor.dto.CacheInfoResponse;
  */
 @RestController
 @RequestMapping("/monitor/cache")
-public class CacheController
-{
+public class CacheController {
+
     @Autowired
     private RedisTemplate<String, String> redisTemplate;
 
-    private final static List<SysCache> caches = new ArrayList<SysCache>();
-    {
+    private final static List<SysCache> caches = new ArrayList<SysCache>(); {
+
         caches.add(new SysCache(CacheConstants.LOGIN_TOKEN_KEY, "用户信息"));
         caches.add(new SysCache(CacheConstants.SYS_CONFIG_KEY, "配置信息"));
         caches.add(new SysCache(CacheConstants.SYS_DICT_KEY, "数据字典"));
@@ -48,8 +48,8 @@ public class CacheController
     @SuppressWarnings("deprecation")
     @PreAuthorize("@ss.hasPermi('monitor:cache:list')")
     @GetMapping()
-    public R<CacheInfoResponse> getInfo() throws Exception
-    {
+    public R<CacheInfoResponse> getInfo() throws Exception {
+
         Properties info = (Properties) redisTemplate.execute((RedisCallback<Object>) connection -> connection.info());
         Properties commandStats = (Properties) redisTemplate.execute((RedisCallback<Object>) connection -> connection.info("commandstats"));
         Object dbSize = redisTemplate.execute((RedisCallback<Object>) connection -> connection.dbSize());
@@ -66,23 +66,23 @@ public class CacheController
 
     @PreAuthorize("@ss.hasPermi('monitor:cache:list')")
     @GetMapping("/getNames")
-    public R<List<SysCache>> cache()
-    {
+    public R<List<SysCache>> cache() {
+
         return R.ofSuccess(caches);
     }
 
     @PreAuthorize("@ss.hasPermi('monitor:cache:list')")
     @GetMapping("/getKeys/{cacheName}")
-    public R<Set<String>> getCacheKeys(@PathVariable String cacheName)
-    {
+    public R<Set<String>> getCacheKeys(@PathVariable String cacheName) {
+
         Set<String> cacheKeys = redisTemplate.keys(cacheName + "*");
         return R.ofSuccess(new TreeSet<>(cacheKeys));
     }
 
     @PreAuthorize("@ss.hasPermi('monitor:cache:list')")
     @GetMapping("/getValue/{cacheName}/{cacheKey}")
-    public R<SysCache> getCacheValue(@PathVariable String cacheName, @PathVariable String cacheKey)
-    {
+    public R<SysCache> getCacheValue(@PathVariable String cacheName, @PathVariable String cacheKey) {
+
         String cacheValue = redisTemplate.opsForValue().get(cacheKey);
         SysCache sysCache = new SysCache(cacheName, cacheKey, cacheValue);
         return R.ofSuccess(sysCache);
@@ -90,8 +90,8 @@ public class CacheController
 
     @PreAuthorize("@ss.hasPermi('monitor:cache:list')")
     @DeleteMapping("/clearCacheName/{cacheName}")
-    public R<Void> clearCacheName(@PathVariable String cacheName)
-    {
+    public R<Void> clearCacheName(@PathVariable String cacheName) {
+
         Collection<String> cacheKeys = redisTemplate.keys(cacheName + "*");
         redisTemplate.delete(cacheKeys);
         return R.ofSuccess();
@@ -99,16 +99,16 @@ public class CacheController
 
     @PreAuthorize("@ss.hasPermi('monitor:cache:list')")
     @DeleteMapping("/clearCacheKey/{cacheKey}")
-    public R<Void> clearCacheKey(@PathVariable String cacheKey)
-    {
+    public R<Void> clearCacheKey(@PathVariable String cacheKey) {
+
         redisTemplate.delete(cacheKey);
         return R.ofSuccess();
     }
 
     @PreAuthorize("@ss.hasPermi('monitor:cache:list')")
     @DeleteMapping("/clearCacheAll")
-    public R<Void> clearCacheAll()
-    {
+    public R<Void> clearCacheAll() {
+
         Collection<String> cacheKeys = redisTemplate.keys("*");
         redisTemplate.delete(cacheKeys);
         return R.ofSuccess();

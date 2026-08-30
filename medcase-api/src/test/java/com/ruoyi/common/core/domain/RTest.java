@@ -7,11 +7,11 @@ import org.junit.jupiter.api.Test;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 
-class RTest
-{
+class RTest {
+
     @Test
-    void successShouldExposeTypedDataAndStableJsonFields()
-    {
+    void successShouldExposeTypedDataAndStableJsonFields() {
+
         R<String> result = R.ofSuccess("token");
 
         assertEquals(0, result.getCode());
@@ -25,8 +25,8 @@ class RTest
     }
 
     @Test
-    void failureShouldKeepCodeAndMessageWithoutData()
-    {
+    void failureShouldKeepCodeAndMessageWithoutData() {
+
         R<Void> result = R.ofFail(401, "认证失败");
 
         assertEquals(401, result.getCode());

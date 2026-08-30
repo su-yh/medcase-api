@@ -10,8 +10,8 @@ import com.ruoyi.common.utils.json.JsonUtils;
 /**
  * 获取地址类
  */
-public class AddressUtils
-{
+public class AddressUtils {
+
     private static final Logger log = LoggerFactory.getLogger(AddressUtils.class);
 
     private static boolean addressEnabled;
@@ -22,25 +22,25 @@ public class AddressUtils
     // 未知地址
     public static final String UNKNOWN = "XX XX";
 
-    public static void setAddressEnabled(boolean addressEnabled)
-    {
+    public static void setAddressEnabled(boolean addressEnabled) {
+
         AddressUtils.addressEnabled = addressEnabled;
     }
 
-    public static String getRealAddressByIP(String ip)
-    {
+    public static String getRealAddressByIP(String ip) {
+
         // 内网不查询
-        if (IpUtils.internalIp(ip))
-        {
+        if (IpUtils.internalIp(ip)) {
+
             return "内网IP";
         }
-        if (addressEnabled)
-        {
-            try
-            {
+        if (addressEnabled) {
+
+            try {
+
                 String rspStr = HttpUtils.sendGet(IP_URL, "ip=" + ip + "&json=true", Constants.GBK);
-                if (StringUtils.isEmpty(rspStr))
-                {
+                if (StringUtils.isEmpty(rspStr)) {
+
                     log.error("获取地理位置异常 {}", ip);
                     return UNKNOWN;
                 }
@@ -48,8 +48,8 @@ public class AddressUtils
                 String city = JsonUtils.readTree(rspStr).path("city").asText();
                 return String.format("%s %s", region, city);
             }
-            catch (Exception e)
-            {
+            catch (Exception e) {
+
                 log.error("获取地理位置异常 {}", ip);
             }
         }

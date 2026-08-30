@@ -7,8 +7,8 @@ import com.ruoyi.system.domain.SysNotice;
 /**
  * 公告已读记录 服务层
  */
-public interface ISysNoticeReadService
-{
+public interface ISysNoticeReadService {
+
     /**
      * 标记已读（幂等，重复调用不报错）
      * @param noticeId 公告ID

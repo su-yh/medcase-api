@@ -7,8 +7,8 @@ import com.ruoyi.system.domain.SysOperLog;
  * 操作日志 数据层
  * 
  */
-public interface SysOperLogMapper
-{
+public interface SysOperLogMapper {
+
     /**
      * 新增操作日志
      * 

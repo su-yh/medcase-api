@@ -7,8 +7,8 @@ import com.ruoyi.system.domain.SysUserOnline;
  * 在线用户 服务层
  * 
  */
-public interface ISysUserOnlineService
-{
+public interface ISysUserOnlineService {
+
     /**
      * 通过登录地址查询信息
      * 

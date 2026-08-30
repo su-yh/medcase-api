@@ -28,15 +28,15 @@ import com.ruoyi.system.service.ISysDictTypeService;
  */
 @RestController
 @RequestMapping("/system/dict/type")
-public class SysDictTypeController extends BaseController
-{
+public class SysDictTypeController extends BaseController {
+
     @Autowired
     private ISysDictTypeService dictTypeService;
 
     @PreAuthorize("@ss.hasPermi('system:dict:list')")
     @GetMapping("/list")
-    public TableDataInfo list(SysDictType dictType)
-    {
+    public TableDataInfo list(SysDictType dictType) {
+
         startPage();
         List<SysDictType> list = dictTypeService.selectDictTypeList(dictType);
         return getDataTable(list);
@@ -45,8 +45,8 @@ public class SysDictTypeController extends BaseController
     @Log(title = "字典类型", businessType = BusinessType.EXPORT)
     @PreAuthorize("@ss.hasPermi('system:dict:export')")
     @PostMapping("/export")
-    public void export(HttpServletResponse response, SysDictType dictType)
-    {
+    public void export(HttpServletResponse response, SysDictType dictType) {
+
         List<SysDictType> list = dictTypeService.selectDictTypeList(dictType);
         ExcelUtil<SysDictType> util = new ExcelUtil<SysDictType>(SysDictType.class);
         util.exportExcel(response, list, "字典类型");
@@ -57,8 +57,8 @@ public class SysDictTypeController extends BaseController
      */
     @PreAuthorize("@ss.hasPermi('system:dict:query')")
     @GetMapping(value = "/{dictId}")
-    public R<SysDictType> getInfo(@PathVariable Long dictId)
-    {
+    public R<SysDictType> getInfo(@PathVariable Long dictId) {
+
         return R.ofSuccess(dictTypeService.selectDictTypeById(dictId));
     }
 
@@ -68,10 +68,10 @@ public class SysDictTypeController extends BaseController
     @PreAuthorize("@ss.hasPermi('system:dict:add')")
     @Log(title = "字典类型", businessType = BusinessType.INSERT)
     @PostMapping
-    public R<Void> add(@Validated @RequestBody SysDictType dict)
-    {
-        if (!dictTypeService.checkDictTypeUnique(dict))
-        {
+    public R<Void> add(@Validated @RequestBody SysDictType dict) {
+
+        if (!dictTypeService.checkDictTypeUnique(dict)) {
+
             return R.ofFail("新增字典'" + dict.getDictName() + "'失败，字典类型已存在");
         }
         dict.setCreateBy(getUsername());
@@ -84,10 +84,10 @@ public class SysDictTypeController extends BaseController
     @PreAuthorize("@ss.hasPermi('system:dict:edit')")
     @Log(title = "字典类型", businessType = BusinessType.UPDATE)
     @PutMapping
-    public R<Void> edit(@Validated @RequestBody SysDictType dict)
-    {
-        if (!dictTypeService.checkDictTypeUnique(dict))
-        {
+    public R<Void> edit(@Validated @RequestBody SysDictType dict) {
+
+        if (!dictTypeService.checkDictTypeUnique(dict)) {
+
             return R.ofFail("修改字典'" + dict.getDictName() + "'失败，字典类型已存在");
         }
         dict.setUpdateBy(getUsername());
@@ -100,8 +100,8 @@ public class SysDictTypeController extends BaseController
     @PreAuthorize("@ss.hasPermi('system:dict:remove')")
     @Log(title = "字典类型", businessType = BusinessType.DELETE)
     @DeleteMapping("/{dictIds}")
-    public R<Void> remove(@PathVariable Long[] dictIds)
-    {
+    public R<Void> remove(@PathVariable Long[] dictIds) {
+
         dictTypeService.deleteDictTypeByIds(dictIds);
         return R.ofSuccess();
     }
@@ -112,8 +112,8 @@ public class SysDictTypeController extends BaseController
     @PreAuthorize("@ss.hasPermi('system:dict:remove')")
     @Log(title = "字典类型", businessType = BusinessType.CLEAN)
     @DeleteMapping("/refreshCache")
-    public R<Void> refreshCache()
-    {
+    public R<Void> refreshCache() {
+
         dictTypeService.resetDictCache();
         return R.ofSuccess();
     }
@@ -122,8 +122,8 @@ public class SysDictTypeController extends BaseController
      * 获取字典选择框列表
      */
     @GetMapping("/optionselect")
-    public R<List<SysDictType>> optionselect()
-    {
+    public R<List<SysDictType>> optionselect() {
+
         List<SysDictType> dictTypes = dictTypeService.selectDictTypeAll();
         return R.ofSuccess(dictTypes);
     }

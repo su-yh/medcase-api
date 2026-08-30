@@ -11,8 +11,8 @@ import lombok.Getter;
  */
 @Getter
 @AllArgsConstructor
-public class UserAuthRoleResponse
-{
+public class UserAuthRoleResponse {
+
     private SysUser user;
     private List<SysRole> roles;
 }

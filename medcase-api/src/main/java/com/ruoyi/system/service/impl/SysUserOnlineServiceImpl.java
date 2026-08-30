@@ -11,8 +11,8 @@ import com.ruoyi.system.service.ISysUserOnlineService;
  * 
  */
 @Service
-public class SysUserOnlineServiceImpl implements ISysUserOnlineService
-{
+public class SysUserOnlineServiceImpl implements ISysUserOnlineService {
+
     /**
      * 通过登录地址查询信息
      * 
@@ -21,10 +21,10 @@ public class SysUserOnlineServiceImpl implements ISysUserOnlineService
      * @return 在线用户信息
      */
     @Override
-    public SysUserOnline selectOnlineByIpaddr(String ipaddr, LoginUser user)
-    {
-        if (StringUtils.equals(ipaddr, user.getIpaddr()))
-        {
+    public SysUserOnline selectOnlineByIpaddr(String ipaddr, LoginUser user) {
+
+        if (StringUtils.equals(ipaddr, user.getIpaddr())) {
+
             return loginUserToUserOnline(user);
         }
         return null;
@@ -38,10 +38,10 @@ public class SysUserOnlineServiceImpl implements ISysUserOnlineService
      * @return 在线用户信息
      */
     @Override
-    public SysUserOnline selectOnlineByUserName(String userName, LoginUser user)
-    {
-        if (StringUtils.equals(userName, user.getUsername()))
-        {
+    public SysUserOnline selectOnlineByUserName(String userName, LoginUser user) {
+
+        if (StringUtils.equals(userName, user.getUsername())) {
+
             return loginUserToUserOnline(user);
         }
         return null;
@@ -56,10 +56,10 @@ public class SysUserOnlineServiceImpl implements ISysUserOnlineService
      * @return 在线用户信息
      */
     @Override
-    public SysUserOnline selectOnlineByInfo(String ipaddr, String userName, LoginUser user)
-    {
-        if (StringUtils.equals(ipaddr, user.getIpaddr()) && StringUtils.equals(userName, user.getUsername()))
-        {
+    public SysUserOnline selectOnlineByInfo(String ipaddr, String userName, LoginUser user) {
+
+        if (StringUtils.equals(ipaddr, user.getIpaddr()) && StringUtils.equals(userName, user.getUsername())) {
+
             return loginUserToUserOnline(user);
         }
         return null;
@@ -72,10 +72,10 @@ public class SysUserOnlineServiceImpl implements ISysUserOnlineService
      * @return 在线用户
      */
     @Override
-    public SysUserOnline loginUserToUserOnline(LoginUser user)
-    {
-        if (StringUtils.isNull(user) || StringUtils.isNull(user.getUser()))
-        {
+    public SysUserOnline loginUserToUserOnline(LoginUser user) {
+
+        if (StringUtils.isNull(user) || StringUtils.isNull(user.getUser())) {
+
             return null;
         }
         SysUserOnline sysUserOnline = new SysUserOnline();
@@ -86,8 +86,8 @@ public class SysUserOnlineServiceImpl implements ISysUserOnlineService
         sysUserOnline.setBrowser(user.getBrowser());
         sysUserOnline.setOs(user.getOs());
         sysUserOnline.setLoginTime(user.getLoginTime());
-        if (StringUtils.isNotNull(user.getUser().getDept()))
-        {
+        if (StringUtils.isNotNull(user.getUser().getDept())) {
+
             sysUserOnline.setDeptName(user.getUser().getDept().getDeptName());
         }
         return sysUserOnline;

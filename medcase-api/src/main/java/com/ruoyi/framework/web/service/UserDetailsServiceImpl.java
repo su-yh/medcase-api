@@ -21,8 +21,8 @@ import org.springframework.stereotype.Service;
  *
  */
 @Service
-public class UserDetailsServiceImpl implements UserDetailsService
-{
+public class UserDetailsServiceImpl implements UserDetailsService {
+
     private static final Logger log = LoggerFactory.getLogger(UserDetailsServiceImpl.class);
 
     @Autowired
@@ -32,21 +32,21 @@ public class UserDetailsServiceImpl implements UserDetailsService
     private SysPermissionService permissionService;
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException
-    {
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+
         SysUser user = userService.selectUserByUserName(username, UserTypeEnums.ADMIN.getCode());
-        if (StringUtils.isNull(user))
-        {
+        if (StringUtils.isNull(user)) {
+
             log.info("登录用户：{} 不存在.", username);
             throw ExceptionUtil.business(ErrorCodeEnums.ADMIN_LOGIN_FAILED);
         }
-        else if (Boolean.TRUE.equals(user.getDelFlag()))
-        {
+        else if (Boolean.TRUE.equals(user.getDelFlag())) {
+
             log.info("登录用户：{} 已被删除.", username);
             throw ExceptionUtil.business(ErrorCodeEnums.USER_DELETED);
         }
-        else if (UserStatusEnums.DISABLE.getCode().equals(user.getStatus()))
-        {
+        else if (UserStatusEnums.DISABLE.getCode().equals(user.getStatus())) {
+
             log.info("登录用户：{} 已被停用.", username);
             throw ExceptionUtil.business(ErrorCodeEnums.USER_BLOCKED);
         }
@@ -54,8 +54,8 @@ public class UserDetailsServiceImpl implements UserDetailsService
         return createLoginUser(user);
     }
 
-    public UserDetails createLoginUser(SysUser user)
-    {
+    public UserDetails createLoginUser(SysUser user) {
+
         return new LoginUser(user.getUserId(), user.getDeptId(), user, permissionService.getMenuPermission(user));
     }
 }

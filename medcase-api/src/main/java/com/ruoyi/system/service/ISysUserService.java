@@ -9,8 +9,8 @@ import com.ruoyi.storage.pojo.FileAttachment;
  * 用户 业务层
  * 
  */
-public interface ISysUserService
-{
+public interface ISysUserService {
+
     /**
      * 根据条件分页查询用户列表
      * 

@@ -7,25 +7,25 @@ import java.util.Set;
  * 排除JSON敏感属性
  * 
  */
-public class PropertyPreExcludeFilter
-{
+public class PropertyPreExcludeFilter {
+
     private final Set<String> excludes = new LinkedHashSet<>();
 
-    public PropertyPreExcludeFilter()
-    {
+    public PropertyPreExcludeFilter() {
+
     }
 
-    public PropertyPreExcludeFilter addExcludes(String... filters)
-    {
-        for (int i = 0; i < filters.length; i++)
-        {
+    public PropertyPreExcludeFilter addExcludes(String... filters) {
+
+        for (int i = 0; i < filters.length; i++) {
+
             this.excludes.add(filters[i]);
         }
         return this;
     }
 
-    public Set<String> getExcludes()
-    {
+    public Set<String> getExcludes() {
+
         return excludes;
     }
 }

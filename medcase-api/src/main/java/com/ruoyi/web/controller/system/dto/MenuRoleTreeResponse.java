@@ -10,8 +10,8 @@ import lombok.Getter;
  */
 @Getter
 @AllArgsConstructor
-public class MenuRoleTreeResponse
-{
+public class MenuRoleTreeResponse {
+
     private List<Long> checkedKeys;
     private List<TreeSelect> menus;
 }

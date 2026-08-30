@@ -4,8 +4,8 @@ package com.ruoyi.common.constant;
  * 用户常量信息
  * 
  */
-public class UserConstants
-{
+public class UserConstants {
+
     /**
      * 平台内系统用户的唯一标志
      */
