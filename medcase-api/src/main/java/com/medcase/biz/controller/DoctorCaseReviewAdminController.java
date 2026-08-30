@@ -39,13 +39,13 @@ public class DoctorCaseReviewAdminController {
         return doctorCaseReviewService.page(pageNum, pageSize, query);
     }
 
-    @PreAuthorize("@ss.hasPermi('case:review:list')")
+    @PreAuthorize("@ss.hasPermi('case:review:query')")
     @GetMapping("/{id}")
     public DoctorCaseReviewVO getInfo(@PathVariable Long id) {
         return doctorCaseReviewService.detail(id);
     }
 
-    @PreAuthorize("@ss.hasPermi('case:review:list')")
+    @PreAuthorize("@ss.hasPermi('case:review:review')")
     @PostMapping("/{id}/review")
     public void review(
             @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser adminUser,
@@ -54,7 +54,7 @@ public class DoctorCaseReviewAdminController {
         doctorCaseReviewService.review(id, request, adminUser);
     }
 
-    @PreAuthorize("@ss.hasPermi('case:review:list')")
+    @PreAuthorize("@ss.hasPermi('case:review:settle')")
     @PostMapping("/{id}/settle")
     public void settle(
             @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser adminUser,
