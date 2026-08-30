@@ -15,4 +15,11 @@ class BaseControllerTest {
         assertFalse(java.util.Arrays.stream(BaseController.class.getDeclaredMethods())
                 .anyMatch(method -> responseFactoryMethods.contains(method.getName())));
     }
+
+    @Test
+    void shouldNotExposePageResultFactoryMethod() {
+
+        assertFalse(java.util.Arrays.stream(BaseController.class.getDeclaredMethods())
+                .anyMatch(method -> method.getName().equals("getPageResult")));
+    }
 }

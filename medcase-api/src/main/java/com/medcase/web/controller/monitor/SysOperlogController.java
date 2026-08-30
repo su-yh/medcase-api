@@ -1,6 +1,7 @@
 package com.medcase.web.controller.monitor;
 
 import java.util.List;
+import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -34,7 +35,7 @@ public class SysOperlogController extends BaseController {
 
         startPage();
         List<SysOperLog> list = operLogService.selectOperLogList(operLog);
-        return getPageResult(list);
+        return new PageResult<>(list, new PageInfo<>(list).getTotal());
     }
 
     @Log(title = "操作日志", businessType = BusinessType.DELETE)

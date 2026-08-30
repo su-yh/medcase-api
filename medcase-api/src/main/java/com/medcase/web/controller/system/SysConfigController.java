@@ -3,6 +3,7 @@ package com.medcase.web.controller.system;
 import com.medcase.common.annotation.Log;
 import com.medcase.common.core.controller.BaseController;
 import com.medcase.common.enums.BusinessType;
+import com.github.pagehelper.PageInfo;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
 import com.medcase.mp.mybatis.PageResult;
@@ -42,7 +43,7 @@ public class SysConfigController extends BaseController {
 
         startPage();
         List<SysConfig> list = configService.selectConfigList(config);
-        return getPageResult(list);
+        return new PageResult<>(list, new PageInfo<>(list).getTotal());
     }
 
     /**

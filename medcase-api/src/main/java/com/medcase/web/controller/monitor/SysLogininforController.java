@@ -1,5 +1,6 @@
 package com.medcase.web.controller.monitor;
 
+import com.github.pagehelper.PageInfo;
 import com.medcase.common.annotation.Log;
 import com.medcase.common.core.controller.BaseController;
 import com.medcase.common.enums.BusinessType;
@@ -39,7 +40,7 @@ public class SysLogininforController extends BaseController {
 
         startPage();
         List<SysLogininfor> list = logininforService.selectLogininforList(logininfor);
-        return getPageResult(list);
+        return new PageResult<>(list, new PageInfo<>(list).getTotal());
     }
 
     @PreAuthorize("@ss.hasPermi('monitor:logininfor:remove')")

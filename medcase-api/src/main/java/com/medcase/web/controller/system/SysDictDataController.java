@@ -2,6 +2,7 @@ package com.medcase.web.controller.system;
 
 import java.util.ArrayList;
 import java.util.List;
+import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -44,7 +45,7 @@ public class SysDictDataController extends BaseController {
 
         startPage();
         List<SysDictData> list = dictDataService.selectDictDataList(dictData);
-        return getPageResult(list);
+        return new PageResult<>(list, new PageInfo<>(list).getTotal());
     }
 
     /**

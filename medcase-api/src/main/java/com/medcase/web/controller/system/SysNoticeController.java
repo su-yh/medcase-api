@@ -1,6 +1,7 @@
 package com.medcase.web.controller.system;
 
 import java.util.List;
+import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -48,7 +49,7 @@ public class SysNoticeController extends BaseController {
 
         startPage();
         List<SysNotice> list = noticeService.selectNoticeList(notice);
-        return getPageResult(list);
+        return new PageResult<>(list, new PageInfo<>(list).getTotal());
     }
 
     /**
@@ -134,7 +135,7 @@ public class SysNoticeController extends BaseController {
 
         startPage();
         List<?> list = noticeReadService.selectReadUsersByNoticeId(noticeId, searchValue);
-        return getPageResult(list);
+        return new PageResult<>(list, new PageInfo<>(list).getTotal());
     }
 
     /**
