@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import com.medcase.common.constant.Constants;
-import com.medcase.common.core.domain.R;
+import com.medcase.mvc.response.R;
 import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.common.utils.MessageUtils;
 import com.medcase.common.utils.ServletUtils;

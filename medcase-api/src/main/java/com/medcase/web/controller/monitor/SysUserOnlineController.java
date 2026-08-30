@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.medcase.common.annotation.Log;
 import com.medcase.common.constant.CacheConstants;
 import com.medcase.common.core.controller.BaseController;
-import com.medcase.common.core.domain.R;
+import com.medcase.mvc.response.R;
 import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.common.core.page.TableDataInfo;
 import com.medcase.common.core.redis.RedisCache;

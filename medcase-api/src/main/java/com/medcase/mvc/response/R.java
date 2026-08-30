@@ -1,11 +1,10 @@
-package com.medcase.common.core.domain;
+package com.medcase.mvc.response;
 
 import com.medcase.common.constant.HttpStatus;
 import lombok.Getter;
 
 /**
  * 统一接口响应对象。
- * TODO: suyh - 把excelExport 处理好了，这个类要迁移一下了。
  *
  * @param <T> 响应数据类型
  */

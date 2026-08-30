@@ -2,7 +2,7 @@ package com.medcase.mvc.response.wrapper;
 
 import com.medcase.common.utils.json.JsonUtils;
 import com.medcase.mvc.response.annotation.WrapperResponseAdvice;
-import com.medcase.common.core.domain.R;
+import com.medcase.mvc.response.R;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.MediaType;

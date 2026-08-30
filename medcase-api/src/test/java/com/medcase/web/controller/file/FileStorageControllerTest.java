@@ -1,6 +1,6 @@
 package com.medcase.web.controller.file;
 
-import com.medcase.common.core.domain.R;
+import com.medcase.mvc.response.R;
 import com.medcase.common.core.domain.entity.SysUser;
 import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.common.enums.UserTypeEnums;

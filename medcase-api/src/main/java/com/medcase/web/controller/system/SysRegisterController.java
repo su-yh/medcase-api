@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import com.medcase.common.annotation.Anonymous;
 import com.medcase.common.core.controller.BaseController;
-import com.medcase.common.core.domain.R;
+import com.medcase.mvc.response.R;
 import com.medcase.common.core.domain.model.RegisterBody;
 import com.medcase.common.utils.StringUtils;
 import com.medcase.framework.web.service.SysRegisterService;

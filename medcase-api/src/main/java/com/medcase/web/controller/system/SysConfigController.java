@@ -1,6 +1,12 @@
 package com.medcase.web.controller.system;
 
-import java.util.List;
+import com.medcase.common.annotation.Log;
+import com.medcase.common.core.controller.BaseController;
+import com.medcase.common.core.page.TableDataInfo;
+import com.medcase.common.enums.BusinessType;
+import com.medcase.mvc.response.R;
+import com.medcase.system.domain.SysConfig;
+import com.medcase.system.service.ISysConfigService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -12,13 +18,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import com.medcase.common.annotation.Log;
-import com.medcase.common.core.controller.BaseController;
-import com.medcase.common.core.domain.R;
-import com.medcase.common.core.page.TableDataInfo;
-import com.medcase.common.enums.BusinessType;
-import com.medcase.system.domain.SysConfig;
-import com.medcase.system.service.ISysConfigService;
+
+import java.util.List;
 
 /**
  * 参数配置 信息操作处理

@@ -4,7 +4,7 @@ import com.google.code.kaptcha.Producer;
 import com.medcase.common.annotation.Anonymous;
 import com.medcase.common.constant.CacheConstants;
 import com.medcase.common.constant.Constants;
-import com.medcase.common.core.domain.R;
+import com.medcase.mvc.response.R;
 import com.medcase.common.core.redis.RedisCache;
 import com.medcase.common.utils.sign.Base64;
 import com.medcase.common.utils.uuid.IdUtils;

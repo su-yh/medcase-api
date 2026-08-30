@@ -1,7 +1,7 @@
 package com.medcase.web.controller.file;
 
 import com.medcase.common.annotation.Anonymous;
-import com.medcase.common.core.domain.R;
+import com.medcase.mvc.response.R;
 import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.common.enums.UserTypeEnums;
 import com.medcase.mvc.authentication.annotation.CurrLoginUser;

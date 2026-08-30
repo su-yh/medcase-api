@@ -12,7 +12,7 @@ import com.medcase.common.utils.StringUtils;
 import com.medcase.framework.web.service.SysLoginService;
 import com.medcase.framework.web.service.SysPermissionService;
 import com.medcase.framework.web.service.TokenService;
-import com.medcase.common.core.domain.R;
+import com.medcase.mvc.response.R;
 import com.medcase.system.domain.vo.RouterVo;
 import com.medcase.system.service.ISysConfigService;
 import com.medcase.system.service.ISysMenuService;

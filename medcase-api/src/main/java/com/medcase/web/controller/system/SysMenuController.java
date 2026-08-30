@@ -17,7 +17,7 @@ import com.medcase.common.annotation.Log;
 import com.medcase.common.constant.HttpStatus;
 import com.medcase.common.constant.UserConstants;
 import com.medcase.common.core.controller.BaseController;
-import com.medcase.common.core.domain.R;
+import com.medcase.mvc.response.R;
 import com.medcase.common.core.domain.entity.SysMenu;
 import com.medcase.common.core.domain.TreeSelect;
 import com.medcase.web.controller.system.dto.MenuRoleTreeResponse;
