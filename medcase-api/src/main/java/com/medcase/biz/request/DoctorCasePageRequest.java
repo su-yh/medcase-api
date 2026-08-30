@@ -14,7 +14,7 @@ import java.util.Date;
  */
 @Data
 public class DoctorCasePageRequest {
-    private String titleLike;
+    private String caseNameLike;
 
     private DoctorCaseStatusEnums status;
 

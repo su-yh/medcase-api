@@ -19,9 +19,9 @@ public class DoctorCaseVO {
 
     private String doctorNickname;
 
-    private String title;
+    private String caseName;
 
-    private String remark;
+    private String content;
 
     private List<FileAttachment> attachments;
 
@@ -45,8 +45,8 @@ public class DoctorCaseVO {
         DoctorCaseVO result = new DoctorCaseVO();
         result.setId(entity.getId());
         result.setDoctorNickname(entity.getDoctorNickname());
-        result.setTitle(entity.getTitle());
-        result.setRemark(entity.getRemark());
+        result.setCaseName(entity.getCaseName());
+        result.setContent(entity.getContent());
         result.setAttachments(entity.getAttachments());
         result.setStatus(entity.getStatus());
         result.setStatusDesc(entity.getStatus() == null ? null : entity.getStatus().getDesc());

@@ -43,14 +43,15 @@ class DoctorCaseReviewServiceTest {
     void pageBuildsAdminPageParametersAndMapsCaseFields() {
         DoctorCaseReviewQuery query = new DoctorCaseReviewQuery();
         query.setId(42L);
-        query.setTitle("高血压");
+        query.setCaseName("高血压");
         query.setStatus(DoctorCaseStatusEnums.PENDING_REVIEW);
 
         DoctorCaseEntity entity = new DoctorCaseEntity();
         entity.setId(42L);
         entity.setDoctorId(12L);
         entity.setDoctorNickname("张医生");
-        entity.setTitle("高血压病例");
+        entity.setCaseName("高血压病例");
+        entity.setContent("病例内容");
         entity.setStatus(DoctorCaseStatusEnums.PENDING_REVIEW);
         when(doctorCaseAdminMapper.selectAdminCasePage(any(PageParam.class), any(DoctorCaseReviewQuery.class)))
                 .thenReturn(new PageResult<>(List.of(entity), 1L));
@@ -64,6 +65,8 @@ class DoctorCaseReviewServiceTest {
         assertEquals(1L, result.getTotal());
         assertEquals(42L, result.getList().get(0).getId());
         assertEquals("张医生", result.getList().get(0).getDoctorName());
+        assertEquals("高血压病例", result.getList().get(0).getCaseName());
+        assertEquals("病例内容", result.getList().get(0).getContent());
         assertEquals("待审核", result.getList().get(0).getStatusDesc());
     }
 

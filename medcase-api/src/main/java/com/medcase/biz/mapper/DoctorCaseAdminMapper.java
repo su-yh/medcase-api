@@ -18,9 +18,9 @@ public interface DoctorCaseAdminMapper extends BaseMapperX<DoctorCaseEntity> {
     default PageResult<DoctorCaseEntity> selectAdminCasePage(
             PageParam pageParam, DoctorCaseReviewQuery query) {
         LambdaQueryWrapperX<DoctorCaseEntity> queryWrapper = build();
-        queryWrapper.eqIfPresent(DoctorCaseEntity::getId, query == null ? null : query.getId());
-        queryWrapper.likeIfPresent(DoctorCaseEntity::getTitle, query == null ? null : query.getTitle());
-        queryWrapper.eqIfPresent(DoctorCaseEntity::getStatus, query == null ? null : query.getStatus());
+        queryWrapper.eqIfPresent(DoctorCaseEntity::getId, query.getId());
+        queryWrapper.likeIfPresent(DoctorCaseEntity::getCaseName, query.getCaseName());
+        queryWrapper.eqIfPresent(DoctorCaseEntity::getStatus, query.getStatus());
         queryWrapper.orderByDesc(DoctorCaseEntity::getCreateTime);
         return selectPage(pageParam, queryWrapper);
     }

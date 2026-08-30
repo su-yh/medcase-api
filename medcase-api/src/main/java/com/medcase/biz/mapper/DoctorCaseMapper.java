@@ -19,7 +19,7 @@ public interface DoctorCaseMapper extends BaseMapperX<DoctorCaseEntity> {
             PageParam pageParam, Long doctorId, DoctorCasePageRequest request) {
         LambdaQueryWrapperX<DoctorCaseEntity> queryWrapper = build();
         queryWrapper.eq(DoctorCaseEntity::getDoctorId, doctorId);
-        queryWrapper.likeIfPresent(DoctorCaseEntity::getTitle, request.getTitleLike());
+        queryWrapper.likeIfPresent(DoctorCaseEntity::getCaseName, request.getCaseNameLike());
         queryWrapper.eqIfPresent(DoctorCaseEntity::getStatus, request.getStatus());
         queryWrapper.geIfPresent(DoctorCaseEntity::getCreateTime, request.getCreateTimeLowerBound());
         queryWrapper.ltIfPresent(DoctorCaseEntity::getCreateTime, request.getCreateTimeUpperBound());

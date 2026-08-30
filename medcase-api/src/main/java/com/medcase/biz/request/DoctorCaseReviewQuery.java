@@ -12,7 +12,7 @@ import lombok.Data;
 public class DoctorCaseReviewQuery {
     private Long id;
 
-    private String title;
+    private String caseName;
 
     private DoctorCaseStatusEnums status;
 }

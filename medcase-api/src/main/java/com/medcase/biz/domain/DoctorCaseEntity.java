@@ -29,9 +29,9 @@ public class DoctorCaseEntity extends AbstractBaseEntity {
 
     private String doctorNickname;
 
-    private String title;
+    private String caseName;
 
-    private String remark;
+    private String content;
 
     @TableField(value = "attachments", typeHandler = JacksonTypeHandler.class)
     private List<FileAttachment> attachments;

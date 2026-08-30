@@ -65,8 +65,8 @@ public class DoctorCaseService {
             entity.setId(request.getId());
         }
 
-        entity.setTitle(request.getTitle());
-        entity.setRemark(request.getRemark());
+        entity.setCaseName(request.getCaseName());
+        entity.setContent(request.getContent());
         entity.setAttachments(request.getAttachments());
         entity.setStatus(status);
 

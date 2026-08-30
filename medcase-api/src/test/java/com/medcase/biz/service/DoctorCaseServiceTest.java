@@ -56,6 +56,8 @@ class DoctorCaseServiceTest {
         DoctorCaseEntity entity = captor.getValue();
         assertEquals(12L, entity.getDoctorId());
         assertEquals("doctor12", entity.getDoctorNickname());
+        assertEquals("病例", entity.getCaseName());
+        assertEquals("病例内容", entity.getContent());
         assertEquals(DoctorCaseStatusEnums.PENDING_REVIEW, entity.getStatus());
     }
 
@@ -196,7 +198,8 @@ class DoctorCaseServiceTest {
     private DoctorCaseSubmitRequest submitRequest(Long id) {
         DoctorCaseSubmitRequest request = new DoctorCaseSubmitRequest();
         request.setId(id);
-        request.setTitle("病例");
+        request.setCaseName("病例");
+        request.setContent("病例内容");
         return request;
     }
 

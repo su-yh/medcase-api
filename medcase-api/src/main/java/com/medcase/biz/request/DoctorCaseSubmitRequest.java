@@ -14,9 +14,9 @@ import java.util.List;
 public class DoctorCaseSubmitRequest {
     private Long id;
 
-    private String title;
+    private String caseName;
 
-    private String remark;
+    private String content;
 
     private List<FileAttachment> attachments;
 }
