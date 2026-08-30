@@ -2,7 +2,9 @@ package com.ruoyi.biz.controller;
 
 import com.ruoyi.biz.request.DoctorLoginRequest;
 import com.ruoyi.biz.request.DoctorRegisterRequest;
+import com.ruoyi.biz.request.DoctorRegisterSmsCodeRequest;
 import com.ruoyi.biz.service.DoctorAuthService;
+import com.ruoyi.biz.service.DoctorRegisterSmsCodeService;
 import com.ruoyi.common.annotation.Anonymous;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.domain.model.LoginUser;
@@ -29,10 +31,13 @@ class DoctorAuthPortalControllerTest {
     @Mock
     private DoctorAuthService doctorAuthService;
 
+    @Mock
+    private DoctorRegisterSmsCodeService smsCodeService;
+
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        doctorController = new DoctorAuthPortalController(doctorAuthService);
+        doctorController = new DoctorAuthPortalController(doctorAuthService, smsCodeService);
     }
 
     @Test
@@ -63,6 +68,16 @@ class DoctorAuthPortalControllerTest {
     }
 
     @Test
+    void sendRegisterSmsCodeDelegatesToService() {
+        DoctorRegisterSmsCodeRequest request = new DoctorRegisterSmsCodeRequest();
+        request.setPhone("13800000000");
+
+        doctorController.sendRegisterSmsCode(request);
+
+        verify(smsCodeService).sendCode("13800000000");
+    }
+
+    @Test
     void logoutDelegatesCurrentDoctorToService() {
         LoginUser doctorUser = doctorLoginUser();
 
@@ -88,8 +103,15 @@ class DoctorAuthPortalControllerTest {
         assertArrayEquals(new RequestMethod[] {RequestMethod.POST},
                 DoctorAuthPortalController.class.getMethod("register", DoctorRegisterRequest.class)
                         .getAnnotation(RequestMapping.class).method());
+        assertArrayEquals(new RequestMethod[] {RequestMethod.POST},
+                DoctorAuthPortalController.class.getMethod(
+                                "sendRegisterSmsCode", DoctorRegisterSmsCodeRequest.class)
+                        .getAnnotation(RequestMapping.class).method());
         assertNotNull(DoctorAuthPortalController.class.getMethod("login", DoctorLoginRequest.class).getAnnotation(Anonymous.class));
         assertNotNull(DoctorAuthPortalController.class.getMethod("register", DoctorRegisterRequest.class).getAnnotation(Anonymous.class));
+        assertNotNull(DoctorAuthPortalController.class.getMethod(
+                        "sendRegisterSmsCode", DoctorRegisterSmsCodeRequest.class)
+                .getAnnotation(Anonymous.class));
     }
 
     @Test

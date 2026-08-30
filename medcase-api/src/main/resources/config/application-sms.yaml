@@ -1,0 +1,8 @@
+sms:
+  aliyun:
+    enabled: true
+    endpoint: dysmsapi.aliyuncs.com
+    access-key-id: ${ALIBABA_CLOUD_ACCESS_KEY_ID:}
+    access-key-secret: ${ALIBABA_CLOUD_ACCESS_KEY_SECRET:}
+    sign-name: ${ALIYUN_SMS_SIGN_NAME:}
+    template-code: ${ALIYUN_SMS_TEMPLATE_CODE:}

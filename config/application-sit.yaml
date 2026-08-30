@@ -39,3 +39,9 @@ spring:
 
 
 
+sms:
+  aliyun:
+    enabled: false
+
+
+

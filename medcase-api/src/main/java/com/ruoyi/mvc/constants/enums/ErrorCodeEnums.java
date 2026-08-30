@@ -56,7 +56,17 @@ public enum ErrorCodeEnums implements IErrorCode {
     DOCTOR_REGISTER_USER_EXISTS("error.code.doctor.register.user.exists", "注册失败，\"{0}\"已存在"),
     DOCTOR_REGISTER_FAILED("error.code.doctor.register.failed", "医生注册失败，请联系系统管理人员"),
     DOCTOR_REGISTER_PHONE_EMPTY("error.code.doctor.register.phone.empty", "医生注册手机号不能为空"),
+    DOCTOR_REGISTER_PHONE_INVALID("error.code.doctor.register.phone.invalid", "医生注册手机号格式不正确"),
     DOCTOR_REGISTER_PHONE_EXISTS("error.code.doctor.register.phone.exists", "注册失败，手机号已被其他医生使用"),
+    DOCTOR_REGISTER_SMS_CODE_EMPTY("error.code.doctor.register.sms.code.empty", "短信验证码不能为空"),
+    DOCTOR_REGISTER_SMS_CODE_INVALID("error.code.doctor.register.sms.code.invalid", "短信验证码错误"),
+    DOCTOR_REGISTER_SMS_CODE_EXPIRED("error.code.doctor.register.sms.code.expired", "短信验证码已失效"),
+    DOCTOR_REGISTER_SMS_CODE_SEND_TOO_FREQUENT(
+            "error.code.doctor.register.sms.code.send.too.frequent", "验证码发送过于频繁，请稍后再试"),
+    DOCTOR_REGISTER_SMS_CONFIG_MISSING(
+            "error.code.doctor.register.sms.config.missing", "短信服务配置缺失，请联系系统管理员"),
+    DOCTOR_REGISTER_SMS_SEND_FAILED(
+            "error.code.doctor.register.sms.send.failed", "短信验证码发送失败，请稍后重试"),
     DOCTOR_REGISTER_NICKNAME_EMPTY("error.code.doctor.register.nickname.empty", "医生姓名不能为空"),
     DOCTOR_REGISTER_SEX_EMPTY("error.code.doctor.register.sex.empty", "性别不能为空"),
     DOCTOR_REGISTER_ID_CARD_NUMBER_EMPTY("error.code.doctor.register.id.card.number.empty", "身份证号码不能为空"),

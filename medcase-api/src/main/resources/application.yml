@@ -14,6 +14,7 @@ spring:
       - classpath:config/application-ruoyi.yaml
       - classpath:config/application-server.yaml
       - classpath:config/application-servlet.yaml
+      - classpath:config/application-sms.yaml
       - classpath:config/application-token.yaml
       - classpath:config/application-user.yaml
       - classpath:config/application-xss.yaml

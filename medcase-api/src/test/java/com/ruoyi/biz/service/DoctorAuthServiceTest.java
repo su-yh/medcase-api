@@ -51,11 +51,14 @@ class DoctorAuthServiceTest {
     @Mock
     private com.ruoyi.framework.web.service.TokenService tokenService;
 
+    @Mock
+    private DoctorRegisterSmsCodeService smsCodeService;
+
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
         doctorAuthService = new DoctorAuthService(
-                doctorUserMapper, loginService, permissionService, tokenService);
+                doctorUserMapper, loginService, permissionService, tokenService, smsCodeService);
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.setRemoteAddr("127.0.0.1");
         RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
@@ -90,6 +93,7 @@ class DoctorAuthServiceTest {
         assertNotNull(user.getPwdUpdateDate());
         assertTrue(SecurityUtils.matchesPassword("secret123", user.getPassword()));
         verify(doctorUserMapper).usernameExists("doctor01");
+        verify(smsCodeService).verifyCode("13800000000", "123456");
     }
 
     @Test
@@ -453,6 +457,7 @@ class DoctorAuthServiceTest {
         registerRequest.setPassword(password);
         registerRequest.setPhone(phone);
         registerRequest.setInviteCode(inviteCode);
+        registerRequest.setSmsCode("123456");
         registerRequest.setNickName("张医生");
         registerRequest.setSex("1");
         registerRequest.setIdCardNumber("110101199001011234");

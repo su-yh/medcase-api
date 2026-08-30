@@ -31,6 +31,7 @@
         <jwt.version>0.9.1</jwt.version>
         <jaxb-api.version>2.3.1</jaxb-api.version>
         <minio.version>8.5.17</minio.version>
+        <aliyun-sms.version>4.6.0</aliyun-sms.version>
     </properties>
 
     <dependencies>
@@ -221,6 +222,13 @@
             <groupId>io.minio</groupId>
             <artifactId>minio</artifactId>
             <version>${minio.version}</version>
+        </dependency>
+
+        <!-- 阿里云短信 -->
+        <dependency>
+            <groupId>com.aliyun</groupId>
+            <artifactId>dysmsapi20170525</artifactId>
+            <version>${aliyun-sms.version}</version>
         </dependency>
 
         <!-- 单元测试 -->

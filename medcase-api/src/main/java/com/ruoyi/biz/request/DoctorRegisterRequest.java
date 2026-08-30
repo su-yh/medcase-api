@@ -17,6 +17,8 @@ public class DoctorRegisterRequest {
 
     private String phone;
 
+    private String smsCode;
+
     private String nickName;
 
     private String sex;

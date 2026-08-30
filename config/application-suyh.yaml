@@ -49,5 +49,7 @@ spring:
       # 密码
       password: root
 
-
+sms:
+  aliyun:
+    enabled: false
 

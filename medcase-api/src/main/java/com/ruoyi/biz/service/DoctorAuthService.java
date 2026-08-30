@@ -43,6 +43,8 @@ public class DoctorAuthService {
 
     private final TokenService tokenService;
 
+    private final DoctorRegisterSmsCodeService smsCodeService;
+
     @Transactional(rollbackFor = Exception.class)
     public void register(DoctorRegisterRequest registerBody) {
         String username = registerBody.getUsername();
@@ -56,6 +58,8 @@ public class DoctorAuthService {
             throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_REGISTER_PASSWORD_EMPTY);
         } else if (!StringUtils.hasText(phone)) {
             throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_REGISTER_PHONE_EMPTY);
+        } else if (!StringUtils.hasText(registerBody.getSmsCode())) {
+            throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_REGISTER_SMS_CODE_EMPTY);
         } else if (!StringUtils.hasText(registerBody.getNickName())) {
             throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_REGISTER_NICKNAME_EMPTY);
         } else if (!StringUtils.hasText(registerBody.getSex())) {
@@ -88,6 +92,8 @@ public class DoctorAuthService {
         if (doctorUserMapper.phoneExists(phone)) {
             throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_REGISTER_PHONE_EXISTS);
         }
+        smsCodeService.verifyCode(phone, registerBody.getSmsCode());
+
         DoctorUserEntity user = new DoctorUserEntity();
         user.setUserName(username);
         user.setUserType(UserTypeEnums.DOCTOR);
