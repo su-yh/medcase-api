@@ -8,8 +8,6 @@ import java.io.IOException;
 
 /**
  * 本地文件路径工具类。
- *
- * @author ruoyi
  */
 public class FileUploadUtils
 {

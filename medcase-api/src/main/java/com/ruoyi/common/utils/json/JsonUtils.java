@@ -16,8 +16,6 @@ import tools.jackson.databind.type.CollectionType;
 
 /**
  * Jackson JSON工具类
- *
- * @author ruoyi
  */
 public final class JsonUtils
 {

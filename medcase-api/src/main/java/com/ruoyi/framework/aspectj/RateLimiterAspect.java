@@ -24,7 +24,6 @@ import com.ruoyi.mvc.exception.ExceptionUtil;
 /**
  * 限流处理
  *
- * @author ruoyi
  */
 @Aspect
 @Component

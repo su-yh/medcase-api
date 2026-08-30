@@ -26,7 +26,6 @@ import com.ruoyi.web.controller.monitor.dto.CacheInfoResponse;
 /**
  * 缓存监控
  * 
- * @author ruoyi
  */
 @RestController
 @RequestMapping("/monitor/cache")

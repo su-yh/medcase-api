@@ -19,7 +19,6 @@ import com.ruoyi.mvc.exception.ExceptionUtil;
 /**
  * 参数配置 服务层实现
  * 
- * @author ruoyi
  */
 @Service
 public class SysConfigServiceImpl implements ISysConfigService

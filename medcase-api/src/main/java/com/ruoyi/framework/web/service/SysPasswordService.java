@@ -11,8 +11,6 @@ import com.ruoyi.mvc.exception.ExceptionUtil;
 
 /**
  * 登录密码方法
- * 
- * @author ruoyi
  */
 @Component
 public class SysPasswordService

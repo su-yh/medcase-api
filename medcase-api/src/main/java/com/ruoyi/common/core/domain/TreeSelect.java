@@ -12,7 +12,6 @@ import com.ruoyi.common.utils.StringUtils;
 /**
  * Treeselect树结构实体类
  * 
- * @author ruoyi
  */
 public class TreeSelect implements Serializable
 {

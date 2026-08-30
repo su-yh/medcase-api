@@ -18,8 +18,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 /**
  * spring security配置
- *
- * @author ruoyi
  */
 @EnableMethodSecurity(prePostEnabled = true, securedEnabled = true)
 @Configuration

@@ -31,7 +31,6 @@ import java.util.Set;
 /**
  * 登录验证
  * 
- * @author ruoyi
  */
 @RestController
 public class SysLoginController
@@ -53,7 +52,6 @@ public class SysLoginController
 
     /**
      * 登录方法
-     * 
      * @param loginBody 登录信息
      * @return 结果
      */

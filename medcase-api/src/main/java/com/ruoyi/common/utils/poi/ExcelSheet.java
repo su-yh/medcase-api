@@ -5,7 +5,6 @@ import java.util.List;
 
 /**
  * 多 Sheet 导出时的数据信息
- *
  * 使用示例：
  * <pre>
  *   List<ExcelSheet<?>> sheets = new ArrayList<>();
@@ -13,8 +12,6 @@ import java.util.List;
  *   sheets.add(new ExcelSheet<>("岗位数据", postList, Post.class, "岗位信息"));
  *   return ExcelUtil.exportMultiSheet(sheets);
  * </pre>
- * 
- * @author ruoyi
  */
 public class ExcelSheet<T>
 {

@@ -27,7 +27,6 @@ import com.ruoyi.web.controller.system.dto.NoticeTopResponse;
 /**
  * 公告 信息操作处理
  * 
- * @author ruoyi
  */
 @RestController
 @RequestMapping("/system/notice")

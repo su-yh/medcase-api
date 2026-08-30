@@ -9,8 +9,6 @@ import com.ruoyi.common.utils.json.JsonUtils;
 
 /**
  * 获取地址类
- *
- * @author ruoyi
  */
 public class AddressUtils
 {

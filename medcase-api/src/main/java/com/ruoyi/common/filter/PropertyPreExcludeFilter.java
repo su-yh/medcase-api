@@ -6,7 +6,6 @@ import java.util.Set;
 /**
  * 排除JSON敏感属性
  * 
- * @author ruoyi
  */
 public class PropertyPreExcludeFilter
 {

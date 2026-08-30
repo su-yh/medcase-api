@@ -8,8 +8,6 @@ import nl.basjes.parse.useragent.UserAgentAnalyzer;
 
 /**
  * UserAgent解析工具类
- * 
- * @author ruoyi
  */
 public class UserAgentUtils
 {

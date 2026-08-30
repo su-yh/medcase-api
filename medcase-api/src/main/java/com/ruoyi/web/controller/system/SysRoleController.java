@@ -33,7 +33,6 @@ import com.ruoyi.web.controller.system.dto.RoleDeptTreeResponse;
 /**
  * 角色信息
  * 
- * @author ruoyi
  */
 @RestController
 @RequestMapping("/system/role")

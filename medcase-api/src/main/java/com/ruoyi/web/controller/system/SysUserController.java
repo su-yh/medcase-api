@@ -38,7 +38,6 @@ import com.ruoyi.web.controller.system.dto.UserDetailResponse;
 /**
  * 用户信息
  * 
- * @author ruoyi
  */
 @RestController
 @RequestMapping("/system/user")

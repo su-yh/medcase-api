@@ -14,8 +14,6 @@ import com.ruoyi.common.utils.StringUtils;
 
 /**
  * 图片处理工具类
- *
- * @author ruoyi
  */
 public class ImageUtils
 {
@@ -68,7 +66,6 @@ public class ImageUtils
 
     /**
      * 读取文件为字节数据
-     *
      * @param url 地址
      * @return 字节数据
      */

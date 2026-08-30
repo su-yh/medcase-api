@@ -8,7 +8,6 @@ import com.ruoyi.storage.pojo.FileAttachment;
 /**
  * 用户 业务层
  * 
- * @author ruoyi
  */
 public interface ISysUserService
 {
@@ -38,7 +37,6 @@ public interface ISysUserService
 
     /**
      * 通过用户名查询用户
-     * 
      * @param userName 用户名
      * @param userType 用户类型
      * @return 用户对象信息

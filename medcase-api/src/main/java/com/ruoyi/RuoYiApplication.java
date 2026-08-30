@@ -5,8 +5,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
  * 启动程序
- * 
- * @author ruoyi
  */
 @SpringBootApplication
 public class RuoYiApplication {

@@ -18,7 +18,6 @@ import com.ruoyi.system.service.ISysUserService;
 /**
  * 首页
  *
- * @author ruoyi
  */
 @RestController
 public class SysIndexController

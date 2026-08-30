@@ -36,6 +36,52 @@ class StartupInfoLoggerTest {
     }
 
     @Test
+    void logsRuntimeConnectionAndSmsInfoWithoutCredentials(CapturedOutput output) {
+        MockEnvironment environment = new MockEnvironment()
+                .withProperty("spring.datasource.dynamic.enabled", "true")
+                .withProperty("spring.datasource.dynamic.primary", "master")
+                .withProperty("spring.datasource.dynamic.strict", "true")
+                .withProperty("spring.datasource.dynamic.hikari.master.jdbc-url",
+                        "jdbc:mysql://db.example.com/medcase")
+                .withProperty("spring.datasource.dynamic.hikari.master.driver-class-name",
+                        "com.mysql.cj.jdbc.Driver")
+                .withProperty("spring.datasource.dynamic.hikari.master.minimum-idle", "10")
+                .withProperty("spring.datasource.dynamic.hikari.master.maximum-pool-size", "20")
+                .withProperty("spring.data.redis.host", "redis.example.com")
+                .withProperty("spring.data.redis.port", "6379")
+                .withProperty("spring.data.redis.database", "15")
+                .withProperty("spring.data.redis.timeout", "10s")
+                .withProperty("spring.data.redis.lettuce.pool.min-idle", "0")
+                .withProperty("spring.data.redis.lettuce.pool.max-idle", "8")
+                .withProperty("spring.data.redis.lettuce.pool.max-active", "8")
+                .withProperty("spring.data.redis.lettuce.pool.max-wait", "-1ms")
+                .withProperty("sms.aliyun.enabled", "false")
+                .withProperty("spring.datasource.dynamic.hikari.master.username", "db-user")
+                .withProperty("spring.datasource.dynamic.hikari.master.password", "db-password")
+                .withProperty("spring.data.redis.password", "redis-password");
+        StartupInfoLogger logger = new StartupInfoLogger(
+                environment,
+                provider(null),
+                provider(null));
+
+        logger.logStartupInfo();
+
+        assertThat(output).contains("Database Enabled : true");
+        assertThat(output).contains("Database Primary : master");
+        assertThat(output).contains("Database JDBC URL: jdbc:mysql://db.example.com/medcase");
+        assertThat(output).contains("Database Driver  : com.mysql.cj.jdbc.Driver");
+        assertThat(output).contains("Database Pool Min : 10");
+        assertThat(output).contains("Database Pool Max : 20");
+        assertThat(output).contains("Redis Host       : redis.example.com");
+        assertThat(output).contains("Redis Port       : 6379");
+        assertThat(output).contains("Redis Database   : 15");
+        assertThat(output).contains("Redis Timeout    : 10s");
+        assertThat(output).contains("SMS Enabled      : false");
+        assertThat(output).doesNotContain("db-password");
+        assertThat(output).doesNotContain("redis-password");
+    }
+
+    @Test
     void logsFallbackInfoWhenBuildAndGitPropertiesAreMissing(CapturedOutput output) {
         StartupInfoLogger logger = new StartupInfoLogger(
                 new MockEnvironment(),

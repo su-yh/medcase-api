@@ -16,7 +16,6 @@ import com.ruoyi.mvc.exception.ExceptionUtil;
 /**
  * 安全服务工具类
  * 
- * @author ruoyi
  */
 public class SecurityUtils
 {

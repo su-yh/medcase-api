@@ -13,7 +13,6 @@ import com.ruoyi.common.utils.json.JsonUtils;
 /**
  * 字典工具类
  * 
- * @author ruoyi
  */
 public class DictUtils
 {

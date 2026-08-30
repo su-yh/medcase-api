@@ -10,8 +10,6 @@ import org.springframework.data.redis.serializer.SerializationException;
 
 /**
  * Redis使用Jackson序列化
- *
- * @author ruoyi
  */
 public class JacksonJsonRedisSerializer<T> implements RedisSerializer<T>
 {
