@@ -9,16 +9,15 @@ import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.medcase.common.constant.HttpStatus;
 import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.common.core.page.PageDomain;
-import com.medcase.common.core.page.TableDataInfo;
 import com.medcase.common.core.page.TableSupport;
 import com.medcase.common.utils.DateUtils;
 import com.medcase.common.utils.PageUtils;
 import com.medcase.common.utils.SecurityUtils;
 import com.medcase.common.utils.StringUtils;
 import com.medcase.common.utils.sql.SqlUtil;
+import com.medcase.mp.mybatis.PageResult;
 
 /**
  * web层通用数据处理
@@ -78,14 +77,9 @@ public class BaseController {
      * 响应请求分页数据
      */
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    protected TableDataInfo getDataTable(List<?> list) {
+    protected <T> PageResult<T> getPageResult(List<T> list) {
 
-        TableDataInfo rspData = new TableDataInfo();
-        rspData.setCode(HttpStatus.SUCCESS);
-        rspData.setMsg("查询成功");
-        rspData.setRows(list);
-        rspData.setTotal(new PageInfo(list).getTotal());
-        return rspData;
+        return new PageResult<>(list, new PageInfo(list).getTotal());
     }
 
     /**

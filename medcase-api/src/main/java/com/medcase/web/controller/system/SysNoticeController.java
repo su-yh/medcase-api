@@ -15,15 +15,14 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import com.medcase.common.annotation.Log;
 import com.medcase.common.core.controller.BaseController;
-import com.medcase.mvc.response.annotation.WrapperResponseAdvice;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
-import com.medcase.common.core.page.TableDataInfo;
 import com.medcase.common.core.text.Convert;
 import com.medcase.common.enums.BusinessType;
 import com.medcase.system.domain.SysNotice;
 import com.medcase.system.service.ISysNoticeReadService;
 import com.medcase.system.service.ISysNoticeService;
+import com.medcase.mp.mybatis.PageResult;
 import com.medcase.web.controller.system.dto.NoticeTopResponse;
 
 /**
@@ -45,12 +44,11 @@ public class SysNoticeController extends BaseController {
      */
     @PreAuthorize("@ss.hasPermi('system:notice:list')")
     @GetMapping("/list")
-    @WrapperResponseAdvice(enable = false)
-    public TableDataInfo list(SysNotice notice) {
+    public PageResult<SysNotice> list(SysNotice notice) {
 
         startPage();
         List<SysNotice> list = noticeService.selectNoticeList(notice);
-        return getDataTable(list);
+        return getPageResult(list);
     }
 
     /**
@@ -132,12 +130,11 @@ public class SysNoticeController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:notice:list')")
     @GetMapping("/readUsers/list")
     @ResponseBody
-    @WrapperResponseAdvice(enable = false)
-    public TableDataInfo readUsersList(Long noticeId, String searchValue) {
+    public PageResult<?> readUsersList(Long noticeId, String searchValue) {
 
         startPage();
         List<?> list = noticeReadService.selectReadUsersByNoticeId(noticeId, searchValue);
-        return getDataTable(list);
+        return getPageResult(list);
     }
 
     /**

@@ -2,11 +2,10 @@ package com.medcase.web.controller.system;
 
 import com.medcase.common.annotation.Log;
 import com.medcase.common.core.controller.BaseController;
-import com.medcase.common.core.page.TableDataInfo;
 import com.medcase.common.enums.BusinessType;
-import com.medcase.mvc.response.annotation.WrapperResponseAdvice;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
+import com.medcase.mp.mybatis.PageResult;
 import com.medcase.system.domain.SysConfig;
 import com.medcase.system.service.ISysConfigService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,12 +38,11 @@ public class SysConfigController extends BaseController {
      */
     @PreAuthorize("@ss.hasPermi('system:config:list')")
     @GetMapping("/list")
-    @WrapperResponseAdvice(enable = false)
-    public TableDataInfo list(SysConfig config) {
+    public PageResult<SysConfig> list(SysConfig config) {
 
         startPage();
         List<SysConfig> list = configService.selectConfigList(config);
-        return getDataTable(list);
+        return getPageResult(list);
     }
 
     /**

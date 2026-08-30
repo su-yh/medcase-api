@@ -10,11 +10,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.medcase.common.annotation.Log;
 import com.medcase.common.core.controller.BaseController;
-import com.medcase.mvc.response.annotation.WrapperResponseAdvice;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
-import com.medcase.common.core.page.TableDataInfo;
 import com.medcase.common.enums.BusinessType;
+import com.medcase.mp.mybatis.PageResult;
 import com.medcase.system.domain.SysOperLog;
 import com.medcase.system.service.ISysOperLogService;
 
@@ -31,12 +30,11 @@ public class SysOperlogController extends BaseController {
 
     @PreAuthorize("@ss.hasPermi('monitor:operlog:list')")
     @GetMapping("/list")
-    @WrapperResponseAdvice(enable = false)
-    public TableDataInfo list(SysOperLog operLog) {
+    public PageResult<SysOperLog> list(SysOperLog operLog) {
 
         startPage();
         List<SysOperLog> list = operLogService.selectOperLogList(operLog);
-        return getDataTable(list);
+        return getPageResult(list);
     }
 
     @Log(title = "操作日志", businessType = BusinessType.DELETE)

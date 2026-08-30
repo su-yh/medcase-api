@@ -16,13 +16,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.medcase.common.annotation.Log;
 import com.medcase.common.core.controller.BaseController;
-import com.medcase.mvc.response.annotation.WrapperResponseAdvice;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
 import com.medcase.common.core.domain.entity.SysDept;
 import com.medcase.common.core.domain.entity.SysRole;
 import com.medcase.common.core.domain.entity.SysUser;
-import com.medcase.common.core.page.TableDataInfo;
 import com.medcase.common.enums.BusinessType;
 import com.medcase.common.utils.SecurityUtils;
 import com.medcase.common.utils.StringUtils;
@@ -30,6 +28,7 @@ import com.medcase.system.service.ISysDeptService;
 import com.medcase.system.service.ISysPostService;
 import com.medcase.system.service.ISysRoleService;
 import com.medcase.system.service.ISysUserService;
+import com.medcase.mp.mybatis.PageResult;
 import com.medcase.web.controller.system.dto.UserAuthRoleResponse;
 import com.medcase.web.controller.system.dto.UserDetailResponse;
 
@@ -58,12 +57,11 @@ public class SysUserController extends BaseController {
      */
     @PreAuthorize("@ss.hasPermi('system:user:list')")
     @GetMapping("/list")
-    @WrapperResponseAdvice(enable = false)
-    public TableDataInfo list(SysUser user) {
+    public PageResult<SysUser> list(SysUser user) {
 
         startPage();
         List<SysUser> list = userService.selectUserList(user);
-        return getDataTable(list);
+        return getPageResult(list);
     }
 
     /**

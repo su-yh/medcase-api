@@ -1,6 +1,14 @@
 package com.medcase.web.controller.monitor;
 
-import java.util.List;
+import com.medcase.common.annotation.Log;
+import com.medcase.common.core.controller.BaseController;
+import com.medcase.common.enums.BusinessType;
+import com.medcase.framework.web.service.SysPasswordService;
+import com.medcase.mp.mybatis.PageResult;
+import com.medcase.mvc.constants.enums.ErrorCodeEnums;
+import com.medcase.mvc.exception.ExceptionUtil;
+import com.medcase.system.domain.SysLogininfor;
+import com.medcase.system.service.ISysLogininforService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -8,16 +16,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import com.medcase.common.annotation.Log;
-import com.medcase.common.core.controller.BaseController;
-import com.medcase.mvc.response.annotation.WrapperResponseAdvice;
-import com.medcase.mvc.constants.enums.ErrorCodeEnums;
-import com.medcase.mvc.exception.ExceptionUtil;
-import com.medcase.common.core.page.TableDataInfo;
-import com.medcase.common.enums.BusinessType;
-import com.medcase.framework.web.service.SysPasswordService;
-import com.medcase.system.domain.SysLogininfor;
-import com.medcase.system.service.ISysLogininforService;
+
+import java.util.List;
 
 /**
  * 系统访问记录
@@ -35,12 +35,11 @@ public class SysLogininforController extends BaseController {
 
     @PreAuthorize("@ss.hasPermi('monitor:logininfor:list')")
     @GetMapping("/list")
-    @WrapperResponseAdvice(enable = false)
-    public TableDataInfo list(SysLogininfor logininfor) {
+    public PageResult<SysLogininfor> list(SysLogininfor logininfor) {
 
         startPage();
         List<SysLogininfor> list = logininforService.selectLogininforList(logininfor);
-        return getDataTable(list);
+        return getPageResult(list);
     }
 
     @PreAuthorize("@ss.hasPermi('monitor:logininfor:remove')")

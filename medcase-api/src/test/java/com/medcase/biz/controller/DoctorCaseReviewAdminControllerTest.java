@@ -45,7 +45,6 @@ class DoctorCaseReviewAdminControllerTest {
                 .flatMap(method -> Stream.concat(
                         Stream.of(method.getReturnType()),
                         Arrays.stream(method.getParameterTypes())))
-                .anyMatch(type -> type.getName().equals("com.medcase.common.core.domain.AjaxResult")
-                        || type.getName().equals("com.medcase.common.core.page.TableDataInfo"));
+                .anyMatch(type -> type.getName().equals("com.medcase.common.core.domain.AjaxResult"));
     }
 }

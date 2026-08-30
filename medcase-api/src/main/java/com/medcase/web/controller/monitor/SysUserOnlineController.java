@@ -14,14 +14,13 @@ import org.springframework.web.bind.annotation.RestController;
 import com.medcase.common.annotation.Log;
 import com.medcase.common.constant.CacheConstants;
 import com.medcase.common.core.controller.BaseController;
-import com.medcase.mvc.response.annotation.WrapperResponseAdvice;
 import com.medcase.common.core.domain.model.LoginUser;
-import com.medcase.common.core.page.TableDataInfo;
 import com.medcase.common.core.redis.RedisCache;
 import com.medcase.common.enums.BusinessType;
 import com.medcase.common.utils.StringUtils;
 import com.medcase.system.domain.SysUserOnline;
 import com.medcase.system.service.ISysUserOnlineService;
+import com.medcase.mp.mybatis.PageResult;
 
 /**
  * 在线用户监控
@@ -39,8 +38,7 @@ public class SysUserOnlineController extends BaseController {
 
     @PreAuthorize("@ss.hasPermi('monitor:online:list')")
     @GetMapping("/list")
-    @WrapperResponseAdvice(enable = false)
-    public TableDataInfo list(String ipaddr, String userName) {
+    public PageResult<SysUserOnline> list(String ipaddr, String userName) {
 
         Collection<String> keys = redisCache.keys(CacheConstants.LOGIN_TOKEN_KEY + "*");
         List<SysUserOnline> userOnlineList = new ArrayList<SysUserOnline>();
@@ -66,7 +64,7 @@ public class SysUserOnlineController extends BaseController {
         }
         Collections.reverse(userOnlineList);
         userOnlineList.removeAll(Collections.singleton(null));
-        return getDataTable(userOnlineList);
+        return getPageResult(userOnlineList);
     }
 
     /**

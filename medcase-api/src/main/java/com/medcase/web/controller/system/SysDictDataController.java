@@ -15,13 +15,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.medcase.common.annotation.Log;
 import com.medcase.common.core.controller.BaseController;
-import com.medcase.mvc.response.annotation.WrapperResponseAdvice;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
 import com.medcase.common.core.domain.entity.SysDictData;
-import com.medcase.common.core.page.TableDataInfo;
 import com.medcase.common.enums.BusinessType;
 import com.medcase.common.utils.StringUtils;
+import com.medcase.mp.mybatis.PageResult;
 import com.medcase.system.service.ISysDictDataService;
 import com.medcase.system.service.ISysDictTypeService;
 
@@ -41,12 +40,11 @@ public class SysDictDataController extends BaseController {
 
     @PreAuthorize("@ss.hasPermi('system:dict:list')")
     @GetMapping("/list")
-    @WrapperResponseAdvice(enable = false)
-    public TableDataInfo list(SysDictData dictData) {
+    public PageResult<SysDictData> list(SysDictData dictData) {
 
         startPage();
         List<SysDictData> list = dictDataService.selectDictDataList(dictData);
-        return getDataTable(list);
+        return getPageResult(list);
     }
 
     /**

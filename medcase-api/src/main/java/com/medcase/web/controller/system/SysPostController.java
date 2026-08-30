@@ -14,11 +14,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.medcase.common.annotation.Log;
 import com.medcase.common.core.controller.BaseController;
-import com.medcase.mvc.response.annotation.WrapperResponseAdvice;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
-import com.medcase.common.core.page.TableDataInfo;
 import com.medcase.common.enums.BusinessType;
+import com.medcase.mp.mybatis.PageResult;
 import com.medcase.system.domain.SysPost;
 import com.medcase.system.service.ISysPostService;
 
@@ -38,12 +37,11 @@ public class SysPostController extends BaseController {
      */
     @PreAuthorize("@ss.hasPermi('system:post:list')")
     @GetMapping("/list")
-    @WrapperResponseAdvice(enable = false)
-    public TableDataInfo list(SysPost post) {
+    public PageResult<SysPost> list(SysPost post) {
 
         startPage();
         List<SysPost> list = postService.selectPostList(post);
-        return getDataTable(list);
+        return getPageResult(list);
     }
     
     /**

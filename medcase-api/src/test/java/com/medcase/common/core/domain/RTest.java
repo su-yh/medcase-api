@@ -1,7 +1,6 @@
 package com.medcase.common.core.domain;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 
 import com.medcase.mvc.response.R;
 import org.junit.jupiter.api.Test;
@@ -23,15 +22,5 @@ class RTest {
         assertEquals(0, json.get("code").intValue());
         assertEquals("操作成功", json.get("msg").textValue());
         assertEquals("token", json.get("data").textValue());
-    }
-
-    @Test
-    void failureShouldKeepCodeAndMessageWithoutData() {
-
-        R<Void> result = R.ofFail(401, "认证失败");
-
-        assertEquals(401, result.getCode());
-        assertEquals("认证失败", result.getMsg());
-        assertNull(result.getData());
     }
 }

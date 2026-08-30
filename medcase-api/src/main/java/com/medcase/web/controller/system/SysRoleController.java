@@ -14,16 +14,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.medcase.common.annotation.Log;
 import com.medcase.common.core.controller.BaseController;
-import com.medcase.mvc.response.annotation.WrapperResponseAdvice;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
 import com.medcase.common.core.domain.entity.SysDept;
 import com.medcase.common.core.domain.entity.SysRole;
 import com.medcase.common.core.domain.entity.SysUser;
-import com.medcase.common.core.page.TableDataInfo;
 import com.medcase.common.enums.BusinessType;
 import com.medcase.framework.web.service.SysPermissionService;
 import com.medcase.framework.web.service.TokenService;
+import com.medcase.mp.mybatis.PageResult;
 import com.medcase.system.domain.SysUserRole;
 import com.medcase.system.service.ISysDeptService;
 import com.medcase.system.service.ISysRoleService;
@@ -55,12 +54,11 @@ public class SysRoleController extends BaseController {
 
     @PreAuthorize("@ss.hasPermi('system:role:list')")
     @GetMapping("/list")
-    @WrapperResponseAdvice(enable = false)
-    public TableDataInfo list(SysRole role) {
+    public PageResult<SysRole> list(SysRole role) {
 
         startPage();
         List<SysRole> list = roleService.selectRoleList(role);
-        return getDataTable(list);
+        return getPageResult(list);
     }
 
     /**
@@ -181,12 +179,11 @@ public class SysRoleController extends BaseController {
      */
     @PreAuthorize("@ss.hasPermi('system:role:list')")
     @GetMapping("/authUser/allocatedList")
-    @WrapperResponseAdvice(enable = false)
-    public TableDataInfo allocatedList(SysUser user) {
+    public PageResult<SysUser> allocatedList(SysUser user) {
 
         startPage();
         List<SysUser> list = userService.selectAllocatedList(user);
-        return getDataTable(list);
+        return getPageResult(list);
     }
 
     /**
@@ -194,12 +191,11 @@ public class SysRoleController extends BaseController {
      */
     @PreAuthorize("@ss.hasPermi('system:role:list')")
     @GetMapping("/authUser/unallocatedList")
-    @WrapperResponseAdvice(enable = false)
-    public TableDataInfo unallocatedList(SysUser user) {
+    public PageResult<SysUser> unallocatedList(SysUser user) {
 
         startPage();
         List<SysUser> list = userService.selectUnallocatedList(user);
-        return getDataTable(list);
+        return getPageResult(list);
     }
 
     /**

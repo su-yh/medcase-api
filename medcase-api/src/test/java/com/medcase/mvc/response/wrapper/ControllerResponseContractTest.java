@@ -6,6 +6,7 @@ import com.medcase.biz.controller.DoctorCaseReviewAdminController;
 import com.medcase.biz.controller.DoctorProfilePortalController;
 import com.medcase.biz.controller.DoctorUserAdminController;
 import com.medcase.mvc.response.R;
+import com.medcase.mp.mybatis.PageResult;
 import com.medcase.web.controller.common.CaptchaController;
 import com.medcase.web.controller.file.FileStorageController;
 import com.medcase.web.controller.monitor.CacheController;
@@ -27,11 +28,13 @@ import com.medcase.web.controller.system.SysRegisterController;
 import com.medcase.web.controller.system.SysRoleController;
 import com.medcase.web.controller.system.SysUserController;
 import com.medcase.web.controller.system.SysVersionController;
+import com.medcase.system.domain.SysConfig;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class ControllerResponseContractTest {
     private static final List<Class<?>> CONTROLLERS = List.of(
@@ -71,5 +74,11 @@ class ControllerResponseContractTest {
                                 + " must return its business value instead of R");
             }
         }
+    }
+
+    @Test
+    void configListShouldUsePageResult() throws NoSuchMethodException {
+        assertEquals(PageResult.class,
+                SysConfigController.class.getMethod("list", SysConfig.class).getReturnType());
     }
 }
