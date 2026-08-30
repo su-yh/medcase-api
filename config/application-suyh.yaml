@@ -1,4 +1,10 @@
 
+# 用户配置
+user:
+  password:
+    # 密码最大错误次数
+    maxRetryCount: 50
+
 
 ruoyi:
   profile: /Users/suyunhong/suyh-develop/medcase/attachmes

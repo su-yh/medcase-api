@@ -1,6 +1,7 @@
 package com.medcase.framework.web.service;
 
 import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -30,6 +31,7 @@ import com.medcase.system.service.ISysUserService;
  * 
  */
 @Component
+@Slf4j
 public class SysLoginService {
 
     @Autowired
@@ -77,6 +79,7 @@ public class SysLoginService {
             authentication = authenticationManager.authenticate(authenticationToken);
         }
         catch (AuthenticationException e) {
+            log.warn("AuthenticationException, username: {}", username, e);
 
             if (e instanceof BadCredentialsException) {
 
