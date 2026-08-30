@@ -8,11 +8,13 @@ import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.domain.entity.SysDept;
 import com.ruoyi.common.core.domain.entity.SysMenu;
 import com.ruoyi.common.utils.StringUtils;
+import lombok.Data;
 
 /**
  * Treeselect树结构实体类
  * 
  */
+@Data
 public class TreeSelect implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -50,43 +52,4 @@ public class TreeSelect implements Serializable {
         this.children = menu.getChildren().stream().map(TreeSelect::new).collect(Collectors.toList());
     }
 
-    public Long getId() {
-
-        return id;
-    }
-
-    public void setId(Long id) {
-
-        this.id = id;
-    }
-
-    public String getLabel() {
-
-        return label;
-    }
-
-    public void setLabel(String label) {
-
-        this.label = label;
-    }
-
-    public boolean isDisabled() {
-
-        return disabled;
-    }
-
-    public void setDisabled(boolean disabled) {
-
-        this.disabled = disabled;
-    }
-
-    public List<TreeSelect> getChildren() {
-
-        return children;
-    }
-
-    public void setChildren(List<TreeSelect> children) {
-
-        this.children = children;
-    }
 }

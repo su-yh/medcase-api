@@ -1,11 +1,13 @@
 package com.ruoyi.system.domain.vo;
 
 import com.ruoyi.common.utils.StringUtils;
+import lombok.Data;
 
 /**
  * 路由显示信息
  * 
  */
+@Data
 public class MetaVo {
 
     /**
@@ -63,43 +65,4 @@ public class MetaVo {
         }
     }
 
-    public boolean isNoCache() {
-
-        return noCache;
-    }
-
-    public void setNoCache(boolean noCache) {
-
-        this.noCache = noCache;
-    }
-
-    public String getTitle() {
-
-        return title;
-    }
-
-    public void setTitle(String title) {
-
-        this.title = title;
-    }
-
-    public String getIcon() {
-
-        return icon;
-    }
-
-    public void setIcon(String icon) {
-
-        this.icon = icon;
-    }
-
-    public String getLink() {
-
-        return link;
-    }
-
-    public void setLink(String link) {
-
-        this.link = link;
-    }
 }
