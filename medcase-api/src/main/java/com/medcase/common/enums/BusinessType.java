@@ -9,50 +9,52 @@ public enum BusinessType {
     /**
      * 其它
      */
-    OTHER,
+    OTHER(0),
 
     /**
      * 新增
      */
-    INSERT,
+    INSERT(1),
 
     /**
      * 修改
      */
-    UPDATE,
+    UPDATE(2),
 
     /**
      * 删除
      */
-    DELETE,
+    DELETE(3),
 
     /**
      * 授权
      */
-    GRANT,
-
-    /**
-     * 导出
-     */
-    EXPORT,
-
-    /**
-     * 导入
-     */
-    IMPORT,
+    GRANT(4),
 
     /**
      * 强退
      */
-    FORCE,
+    FORCE(7),
 
     /**
      * 生成代码
      */
-    GENCODE,
+    GENCODE(8),
     
     /**
      * 清空数据
      */
-    CLEAN,
+    CLEAN(9);
+
+    private final int code;
+
+    BusinessType(int code) {
+
+        this.code = code;
+    }
+
+    public int getCode() {
+
+        return code;
+    }
 }

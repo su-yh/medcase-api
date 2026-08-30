@@ -8,7 +8,6 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Date;
 import org.apache.commons.lang3.Validate;
-import org.apache.poi.ss.usermodel.DateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.medcase.common.core.text.Convert;
@@ -200,7 +199,7 @@ public class ReflectUtils {
                         }
                         else {
 
-                            args[i] = DateUtil.getJavaDate((Double) args[i]);
+                            args[i] = new Date(Math.round((((Number) args[i]).doubleValue() - 25569) * 86400000L));
                         }
                     }
                     else if (cs[i] == boolean.class || cs[i] == Boolean.class) {

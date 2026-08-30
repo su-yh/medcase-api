@@ -30,8 +30,6 @@ public enum ErrorCodeEnums implements IErrorCode {
     LOGIN_USER_RESOLVE_FAILED("error.code.login.user.resolve.failed", "获取用户信息异常"),
     SUPER_ADMIN_USER_OPERATION("error.code.super.admin.user.operation", "不允许操作超级管理员用户"),
     USER_DATA_SCOPE_DENIED("error.code.user.data.scope.denied", "没有权限访问用户数据！"),
-    USER_IMPORT_EMPTY("error.code.user.import.empty", "导入用户数据不能为空！"),
-    USER_IMPORT_FAILED("error.code.user.import.failed", "{0}"),
     CONFIG_BUILTIN_DELETE("error.code.config.builtin.delete", "内置参数【{0}】不能删除 "),
     MENU_SORT_SAVE_FAILED("error.code.menu.sort.save.failed", "保存排序异常，请联系管理员"),
     DEPT_DATA_SCOPE_DENIED("error.code.dept.data.scope.denied", "没有权限访问部门数据！"),

@@ -7,7 +7,6 @@ import com.medcase.common.core.domain.entity.SysUser;
 import com.medcase.common.enums.UserTypeEnums;
 import com.medcase.common.utils.SecurityUtils;
 import com.medcase.common.utils.StringUtils;
-import com.medcase.common.utils.bean.BeanValidators;
 import com.medcase.common.utils.spring.SpringUtils;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
@@ -20,11 +19,9 @@ import com.medcase.system.mapper.SysRoleMapper;
 import com.medcase.system.mapper.SysUserMapper;
 import com.medcase.system.mapper.SysUserPostMapper;
 import com.medcase.system.mapper.SysUserRoleMapper;
-import com.medcase.system.service.ISysConfigService;
 import com.medcase.system.service.ISysDeptService;
 import com.medcase.system.service.ISysUserService;
 import com.medcase.storage.pojo.FileAttachment;
-import jakarta.validation.Validator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,13 +60,7 @@ public class SysUserServiceImpl implements ISysUserService {
     private SysUserPostMapper userPostMapper;
 
     @Autowired
-    private ISysConfigService configService;
-
-    @Autowired
     private ISysDeptService deptService;
-
-    @Autowired
-    protected Validator validator;
 
     /**
      * 根据条件分页查询用户列表
@@ -506,80 +497,4 @@ public class SysUserServiceImpl implements ISysUserService {
         return userMapper.deleteUserByIds(userIds);
     }
 
-    /**
-     * 导入用户数据
-     * 
-     * @param userList 用户数据列表
-     * @param isUpdateSupport 是否更新支持，如果已存在，则进行更新数据
-     * @param operName 操作用户
-     * @return 结果
-     */
-    @Override
-    public String importUser(List<SysUser> userList, Boolean isUpdateSupport, String operName) {
-
-        if (StringUtils.isNull(userList) || userList.size() == 0) {
-
-            throw ExceptionUtil.business(ErrorCodeEnums.USER_IMPORT_EMPTY);
-        }
-        int successNum = 0;
-        int failureNum = 0;
-        StringBuilder successMsg = new StringBuilder();
-        StringBuilder failureMsg = new StringBuilder();
-        for (SysUser user : userList) {
-
-            try {
-
-                // 验证是否存在这个用户
-                SysUser u = userMapper.selectUserByUserName(user.getUserName(), UserTypeEnums.ADMIN.getCode());
-                if (StringUtils.isNull(u)) {
-
-                    BeanValidators.validateWithException(validator, user);
-                    deptService.checkDeptDataScope(user.getDeptId());
-                    String password = configService.selectConfigByKey("sys.user.initPassword");
-                    user.setPassword(SecurityUtils.encryptPassword(password));
-                    user.setUserType(UserTypeEnums.ADMIN);
-                    user.setCreateBy(operName);
-                    userMapper.insertUser(user);
-                    successNum++;
-                    successMsg.append("<br/>" + successNum + "、账号 " + user.getUserName() + " 导入成功");
-                }
-                else if (isUpdateSupport) {
-
-                    BeanValidators.validateWithException(validator, user);
-                    checkUserAllowed(u);
-                    checkUserDataScope(u.getUserId());
-                    deptService.checkDeptDataScope(user.getDeptId());
-                    user.setUserId(u.getUserId());
-                    user.setDeptId(u.getDeptId());
-                    user.setUserType(UserTypeEnums.ADMIN);
-                    user.setUpdateBy(operName);
-                    userMapper.updateUser(user);
-                    successNum++;
-                    successMsg.append("<br/>" + successNum + "、账号 " + user.getUserName() + " 更新成功");
-                }
-                else {
-
-                    failureNum++;
-                    failureMsg.append("<br/>" + failureNum + "、账号 " + user.getUserName() + " 已存在");
-                }
-            }
-            catch (Exception e) {
-
-                failureNum++;
-                String msg = "<br/>" + failureNum + "、账号 " + user.getUserName() + " 导入失败：";
-                failureMsg.append(msg + e.getMessage());
-                log.error(msg, e);
-            }
-        }
-        if (failureNum > 0) {
-
-            failureMsg.insert(0, "很抱歉，导入失败！共 " + failureNum + " 条数据格式不正确，错误如下：");
-            throw ExceptionUtil.business(ErrorCodeEnums.USER_IMPORT_FAILED, failureMsg.toString());
-        }
-        else {
-
-            successMsg.insert(0, "恭喜您，数据已全部导入成功！共 " + successNum + " 条，数据如下：");
-        }
-        return successMsg.toString();
-    }
 }

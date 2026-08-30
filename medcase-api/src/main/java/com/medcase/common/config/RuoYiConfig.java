@@ -1,10 +1,8 @@
 package com.medcase.common.config;
 
-import com.medcase.common.utils.file.FileUtils;
 import com.medcase.common.utils.file.FileUploadUtils;
 import com.medcase.common.utils.file.ImageUtils;
 import com.medcase.common.utils.ip.AddressUtils;
-import com.medcase.common.utils.poi.ExcelUtil;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
@@ -59,9 +57,7 @@ public class RuoYiConfig {
 
         this.profile = profile;
         FileUploadUtils.setDefaultBaseDir(profile);
-        FileUtils.setImportPath(profile + "/import");
         ImageUtils.setLocalPath(profile);
-        ExcelUtil.setDownloadPath(profile + "/download/");
     }
 
     public boolean isAddressEnabled() {
@@ -81,14 +77,6 @@ public class RuoYiConfig {
 
     public void setCaptchaType(String captchaType) {
         this.captchaType = captchaType;
-    }
-
-    /**
-     * 获取导入上传路径
-     */
-    public String getImportPath() {
-
-        return getProfile() + "/import";
     }
 
     /**

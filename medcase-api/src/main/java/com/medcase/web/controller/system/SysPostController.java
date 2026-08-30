@@ -1,7 +1,6 @@
 package com.medcase.web.controller.system;
 
 import java.util.List;
-import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -18,7 +17,6 @@ import com.medcase.common.core.controller.BaseController;
 import com.medcase.common.core.domain.R;
 import com.medcase.common.core.page.TableDataInfo;
 import com.medcase.common.enums.BusinessType;
-import com.medcase.common.utils.poi.ExcelUtil;
 import com.medcase.system.domain.SysPost;
 import com.medcase.system.service.ISysPostService;
 
@@ -45,16 +43,6 @@ public class SysPostController extends BaseController {
         return getDataTable(list);
     }
     
-    @Log(title = "岗位管理", businessType = BusinessType.EXPORT)
-    @PreAuthorize("@ss.hasPermi('system:post:export')")
-    @PostMapping("/export")
-    public void export(HttpServletResponse response, SysPost post) {
-
-        List<SysPost> list = postService.selectPostList(post);
-        ExcelUtil<SysPost> util = new ExcelUtil<SysPost>(SysPost.class);
-        util.exportExcel(response, list, "岗位数据");
-    }
-
     /**
      * 根据岗位编号获取详细信息
      */

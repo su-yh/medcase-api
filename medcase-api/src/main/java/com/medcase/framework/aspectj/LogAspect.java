@@ -149,7 +149,7 @@ public class LogAspect {
     public void getControllerMethodDescription(JoinPoint joinPoint, Log log, SysOperLog operLog, Object jsonResult) throws Exception {
 
         // 设置action动作
-        operLog.setBusinessType(log.businessType().ordinal());
+        operLog.setBusinessType(log.businessType().getCode());
         // 设置标题
         operLog.setTitle(log.title());
         // 设置操作人类别

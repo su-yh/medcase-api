@@ -2,7 +2,6 @@ package com.medcase.web.controller.system;
 
 import java.util.ArrayList;
 import java.util.List;
-import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -21,7 +20,6 @@ import com.medcase.common.core.domain.entity.SysDictData;
 import com.medcase.common.core.page.TableDataInfo;
 import com.medcase.common.enums.BusinessType;
 import com.medcase.common.utils.StringUtils;
-import com.medcase.common.utils.poi.ExcelUtil;
 import com.medcase.system.service.ISysDictDataService;
 import com.medcase.system.service.ISysDictTypeService;
 
@@ -46,16 +44,6 @@ public class SysDictDataController extends BaseController {
         startPage();
         List<SysDictData> list = dictDataService.selectDictDataList(dictData);
         return getDataTable(list);
-    }
-
-    @Log(title = "字典数据", businessType = BusinessType.EXPORT)
-    @PreAuthorize("@ss.hasPermi('system:dict:export')")
-    @PostMapping("/export")
-    public void export(HttpServletResponse response, SysDictData dictData) {
-
-        List<SysDictData> list = dictDataService.selectDictDataList(dictData);
-        ExcelUtil<SysDictData> util = new ExcelUtil<SysDictData>(SysDictData.class);
-        util.exportExcel(response, list, "字典数据");
     }
 
     /**
