@@ -2,8 +2,10 @@ package com.medcase.system.plus.mapper;
 
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.medcase.common.core.domain.entity.SysDept;
 import com.medcase.mp.mybatis.BaseMapperX;
 import com.medcase.system.plus.entity.SysDeptEntity;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.Collection;
@@ -11,6 +13,11 @@ import java.util.List;
 
 @Mapper
 public interface SysDeptMapper extends BaseMapperX<SysDeptEntity> {
+    List<SysDept> selectDeptList(SysDept dept);
+
+    List<Long> selectDeptListByRoleId(
+            @Param("roleId") Long roleId, @Param("deptCheckStrictly") boolean deptCheckStrictly);
+
     default int selectNormalChildrenCount(Long deptId) {
         return Math.toIntExact(selectCount(build()
                 .eq(SysDeptEntity::getStatus, "0")

@@ -35,9 +35,6 @@ import com.medcase.mvc.exception.ExceptionUtil;
 public class SysRoleServiceImpl implements ISysRoleService {
 
     @Autowired
-    private com.medcase.system.mapper.SysRoleHistoryMapper roleHistoryMapper;
-
-    @Autowired
     private SysRoleMapper roleMapper;
 
     @Autowired
@@ -59,7 +56,7 @@ public class SysRoleServiceImpl implements ISysRoleService {
     @DataScope(deptAlias = "d")
     public List<SysRole> selectRoleList(SysRole role) {
 
-        return roleHistoryMapper.selectRoleList(role);
+        return roleMapper.selectRoleList(role);
     }
 
     /**
@@ -71,7 +68,7 @@ public class SysRoleServiceImpl implements ISysRoleService {
     @Override
     public List<SysRole> selectRolesByUserId(Long userId) {
 
-        List<SysRole> userRoles = roleHistoryMapper.selectRolePermissionByUserId(userId);
+        List<SysRole> userRoles = roleMapper.selectRolePermissionByUserId(userId);
         List<SysRole> roles = selectRoleAll();
         for (SysRole role : roles) {
 
@@ -96,7 +93,7 @@ public class SysRoleServiceImpl implements ISysRoleService {
     @Override
     public Set<String> selectRolePermissionByUserId(Long userId) {
 
-        List<SysRole> perms = roleHistoryMapper.selectRolePermissionByUserId(userId);
+        List<SysRole> perms = roleMapper.selectRolePermissionByUserId(userId);
         Set<String> permsSet = new HashSet<>();
         for (SysRole perm : perms) {
 
@@ -128,7 +125,7 @@ public class SysRoleServiceImpl implements ISysRoleService {
     @Override
     public List<Long> selectRoleListByUserId(Long userId) {
 
-        return roleHistoryMapper.selectRoleListByUserId(userId);
+        return roleMapper.selectRoleListByUserId(userId);
     }
 
     /**

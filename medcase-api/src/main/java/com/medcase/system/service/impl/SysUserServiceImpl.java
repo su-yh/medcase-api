@@ -17,6 +17,7 @@ import com.medcase.system.event.UserAvatarUploadedEvent;
 import com.medcase.system.plus.SystemEntityConverter;
 import com.medcase.system.plus.entity.SysUserEntity;
 import com.medcase.system.plus.mapper.SysPostMapper;
+import com.medcase.system.plus.mapper.SysRoleMapper;
 import com.medcase.system.plus.mapper.SysUserMapper;
 import com.medcase.system.plus.mapper.SysUserPostMapper;
 import com.medcase.system.plus.mapper.SysUserRoleMapper;
@@ -42,16 +43,13 @@ import java.util.stream.Collectors;
 public class SysUserServiceImpl implements ISysUserService {
 
     @Autowired
-    private com.medcase.system.mapper.SysUserHistoryMapper userHistoryMapper;
-
-    @Autowired
-    private com.medcase.system.mapper.SysRoleHistoryMapper roleHistoryMapper;
-
-    @Autowired
-    private com.medcase.system.mapper.SysPostHistoryMapper postHistoryMapper;
-
-    @Autowired
     private SysUserMapper userMapper;
+
+    @Autowired
+    private SysRoleMapper roleMapper;
+
+    @Autowired
+    private SysPostMapper postMapper;
 
     @Autowired
     private SysUserRoleMapper userRoleMapper;
@@ -72,7 +70,7 @@ public class SysUserServiceImpl implements ISysUserService {
     @DataScope(deptAlias = "d", userAlias = "u")
     public List<SysUser> selectUserList(SysUser user) {
         useAdminUserTypeIfAbsent(user);
-        return userHistoryMapper.selectUserList(user);
+        return userMapper.selectUserList(user);
     }
 
     /**
@@ -85,7 +83,7 @@ public class SysUserServiceImpl implements ISysUserService {
     @DataScope(deptAlias = "d", userAlias = "u")
     public List<SysUser> selectAllocatedList(SysUser user) {
         useAdminUserTypeIfAbsent(user);
-        return userHistoryMapper.selectAllocatedList(user);
+        return userMapper.selectAllocatedList(user);
     }
 
     /**
@@ -98,7 +96,7 @@ public class SysUserServiceImpl implements ISysUserService {
     @DataScope(deptAlias = "d", userAlias = "u")
     public List<SysUser> selectUnallocatedList(SysUser user) {
         useAdminUserTypeIfAbsent(user);
-        return userHistoryMapper.selectUnallocatedList(user);
+        return userMapper.selectUnallocatedList(user);
     }
 
     private void useAdminUserTypeIfAbsent(SysUser user) {
@@ -141,7 +139,7 @@ public class SysUserServiceImpl implements ISysUserService {
     @Override
     public String selectUserRoleGroup(String userName) {
 
-        List<SysRole> list = roleHistoryMapper.selectRolesByUserName(userName);
+        List<SysRole> list = roleMapper.selectRolesByUserName(userName);
         if (CollectionUtils.isEmpty(list)) {
 
             return StringUtils.EMPTY;
@@ -158,7 +156,7 @@ public class SysUserServiceImpl implements ISysUserService {
     @Override
     public String selectUserPostGroup(String userName) {
 
-        List<SysPost> list = postHistoryMapper.selectPostsByUserName(userName);
+        List<SysPost> list = postMapper.selectPostsByUserName(userName);
         if (CollectionUtils.isEmpty(list)) {
 
             return StringUtils.EMPTY;

@@ -1,15 +1,27 @@
 package com.medcase.system.plus.mapper;
 
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.medcase.common.core.domain.entity.SysRole;
 import com.medcase.mp.mybatis.BaseMapperX;
 import com.medcase.mp.mybatis.LambdaQueryWrapperX;
 import com.medcase.system.plus.entity.SysRoleEntity;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.Arrays;
+import java.util.List;
 
 @Mapper
 public interface SysRoleMapper extends BaseMapperX<SysRoleEntity> {
+    List<SysRole> selectRoleList(SysRole role);
+
+    List<SysRole> selectRolePermissionByUserId(Long userId);
+
+    List<SysRole> selectRoleAll();
+
+    List<Long> selectRoleListByUserId(Long userId);
+
+    List<SysRole> selectRolesByUserName(String userName);
+
     default SysRoleEntity selectRoleByName(String roleName) {
         return selectOne(build()
                 .eq(SysRoleEntity::getRoleName, roleName)

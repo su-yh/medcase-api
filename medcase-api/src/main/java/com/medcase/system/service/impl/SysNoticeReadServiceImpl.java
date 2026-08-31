@@ -18,9 +18,6 @@ import com.medcase.system.service.ISysNoticeReadService;
 public class SysNoticeReadServiceImpl implements ISysNoticeReadService {
 
     @Autowired
-    private com.medcase.system.mapper.SysNoticeReadHistoryMapper noticeReadHistoryMapper;
-
-    @Autowired
     private SysNoticeReadMapper noticeReadMapper;
 
     /**
@@ -41,7 +38,7 @@ public class SysNoticeReadServiceImpl implements ISysNoticeReadService {
     @Override
     public int selectUnreadCount(Long userId) {
 
-        return noticeReadHistoryMapper.selectUnreadCount(userId);
+        return noticeReadMapper.selectUnreadCount(userId);
     }
 
     /**
@@ -50,7 +47,7 @@ public class SysNoticeReadServiceImpl implements ISysNoticeReadService {
     @Override
     public List<SysNotice> selectNoticeListWithReadStatus(Long userId, int limit) {
 
-        return noticeReadHistoryMapper.selectNoticeListWithReadStatus(userId, limit);
+        return noticeReadMapper.selectNoticeListWithReadStatus(userId, limit);
     }
 
     /**
@@ -80,7 +77,7 @@ public class SysNoticeReadServiceImpl implements ISysNoticeReadService {
     @Override
     public List<Map<String, Object>> selectReadUsersByNoticeId(Long noticeId, String searchValue) {
 
-        return noticeReadHistoryMapper.selectReadUsersByNoticeId(noticeId, searchValue);
+        return noticeReadMapper.selectReadUsersByNoticeId(noticeId, searchValue);
     }
 
     /**

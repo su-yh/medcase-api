@@ -1,6 +1,7 @@
 package com.medcase.system.plus.mapper;
 
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.medcase.common.core.domain.entity.SysUser;
 import com.medcase.mp.mybatis.BaseMapperX;
 import com.medcase.mp.mybatis.LambdaQueryWrapperX;
 import com.medcase.common.enums.UserTypeEnums;
@@ -10,9 +11,16 @@ import org.apache.ibatis.annotations.Mapper;
 
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 @Mapper
 public interface SysUserMapper extends BaseMapperX<SysUserEntity> {
+    List<SysUser> selectUserList(SysUser user);
+
+    List<SysUser> selectAllocatedList(SysUser user);
+
+    List<SysUser> selectUnallocatedList(SysUser user);
+
     default SysUserEntity selectUserByUserName(
             String userName, String userType, String delFlag) {
         return selectOne(build()

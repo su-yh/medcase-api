@@ -2,7 +2,7 @@
 <!DOCTYPE mapper
 PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.medcase.system.mapper.SysNoticeReadHistoryMapper">
+<mapper namespace="com.medcase.system.plus.mapper.SysNoticeReadMapper">
 
     <!-- 查询未读数量：正常状态公告 减去 当前用户已读数 -->
     <select id="selectUnreadCount" resultType="int">

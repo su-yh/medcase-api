@@ -23,11 +23,11 @@ import com.medcase.common.utils.SecurityUtils;
 import com.medcase.common.utils.StringUtils;
 import com.medcase.system.domain.vo.MetaVo;
 import com.medcase.system.domain.vo.RouterVo;
-import com.medcase.system.mapper.SysRoleHistoryMapper;
 import com.medcase.system.plus.SystemEntityConverter;
 import com.medcase.system.plus.entity.SysMenuEntity;
 import com.medcase.system.plus.mapper.SysMenuMapper;
 import com.medcase.system.plus.mapper.SysRoleMenuMapper;
+import com.medcase.system.plus.mapper.SysRoleMapper;
 import com.medcase.system.service.ISysMenuService;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
@@ -45,13 +45,10 @@ public class SysMenuServiceImpl implements ISysMenuService {
     public static final Long MENU_ROOT_ID = 0L;
 
     @Autowired
-    private com.medcase.system.mapper.SysMenuHistoryMapper menuHistoryMapper;
-
-    @Autowired
-    private SysRoleHistoryMapper roleMapper;
-
-    @Autowired
     private SysMenuMapper menuMapper;
+
+    @Autowired
+    private SysRoleMapper roleMapper;
 
     @Autowired
     private SysRoleMenuMapper roleMenuMapper;
@@ -79,12 +76,12 @@ public class SysMenuServiceImpl implements ISysMenuService {
         // 管理员显示所有菜单信息
         if (SecurityUtils.isAdmin(userId)) {
 
-            menuList = menuHistoryMapper.selectMenuList(menu);
+            menuList = menuMapper.selectMenuList(menu);
         }
         else {
 
             menu.getParams().put("userId", userId);
-            menuList = menuHistoryMapper.selectMenuListByUserId(menu);
+            menuList = menuMapper.selectMenuListByUserId(menu);
         }
         return menuList;
     }
@@ -97,7 +94,7 @@ public class SysMenuServiceImpl implements ISysMenuService {
     @Override
     public Set<String> selectMenuPermsByUserId(Long userId) {
 
-        List<String> perms = menuHistoryMapper.selectMenuPermsByUserId(userId);
+        List<String> perms = menuMapper.selectMenuPermsByUserId(userId);
         Set<String> permsSet = new HashSet<>();
         for (String perm : perms) {
 
@@ -117,7 +114,7 @@ public class SysMenuServiceImpl implements ISysMenuService {
     @Override
     public Set<String> selectMenuPermsByRoleId(Long roleId) {
 
-        List<String> perms = menuHistoryMapper.selectMenuPermsByRoleId(roleId);
+        List<String> perms = menuMapper.selectMenuPermsByRoleId(roleId);
         Set<String> permsSet = new HashSet<>();
         for (String perm : perms) {
 
@@ -140,11 +137,11 @@ public class SysMenuServiceImpl implements ISysMenuService {
         List<SysMenu> menus = null;
         if (SecurityUtils.isAdmin(userId)) {
 
-            menus = menuHistoryMapper.selectMenuTreeAll();
+            menus = menuMapper.selectMenuTreeAll();
         }
         else {
 
-            menus = menuHistoryMapper.selectMenuTreeByUserId(userId);
+            menus = menuMapper.selectMenuTreeByUserId(userId);
         }
         return getChildPerms(menus, MENU_ROOT_ID);
     }
@@ -157,8 +154,8 @@ public class SysMenuServiceImpl implements ISysMenuService {
     @Override
     public List<Long> selectMenuListByRoleId(Long roleId) {
 
-        SysRole role = roleMapper.selectRoleById(roleId);
-        return menuHistoryMapper.selectMenuListByRoleId(roleId, role.isMenuCheckStrictly());
+        SysRole role = SystemEntityConverter.toDomain(roleMapper.selectById(roleId));
+        return menuMapper.selectMenuListByRoleId(roleId, role.isMenuCheckStrictly());
     }
 
     /**
@@ -384,7 +381,7 @@ public class SysMenuServiceImpl implements ISysMenuService {
         Long parentId = menu.getParentId();
         String path = menu.getPath();
         String routeName = StringUtils.isEmpty(menu.getRouteName()) ? path : menu.getRouteName();
-        List<SysMenu> sysMenuList = menuHistoryMapper.selectMenusByPathOrRouteName(path, routeName);
+        List<SysMenu> sysMenuList = menuMapper.selectMenusByPathOrRouteName(path, routeName);
         for (SysMenu sysMenu : sysMenuList) {
 
             if (sysMenu.getMenuId().longValue() != menuId.longValue()) {

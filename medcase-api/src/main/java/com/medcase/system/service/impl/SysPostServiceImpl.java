@@ -24,9 +24,6 @@ import com.medcase.mvc.exception.ExceptionUtil;
 public class SysPostServiceImpl implements ISysPostService {
 
     @Autowired
-    private com.medcase.system.mapper.SysPostHistoryMapper postHistoryMapper;
-
-    @Autowired
     private SysPostMapper postMapper;
 
     @Autowired
@@ -41,7 +38,7 @@ public class SysPostServiceImpl implements ISysPostService {
     @Override
     public List<SysPost> selectPostList(SysPost post) {
 
-        return postHistoryMapper.selectPostList(post);
+        return postMapper.selectPostList(post);
     }
 
     /**
@@ -76,7 +73,7 @@ public class SysPostServiceImpl implements ISysPostService {
     @Override
     public List<Long> selectPostListByUserId(Long userId) {
 
-        return postHistoryMapper.selectPostListByUserId(userId);
+        return postMapper.selectPostListByUserId(userId);
     }
 
     /**

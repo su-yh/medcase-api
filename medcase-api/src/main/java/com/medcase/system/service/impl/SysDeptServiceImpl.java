@@ -20,8 +20,8 @@ import com.medcase.common.utils.spring.SpringUtils;
 import com.medcase.system.plus.SystemEntityConverter;
 import com.medcase.system.plus.entity.SysDeptEntity;
 import com.medcase.system.plus.mapper.SysDeptMapper;
+import com.medcase.system.plus.mapper.SysRoleMapper;
 import com.medcase.system.plus.mapper.SysUserMapper;
-import com.medcase.system.mapper.SysRoleHistoryMapper;
 import com.medcase.system.service.ISysDeptService;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
@@ -34,13 +34,10 @@ import com.medcase.mvc.exception.ExceptionUtil;
 public class SysDeptServiceImpl implements ISysDeptService {
 
     @Autowired
-    private com.medcase.system.mapper.SysDeptHistoryMapper deptHistoryMapper;
-
-    @Autowired
-    private SysRoleHistoryMapper roleMapper;
-
-    @Autowired
     private SysDeptMapper deptMapper;
+
+    @Autowired
+    private SysRoleMapper roleMapper;
 
     @Autowired
     private SysUserMapper userMapper;
@@ -55,7 +52,7 @@ public class SysDeptServiceImpl implements ISysDeptService {
     @DataScope(deptAlias = "d")
     public List<SysDept> selectDeptList(SysDept dept) {
 
-        return deptHistoryMapper.selectDeptList(dept);
+        return deptMapper.selectDeptList(dept);
     }
 
     /**
@@ -120,8 +117,8 @@ public class SysDeptServiceImpl implements ISysDeptService {
     @Override
     public List<Long> selectDeptListByRoleId(Long roleId) {
 
-        SysRole role = roleMapper.selectRoleById(roleId);
-        return deptHistoryMapper.selectDeptListByRoleId(roleId, role.isDeptCheckStrictly());
+        SysRole role = SystemEntityConverter.toDomain(roleMapper.selectById(roleId));
+        return deptMapper.selectDeptListByRoleId(roleId, role.isDeptCheckStrictly());
     }
 
     /**
