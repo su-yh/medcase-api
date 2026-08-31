@@ -16,6 +16,8 @@ import com.medcase.system.domain.SysUserRole;
 import com.medcase.system.event.UserAvatarUploadedEvent;
 import com.medcase.system.converter.SystemEntityConverter;
 import com.medcase.system.entity.SysUserEntity;
+import com.medcase.system.entity.SysUserPostEntity;
+import com.medcase.system.entity.SysUserRoleEntity;
 import com.medcase.system.mapper.SysPostMapper;
 import com.medcase.system.mapper.SysRoleMapper;
 import com.medcase.system.mapper.SysUserMapper;
@@ -440,7 +442,7 @@ public class SysUserServiceImpl implements ISysUserService {
             }
             userPostMapper.insertUserPosts(
                     SystemEntityConverter.copyList(list,
-                            com.medcase.system.entity.SysUserPostEntity.class));
+                            SysUserPostEntity.class));
         }
     }
 
@@ -465,7 +467,7 @@ public class SysUserServiceImpl implements ISysUserService {
             }
             userRoleMapper.insertUserRoles(
                     SystemEntityConverter.copyList(list,
-                            com.medcase.system.entity.SysUserRoleEntity.class));
+                            SysUserRoleEntity.class));
         }
     }
 

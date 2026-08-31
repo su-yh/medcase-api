@@ -18,7 +18,10 @@ import com.medcase.system.domain.SysRoleDept;
 import com.medcase.system.domain.SysRoleMenu;
 import com.medcase.system.domain.SysUserRole;
 import com.medcase.system.converter.SystemEntityConverter;
+import com.medcase.system.entity.SysRoleDeptEntity;
 import com.medcase.system.entity.SysRoleEntity;
+import com.medcase.system.entity.SysRoleMenuEntity;
+import com.medcase.system.entity.SysUserRoleEntity;
 import com.medcase.system.mapper.SysRoleDeptMapper;
 import com.medcase.system.mapper.SysRoleMapper;
 import com.medcase.system.mapper.SysRoleMenuMapper;
@@ -309,7 +312,7 @@ public class SysRoleServiceImpl implements ISysRoleService {
 
             roleMenuMapper.insertRoleMenus(
                     SystemEntityConverter.copyList(list,
-                            com.medcase.system.entity.SysRoleMenuEntity.class));
+                            SysRoleMenuEntity.class));
             rows = list.size();
         }
         return rows;
@@ -336,7 +339,7 @@ public class SysRoleServiceImpl implements ISysRoleService {
 
             roleDeptMapper.insertRoleDepts(
                     SystemEntityConverter.copyList(list,
-                            com.medcase.system.entity.SysRoleDeptEntity.class));
+                            SysRoleDeptEntity.class));
             rows = list.size();
         }
         return rows;
@@ -433,7 +436,7 @@ public class SysRoleServiceImpl implements ISysRoleService {
         }
         userRoleMapper.insertUserRoles(
                 SystemEntityConverter.copyList(list,
-                        com.medcase.system.entity.SysUserRoleEntity.class));
+                        SysUserRoleEntity.class));
         return list.size();
     }
 }
