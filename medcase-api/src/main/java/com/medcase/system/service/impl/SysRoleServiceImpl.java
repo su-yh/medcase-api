@@ -17,12 +17,12 @@ import com.medcase.common.utils.spring.SpringUtils;
 import com.medcase.system.domain.SysRoleDept;
 import com.medcase.system.domain.SysRoleMenu;
 import com.medcase.system.domain.SysUserRole;
-import com.medcase.system.plus.SystemEntityConverter;
-import com.medcase.system.plus.entity.SysRoleEntity;
-import com.medcase.system.plus.mapper.SysRoleDeptMapper;
-import com.medcase.system.plus.mapper.SysRoleMapper;
-import com.medcase.system.plus.mapper.SysRoleMenuMapper;
-import com.medcase.system.plus.mapper.SysUserRoleMapper;
+import com.medcase.system.converter.SystemEntityConverter;
+import com.medcase.system.entity.SysRoleEntity;
+import com.medcase.system.mapper.SysRoleDeptMapper;
+import com.medcase.system.mapper.SysRoleMapper;
+import com.medcase.system.mapper.SysRoleMenuMapper;
+import com.medcase.system.mapper.SysUserRoleMapper;
 import com.medcase.system.service.ISysRoleService;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
@@ -309,7 +309,7 @@ public class SysRoleServiceImpl implements ISysRoleService {
 
             roleMenuMapper.insertRoleMenus(
                     SystemEntityConverter.copyList(list,
-                            com.medcase.system.plus.entity.SysRoleMenuEntity.class));
+                            com.medcase.system.entity.SysRoleMenuEntity.class));
             rows = list.size();
         }
         return rows;
@@ -336,7 +336,7 @@ public class SysRoleServiceImpl implements ISysRoleService {
 
             roleDeptMapper.insertRoleDepts(
                     SystemEntityConverter.copyList(list,
-                            com.medcase.system.plus.entity.SysRoleDeptEntity.class));
+                            com.medcase.system.entity.SysRoleDeptEntity.class));
             rows = list.size();
         }
         return rows;
@@ -433,7 +433,7 @@ public class SysRoleServiceImpl implements ISysRoleService {
         }
         userRoleMapper.insertUserRoles(
                 SystemEntityConverter.copyList(list,
-                        com.medcase.system.plus.entity.SysUserRoleEntity.class));
+                        com.medcase.system.entity.SysUserRoleEntity.class));
         return list.size();
     }
 }

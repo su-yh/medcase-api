@@ -5,9 +5,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.medcase.common.core.domain.entity.SysDictData;
 import com.medcase.common.utils.DictUtils;
-import com.medcase.system.plus.SystemEntityConverter;
-import com.medcase.system.plus.entity.SysDictDataEntity;
-import com.medcase.system.plus.mapper.SysDictDataMapper;
+import com.medcase.system.converter.SystemEntityConverter;
+import com.medcase.system.entity.SysDictDataEntity;
+import com.medcase.system.mapper.SysDictDataMapper;
 import com.medcase.system.service.ISysDictDataService;
 
 /**

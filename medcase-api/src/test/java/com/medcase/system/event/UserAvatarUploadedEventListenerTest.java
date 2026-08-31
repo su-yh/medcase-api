@@ -4,7 +4,7 @@ import com.medcase.common.core.domain.entity.SysUser;
 import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.framework.web.service.TokenService;
 import com.medcase.storage.pojo.FileAttachment;
-import com.medcase.system.plus.mapper.SysUserMapper;
+import com.medcase.system.mapper.SysUserMapper;
 import com.medcase.system.service.impl.SysUserServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;

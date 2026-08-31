@@ -7,7 +7,7 @@ import static org.mockito.Mockito.when;
 
 import com.medcase.common.core.domain.entity.SysUser;
 import com.medcase.common.enums.UserTypeEnums;
-import com.medcase.system.plus.mapper.SysUserMapper;
+import com.medcase.system.mapper.SysUserMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;

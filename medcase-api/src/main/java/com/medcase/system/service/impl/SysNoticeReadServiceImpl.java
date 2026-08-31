@@ -6,9 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.medcase.system.domain.SysNotice;
 import com.medcase.system.domain.SysNoticeRead;
-import com.medcase.system.plus.SystemEntityConverter;
-import com.medcase.system.plus.entity.SysNoticeReadEntity;
-import com.medcase.system.plus.mapper.SysNoticeReadMapper;
+import com.medcase.system.converter.SystemEntityConverter;
+import com.medcase.system.entity.SysNoticeReadEntity;
+import com.medcase.system.mapper.SysNoticeReadMapper;
 import com.medcase.system.service.ISysNoticeReadService;
 
 /**

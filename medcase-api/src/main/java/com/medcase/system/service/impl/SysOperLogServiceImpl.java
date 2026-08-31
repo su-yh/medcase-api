@@ -5,9 +5,9 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.medcase.system.domain.SysOperLog;
-import com.medcase.system.plus.SystemEntityConverter;
-import com.medcase.system.plus.entity.SysOperLogEntity;
-import com.medcase.system.plus.mapper.SysOperLogMapper;
+import com.medcase.system.converter.SystemEntityConverter;
+import com.medcase.system.entity.SysOperLogEntity;
+import com.medcase.system.mapper.SysOperLogMapper;
 import com.medcase.system.service.ISysOperLogService;
 
 /**
