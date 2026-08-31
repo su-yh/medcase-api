@@ -4,7 +4,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.medcase.system.mapper.SysMenuMapper">
 
-	<resultMap type="SysMenu" id="SysMenuResult">
+	<resultMap type="com.medcase.common.core.domain.entity.SysMenu" id="SysMenuResult">
 		<id     property="menuId"         column="menu_id"        />
 		<result property="menuName"       column="menu_name"      />
 		<result property="parentName"     column="parent_name"    />
@@ -33,7 +33,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		from sys_menu
     </sql>
 
-    <select id="selectMenuList" parameterType="SysMenu" resultMap="SysMenuResult">
+    <select id="selectMenuList" parameterType="com.medcase.common.core.domain.entity.SysMenu" resultMap="SysMenuResult">
 		<include refid="selectMenuVo"/>
 		<where>
 			<if test="menuName != null and menuName != ''">
@@ -55,7 +55,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		order by m.parent_id, m.order_num
 	</select>
 
-	<select id="selectMenuListByUserId" parameterType="SysMenu" resultMap="SysMenuResult">
+	<select id="selectMenuListByUserId" parameterType="com.medcase.common.core.domain.entity.SysMenu" resultMap="SysMenuResult">
 		select distinct m.menu_id, m.parent_id, m.menu_name, m.path, m.component, m.`query`, m.route_name, m.visible, m.status, ifnull(m.perms,'') as perms, m.is_frame, m.is_cache, m.menu_type, m.icon, m.order_num, m.create_time
 		from sys_menu m
 		left join sys_role_menu rm on m.menu_id = rm.menu_id
@@ -74,7 +74,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		order by m.parent_id, m.order_num
 	</select>
 
-    <select id="selectMenuTreeByUserId" parameterType="Long" resultMap="SysMenuResult">
+    <select id="selectMenuTreeByUserId" parameterType="java.lang.Long" resultMap="SysMenuResult">
 		select distinct m.menu_id, m.parent_id, m.menu_name, m.path, m.component, m.`query`, m.route_name, m.visible, m.status, ifnull(m.perms,'') as perms, m.is_frame, m.is_cache, m.menu_type, m.icon, m.order_num, m.create_time
 		from sys_menu m
 			 left join sys_role_menu rm on m.menu_id = rm.menu_id
@@ -85,7 +85,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		order by m.parent_id, m.order_num
 	</select>
 
-	<select id="selectMenuListByRoleId" resultType="Long">
+	<select id="selectMenuListByRoleId" resultType="java.lang.Long">
 		select m.menu_id
 		from sys_menu m
             left join sys_role_menu rm on m.menu_id = rm.menu_id
@@ -96,14 +96,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		order by m.parent_id, m.order_num
 	</select>
 
-	<select id="selectMenuPerms" resultType="String">
+	<select id="selectMenuPerms" resultType="java.lang.String">
 		select distinct m.perms
 		from sys_menu m
 			 left join sys_role_menu rm on m.menu_id = rm.menu_id
 			 left join sys_user_role ur on rm.role_id = ur.role_id
 	</select>
 
-	<select id="selectMenuPermsByUserId" parameterType="Long" resultType="String">
+	<select id="selectMenuPermsByUserId" parameterType="java.lang.Long" resultType="java.lang.String">
 		select distinct m.perms
 		from sys_menu m
 			 left join sys_role_menu rm on m.menu_id = rm.menu_id
@@ -112,14 +112,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		where m.status = '0' and r.status = '0' and ur.user_id = #{userId}
 	</select>
 
-	<select id="selectMenuPermsByRoleId" parameterType="Long" resultType="String">
+	<select id="selectMenuPermsByRoleId" parameterType="java.lang.Long" resultType="java.lang.String">
 		select distinct m.perms
 		from sys_menu m
 			 left join sys_role_menu rm on m.menu_id = rm.menu_id
 		where m.status = '0' and rm.role_id = #{roleId}
 	</select>
 
-	<select id="selectMenusByPathOrRouteName" parameterType="SysMenu" resultMap="SysMenuResult">
+	<select id="selectMenusByPathOrRouteName" parameterType="com.medcase.common.core.domain.entity.SysMenu" resultMap="SysMenuResult">
 		<include refid="selectMenuVo"/>
 		where menu_type in ('M', 'C') and (path = #{path} or path = #{routeName} or route_name = #{path} or route_name = #{routeName})
 	</select>

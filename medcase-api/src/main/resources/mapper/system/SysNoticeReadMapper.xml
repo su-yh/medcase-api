@@ -5,7 +5,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 <mapper namespace="com.medcase.system.mapper.SysNoticeReadMapper">
 
     <!-- 查询未读数量：正常状态公告 减去 当前用户已读数 -->
-    <select id="selectUnreadCount" resultType="int">
+    <select id="selectUnreadCount" resultType="java.lang.Integer">
         select count(*) from sys_notice n
         where n.status = '0' and not exists (select 1 from sys_notice_read r where r.notice_id = n.notice_id and r.user_id = #{userId})
     </select>
