@@ -4,7 +4,9 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.medcase.system.domain.SysNotice;
-import com.medcase.system.mapper.SysNoticeMapper;
+import com.medcase.system.plus.SystemEntityConverter;
+import com.medcase.system.plus.entity.SysNoticeEntity;
+import com.medcase.system.plus.mapper.SysNoticeMapper;
 import com.medcase.system.service.ISysNoticeService;
 
 /**
@@ -26,7 +28,7 @@ public class SysNoticeServiceImpl implements ISysNoticeService {
     @Override
     public SysNotice selectNoticeById(Long noticeId) {
 
-        return noticeMapper.selectNoticeById(noticeId);
+        return SystemEntityConverter.toDomain(noticeMapper.selectNoticeById(noticeId));
     }
 
     /**
@@ -38,7 +40,9 @@ public class SysNoticeServiceImpl implements ISysNoticeService {
     @Override
     public List<SysNotice> selectNoticeList(SysNotice notice) {
 
-        return noticeMapper.selectNoticeList(notice);
+        return SystemEntityConverter.copyList(noticeMapper.selectNoticeList(
+                notice.getNoticeTitle(), notice.getNoticeType(), notice.getCreateBy()),
+                SysNotice.class);
     }
 
     /**
@@ -50,7 +54,10 @@ public class SysNoticeServiceImpl implements ISysNoticeService {
     @Override
     public int insertNotice(SysNotice notice) {
 
-        return noticeMapper.insertNotice(notice);
+        SysNoticeEntity entity = SystemEntityConverter.toEntity(notice);
+        int result = noticeMapper.insertNotice(entity);
+        notice.setNoticeId(entity.getNoticeId());
+        return result;
     }
 
     /**
@@ -62,7 +69,7 @@ public class SysNoticeServiceImpl implements ISysNoticeService {
     @Override
     public int updateNotice(SysNotice notice) {
 
-        return noticeMapper.updateNotice(notice);
+        return noticeMapper.updateNotice(SystemEntityConverter.toEntity(notice));
     }
 
     /**

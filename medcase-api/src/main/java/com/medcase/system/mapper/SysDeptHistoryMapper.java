@@ -8,7 +8,7 @@ import com.medcase.common.core.domain.entity.SysDept;
  * 部门管理 数据层
  * 
  */
-public interface SysDeptMapper {
+public interface SysDeptHistoryMapper {
 
     /**
      * 查询部门管理数据

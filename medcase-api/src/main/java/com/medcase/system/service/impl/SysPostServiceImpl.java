@@ -1,13 +1,17 @@
 package com.medcase.system.service.impl;
 
+import java.util.Arrays;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.medcase.common.constant.UserConstants;
 import com.medcase.common.utils.StringUtils;
 import com.medcase.system.domain.SysPost;
-import com.medcase.system.mapper.SysPostMapper;
-import com.medcase.system.mapper.SysUserPostMapper;
+import com.medcase.system.plus.SystemEntityConverter;
+import com.medcase.system.plus.entity.SysPostEntity;
+import com.medcase.system.plus.entity.SysUserPostEntity;
+import com.medcase.system.plus.mapper.SysPostMapper;
+import com.medcase.system.plus.mapper.SysUserPostMapper;
 import com.medcase.system.service.ISysPostService;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
@@ -18,6 +22,9 @@ import com.medcase.mvc.exception.ExceptionUtil;
  */
 @Service
 public class SysPostServiceImpl implements ISysPostService {
+
+    @Autowired
+    private com.medcase.system.mapper.SysPostHistoryMapper postHistoryMapper;
 
     @Autowired
     private SysPostMapper postMapper;
@@ -34,7 +41,7 @@ public class SysPostServiceImpl implements ISysPostService {
     @Override
     public List<SysPost> selectPostList(SysPost post) {
 
-        return postMapper.selectPostList(post);
+        return postHistoryMapper.selectPostList(post);
     }
 
     /**
@@ -45,7 +52,7 @@ public class SysPostServiceImpl implements ISysPostService {
     @Override
     public List<SysPost> selectPostAll() {
 
-        return postMapper.selectPostAll();
+        return SystemEntityConverter.copyList(postMapper.selectAllPosts(), SysPost.class);
     }
 
     /**
@@ -57,7 +64,7 @@ public class SysPostServiceImpl implements ISysPostService {
     @Override
     public SysPost selectPostById(Long postId) {
 
-        return postMapper.selectPostById(postId);
+        return SystemEntityConverter.toDomain(postMapper.selectPostById(postId));
     }
 
     /**
@@ -69,7 +76,7 @@ public class SysPostServiceImpl implements ISysPostService {
     @Override
     public List<Long> selectPostListByUserId(Long userId) {
 
-        return postMapper.selectPostListByUserId(userId);
+        return postHistoryMapper.selectPostListByUserId(userId);
     }
 
     /**
@@ -82,7 +89,8 @@ public class SysPostServiceImpl implements ISysPostService {
     public boolean checkPostNameUnique(SysPost post) {
 
         Long postId = StringUtils.isNull(post.getPostId()) ? -1L : post.getPostId();
-        SysPost info = postMapper.checkPostNameUnique(post.getPostName());
+        SysPost info = SystemEntityConverter.toDomain(
+                postMapper.selectPostByName(post.getPostName()));
         if (StringUtils.isNotNull(info) && info.getPostId().longValue() != postId.longValue()) {
 
             return UserConstants.NOT_UNIQUE;
@@ -100,7 +108,8 @@ public class SysPostServiceImpl implements ISysPostService {
     public boolean checkPostCodeUnique(SysPost post) {
 
         Long postId = StringUtils.isNull(post.getPostId()) ? -1L : post.getPostId();
-        SysPost info = postMapper.checkPostCodeUnique(post.getPostCode());
+        SysPost info = SystemEntityConverter.toDomain(
+                postMapper.selectPostByCode(post.getPostCode()));
         if (StringUtils.isNotNull(info) && info.getPostId().longValue() != postId.longValue()) {
 
             return UserConstants.NOT_UNIQUE;
@@ -117,7 +126,7 @@ public class SysPostServiceImpl implements ISysPostService {
     @Override
     public int countUserPostById(Long postId) {
 
-        return userPostMapper.countUserPostById(postId);
+        return Math.toIntExact(userPostMapper.countByPostId(postId));
     }
 
     /**
@@ -149,7 +158,7 @@ public class SysPostServiceImpl implements ISysPostService {
                 throw ExceptionUtil.business(ErrorCodeEnums.POST_ASSIGNED_DELETE, post.getPostName());
             }
         }
-        return postMapper.deletePostByIds(postIds);
+        return postMapper.deletePostsByIds(postIds);
     }
 
     /**
@@ -161,7 +170,10 @@ public class SysPostServiceImpl implements ISysPostService {
     @Override
     public int insertPost(SysPost post) {
 
-        return postMapper.insertPost(post);
+        SysPostEntity entity = SystemEntityConverter.toEntity(post);
+        int row = postMapper.insertPost(entity);
+        post.setPostId(entity.getPostId());
+        return row;
     }
 
     /**
@@ -173,6 +185,6 @@ public class SysPostServiceImpl implements ISysPostService {
     @Override
     public int updatePost(SysPost post) {
 
-        return postMapper.updatePost(post);
+        return postMapper.updatePost(SystemEntityConverter.toEntity(post));
     }
 }

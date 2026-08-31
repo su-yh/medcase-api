@@ -13,8 +13,10 @@ import com.medcase.common.core.domain.entity.SysDictData;
 import com.medcase.common.core.domain.entity.SysDictType;
 import com.medcase.common.utils.DictUtils;
 import com.medcase.common.utils.StringUtils;
-import com.medcase.system.mapper.SysDictDataMapper;
-import com.medcase.system.mapper.SysDictTypeMapper;
+import com.medcase.system.plus.SystemEntityConverter;
+import com.medcase.system.plus.entity.SysDictTypeEntity;
+import com.medcase.system.plus.mapper.SysDictDataMapper;
+import com.medcase.system.plus.mapper.SysDictTypeMapper;
 import com.medcase.system.service.ISysDictTypeService;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
@@ -50,7 +52,11 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService {
     @Override
     public List<SysDictType> selectDictTypeList(SysDictType dictType) {
 
-        return dictTypeMapper.selectDictTypeList(dictType);
+        Object beginTime = dictType.getParams().get("beginTime");
+        Object endTime = dictType.getParams().get("endTime");
+        return SystemEntityConverter.copyList(dictTypeMapper.selectDictTypeList(
+                dictType.getDictName(), dictType.getStatus(), dictType.getDictType(),
+                beginTime, endTime), SysDictType.class);
     }
 
     /**
@@ -61,7 +67,7 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService {
     @Override
     public List<SysDictType> selectDictTypeAll() {
 
-        return dictTypeMapper.selectDictTypeAll();
+        return SystemEntityConverter.copyList(dictTypeMapper.selectAllDictTypes(), SysDictType.class);
     }
 
     /**
@@ -78,7 +84,9 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService {
 
             return dictDatas;
         }
-        dictDatas = dictDataMapper.selectDictDataByType(dictType);
+        dictDatas = SystemEntityConverter.copyList(
+                dictDataMapper.selectEnabledDictDataByType(dictType),
+                SysDictData.class);
         if (StringUtils.isNotEmpty(dictDatas)) {
 
             DictUtils.setDictCache(dictType, dictDatas);
@@ -96,7 +104,7 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService {
     @Override
     public SysDictType selectDictTypeById(Long dictId) {
 
-        return dictTypeMapper.selectDictTypeById(dictId);
+        return SystemEntityConverter.toDomain(dictTypeMapper.selectDictTypeById(dictId));
     }
 
     /**
@@ -108,7 +116,7 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService {
     @Override
     public SysDictType selectDictTypeByType(String dictType) {
 
-        return dictTypeMapper.selectDictTypeByType(dictType);
+        return SystemEntityConverter.toDomain(dictTypeMapper.selectDictTypeByType(dictType));
     }
 
     /**
@@ -122,7 +130,7 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService {
         for (Long dictId : dictIds) {
 
             SysDictType dictType = selectDictTypeById(dictId);
-            if (dictDataMapper.countDictDataByType(dictType.getDictType()) > 0) {
+            if (dictDataMapper.countByDictType(dictType.getDictType()) > 0) {
 
                 throw ExceptionUtil.business(ErrorCodeEnums.DICT_TYPE_ASSIGNED_DELETE, dictType.getDictName());
             }
@@ -139,7 +147,10 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService {
 
         SysDictData dictData = new SysDictData();
         dictData.setStatus("0");
-        Map<String, List<SysDictData>> dictDataMap = dictDataMapper.selectDictDataList(dictData).stream().collect(Collectors.groupingBy(SysDictData::getDictType));
+        Map<String, List<SysDictData>> dictDataMap = SystemEntityConverter.copyList(
+                dictDataMapper.selectDictDataList(
+                        dictData.getDictType(), dictData.getDictLabel(), dictData.getStatus()),
+                SysDictData.class).stream().collect(Collectors.groupingBy(SysDictData::getDictType));
         for (Map.Entry<String, List<SysDictData>> entry : dictDataMap.entrySet()) {
 
             DictUtils.setDictCache(entry.getKey(), entry.getValue().stream().sorted(Comparator.comparing(SysDictData::getDictSort)).collect(Collectors.toList()));
@@ -174,7 +185,9 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService {
     @Override
     public int insertDictType(SysDictType dict) {
 
-        int row = dictTypeMapper.insertDictType(dict);
+        SysDictTypeEntity entity = SystemEntityConverter.toEntity(dict);
+        int row = dictTypeMapper.insertDictType(entity);
+        dict.setDictId(entity.getDictId());
         if (row > 0) {
 
             DictUtils.setDictCache(dict.getDictType(), null);
@@ -192,12 +205,12 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService {
     @Transactional
     public int updateDictType(SysDictType dict) {
 
-        SysDictType oldDict = dictTypeMapper.selectDictTypeById(dict.getDictId());
-        dictDataMapper.updateDictDataType(oldDict.getDictType(), dict.getDictType());
-        int row = dictTypeMapper.updateDictType(dict);
+        SysDictType oldDict = selectDictTypeById(dict.getDictId());
+        dictDataMapper.updateDictType(oldDict.getDictType(), dict.getDictType());
+        int row = dictTypeMapper.updateDictType(SystemEntityConverter.toEntity(dict));
         if (row > 0) {
 
-            List<SysDictData> dictDatas = dictDataMapper.selectDictDataByType(dict.getDictType());
+            List<SysDictData> dictDatas = selectDictDataByType(dict.getDictType());
             DictUtils.setDictCache(dict.getDictType(), dictDatas);
         }
         return row;
@@ -213,7 +226,8 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService {
     public boolean checkDictTypeUnique(SysDictType dict) {
 
         Long dictId = StringUtils.isNull(dict.getDictId()) ? -1L : dict.getDictId();
-        SysDictType dictType = dictTypeMapper.checkDictTypeUnique(dict.getDictType());
+        SysDictType dictType = SystemEntityConverter.toDomain(
+                dictTypeMapper.selectDictTypeByType(dict.getDictType()));
         if (StringUtils.isNotNull(dictType) && dictType.getDictId().longValue() != dictId.longValue()) {
 
             return UserConstants.NOT_UNIQUE;

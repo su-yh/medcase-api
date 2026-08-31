@@ -16,7 +16,7 @@ public class SysDictDataEntity extends AbstractBaseEntity {
     @TableId(value = "dict_code", type = IdType.AUTO)
     private Long dictCode;
 
-    private Integer dictSort;
+    private Long dictSort;
 
     private String dictLabel;
 

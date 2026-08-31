@@ -9,7 +9,7 @@ import com.medcase.storage.pojo.FileAttachment;
 /**
  * 用户表 数据层
  */
-public interface SysUserMapper {
+public interface SysUserHistoryMapper {
 
     /**
      * 根据条件分页查询用户列表

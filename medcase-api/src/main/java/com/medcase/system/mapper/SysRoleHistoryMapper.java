@@ -7,7 +7,7 @@ import com.medcase.common.core.domain.entity.SysRole;
  * 角色表 数据层
  * 
  */
-public interface SysRoleMapper {
+public interface SysRoleHistoryMapper {
 
     /**
      * 根据条件分页查询角色数据

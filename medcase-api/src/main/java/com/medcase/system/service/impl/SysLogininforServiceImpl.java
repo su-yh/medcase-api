@@ -4,7 +4,9 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.medcase.system.domain.SysLogininfor;
-import com.medcase.system.mapper.SysLogininforMapper;
+import com.medcase.system.plus.SystemEntityConverter;
+import com.medcase.system.plus.entity.SysLogininforEntity;
+import com.medcase.system.plus.mapper.SysLogininforMapper;
 import com.medcase.system.service.ISysLogininforService;
 
 /**
@@ -26,7 +28,9 @@ public class SysLogininforServiceImpl implements ISysLogininforService {
     @Override
     public void insertLogininfor(SysLogininfor logininfor) {
 
-        logininforMapper.insertLogininfor(logininfor);
+        SysLogininforEntity entity = SystemEntityConverter.toEntity(logininfor);
+        logininforMapper.insertLogininfor(entity);
+        logininfor.setInfoId(entity.getInfoId());
     }
 
     /**
@@ -38,7 +42,10 @@ public class SysLogininforServiceImpl implements ISysLogininforService {
     @Override
     public List<SysLogininfor> selectLogininforList(SysLogininfor logininfor) {
 
-        return logininforMapper.selectLogininforList(logininfor);
+        return SystemEntityConverter.copyList(logininforMapper.selectLogininforList(
+                logininfor.getIpaddr(), logininfor.getStatus(), logininfor.getUserName(),
+                logininfor.getParams().get("beginTime"), logininfor.getParams().get("endTime")),
+                SysLogininfor.class);
     }
 
     /**

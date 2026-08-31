@@ -9,7 +9,7 @@ import com.medcase.system.domain.SysNoticeRead;
 /**
  * 公告已读记录 数据层
  */
-public interface SysNoticeReadMapper {
+public interface SysNoticeReadHistoryMapper {
 
     /**
      * 新增已读记录（忽略重复）
@@ -24,14 +24,6 @@ public interface SysNoticeReadMapper {
      * @return 未读数量
      */
     public int selectUnreadCount(@Param("userId") Long userId);
-
-    /**
-     * 查询某用户是否已读某公告
-     * @param noticeId 公告ID
-     * @param userId   用户ID
-     * @return 已读记录数（0未读 1已读）
-     */
-    public int selectIsRead(@Param("noticeId") Long noticeId, @Param("userId") Long userId);
 
     /**
      * 批量标记已读

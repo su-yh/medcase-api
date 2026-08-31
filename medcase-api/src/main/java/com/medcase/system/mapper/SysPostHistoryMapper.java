@@ -7,7 +7,7 @@ import com.medcase.system.domain.SysPost;
  * 岗位信息 数据层
  * 
  */
-public interface SysPostMapper {
+public interface SysPostHistoryMapper {
 
     /**
      * 查询岗位数据集合

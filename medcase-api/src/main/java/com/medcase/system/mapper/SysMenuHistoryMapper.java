@@ -8,7 +8,7 @@ import com.medcase.common.core.domain.entity.SysMenu;
  * 菜单表 数据层
  *
  */
-public interface SysMenuMapper {
+public interface SysMenuHistoryMapper {
 
     /**
      * 查询系统菜单列表

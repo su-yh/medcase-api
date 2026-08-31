@@ -11,10 +11,13 @@ import com.medcase.common.core.redis.RedisCache;
 import com.medcase.common.core.text.Convert;
 import com.medcase.common.utils.StringUtils;
 import com.medcase.system.domain.SysConfig;
-import com.medcase.system.mapper.SysConfigMapper;
+import com.medcase.system.plus.SystemEntityConverter;
+import com.medcase.system.plus.entity.SysConfigEntity;
+import com.medcase.system.plus.mapper.SysConfigMapper;
 import com.medcase.system.service.ISysConfigService;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
+import java.util.Date;
 
 /**
  * 参数配置 服务层实现
@@ -47,9 +50,7 @@ public class SysConfigServiceImpl implements ISysConfigService {
     @Override
     public SysConfig selectConfigById(Long configId) {
 
-        SysConfig config = new SysConfig();
-        config.setConfigId(configId);
-        return configMapper.selectConfig(config);
+        return SystemEntityConverter.toDomain(configMapper.selectConfigById(configId));
     }
 
     /**
@@ -66,9 +67,8 @@ public class SysConfigServiceImpl implements ISysConfigService {
 
             return configValue;
         }
-        SysConfig config = new SysConfig();
-        config.setConfigKey(configKey);
-        SysConfig retConfig = configMapper.selectConfig(config);
+        SysConfigEntity retConfigEntity = configMapper.selectConfigByKey(configKey);
+        SysConfig retConfig = SystemEntityConverter.toDomain(retConfigEntity);
         if (StringUtils.isNotNull(retConfig)) {
 
             redisCache.setCacheObject(getCacheKey(configKey), retConfig.getConfigValue());
@@ -102,7 +102,11 @@ public class SysConfigServiceImpl implements ISysConfigService {
     @Override
     public List<SysConfig> selectConfigList(SysConfig config) {
 
-        return configMapper.selectConfigList(config);
+        Date beginTime = getDateParam(config, "beginTime");
+        Date endTime = getDateParam(config, "endTime");
+        return SystemEntityConverter.copyList(configMapper.selectConfigList(
+                config.getConfigName(), config.getConfigType(), config.getConfigKey(),
+                beginTime, endTime), SysConfig.class);
     }
 
     /**
@@ -114,7 +118,9 @@ public class SysConfigServiceImpl implements ISysConfigService {
     @Override
     public int insertConfig(SysConfig config) {
 
-        int row = configMapper.insertConfig(config);
+        SysConfigEntity entity = SystemEntityConverter.toEntity(config);
+        int row = configMapper.insertConfig(entity);
+        config.setConfigId(entity.getConfigId());
         if (row > 0) {
 
             redisCache.setCacheObject(getCacheKey(config.getConfigKey()), config.getConfigValue());
@@ -131,13 +137,13 @@ public class SysConfigServiceImpl implements ISysConfigService {
     @Override
     public int updateConfig(SysConfig config) {
 
-        SysConfig temp = configMapper.selectConfigById(config.getConfigId());
+        SysConfig temp = selectConfigById(config.getConfigId());
         if (!StringUtils.equals(temp.getConfigKey(), config.getConfigKey())) {
 
             redisCache.deleteObject(getCacheKey(temp.getConfigKey()));
         }
 
-        int row = configMapper.updateConfig(config);
+        int row = configMapper.updateConfig(SystemEntityConverter.toEntity(config));
         if (row > 0) {
 
             redisCache.setCacheObject(getCacheKey(config.getConfigKey()), config.getConfigValue());
@@ -171,7 +177,9 @@ public class SysConfigServiceImpl implements ISysConfigService {
     @Override
     public void loadingConfigCache() {
 
-        List<SysConfig> configsList = configMapper.selectConfigList(new SysConfig());
+        List<SysConfig> configsList = SystemEntityConverter.copyList(
+                configMapper.selectAllConfigs(),
+                SysConfig.class);
         for (SysConfig config : configsList) {
 
             redisCache.setCacheObject(getCacheKey(config.getConfigKey()), config.getConfigValue());
@@ -208,7 +216,8 @@ public class SysConfigServiceImpl implements ISysConfigService {
     public boolean checkConfigKeyUnique(SysConfig config) {
 
         Long configId = StringUtils.isNull(config.getConfigId()) ? -1L : config.getConfigId();
-        SysConfig info = configMapper.checkConfigKeyUnique(config.getConfigKey());
+        SysConfig info = SystemEntityConverter.toDomain(
+                configMapper.selectConfigByKeyForUnique(config.getConfigKey()));
         if (StringUtils.isNotNull(info) && info.getConfigId().longValue() != configId.longValue()) {
 
             return UserConstants.NOT_UNIQUE;
@@ -225,5 +234,11 @@ public class SysConfigServiceImpl implements ISysConfigService {
     private String getCacheKey(String configKey) {
 
         return CacheConstants.SYS_CONFIG_KEY + configKey;
+    }
+
+    private Date getDateParam(SysConfig config, String key) {
+
+        Object value = config.getParams().get(key);
+        return value == null ? null : com.medcase.common.utils.DateUtils.parseDate(value);
     }
 }

@@ -1,10 +1,13 @@
 package com.medcase.system.service.impl;
 
+import java.util.Arrays;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.medcase.system.domain.SysOperLog;
-import com.medcase.system.mapper.SysOperLogMapper;
+import com.medcase.system.plus.SystemEntityConverter;
+import com.medcase.system.plus.entity.SysOperLogEntity;
+import com.medcase.system.plus.mapper.SysOperLogMapper;
 import com.medcase.system.service.ISysOperLogService;
 
 /**
@@ -25,7 +28,9 @@ public class SysOperLogServiceImpl implements ISysOperLogService {
     @Override
     public void insertOperlog(SysOperLog operLog) {
 
-        operLogMapper.insertOperlog(operLog);
+        SysOperLogEntity entity = SystemEntityConverter.toEntity(operLog);
+        operLogMapper.insertOperLog(entity);
+        operLog.setOperId(entity.getOperId());
     }
 
     /**
@@ -37,7 +42,11 @@ public class SysOperLogServiceImpl implements ISysOperLogService {
     @Override
     public List<SysOperLog> selectOperLogList(SysOperLog operLog) {
 
-        return operLogMapper.selectOperLogList(operLog);
+        return SystemEntityConverter.copyList(operLogMapper.selectOperLogList(
+                operLog.getOperIp(), operLog.getTitle(), operLog.getBusinessType(),
+                operLog.getBusinessTypes(), operLog.getStatus(), operLog.getOperName(),
+                operLog.getParams().get("beginTime"), operLog.getParams().get("endTime")),
+                SysOperLog.class);
     }
 
     /**
@@ -61,7 +70,7 @@ public class SysOperLogServiceImpl implements ISysOperLogService {
     @Override
     public SysOperLog selectOperLogById(Long operId) {
 
-        return operLogMapper.selectOperLogById(operId);
+        return SystemEntityConverter.toDomain(operLogMapper.selectOperLogById(operId));
     }
 
     /**

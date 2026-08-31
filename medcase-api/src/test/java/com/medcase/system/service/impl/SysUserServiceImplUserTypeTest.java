@@ -7,10 +7,9 @@ import static org.mockito.Mockito.when;
 
 import com.medcase.common.core.domain.entity.SysUser;
 import com.medcase.common.enums.UserTypeEnums;
-import com.medcase.system.mapper.SysUserMapper;
+import com.medcase.system.plus.mapper.SysUserMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -33,43 +32,40 @@ class SysUserServiceImplUserTypeTest {
     @Test
     void checkUserNameUniqueDefaultsToAdminUserType() {
 
-        when(userMapper.checkUserNameUnique(any(SysUser.class))).thenReturn(null);
+        when(userMapper.selectUserByUserNameAndType(any(), any(), any())).thenReturn(null);
         SysUser user = new SysUser();
         user.setUserName("same-name");
 
         userService.checkUserNameUnique(user);
 
-        ArgumentCaptor<SysUser> captor = ArgumentCaptor.forClass(SysUser.class);
-        verify(userMapper).checkUserNameUnique(captor.capture());
-        assertEquals(UserTypeEnums.ADMIN, captor.getValue().getUserType());
+        verify(userMapper).selectUserByUserNameAndType("same-name", UserTypeEnums.ADMIN, "0");
+        assertEquals(UserTypeEnums.ADMIN, user.getUserType());
     }
 
     @Test
     void checkPhoneUniquePreservesExplicitDoctorUserType() {
 
-        when(userMapper.checkPhoneUnique(any(SysUser.class))).thenReturn(null);
+        when(userMapper.selectUserByPhoneAndType(any(), any(), any())).thenReturn(null);
         SysUser user = new SysUser();
         user.setPhonenumber("15888888888");
         user.setUserType(UserTypeEnums.DOCTOR);
 
         userService.checkPhoneUnique(user);
 
-        ArgumentCaptor<SysUser> captor = ArgumentCaptor.forClass(SysUser.class);
-        verify(userMapper).checkPhoneUnique(captor.capture());
-        assertEquals(UserTypeEnums.DOCTOR, captor.getValue().getUserType());
+        verify(userMapper).selectUserByPhoneAndType("15888888888", UserTypeEnums.DOCTOR, "0");
+        assertEquals(UserTypeEnums.DOCTOR, user.getUserType());
     }
 
     @Test
     void checkEmailUniqueDefaultsToAdminUserType() {
 
-        when(userMapper.checkEmailUnique(any(SysUser.class))).thenReturn(null);
+        when(userMapper.selectUserByEmailAndType(any(), any(), any())).thenReturn(null);
         SysUser user = new SysUser();
         user.setEmail("same@example.com");
 
         userService.checkEmailUnique(user);
 
-        ArgumentCaptor<SysUser> captor = ArgumentCaptor.forClass(SysUser.class);
-        verify(userMapper).checkEmailUnique(captor.capture());
-        assertEquals(UserTypeEnums.ADMIN, captor.getValue().getUserType());
+        verify(userMapper).selectUserByEmailAndType("same@example.com", UserTypeEnums.ADMIN, "0");
+        assertEquals(UserTypeEnums.ADMIN, user.getUserType());
     }
 }

@@ -14,16 +14,15 @@ import com.medcase.system.domain.SysPost;
 import com.medcase.system.domain.SysUserPost;
 import com.medcase.system.domain.SysUserRole;
 import com.medcase.system.event.UserAvatarUploadedEvent;
-import com.medcase.system.mapper.SysPostMapper;
-import com.medcase.system.mapper.SysRoleMapper;
-import com.medcase.system.mapper.SysUserMapper;
-import com.medcase.system.mapper.SysUserPostMapper;
-import com.medcase.system.mapper.SysUserRoleMapper;
+import com.medcase.system.plus.SystemEntityConverter;
+import com.medcase.system.plus.entity.SysUserEntity;
+import com.medcase.system.plus.mapper.SysPostMapper;
+import com.medcase.system.plus.mapper.SysUserMapper;
+import com.medcase.system.plus.mapper.SysUserPostMapper;
+import com.medcase.system.plus.mapper.SysUserRoleMapper;
 import com.medcase.system.service.ISysDeptService;
 import com.medcase.system.service.ISysUserService;
 import com.medcase.storage.pojo.FileAttachment;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
@@ -42,16 +41,17 @@ import java.util.stream.Collectors;
 @Service
 public class SysUserServiceImpl implements ISysUserService {
 
-    private static final Logger log = LoggerFactory.getLogger(SysUserServiceImpl.class);
+    @Autowired
+    private com.medcase.system.mapper.SysUserHistoryMapper userHistoryMapper;
+
+    @Autowired
+    private com.medcase.system.mapper.SysRoleHistoryMapper roleHistoryMapper;
+
+    @Autowired
+    private com.medcase.system.mapper.SysPostHistoryMapper postHistoryMapper;
 
     @Autowired
     private SysUserMapper userMapper;
-
-    @Autowired
-    private SysRoleMapper roleMapper;
-
-    @Autowired
-    private SysPostMapper postMapper;
 
     @Autowired
     private SysUserRoleMapper userRoleMapper;
@@ -72,7 +72,7 @@ public class SysUserServiceImpl implements ISysUserService {
     @DataScope(deptAlias = "d", userAlias = "u")
     public List<SysUser> selectUserList(SysUser user) {
         useAdminUserTypeIfAbsent(user);
-        return userMapper.selectUserList(user);
+        return userHistoryMapper.selectUserList(user);
     }
 
     /**
@@ -85,7 +85,7 @@ public class SysUserServiceImpl implements ISysUserService {
     @DataScope(deptAlias = "d", userAlias = "u")
     public List<SysUser> selectAllocatedList(SysUser user) {
         useAdminUserTypeIfAbsent(user);
-        return userMapper.selectAllocatedList(user);
+        return userHistoryMapper.selectAllocatedList(user);
     }
 
     /**
@@ -98,7 +98,7 @@ public class SysUserServiceImpl implements ISysUserService {
     @DataScope(deptAlias = "d", userAlias = "u")
     public List<SysUser> selectUnallocatedList(SysUser user) {
         useAdminUserTypeIfAbsent(user);
-        return userMapper.selectUnallocatedList(user);
+        return userHistoryMapper.selectUnallocatedList(user);
     }
 
     private void useAdminUserTypeIfAbsent(SysUser user) {
@@ -116,7 +116,8 @@ public class SysUserServiceImpl implements ISysUserService {
     @Override
     public SysUser selectUserByUserName(String userName, String userType) {
 
-        return userMapper.selectUserByUserName(userName, userType);
+        return SystemEntityConverter.toDomain(
+                userMapper.selectUserByUserName(userName, userType, "0"));
     }
 
     /**
@@ -128,7 +129,7 @@ public class SysUserServiceImpl implements ISysUserService {
     @Override
     public SysUser selectUserById(Long userId) {
 
-        return userMapper.selectUserById(userId);
+        return SystemEntityConverter.toDomain(userMapper.selectUserById(userId));
     }
 
     /**
@@ -140,7 +141,7 @@ public class SysUserServiceImpl implements ISysUserService {
     @Override
     public String selectUserRoleGroup(String userName) {
 
-        List<SysRole> list = roleMapper.selectRolesByUserName(userName);
+        List<SysRole> list = roleHistoryMapper.selectRolesByUserName(userName);
         if (CollectionUtils.isEmpty(list)) {
 
             return StringUtils.EMPTY;
@@ -157,7 +158,7 @@ public class SysUserServiceImpl implements ISysUserService {
     @Override
     public String selectUserPostGroup(String userName) {
 
-        List<SysPost> list = postMapper.selectPostsByUserName(userName);
+        List<SysPost> list = postHistoryMapper.selectPostsByUserName(userName);
         if (CollectionUtils.isEmpty(list)) {
 
             return StringUtils.EMPTY;
@@ -175,7 +176,9 @@ public class SysUserServiceImpl implements ISysUserService {
     public boolean checkUserNameUnique(SysUser user) {
         Long userId = StringUtils.isNull(user.getUserId()) ? -1L : user.getUserId();
         useAdminUserTypeIfAbsent(user);
-        SysUser info = userMapper.checkUserNameUnique(user);
+        SysUser info = SystemEntityConverter.toDomain(
+                userMapper.selectUserByUserNameAndType(
+                        user.getUserName(), user.getUserType(), "0"));
         if (StringUtils.isNotNull(info) && info.getUserId().longValue() != userId.longValue()) {
             return UserConstants.NOT_UNIQUE;
         }
@@ -192,7 +195,9 @@ public class SysUserServiceImpl implements ISysUserService {
     public boolean checkPhoneUnique(SysUser user) {
         Long userId = StringUtils.isNull(user.getUserId()) ? -1L : user.getUserId();
         useAdminUserTypeIfAbsent(user);
-        SysUser info = userMapper.checkPhoneUnique(user);
+        SysUser info = SystemEntityConverter.toDomain(
+                userMapper.selectUserByPhoneAndType(
+                        user.getPhonenumber(), user.getUserType(), "0"));
         if (StringUtils.isNotNull(info) && info.getUserId().longValue() != userId.longValue()) {
             return UserConstants.NOT_UNIQUE;
         }
@@ -209,7 +214,9 @@ public class SysUserServiceImpl implements ISysUserService {
     public boolean checkEmailUnique(SysUser user) {
         Long userId = StringUtils.isNull(user.getUserId()) ? -1L : user.getUserId();
         useAdminUserTypeIfAbsent(user);
-        SysUser info = userMapper.checkEmailUnique(user);
+        SysUser info = SystemEntityConverter.toDomain(
+                userMapper.selectUserByEmailAndType(
+                        user.getEmail(), user.getUserType(), "0"));
         if (StringUtils.isNotNull(info) && info.getUserId().longValue() != userId.longValue()) {
             return UserConstants.NOT_UNIQUE;
         }
@@ -259,8 +266,9 @@ public class SysUserServiceImpl implements ISysUserService {
     public int insertUser(SysUser user) {
 
         user.setUserType(UserTypeEnums.ADMIN);
-        // 新增用户信息
-        int rows = userMapper.insertUser(user);
+        SysUserEntity entity = SystemEntityConverter.toEntity(user);
+        int rows = userMapper.insertUser(entity);
+        user.setUserId(entity.getUserId());
         // 新增用户岗位关联
         insertUserPost(user);
         // 新增用户与角色管理
@@ -278,7 +286,7 @@ public class SysUserServiceImpl implements ISysUserService {
     public boolean registerUser(SysUser user) {
 
         user.setUserType(UserTypeEnums.ADMIN);
-        return userMapper.insertUser(user) > 0;
+        return userMapper.insertUser(SystemEntityConverter.toEntity(user)) > 0;
     }
 
     /**
@@ -293,14 +301,14 @@ public class SysUserServiceImpl implements ISysUserService {
 
         Long userId = user.getUserId();
         // 删除用户与角色关联
-        userRoleMapper.deleteUserRoleByUserId(userId);
+        userRoleMapper.deleteByUserId(userId);
         // 新增用户与角色管理
         insertUserRole(user);
         // 删除用户与岗位关联
-        userPostMapper.deleteUserPostByUserId(userId);
+        userPostMapper.deleteByUserId(userId);
         // 新增用户与岗位管理
         insertUserPost(user);
-        return userMapper.updateUser(user);
+        return userMapper.updateUser(SystemEntityConverter.toEntity(user));
     }
 
     /**
@@ -313,7 +321,7 @@ public class SysUserServiceImpl implements ISysUserService {
     @Transactional
     public void insertUserAuth(Long userId, Long[] roleIds) {
 
-        userRoleMapper.deleteUserRoleByUserId(userId);
+        userRoleMapper.deleteByUserId(userId);
         insertUserRole(userId, roleIds);
     }
 
@@ -338,7 +346,7 @@ public class SysUserServiceImpl implements ISysUserService {
     @Override
     public int updateUserProfile(SysUser user) {
 
-        return userMapper.updateUser(user);
+        return userMapper.updateUser(SystemEntityConverter.toEntity(user));
     }
 
     /**
@@ -386,7 +394,8 @@ public class SysUserServiceImpl implements ISysUserService {
     @Override
     public int resetPwd(SysUser user) {
 
-        return userMapper.resetUserPwd(user.getUserId(), user.getPassword());
+        return userMapper.resetUserPassword(
+                user.getUserId(), user.getPassword(), new Date());
     }
 
     /**
@@ -399,7 +408,7 @@ public class SysUserServiceImpl implements ISysUserService {
     @Override
     public int resetUserPwd(Long userId, String password) {
 
-        return userMapper.resetUserPwd(userId, password);
+        return userMapper.resetUserPassword(userId, password, new Date());
     }
 
     /**
@@ -431,7 +440,9 @@ public class SysUserServiceImpl implements ISysUserService {
                 up.setPostId(postId);
                 list.add(up);
             }
-            userPostMapper.batchUserPost(list);
+            userPostMapper.insertUserPosts(
+                    SystemEntityConverter.copyList(list,
+                            com.medcase.system.plus.entity.SysUserPostEntity.class));
         }
     }
 
@@ -454,7 +465,9 @@ public class SysUserServiceImpl implements ISysUserService {
                 ur.setRoleId(roleId);
                 list.add(ur);
             }
-            userRoleMapper.batchUserRole(list);
+            userRoleMapper.insertUserRoles(
+                    SystemEntityConverter.copyList(list,
+                            com.medcase.system.plus.entity.SysUserRoleEntity.class));
         }
     }
 
@@ -469,9 +482,9 @@ public class SysUserServiceImpl implements ISysUserService {
     public int deleteUserById(Long userId) {
 
         // 删除用户与角色关联
-        userRoleMapper.deleteUserRoleByUserId(userId);
+        userRoleMapper.deleteByUserId(userId);
         // 删除用户与岗位表
-        userPostMapper.deleteUserPostByUserId(userId);
+        userPostMapper.deleteByUserId(userId);
         return userMapper.deleteUserById(userId);
     }
 
@@ -491,10 +504,10 @@ public class SysUserServiceImpl implements ISysUserService {
             checkUserDataScope(userId);
         }
         // 删除用户与角色关联
-        userRoleMapper.deleteUserRole(userIds);
+        userRoleMapper.deleteByUserIds(userIds);
         // 删除用户与岗位关联
-        userPostMapper.deleteUserPost(userIds);
-        return userMapper.deleteUserByIds(userIds);
+        userPostMapper.deleteByUserIds(userIds);
+        return userMapper.deleteUsersByIds(userIds);
     }
 
 }
