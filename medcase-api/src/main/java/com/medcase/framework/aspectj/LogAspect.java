@@ -14,7 +14,7 @@ import com.medcase.common.utils.ip.IpUtils;
 import com.medcase.common.utils.json.JsonUtils;
 import com.medcase.framework.manager.AsyncManager;
 import com.medcase.framework.manager.factory.AsyncFactory;
-import com.medcase.system.domain.SysOperLog;
+import com.medcase.system.entity.SysOperLogEntity;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.ArrayUtils;
@@ -93,7 +93,7 @@ public class LogAspect {
             LoginUser loginUser = SecurityUtils.getLoginUser();
 
             // *========数据库日志=========*//
-            SysOperLog operLog = new SysOperLog();
+            SysOperLogEntity operLog = new SysOperLogEntity();
             operLog.setStatus(BusinessStatus.SUCCESS.ordinal());
             // 请求的地址
             String ip = IpUtils.getIpAddr();
@@ -146,7 +146,7 @@ public class LogAspect {
      * @param operLog 操作日志
      * @throws Exception
      */
-    public void getControllerMethodDescription(JoinPoint joinPoint, Log log, SysOperLog operLog, Object jsonResult) throws Exception {
+    public void getControllerMethodDescription(JoinPoint joinPoint, Log log, SysOperLogEntity operLog, Object jsonResult) throws Exception {
 
         // 设置action动作
         operLog.setBusinessType(log.businessType().getCode());
@@ -173,7 +173,7 @@ public class LogAspect {
      * @param operLog 操作日志
      * @throws Exception 异常
      */
-    private void setRequestValue(JoinPoint joinPoint, SysOperLog operLog, String[] excludeParamNames) throws Exception {
+    private void setRequestValue(JoinPoint joinPoint, SysOperLogEntity operLog, String[] excludeParamNames) throws Exception {
 
         String requestMethod = operLog.getRequestMethod();
         Map<?, ?> paramsMap = ServletUtils.getParamMap(ServletUtils.getRequest());

@@ -11,8 +11,8 @@ import com.medcase.common.utils.http.UserAgentUtils;
 import com.medcase.common.utils.ip.AddressUtils;
 import com.medcase.common.utils.ip.IpUtils;
 import com.medcase.common.utils.spring.SpringUtils;
-import com.medcase.system.domain.SysLogininfor;
-import com.medcase.system.domain.SysOperLog;
+import com.medcase.system.entity.SysLogininforEntity;
+import com.medcase.system.entity.SysOperLogEntity;
 import com.medcase.system.service.ISysLogininforService;
 import com.medcase.system.service.ISysOperLogService;
 
@@ -57,7 +57,7 @@ public class AsyncFactory {
                 // 获取客户端浏览器
                 String browser = UserAgentUtils.getBrowser(userAgent);
                 // 封装对象
-                SysLogininfor logininfor = new SysLogininfor();
+                SysLogininforEntity logininfor = new SysLogininforEntity();
                 logininfor.setUserName(username);
                 logininfor.setIpaddr(ip);
                 logininfor.setLoginLocation(address);
@@ -85,7 +85,7 @@ public class AsyncFactory {
      * @param operLog 操作日志信息
      * @return 任务task
      */
-    public static TimerTask recordOper(final SysOperLog operLog) {
+    public static TimerTask recordOper(final SysOperLogEntity operLog) {
 
         return new TimerTask() {
 

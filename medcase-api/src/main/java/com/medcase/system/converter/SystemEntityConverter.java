@@ -7,31 +7,17 @@ import com.medcase.common.core.domain.entity.SysMenu;
 import com.medcase.common.core.domain.entity.SysRole;
 import com.medcase.common.core.domain.entity.SysUser;
 import com.medcase.system.domain.SysConfig;
-import com.medcase.system.domain.SysLogininfor;
 import com.medcase.system.domain.SysNotice;
-import com.medcase.system.domain.SysNoticeRead;
-import com.medcase.system.domain.SysOperLog;
 import com.medcase.system.domain.SysPost;
-import com.medcase.system.domain.SysRoleDept;
-import com.medcase.system.domain.SysRoleMenu;
-import com.medcase.system.domain.SysUserPost;
-import com.medcase.system.domain.SysUserRole;
 import com.medcase.system.entity.SysConfigEntity;
 import com.medcase.system.entity.SysDeptEntity;
 import com.medcase.system.entity.SysDictDataEntity;
 import com.medcase.system.entity.SysDictTypeEntity;
-import com.medcase.system.entity.SysLogininforEntity;
 import com.medcase.system.entity.SysMenuEntity;
 import com.medcase.system.entity.SysNoticeEntity;
-import com.medcase.system.entity.SysNoticeReadEntity;
-import com.medcase.system.entity.SysOperLogEntity;
 import com.medcase.system.entity.SysPostEntity;
-import com.medcase.system.entity.SysRoleDeptEntity;
 import com.medcase.system.entity.SysRoleEntity;
-import com.medcase.system.entity.SysRoleMenuEntity;
 import com.medcase.system.entity.SysUserEntity;
-import com.medcase.system.entity.SysUserPostEntity;
-import com.medcase.system.entity.SysUserRoleEntity;
 import org.springframework.beans.BeanUtils;
 
 import java.util.List;
@@ -76,14 +62,6 @@ public final class SystemEntityConverter {
         return copy(source, SysDictType.class);
     }
 
-    public static SysLogininforEntity toEntity(SysLogininfor source) {
-        return copy(source, SysLogininforEntity.class);
-    }
-
-    public static SysLogininfor toDomain(SysLogininforEntity source) {
-        return copy(source, SysLogininfor.class);
-    }
-
     public static SysMenuEntity toEntity(SysMenu source) {
         return copy(source, SysMenuEntity.class);
     }
@@ -100,36 +78,12 @@ public final class SystemEntityConverter {
         return copy(source, SysNotice.class);
     }
 
-    public static SysNoticeReadEntity toEntity(SysNoticeRead source) {
-        return copy(source, SysNoticeReadEntity.class);
-    }
-
-    public static SysNoticeRead toDomain(SysNoticeReadEntity source) {
-        return copy(source, SysNoticeRead.class);
-    }
-
-    public static SysOperLogEntity toEntity(SysOperLog source) {
-        return copy(source, SysOperLogEntity.class);
-    }
-
-    public static SysOperLog toDomain(SysOperLogEntity source) {
-        return copy(source, SysOperLog.class);
-    }
-
     public static SysPostEntity toEntity(SysPost source) {
         return copy(source, SysPostEntity.class);
     }
 
     public static SysPost toDomain(SysPostEntity source) {
         return copy(source, SysPost.class);
-    }
-
-    public static SysRoleDeptEntity toEntity(SysRoleDept source) {
-        return copy(source, SysRoleDeptEntity.class);
-    }
-
-    public static SysRoleDept toDomain(SysRoleDeptEntity source) {
-        return copy(source, SysRoleDept.class);
     }
 
     public static SysRoleEntity toEntity(SysRole source) {
@@ -140,36 +94,12 @@ public final class SystemEntityConverter {
         return copy(source, SysRole.class);
     }
 
-    public static SysRoleMenuEntity toEntity(SysRoleMenu source) {
-        return copy(source, SysRoleMenuEntity.class);
-    }
-
-    public static SysRoleMenu toDomain(SysRoleMenuEntity source) {
-        return copy(source, SysRoleMenu.class);
-    }
-
     public static SysUserEntity toEntity(SysUser source) {
         return copy(source, SysUserEntity.class);
     }
 
     public static SysUser toDomain(SysUserEntity source) {
         return copy(source, SysUser.class);
-    }
-
-    public static SysUserPostEntity toEntity(SysUserPost source) {
-        return copy(source, SysUserPostEntity.class);
-    }
-
-    public static SysUserPost toDomain(SysUserPostEntity source) {
-        return copy(source, SysUserPost.class);
-    }
-
-    public static SysUserRoleEntity toEntity(SysUserRole source) {
-        return copy(source, SysUserRoleEntity.class);
-    }
-
-    public static SysUserRole toDomain(SysUserRoleEntity source) {
-        return copy(source, SysUserRole.class);
     }
 
     public static <S, T> List<T> copyList(List<S> sources, Class<T> targetType) {

@@ -1,7 +1,7 @@
 package com.medcase.system.service;
 
 import java.util.List;
-import com.medcase.system.domain.SysLogininfor;
+import com.medcase.system.entity.SysLogininforEntity;
 
 /**
  * 系统访问日志情况信息 服务层
@@ -14,7 +14,7 @@ public interface ISysLogininforService {
      * 
      * @param logininfor 访问日志对象
      */
-    public void insertLogininfor(SysLogininfor logininfor);
+    public void insertLogininfor(SysLogininforEntity logininfor);
 
     /**
      * 查询系统登录日志集合
@@ -22,7 +22,9 @@ public interface ISysLogininforService {
      * @param logininfor 访问日志对象
      * @return 登录记录集合
      */
-    public List<SysLogininfor> selectLogininforList(SysLogininfor logininfor);
+    public List<SysLogininforEntity> selectLogininforList(
+            String ipaddr, String status, String userName,
+            String beginTime, String endTime);
 
     /**
      * 批量删除系统登录日志

@@ -15,8 +15,10 @@ import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
 import com.medcase.common.enums.BusinessType;
 import com.medcase.mp.mybatis.PageResult;
-import com.medcase.system.domain.SysOperLog;
+import com.medcase.system.entity.SysOperLogEntity;
 import com.medcase.system.service.ISysOperLogService;
+import com.medcase.web.controller.monitor.dto.OperLogQueryRequest;
+import com.medcase.web.controller.monitor.dto.OperLogResponse;
 
 /**
  * 操作日志记录
@@ -31,11 +33,17 @@ public class SysOperlogController extends BaseController {
 
     @PreAuthorize("@ss.hasPermi('monitor:operlog:list')")
     @GetMapping("/list")
-    public PageResult<SysOperLog> list(SysOperLog operLog) {
+    public PageResult<OperLogResponse> list(OperLogQueryRequest request) {
 
         startPage();
-        List<SysOperLog> list = operLogService.selectOperLogList(operLog);
-        return new PageResult<>(list, new PageInfo<>(list).getTotal());
+        List<SysOperLogEntity> entities = operLogService.selectOperLogList(
+                request.getOperIp(), request.getTitle(), request.getBusinessType(),
+                request.getStatus(), request.getOperName(),
+                request.getBeginTime(), request.getEndTime());
+        List<OperLogResponse> list = entities.stream()
+                .map(OperLogResponse::new)
+                .toList();
+        return new PageResult<>(list, new PageInfo<>(entities).getTotal());
     }
 
     @Log(title = "操作日志", businessType = BusinessType.DELETE)

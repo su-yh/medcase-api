@@ -11,13 +11,11 @@ import java.util.List;
 public interface SysOperLogMapper extends BaseMapperX<SysOperLogEntity> {
     default List<SysOperLogEntity> selectOperLogList(
             String operIp, String title, Integer businessType,
-            Integer[] businessTypes, Integer status, String operName,
-            Object beginTime, Object endTime) {
+            Integer status, String operName, String beginTime, String endTime) {
         LambdaQueryWrapper<SysOperLogEntity> query = build()
                 .likeIfPresent(SysOperLogEntity::getOperIp, operIp)
                 .likeIfPresent(SysOperLogEntity::getTitle, title)
                 .eqIfPresent(SysOperLogEntity::getBusinessType, businessType)
-                .inIfPresent(SysOperLogEntity::getBusinessType, java.util.Arrays.asList(businessTypes))
                 .eqIfPresent(SysOperLogEntity::getStatus, status)
                 .likeIfPresent(SysOperLogEntity::getOperName, operName)
                 .geIfPresent(SysOperLogEntity::getOperTime, beginTime)

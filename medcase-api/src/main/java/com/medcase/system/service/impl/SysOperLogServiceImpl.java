@@ -4,8 +4,6 @@ import java.util.Arrays;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.medcase.system.domain.SysOperLog;
-import com.medcase.system.converter.SystemEntityConverter;
 import com.medcase.system.entity.SysOperLogEntity;
 import com.medcase.system.mapper.SysOperLogMapper;
 import com.medcase.system.service.ISysOperLogService;
@@ -26,11 +24,9 @@ public class SysOperLogServiceImpl implements ISysOperLogService {
      * @param operLog 操作日志对象
      */
     @Override
-    public void insertOperlog(SysOperLog operLog) {
+    public void insertOperlog(SysOperLogEntity operLog) {
 
-        SysOperLogEntity entity = SystemEntityConverter.toEntity(operLog);
-        operLogMapper.insert(entity);
-        operLog.setOperId(entity.getOperId());
+        operLogMapper.insert(operLog);
     }
 
     /**
@@ -40,13 +36,12 @@ public class SysOperLogServiceImpl implements ISysOperLogService {
      * @return 操作日志集合
      */
     @Override
-    public List<SysOperLog> selectOperLogList(SysOperLog operLog) {
+    public List<SysOperLogEntity> selectOperLogList(
+            String operIp, String title, Integer businessType,
+            Integer status, String operName, String beginTime, String endTime) {
 
-        return SystemEntityConverter.copyList(operLogMapper.selectOperLogList(
-                operLog.getOperIp(), operLog.getTitle(), operLog.getBusinessType(),
-                operLog.getBusinessTypes(), operLog.getStatus(), operLog.getOperName(),
-                operLog.getParams().get("beginTime"), operLog.getParams().get("endTime")),
-                SysOperLog.class);
+        return operLogMapper.selectOperLogList(
+                operIp, title, businessType, status, operName, beginTime, endTime);
     }
 
     /**
@@ -68,9 +63,9 @@ public class SysOperLogServiceImpl implements ISysOperLogService {
      * @return 操作日志对象
      */
     @Override
-    public SysOperLog selectOperLogById(Long operId) {
+    public SysOperLogEntity selectOperLogById(Long operId) {
 
-        return SystemEntityConverter.toDomain(operLogMapper.selectById(operId));
+        return operLogMapper.selectById(operId);
     }
 
     /**

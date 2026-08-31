@@ -11,8 +11,6 @@ import com.medcase.common.utils.spring.SpringUtils;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
 import com.medcase.system.domain.SysPost;
-import com.medcase.system.domain.SysUserPost;
-import com.medcase.system.domain.SysUserRole;
 import com.medcase.system.event.UserAvatarUploadedEvent;
 import com.medcase.system.converter.SystemEntityConverter;
 import com.medcase.system.entity.SysUserEntity;
@@ -432,17 +430,15 @@ public class SysUserServiceImpl implements ISysUserService {
         if (StringUtils.isNotEmpty(posts)) {
 
             // 新增用户与岗位管理
-            List<SysUserPost> list = new ArrayList<SysUserPost>(posts.length);
+            List<SysUserPostEntity> list = new ArrayList<>(posts.length);
             for (Long postId : posts) {
 
-                SysUserPost up = new SysUserPost();
+                SysUserPostEntity up = new SysUserPostEntity();
                 up.setUserId(user.getUserId());
                 up.setPostId(postId);
                 list.add(up);
             }
-            userPostMapper.insertUserPosts(
-                    SystemEntityConverter.copyList(list,
-                            SysUserPostEntity.class));
+            userPostMapper.insertUserPosts(list);
         }
     }
 
@@ -457,17 +453,15 @@ public class SysUserServiceImpl implements ISysUserService {
         if (StringUtils.isNotEmpty(roleIds)) {
 
             // 新增用户与角色管理
-            List<SysUserRole> list = new ArrayList<SysUserRole>(roleIds.length);
+            List<SysUserRoleEntity> list = new ArrayList<>(roleIds.length);
             for (Long roleId : roleIds) {
 
-                SysUserRole ur = new SysUserRole();
+                SysUserRoleEntity ur = new SysUserRoleEntity();
                 ur.setUserId(userId);
                 ur.setRoleId(roleId);
                 list.add(ur);
             }
-            userRoleMapper.insertUserRoles(
-                    SystemEntityConverter.copyList(list,
-                            SysUserRoleEntity.class));
+            userRoleMapper.insertUserRoles(list);
         }
     }
 

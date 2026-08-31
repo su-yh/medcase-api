@@ -3,7 +3,6 @@ package com.medcase.system.service;
 import java.util.List;
 import java.util.Set;
 import com.medcase.common.core.domain.entity.SysRole;
-import com.medcase.system.domain.SysUserRole;
 
 /**
  * 角色业务层
@@ -150,7 +149,7 @@ public interface ISysRoleService {
      * @param userRole 用户和角色关联信息
      * @return 结果
      */
-    public int deleteAuthUser(SysUserRole userRole);
+    public int deleteAuthUser(Long userId, Long roleId);
 
     /**
      * 批量取消授权用户角色

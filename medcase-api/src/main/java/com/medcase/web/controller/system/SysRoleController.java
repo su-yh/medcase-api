@@ -24,10 +24,10 @@ import com.medcase.common.enums.BusinessType;
 import com.medcase.framework.web.service.SysPermissionService;
 import com.medcase.framework.web.service.TokenService;
 import com.medcase.mp.mybatis.PageResult;
-import com.medcase.system.domain.SysUserRole;
 import com.medcase.system.service.ISysDeptService;
 import com.medcase.system.service.ISysRoleService;
 import com.medcase.system.service.ISysUserService;
+import com.medcase.web.controller.system.dto.RoleUserRequest;
 import com.medcase.web.controller.system.dto.RoleDeptTreeResponse;
 
 /**
@@ -205,9 +205,9 @@ public class SysRoleController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:role:edit')")
     @Log(title = "角色管理", businessType = BusinessType.GRANT)
     @PutMapping("/authUser/cancel")
-    public void cancelAuthUser(@RequestBody SysUserRole userRole) {
+    public void cancelAuthUser(@RequestBody RoleUserRequest request) {
 
-        if (roleService.deleteAuthUser(userRole) <= 0) {
+        if (roleService.deleteAuthUser(request.getUserId(), request.getRoleId()) <= 0) {
             throw ExceptionUtil.business(ErrorCodeEnums.ROLE_AUTH_USER_DELETE_FAILED);
         }
     }

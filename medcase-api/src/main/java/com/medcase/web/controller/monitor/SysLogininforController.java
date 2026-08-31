@@ -8,8 +8,10 @@ import com.medcase.framework.web.service.SysPasswordService;
 import com.medcase.mp.mybatis.PageResult;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
-import com.medcase.system.domain.SysLogininfor;
+import com.medcase.system.entity.SysLogininforEntity;
 import com.medcase.system.service.ISysLogininforService;
+import com.medcase.web.controller.monitor.dto.LogininforQueryRequest;
+import com.medcase.web.controller.monitor.dto.LogininforResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -36,11 +38,16 @@ public class SysLogininforController extends BaseController {
 
     @PreAuthorize("@ss.hasPermi('monitor:logininfor:list')")
     @GetMapping("/list")
-    public PageResult<SysLogininfor> list(SysLogininfor logininfor) {
+    public PageResult<LogininforResponse> list(LogininforQueryRequest request) {
 
         startPage();
-        List<SysLogininfor> list = logininforService.selectLogininforList(logininfor);
-        return new PageResult<>(list, new PageInfo<>(list).getTotal());
+        List<SysLogininforEntity> entities = logininforService.selectLogininforList(
+                request.getIpaddr(), request.getStatus(), request.getUserName(),
+                request.getBeginTime(), request.getEndTime());
+        List<LogininforResponse> list = entities.stream()
+                .map(LogininforResponse::new)
+                .toList();
+        return new PageResult<>(list, new PageInfo<>(entities).getTotal());
     }
 
     @PreAuthorize("@ss.hasPermi('monitor:logininfor:remove')")

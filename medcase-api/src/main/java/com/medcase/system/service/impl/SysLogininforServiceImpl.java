@@ -4,8 +4,6 @@ import java.util.Arrays;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.medcase.system.domain.SysLogininfor;
-import com.medcase.system.converter.SystemEntityConverter;
 import com.medcase.system.entity.SysLogininforEntity;
 import com.medcase.system.mapper.SysLogininforMapper;
 import com.medcase.system.service.ISysLogininforService;
@@ -27,11 +25,9 @@ public class SysLogininforServiceImpl implements ISysLogininforService {
      * @param logininfor 访问日志对象
      */
     @Override
-    public void insertLogininfor(SysLogininfor logininfor) {
+    public void insertLogininfor(SysLogininforEntity logininfor) {
 
-        SysLogininforEntity entity = SystemEntityConverter.toEntity(logininfor);
-        logininforMapper.insert(entity);
-        logininfor.setInfoId(entity.getInfoId());
+        logininforMapper.insert(logininfor);
     }
 
     /**
@@ -41,12 +37,12 @@ public class SysLogininforServiceImpl implements ISysLogininforService {
      * @return 登录记录集合
      */
     @Override
-    public List<SysLogininfor> selectLogininforList(SysLogininfor logininfor) {
+    public List<SysLogininforEntity> selectLogininforList(
+            String ipaddr, String status, String userName,
+            String beginTime, String endTime) {
 
-        return SystemEntityConverter.copyList(logininforMapper.selectLogininforList(
-                logininfor.getIpaddr(), logininfor.getStatus(), logininfor.getUserName(),
-                logininfor.getParams().get("beginTime"), logininfor.getParams().get("endTime")),
-                SysLogininfor.class);
+        return logininforMapper.selectLogininforList(
+                ipaddr, status, userName, beginTime, endTime);
     }
 
     /**

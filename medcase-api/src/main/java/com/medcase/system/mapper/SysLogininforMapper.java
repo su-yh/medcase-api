@@ -5,14 +5,13 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.medcase.system.entity.SysLogininforEntity;
 import org.apache.ibatis.annotations.Mapper;
 
-import java.util.Date;
 import java.util.List;
 
 @Mapper
 public interface SysLogininforMapper extends BaseMapperX<SysLogininforEntity> {
     default List<SysLogininforEntity> selectLogininforList(
             String ipaddr, String status, String userName,
-            Object beginTime, Object endTime) {
+            String beginTime, String endTime) {
         LambdaQueryWrapper<SysLogininforEntity> query = build()
                 .likeIfPresent(SysLogininforEntity::getIpaddr, ipaddr)
                 .eqIfPresent(SysLogininforEntity::getStatus, status)

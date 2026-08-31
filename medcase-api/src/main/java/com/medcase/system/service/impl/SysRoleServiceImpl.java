@@ -14,9 +14,6 @@ import com.medcase.common.core.domain.entity.SysRole;
 import com.medcase.common.utils.SecurityUtils;
 import com.medcase.common.utils.StringUtils;
 import com.medcase.common.utils.spring.SpringUtils;
-import com.medcase.system.domain.SysRoleDept;
-import com.medcase.system.domain.SysRoleMenu;
-import com.medcase.system.domain.SysUserRole;
 import com.medcase.system.converter.SystemEntityConverter;
 import com.medcase.system.entity.SysRoleDeptEntity;
 import com.medcase.system.entity.SysRoleEntity;
@@ -300,19 +297,17 @@ public class SysRoleServiceImpl implements ISysRoleService {
 
         int rows = 1;
         // 新增用户与角色管理
-        List<SysRoleMenu> list = new ArrayList<SysRoleMenu>();
+        List<SysRoleMenuEntity> list = new ArrayList<>();
         for (Long menuId : role.getMenuIds()) {
 
-            SysRoleMenu rm = new SysRoleMenu();
+            SysRoleMenuEntity rm = new SysRoleMenuEntity();
             rm.setRoleId(role.getRoleId());
             rm.setMenuId(menuId);
             list.add(rm);
         }
         if (list.size() > 0) {
 
-            roleMenuMapper.insertRoleMenus(
-                    SystemEntityConverter.copyList(list,
-                            SysRoleMenuEntity.class));
+            roleMenuMapper.insertRoleMenus(list);
             rows = list.size();
         }
         return rows;
@@ -327,19 +322,17 @@ public class SysRoleServiceImpl implements ISysRoleService {
 
         int rows = 1;
         // 新增角色与部门（数据权限）管理
-        List<SysRoleDept> list = new ArrayList<SysRoleDept>();
+        List<SysRoleDeptEntity> list = new ArrayList<>();
         for (Long deptId : role.getDeptIds()) {
 
-            SysRoleDept rd = new SysRoleDept();
+            SysRoleDeptEntity rd = new SysRoleDeptEntity();
             rd.setRoleId(role.getRoleId());
             rd.setDeptId(deptId);
             list.add(rd);
         }
         if (list.size() > 0) {
 
-            roleDeptMapper.insertRoleDepts(
-                    SystemEntityConverter.copyList(list,
-                            SysRoleDeptEntity.class));
+            roleDeptMapper.insertRoleDepts(list);
             rows = list.size();
         }
         return rows;
@@ -396,10 +389,9 @@ public class SysRoleServiceImpl implements ISysRoleService {
      * @return 结果
      */
     @Override
-    public int deleteAuthUser(SysUserRole userRole) {
+    public int deleteAuthUser(Long userId, Long roleId) {
 
-        return userRoleMapper.deleteByUserAndRole(
-                userRole.getUserId(), userRole.getRoleId());
+        return userRoleMapper.deleteByUserAndRole(userId, roleId);
     }
 
     /**
@@ -426,17 +418,15 @@ public class SysRoleServiceImpl implements ISysRoleService {
     public int insertAuthUsers(Long roleId, Long[] userIds) {
 
         // 新增用户与角色管理
-        List<SysUserRole> list = new ArrayList<SysUserRole>();
+        List<SysUserRoleEntity> list = new ArrayList<>();
         for (Long userId : userIds) {
 
-            SysUserRole ur = new SysUserRole();
+            SysUserRoleEntity ur = new SysUserRoleEntity();
             ur.setUserId(userId);
             ur.setRoleId(roleId);
             list.add(ur);
         }
-        userRoleMapper.insertUserRoles(
-                SystemEntityConverter.copyList(list,
-                        SysUserRoleEntity.class));
+        userRoleMapper.insertUserRoles(list);
         return list.size();
     }
 }

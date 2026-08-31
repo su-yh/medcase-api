@@ -5,8 +5,6 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.medcase.system.domain.SysNotice;
-import com.medcase.system.domain.SysNoticeRead;
-import com.medcase.system.converter.SystemEntityConverter;
 import com.medcase.system.entity.SysNoticeReadEntity;
 import com.medcase.system.mapper.SysNoticeReadMapper;
 import com.medcase.system.service.ISysNoticeReadService;
@@ -26,10 +24,10 @@ public class SysNoticeReadServiceImpl implements ISysNoticeReadService {
     @Override
     public void markRead(Long noticeId, Long userId) {
 
-        SysNoticeRead record = new SysNoticeRead();
+        SysNoticeReadEntity record = new SysNoticeReadEntity();
         record.setNoticeId(noticeId);
         record.setUserId(userId);
-        noticeReadMapper.insert(SystemEntityConverter.toEntity(record));
+        noticeReadMapper.insert(record);
     }
 
     /**
