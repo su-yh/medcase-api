@@ -19,8 +19,11 @@ import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
 import com.medcase.common.enums.BusinessType;
 import com.medcase.mp.mybatis.PageResult;
-import com.medcase.system.domain.SysPost;
+import com.medcase.system.entity.SysPostEntity;
 import com.medcase.system.service.ISysPostService;
+import com.medcase.web.controller.system.dto.PostQueryRequest;
+import com.medcase.web.controller.system.dto.PostResponse;
+import com.medcase.web.controller.system.dto.PostSaveRequest;
 
 /**
  * 岗位信息操作处理
@@ -38,11 +41,15 @@ public class SysPostController extends BaseController {
      */
     @PreAuthorize("@ss.hasPermi('system:post:list')")
     @GetMapping("/list")
-    public PageResult<SysPost> list(SysPost post) {
+    public PageResult<PostResponse> list(PostQueryRequest request) {
 
         startPage();
-        List<SysPost> list = postService.selectPostList(post);
-        return new PageResult<>(list, new PageInfo<>(list).getTotal());
+        List<SysPostEntity> entities = postService.selectPostList(
+                request.getPostCode(), request.getPostName(), request.getStatus());
+        List<PostResponse> list = entities.stream()
+                .map(PostResponse::fromEntity)
+                .toList();
+        return new PageResult<>(list, new PageInfo<>(entities).getTotal());
     }
     
     /**
@@ -50,9 +57,9 @@ public class SysPostController extends BaseController {
      */
     @PreAuthorize("@ss.hasPermi('system:post:query')")
     @GetMapping(value = "/{postId}")
-    public SysPost getInfo(@PathVariable Long postId) {
+    public PostResponse getInfo(@PathVariable Long postId) {
 
-        return postService.selectPostById(postId);
+        return PostResponse.fromEntity(postService.selectPostById(postId));
     }
 
     /**
@@ -61,14 +68,15 @@ public class SysPostController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:post:add')")
     @Log(title = "岗位管理", businessType = BusinessType.INSERT)
     @PostMapping
-    public void add(@Validated @RequestBody SysPost post) {
+    public void add(@Validated @RequestBody PostSaveRequest request) {
 
-        if (!postService.checkPostNameUnique(post)) {
+        if (!postService.checkPostNameUnique(request.getPostId(), request.getPostName())) {
             throw ExceptionUtil.business(ErrorCodeEnums.POST_NAME_EXISTS);
         }
-        else if (!postService.checkPostCodeUnique(post)) {
+        else if (!postService.checkPostCodeUnique(request.getPostId(), request.getPostCode())) {
             throw ExceptionUtil.business(ErrorCodeEnums.POST_CODE_EXISTS);
         }
+        SysPostEntity post = toEntity(request);
         post.setCreateBy(getUsername());
         if (postService.insertPost(post) <= 0) {
             throw ExceptionUtil.business(ErrorCodeEnums.POST_OPERATION_FAILED);
@@ -81,14 +89,15 @@ public class SysPostController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:post:edit')")
     @Log(title = "岗位管理", businessType = BusinessType.UPDATE)
     @PutMapping
-    public void edit(@Validated @RequestBody SysPost post) {
+    public void edit(@Validated @RequestBody PostSaveRequest request) {
 
-        if (!postService.checkPostNameUnique(post)) {
+        if (!postService.checkPostNameUnique(request.getPostId(), request.getPostName())) {
             throw ExceptionUtil.business(ErrorCodeEnums.POST_NAME_EXISTS);
         }
-        else if (!postService.checkPostCodeUnique(post)) {
+        else if (!postService.checkPostCodeUnique(request.getPostId(), request.getPostCode())) {
             throw ExceptionUtil.business(ErrorCodeEnums.POST_CODE_EXISTS);
         }
+        SysPostEntity post = toEntity(request);
         post.setUpdateBy(getUsername());
         if (postService.updatePost(post) <= 0) {
             throw ExceptionUtil.business(ErrorCodeEnums.POST_OPERATION_FAILED);
@@ -112,9 +121,21 @@ public class SysPostController extends BaseController {
      * 获取岗位选择框列表
      */
     @GetMapping("/optionselect")
-    public List<SysPost> optionselect() {
+    public List<PostResponse> optionselect() {
 
-        List<SysPost> posts = postService.selectPostAll();
-        return posts;
+        return postService.selectPostAll().stream()
+                .map(PostResponse::fromEntity)
+                .toList();
+    }
+
+    private SysPostEntity toEntity(PostSaveRequest request) {
+        SysPostEntity entity = new SysPostEntity();
+        entity.setPostId(request.getPostId());
+        entity.setPostCode(request.getPostCode());
+        entity.setPostName(request.getPostName());
+        entity.setPostSort(request.getPostSort());
+        entity.setStatus(request.getStatus());
+        entity.setRemark(request.getRemark());
+        return entity;
     }
 }

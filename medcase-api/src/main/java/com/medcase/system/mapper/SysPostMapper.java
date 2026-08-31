@@ -1,8 +1,6 @@
 package com.medcase.system.mapper;
 
 import com.medcase.mp.mybatis.BaseMapperX;
-import com.medcase.system.domain.SysPost;
-import com.medcase.mp.mybatis.LambdaQueryWrapperX;
 import com.medcase.system.entity.SysPostEntity;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -10,11 +8,17 @@ import java.util.List;
 
 @Mapper
 public interface SysPostMapper extends BaseMapperX<SysPostEntity> {
-    List<SysPost> selectPostList(SysPost post);
+    default List<SysPostEntity> selectPostList(
+            String postCode, String postName, String status) {
+        return selectList(build()
+                .likeIfPresent(SysPostEntity::getPostCode, postCode)
+                .likeIfPresent(SysPostEntity::getPostName, postName)
+                .eqIfPresent(SysPostEntity::getStatus, status));
+    }
 
     List<Long> selectPostListByUserId(Long userId);
 
-    List<SysPost> selectPostsByUserName(String userName);
+    List<SysPostEntity> selectPostsByUserName(String userName);
 
     default List<SysPostEntity> selectAllPosts() {
         return selectList(build());

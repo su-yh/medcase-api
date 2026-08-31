@@ -32,6 +32,7 @@ import com.medcase.system.service.ISysUserService;
 import com.medcase.mp.mybatis.PageResult;
 import com.medcase.web.controller.system.dto.UserAuthRoleResponse;
 import com.medcase.web.controller.system.dto.UserDetailResponse;
+import com.medcase.web.controller.system.dto.PostResponse;
 
 /**
  * 用户信息
@@ -86,12 +87,15 @@ public class SysUserController extends BaseController {
         List<SysRole> availableRoles = SecurityUtils.isAdmin(userId)
                 ? roles
                 : roles.stream().filter(r -> !r.isAdmin()).collect(Collectors.toList());
+        List<PostResponse> posts = postService.selectPostAll().stream()
+                .map(PostResponse::fromEntity)
+                .toList();
         return new UserDetailResponse(
                 sysUser,
                 postIds,
                 roleIds,
                 availableRoles,
-                postService.selectPostAll());
+                posts);
     }
 
     /**

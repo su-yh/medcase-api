@@ -1,13 +1,13 @@
 package com.medcase.system.service.impl;
 
 import java.util.List;
-import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.medcase.system.domain.SysNotice;
 import com.medcase.system.entity.SysNoticeReadEntity;
 import com.medcase.system.mapper.SysNoticeReadMapper;
 import com.medcase.system.service.ISysNoticeReadService;
+import com.medcase.web.controller.system.dto.NoticeReadUserResponse;
+import com.medcase.web.controller.system.dto.NoticeTopItemResponse;
 
 /**
  * 公告已读记录 服务层实现
@@ -43,7 +43,7 @@ public class SysNoticeReadServiceImpl implements ISysNoticeReadService {
      * 查询公告列表并标记当前用户已读状态
      */
     @Override
-    public List<SysNotice> selectNoticeListWithReadStatus(Long userId, int limit) {
+    public List<NoticeTopItemResponse> selectNoticeListWithReadStatus(Long userId, int limit) {
 
         return noticeReadMapper.selectNoticeListWithReadStatus(userId, limit);
     }
@@ -73,7 +73,7 @@ public class SysNoticeReadServiceImpl implements ISysNoticeReadService {
      * 查询已阅读某公告的用户列表
      */
     @Override
-    public List<Map<String, Object>> selectReadUsersByNoticeId(Long noticeId, String searchValue) {
+    public List<NoticeReadUserResponse> selectReadUsersByNoticeId(Long noticeId, String searchValue) {
 
         return noticeReadMapper.selectReadUsersByNoticeId(noticeId, searchValue);
     }

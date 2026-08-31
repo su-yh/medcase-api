@@ -4,8 +4,6 @@ import java.util.Arrays;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.medcase.system.domain.SysNotice;
-import com.medcase.system.converter.SystemEntityConverter;
 import com.medcase.system.entity.SysNoticeEntity;
 import com.medcase.system.mapper.SysNoticeMapper;
 import com.medcase.system.service.ISysNoticeService;
@@ -27,9 +25,9 @@ public class SysNoticeServiceImpl implements ISysNoticeService {
      * @return 公告信息
      */
     @Override
-    public SysNotice selectNoticeById(Long noticeId) {
+    public SysNoticeEntity selectNoticeById(Long noticeId) {
 
-        return SystemEntityConverter.toDomain(noticeMapper.selectById(noticeId));
+        return noticeMapper.selectById(noticeId);
     }
 
     /**
@@ -39,11 +37,10 @@ public class SysNoticeServiceImpl implements ISysNoticeService {
      * @return 公告集合
      */
     @Override
-    public List<SysNotice> selectNoticeList(SysNotice notice) {
+    public List<SysNoticeEntity> selectNoticeList(
+            String noticeTitle, String noticeType, String createBy) {
 
-        return SystemEntityConverter.copyList(noticeMapper.selectNoticeList(
-                notice.getNoticeTitle(), notice.getNoticeType(), notice.getCreateBy()),
-                SysNotice.class);
+        return noticeMapper.selectNoticeList(noticeTitle, noticeType, createBy);
     }
 
     /**
@@ -53,12 +50,9 @@ public class SysNoticeServiceImpl implements ISysNoticeService {
      * @return 结果
      */
     @Override
-    public int insertNotice(SysNotice notice) {
+    public int insertNotice(SysNoticeEntity notice) {
 
-        SysNoticeEntity entity = SystemEntityConverter.toEntity(notice);
-        int result = noticeMapper.insert(entity);
-        notice.setNoticeId(entity.getNoticeId());
-        return result;
+        return noticeMapper.insert(notice);
     }
 
     /**
@@ -68,9 +62,9 @@ public class SysNoticeServiceImpl implements ISysNoticeService {
      * @return 结果
      */
     @Override
-    public int updateNotice(SysNotice notice) {
+    public int updateNotice(SysNoticeEntity notice) {
 
-        return noticeMapper.updateById(SystemEntityConverter.toEntity(notice));
+        return noticeMapper.updateById(notice);
     }
 
     /**

@@ -10,8 +10,6 @@ import com.medcase.common.constant.UserConstants;
 import com.medcase.common.core.redis.RedisCache;
 import com.medcase.common.core.text.Convert;
 import com.medcase.common.utils.StringUtils;
-import com.medcase.system.domain.SysConfig;
-import com.medcase.system.converter.SystemEntityConverter;
 import com.medcase.system.entity.SysConfigEntity;
 import com.medcase.system.mapper.SysConfigMapper;
 import com.medcase.system.service.ISysConfigService;
@@ -48,9 +46,9 @@ public class SysConfigServiceImpl implements ISysConfigService {
      * @return 参数配置信息
      */
     @Override
-    public SysConfig selectConfigById(Long configId) {
+    public SysConfigEntity selectConfigById(Long configId) {
 
-        return SystemEntityConverter.toDomain(configMapper.selectById(configId));
+        return configMapper.selectById(configId);
     }
 
     /**
@@ -67,12 +65,11 @@ public class SysConfigServiceImpl implements ISysConfigService {
 
             return configValue;
         }
-        SysConfigEntity retConfigEntity = configMapper.selectConfigByKey(configKey);
-        SysConfig retConfig = SystemEntityConverter.toDomain(retConfigEntity);
-        if (StringUtils.isNotNull(retConfig)) {
+        SysConfigEntity config = configMapper.selectConfigByKey(configKey);
+        if (StringUtils.isNotNull(config)) {
 
-            redisCache.setCacheObject(getCacheKey(configKey), retConfig.getConfigValue());
-            return retConfig.getConfigValue();
+            redisCache.setCacheObject(getCacheKey(configKey), config.getConfigValue());
+            return config.getConfigValue();
         }
         return StringUtils.EMPTY;
     }
@@ -100,13 +97,13 @@ public class SysConfigServiceImpl implements ISysConfigService {
      * @return 参数配置集合
      */
     @Override
-    public List<SysConfig> selectConfigList(SysConfig config) {
+    public List<SysConfigEntity> selectConfigList(
+            String configName, String configType, String configKey,
+            String beginTime, String endTime) {
 
-        Date beginTime = getDateParam(config, "beginTime");
-        Date endTime = getDateParam(config, "endTime");
-        return SystemEntityConverter.copyList(configMapper.selectConfigList(
-                config.getConfigName(), config.getConfigType(), config.getConfigKey(),
-                beginTime, endTime), SysConfig.class);
+        return configMapper.selectConfigList(
+                configName, configType, configKey,
+                parseDate(beginTime), parseDate(endTime));
     }
 
     /**
@@ -116,11 +113,9 @@ public class SysConfigServiceImpl implements ISysConfigService {
      * @return 结果
      */
     @Override
-    public int insertConfig(SysConfig config) {
+    public int insertConfig(SysConfigEntity config) {
 
-        SysConfigEntity entity = SystemEntityConverter.toEntity(config);
-        int row = configMapper.insert(entity);
-        config.setConfigId(entity.getConfigId());
+        int row = configMapper.insert(config);
         if (row > 0) {
 
             redisCache.setCacheObject(getCacheKey(config.getConfigKey()), config.getConfigValue());
@@ -135,15 +130,15 @@ public class SysConfigServiceImpl implements ISysConfigService {
      * @return 结果
      */
     @Override
-    public int updateConfig(SysConfig config) {
+    public int updateConfig(SysConfigEntity config) {
 
-        SysConfig temp = selectConfigById(config.getConfigId());
+        SysConfigEntity temp = selectConfigById(config.getConfigId());
         if (!StringUtils.equals(temp.getConfigKey(), config.getConfigKey())) {
 
             redisCache.deleteObject(getCacheKey(temp.getConfigKey()));
         }
 
-        int row = configMapper.updateById(SystemEntityConverter.toEntity(config));
+        int row = configMapper.updateById(config);
         if (row > 0) {
 
             redisCache.setCacheObject(getCacheKey(config.getConfigKey()), config.getConfigValue());
@@ -161,7 +156,7 @@ public class SysConfigServiceImpl implements ISysConfigService {
 
         for (Long configId : configIds) {
 
-            SysConfig config = selectConfigById(configId);
+            SysConfigEntity config = selectConfigById(configId);
             if (StringUtils.equals(UserConstants.YES, config.getConfigType())) {
 
                 throw ExceptionUtil.business(ErrorCodeEnums.CONFIG_BUILTIN_DELETE, config.getConfigKey());
@@ -177,10 +172,8 @@ public class SysConfigServiceImpl implements ISysConfigService {
     @Override
     public void loadingConfigCache() {
 
-        List<SysConfig> configsList = SystemEntityConverter.copyList(
-                configMapper.selectAllConfigs(),
-                SysConfig.class);
-        for (SysConfig config : configsList) {
+        List<SysConfigEntity> configs = configMapper.selectAllConfigs();
+        for (SysConfigEntity config : configs) {
 
             redisCache.setCacheObject(getCacheKey(config.getConfigKey()), config.getConfigValue());
         }
@@ -213,12 +206,11 @@ public class SysConfigServiceImpl implements ISysConfigService {
      * @return 结果
      */
     @Override
-    public boolean checkConfigKeyUnique(SysConfig config) {
+    public boolean checkConfigKeyUnique(Long configId, String configKey) {
 
-        Long configId = StringUtils.isNull(config.getConfigId()) ? -1L : config.getConfigId();
-        SysConfig info = SystemEntityConverter.toDomain(
-                configMapper.selectConfigByKey(config.getConfigKey()));
-        if (StringUtils.isNotNull(info) && info.getConfigId().longValue() != configId.longValue()) {
+        Long currentConfigId = StringUtils.isNull(configId) ? -1L : configId;
+        SysConfigEntity info = configMapper.selectConfigByKey(configKey);
+        if (StringUtils.isNotNull(info) && info.getConfigId().longValue() != currentConfigId.longValue()) {
 
             return UserConstants.NOT_UNIQUE;
         }
@@ -236,9 +228,7 @@ public class SysConfigServiceImpl implements ISysConfigService {
         return CacheConstants.SYS_CONFIG_KEY + configKey;
     }
 
-    private Date getDateParam(SysConfig config, String key) {
-
-        Object value = config.getParams().get(key);
-        return value == null ? null : com.medcase.common.utils.DateUtils.parseDate(value);
+    private Date parseDate(String value) {
+        return StringUtils.isEmpty(value) ? null : com.medcase.common.utils.DateUtils.parseDate(value);
     }
 }

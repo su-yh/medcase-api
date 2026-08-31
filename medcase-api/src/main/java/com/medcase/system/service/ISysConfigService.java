@@ -1,7 +1,7 @@
 package com.medcase.system.service;
 
 import java.util.List;
-import com.medcase.system.domain.SysConfig;
+import com.medcase.system.entity.SysConfigEntity;
 
 /**
  * 参数配置 服务层
@@ -15,7 +15,7 @@ public interface ISysConfigService {
      * @param configId 参数配置ID
      * @return 参数配置信息
      */
-    public SysConfig selectConfigById(Long configId);
+    public SysConfigEntity selectConfigById(Long configId);
 
     /**
      * 根据键名查询参数配置信息
@@ -38,7 +38,9 @@ public interface ISysConfigService {
      * @param config 参数配置信息
      * @return 参数配置集合
      */
-    public List<SysConfig> selectConfigList(SysConfig config);
+    public List<SysConfigEntity> selectConfigList(
+            String configName, String configType, String configKey,
+            String beginTime, String endTime);
 
     /**
      * 新增参数配置
@@ -46,7 +48,7 @@ public interface ISysConfigService {
      * @param config 参数配置信息
      * @return 结果
      */
-    public int insertConfig(SysConfig config);
+    public int insertConfig(SysConfigEntity config);
 
     /**
      * 修改参数配置
@@ -54,7 +56,7 @@ public interface ISysConfigService {
      * @param config 参数配置信息
      * @return 结果
      */
-    public int updateConfig(SysConfig config);
+    public int updateConfig(SysConfigEntity config);
 
     /**
      * 批量删除参数信息
@@ -84,5 +86,5 @@ public interface ISysConfigService {
      * @param config 参数信息
      * @return 结果
      */
-    public boolean checkConfigKeyUnique(SysConfig config);
+    public boolean checkConfigKeyUnique(Long configId, String configKey);
 }

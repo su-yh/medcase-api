@@ -10,12 +10,12 @@ import com.medcase.common.utils.StringUtils;
 import com.medcase.common.utils.spring.SpringUtils;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
-import com.medcase.system.domain.SysPost;
 import com.medcase.system.event.UserAvatarUploadedEvent;
 import com.medcase.system.converter.SystemEntityConverter;
 import com.medcase.system.entity.SysUserEntity;
 import com.medcase.system.entity.SysUserPostEntity;
 import com.medcase.system.entity.SysUserRoleEntity;
+import com.medcase.system.entity.SysPostEntity;
 import com.medcase.system.mapper.SysPostMapper;
 import com.medcase.system.mapper.SysRoleMapper;
 import com.medcase.system.mapper.SysUserMapper;
@@ -156,12 +156,12 @@ public class SysUserServiceImpl implements ISysUserService {
     @Override
     public String selectUserPostGroup(String userName) {
 
-        List<SysPost> list = postMapper.selectPostsByUserName(userName);
+        List<SysPostEntity> list = postMapper.selectPostsByUserName(userName);
         if (CollectionUtils.isEmpty(list)) {
 
             return StringUtils.EMPTY;
         }
-        return list.stream().map(SysPost::getPostName).collect(Collectors.joining(","));
+        return list.stream().map(SysPostEntity::getPostName).collect(Collectors.joining(","));
     }
 
     /**

@@ -6,10 +6,6 @@ import com.medcase.common.core.domain.entity.SysDictType;
 import com.medcase.common.core.domain.entity.SysMenu;
 import com.medcase.common.core.domain.entity.SysRole;
 import com.medcase.common.core.domain.entity.SysUser;
-import com.medcase.system.domain.SysConfig;
-import com.medcase.system.domain.SysNotice;
-import com.medcase.system.domain.SysPost;
-import com.medcase.system.entity.SysConfigEntity;
 import com.medcase.system.entity.SysDeptEntity;
 import com.medcase.system.entity.SysDictDataEntity;
 import com.medcase.system.entity.SysDictTypeEntity;
@@ -28,14 +24,6 @@ import java.util.List;
 public final class SystemEntityConverter {
 
     private SystemEntityConverter() {
-    }
-
-    public static SysConfigEntity toEntity(SysConfig source) {
-        return copy(source, SysConfigEntity.class);
-    }
-
-    public static SysConfig toDomain(SysConfigEntity source) {
-        return copy(source, SysConfig.class);
     }
 
     public static SysDeptEntity toEntity(SysDept source) {
@@ -68,22 +56,6 @@ public final class SystemEntityConverter {
 
     public static SysMenu toDomain(SysMenuEntity source) {
         return copy(source, SysMenu.class);
-    }
-
-    public static SysNoticeEntity toEntity(SysNotice source) {
-        return copy(source, SysNoticeEntity.class);
-    }
-
-    public static SysNotice toDomain(SysNoticeEntity source) {
-        return copy(source, SysNotice.class);
-    }
-
-    public static SysPostEntity toEntity(SysPost source) {
-        return copy(source, SysPostEntity.class);
-    }
-
-    public static SysPost toDomain(SysPostEntity source) {
-        return copy(source, SysPost.class);
     }
 
     public static SysRoleEntity toEntity(SysRole source) {

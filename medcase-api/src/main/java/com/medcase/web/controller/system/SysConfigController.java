@@ -7,8 +7,11 @@ import com.github.pagehelper.PageInfo;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
 import com.medcase.mp.mybatis.PageResult;
-import com.medcase.system.domain.SysConfig;
+import com.medcase.system.entity.SysConfigEntity;
 import com.medcase.system.service.ISysConfigService;
+import com.medcase.web.controller.system.dto.ConfigQueryRequest;
+import com.medcase.web.controller.system.dto.ConfigResponse;
+import com.medcase.web.controller.system.dto.ConfigSaveRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -39,11 +42,16 @@ public class SysConfigController extends BaseController {
      */
     @PreAuthorize("@ss.hasPermi('system:config:list')")
     @GetMapping("/list")
-    public PageResult<SysConfig> list(SysConfig config) {
+    public PageResult<ConfigResponse> list(ConfigQueryRequest request) {
 
         startPage();
-        List<SysConfig> list = configService.selectConfigList(config);
-        return new PageResult<>(list, new PageInfo<>(list).getTotal());
+        List<SysConfigEntity> entities = configService.selectConfigList(
+                request.getConfigName(), request.getConfigType(), request.getConfigKey(),
+                request.getBeginTime(), request.getEndTime());
+        List<ConfigResponse> list = entities.stream()
+                .map(ConfigResponse::fromEntity)
+                .toList();
+        return new PageResult<>(list, new PageInfo<>(entities).getTotal());
     }
 
     /**
@@ -51,9 +59,9 @@ public class SysConfigController extends BaseController {
      */
     @PreAuthorize("@ss.hasPermi('system:config:query')")
     @GetMapping(value = "/{configId}")
-    public SysConfig getInfo(@PathVariable Long configId) {
+    public ConfigResponse getInfo(@PathVariable Long configId) {
 
-        return configService.selectConfigById(configId);
+        return ConfigResponse.fromEntity(configService.selectConfigById(configId));
     }
 
     /**
@@ -71,11 +79,12 @@ public class SysConfigController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:config:add')")
     @Log(title = "参数管理", businessType = BusinessType.INSERT)
     @PostMapping
-    public void add(@Validated @RequestBody SysConfig config) {
+    public void add(@Validated @RequestBody ConfigSaveRequest request) {
 
-        if (!configService.checkConfigKeyUnique(config)) {
+        if (!configService.checkConfigKeyUnique(request.getConfigId(), request.getConfigKey())) {
             throw ExceptionUtil.business(ErrorCodeEnums.CONFIG_KEY_EXISTS);
         }
+        SysConfigEntity config = toEntity(request);
         config.setCreateBy(getUsername());
         if (configService.insertConfig(config) <= 0) {
             throw ExceptionUtil.business(ErrorCodeEnums.CONFIG_OPERATION_FAILED);
@@ -88,11 +97,12 @@ public class SysConfigController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:config:edit')")
     @Log(title = "参数管理", businessType = BusinessType.UPDATE)
     @PutMapping
-    public void edit(@Validated @RequestBody SysConfig config) {
+    public void edit(@Validated @RequestBody ConfigSaveRequest request) {
 
-        if (!configService.checkConfigKeyUnique(config)) {
+        if (!configService.checkConfigKeyUnique(request.getConfigId(), request.getConfigKey())) {
             throw ExceptionUtil.business(ErrorCodeEnums.CONFIG_KEY_EXISTS);
         }
+        SysConfigEntity config = toEntity(request);
         config.setUpdateBy(getUsername());
         if (configService.updateConfig(config) <= 0) {
             throw ExceptionUtil.business(ErrorCodeEnums.CONFIG_OPERATION_FAILED);
@@ -119,5 +129,16 @@ public class SysConfigController extends BaseController {
     public void refreshCache() {
 
         configService.resetConfigCache();
+    }
+
+    private SysConfigEntity toEntity(ConfigSaveRequest request) {
+        SysConfigEntity entity = new SysConfigEntity();
+        entity.setConfigId(request.getConfigId());
+        entity.setConfigName(request.getConfigName());
+        entity.setConfigKey(request.getConfigKey());
+        entity.setConfigValue(request.getConfigValue());
+        entity.setConfigType(request.getConfigType());
+        entity.setRemark(request.getRemark());
+        return entity;
     }
 }

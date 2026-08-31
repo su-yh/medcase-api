@@ -1,7 +1,7 @@
 package com.medcase.system.service;
 
 import java.util.List;
-import com.medcase.system.domain.SysNotice;
+import com.medcase.system.entity.SysNoticeEntity;
 
 /**
  * 公告 服务层
@@ -15,7 +15,7 @@ public interface ISysNoticeService {
      * @param noticeId 公告ID
      * @return 公告信息
      */
-    public SysNotice selectNoticeById(Long noticeId);
+    public SysNoticeEntity selectNoticeById(Long noticeId);
 
     /**
      * 查询公告列表
@@ -23,7 +23,8 @@ public interface ISysNoticeService {
      * @param notice 公告信息
      * @return 公告集合
      */
-    public List<SysNotice> selectNoticeList(SysNotice notice);
+    public List<SysNoticeEntity> selectNoticeList(
+            String noticeTitle, String noticeType, String createBy);
 
     /**
      * 新增公告
@@ -31,7 +32,7 @@ public interface ISysNoticeService {
      * @param notice 公告信息
      * @return 结果
      */
-    public int insertNotice(SysNotice notice);
+    public int insertNotice(SysNoticeEntity notice);
 
     /**
      * 修改公告
@@ -39,7 +40,7 @@ public interface ISysNoticeService {
      * @param notice 公告信息
      * @return 结果
      */
-    public int updateNotice(SysNotice notice);
+    public int updateNotice(SysNoticeEntity notice);
 
     /**
      * 删除公告信息

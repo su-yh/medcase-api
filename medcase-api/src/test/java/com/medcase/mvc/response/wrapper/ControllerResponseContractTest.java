@@ -28,9 +28,10 @@ import com.medcase.web.controller.system.SysRegisterController;
 import com.medcase.web.controller.system.SysRoleController;
 import com.medcase.web.controller.system.SysUserController;
 import com.medcase.web.controller.system.SysVersionController;
-import com.medcase.system.domain.SysConfig;
 import org.junit.jupiter.api.Test;
 
+import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -77,8 +78,43 @@ class ControllerResponseContractTest {
     }
 
     @Test
-    void configListShouldUsePageResult() throws NoSuchMethodException {
-        assertEquals(PageResult.class,
-                SysConfigController.class.getMethod("list", SysConfig.class).getReturnType());
+    void systemManagementControllersShouldUseDedicatedDtos() {
+        assertDtoContract(
+                SysConfigController.class,
+                "list",
+                "com.medcase.web.controller.system.dto.ConfigQueryRequest",
+                "com.medcase.web.controller.system.dto.ConfigResponse");
+        assertDtoContract(
+                SysNoticeController.class,
+                "list",
+                "com.medcase.web.controller.system.dto.NoticeQueryRequest",
+                "com.medcase.web.controller.system.dto.NoticeResponse");
+        assertDtoContract(
+                SysPostController.class,
+                "list",
+                "com.medcase.web.controller.system.dto.PostQueryRequest",
+                "com.medcase.web.controller.system.dto.PostResponse");
+    }
+
+    private void assertDtoContract(
+            Class<?> controllerType, String methodName,
+            String requestTypeName, String responseTypeName) {
+        Method method = findMethod(controllerType, methodName);
+
+        assertEquals(requestTypeName, method.getParameterTypes()[0].getName());
+        assertEquals(PageResult.class, method.getReturnType());
+
+        ParameterizedType pageResultType = (ParameterizedType) method.getGenericReturnType();
+        assertEquals(responseTypeName,
+                pageResultType.getActualTypeArguments()[0].getTypeName());
+    }
+
+    private Method findMethod(Class<?> controllerType, String methodName) {
+        for (Method method : controllerType.getDeclaredMethods()) {
+            if (method.getName().equals(methodName)) {
+                return method;
+            }
+        }
+        throw new AssertionError(controllerType.getName() + "#" + methodName + " does not exist");
     }
 }

@@ -3,7 +3,6 @@ package com.medcase.web.controller.system.dto;
 import java.util.List;
 import com.medcase.common.core.domain.entity.SysRole;
 import com.medcase.common.core.domain.entity.SysUser;
-import com.medcase.system.domain.SysPost;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -18,5 +17,5 @@ public class UserDetailResponse {
     private List<Long> postIds;
     private List<Long> roleIds;
     private List<SysRole> roles;
-    private List<SysPost> posts;
+    private List<PostResponse> posts;
 }

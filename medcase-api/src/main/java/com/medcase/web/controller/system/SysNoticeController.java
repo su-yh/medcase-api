@@ -20,10 +20,15 @@ import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
 import com.medcase.common.core.text.Convert;
 import com.medcase.common.enums.BusinessType;
-import com.medcase.system.domain.SysNotice;
+import com.medcase.system.entity.SysNoticeEntity;
 import com.medcase.system.service.ISysNoticeReadService;
 import com.medcase.system.service.ISysNoticeService;
 import com.medcase.mp.mybatis.PageResult;
+import com.medcase.web.controller.system.dto.NoticeQueryRequest;
+import com.medcase.web.controller.system.dto.NoticeReadUserResponse;
+import com.medcase.web.controller.system.dto.NoticeResponse;
+import com.medcase.web.controller.system.dto.NoticeSaveRequest;
+import com.medcase.web.controller.system.dto.NoticeTopItemResponse;
 import com.medcase.web.controller.system.dto.NoticeTopResponse;
 
 /**
@@ -45,20 +50,24 @@ public class SysNoticeController extends BaseController {
      */
     @PreAuthorize("@ss.hasPermi('system:notice:list')")
     @GetMapping("/list")
-    public PageResult<SysNotice> list(SysNotice notice) {
+    public PageResult<NoticeResponse> list(NoticeQueryRequest request) {
 
         startPage();
-        List<SysNotice> list = noticeService.selectNoticeList(notice);
-        return new PageResult<>(list, new PageInfo<>(list).getTotal());
+        List<SysNoticeEntity> entities = noticeService.selectNoticeList(
+                request.getNoticeTitle(), request.getNoticeType(), request.getCreateBy());
+        List<NoticeResponse> list = entities.stream()
+                .map(NoticeResponse::fromEntity)
+                .toList();
+        return new PageResult<>(list, new PageInfo<>(entities).getTotal());
     }
 
     /**
      * 根据通知公告编号获取详细信息
      */
     @GetMapping(value = "/{noticeId}")
-    public SysNotice getInfo(@PathVariable Long noticeId) {
+    public NoticeResponse getInfo(@PathVariable Long noticeId) {
 
-        return noticeService.selectNoticeById(noticeId);
+        return NoticeResponse.fromEntity(noticeService.selectNoticeById(noticeId));
     }
 
     /**
@@ -67,8 +76,9 @@ public class SysNoticeController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:notice:add')")
     @Log(title = "通知公告", businessType = BusinessType.INSERT)
     @PostMapping
-    public void add(@Validated @RequestBody SysNotice notice) {
+    public void add(@Validated @RequestBody NoticeSaveRequest request) {
 
+        SysNoticeEntity notice = toEntity(request);
         notice.setCreateBy(getUsername());
         if (noticeService.insertNotice(notice) <= 0) {
             throw ExceptionUtil.business(ErrorCodeEnums.NOTICE_OPERATION_FAILED);
@@ -81,8 +91,9 @@ public class SysNoticeController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:notice:edit')")
     @Log(title = "通知公告", businessType = BusinessType.UPDATE)
     @PutMapping
-    public void edit(@Validated @RequestBody SysNotice notice) {
+    public void edit(@Validated @RequestBody NoticeSaveRequest request) {
 
+        SysNoticeEntity notice = toEntity(request);
         notice.setUpdateBy(getUsername());
         if (noticeService.updateNotice(notice) <= 0) {
             throw ExceptionUtil.business(ErrorCodeEnums.NOTICE_OPERATION_FAILED);
@@ -97,8 +108,10 @@ public class SysNoticeController extends BaseController {
     public NoticeTopResponse listTop() {
 
         Long userId = getUserId();
-        List<SysNotice> list = noticeReadService.selectNoticeListWithReadStatus(userId, 5);
-        long unreadCount = list.stream().filter(n -> !n.getIsRead()).count();
+        List<NoticeTopItemResponse> list = noticeReadService.selectNoticeListWithReadStatus(userId, 5);
+        long unreadCount = list.stream()
+                .filter(item -> !item.isRead())
+                .count();
         return new NoticeTopResponse(list, unreadCount);
     }
 
@@ -131,10 +144,11 @@ public class SysNoticeController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:notice:list')")
     @GetMapping("/readUsers/list")
     @ResponseBody
-    public PageResult<?> readUsersList(Long noticeId, String searchValue) {
+    public PageResult<NoticeReadUserResponse> readUsersList(Long noticeId, String searchValue) {
 
         startPage();
-        List<?> list = noticeReadService.selectReadUsersByNoticeId(noticeId, searchValue);
+        List<NoticeReadUserResponse> list = noticeReadService.selectReadUsersByNoticeId(
+                noticeId, searchValue);
         return new PageResult<>(list, new PageInfo<>(list).getTotal());
     }
 
@@ -150,5 +164,15 @@ public class SysNoticeController extends BaseController {
         if (noticeService.deleteNoticeByIds(noticeIds) <= 0) {
             throw ExceptionUtil.business(ErrorCodeEnums.NOTICE_OPERATION_FAILED);
         }
+    }
+
+    private SysNoticeEntity toEntity(NoticeSaveRequest request) {
+        SysNoticeEntity entity = new SysNoticeEntity();
+        entity.setNoticeId(request.getNoticeId());
+        entity.setNoticeTitle(request.getNoticeTitle());
+        entity.setNoticeType(request.getNoticeType());
+        entity.setNoticeContent(request.getNoticeContent());
+        entity.setStatus(request.getStatus());
+        return entity;
     }
 }

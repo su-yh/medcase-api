@@ -1,8 +1,8 @@
 package com.medcase.system.service;
 
 import java.util.List;
-import java.util.Map;
-import com.medcase.system.domain.SysNotice;
+import com.medcase.web.controller.system.dto.NoticeReadUserResponse;
+import com.medcase.web.controller.system.dto.NoticeTopItemResponse;
 
 /**
  * 公告已读记录 服务层
@@ -29,7 +29,7 @@ public interface ISysNoticeReadService {
      * @param limit  最多返回条数
      * @return 带 isRead 标记的公告列表
      */
-    public List<SysNotice> selectNoticeListWithReadStatus(Long userId, int limit);
+    public List<NoticeTopItemResponse> selectNoticeListWithReadStatus(Long userId, int limit);
 
     /**
      * 批量标记已读
@@ -44,7 +44,7 @@ public interface ISysNoticeReadService {
      * @param searchValue 搜索值
      * @return 已读用户列表
      */
-    public List<Map<String, Object>> selectReadUsersByNoticeId(Long noticeId, String searchValue);
+    public List<NoticeReadUserResponse> selectReadUsersByNoticeId(Long noticeId, String searchValue);
 
     /**
      * 删除公告时清理对应已读记录

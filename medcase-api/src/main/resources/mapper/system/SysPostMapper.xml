@@ -4,7 +4,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.medcase.system.mapper.SysPostMapper">
 
-	<resultMap type="SysPost" id="SysPostResult">
+	<resultMap type="com.medcase.system.entity.SysPostEntity" id="SysPostResult">
 		<id     property="postId"        column="post_id"       />
 		<result property="postCode"      column="post_code"     />
 		<result property="postName"      column="post_name"     />
@@ -16,26 +16,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		<result property="updateTime"    column="update_time"   />
 		<result property="remark"        column="remark"        />
 	</resultMap>
-
-	<sql id="selectPostVo">
-        select post_id, post_code, post_name, post_sort, status, create_by, create_time, remark
-		from sys_post
-    </sql>
-
-	<select id="selectPostList" parameterType="SysPost" resultMap="SysPostResult">
-	    <include refid="selectPostVo"/>
-		<where>
-			<if test="postCode != null and postCode != ''">
-				AND post_code like concat('%', #{postCode}, '%')
-			</if>
-			<if test="status != null and status != ''">
-				AND status = #{status}
-			</if>
-			<if test="postName != null and postName != ''">
-				AND post_name like concat('%', #{postName}, '%')
-			</if>
-		</where>
-	</select>
 
 	<select id="selectPostListByUserId" parameterType="Long" resultType="Long">
 		select p.post_id

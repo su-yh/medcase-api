@@ -1,7 +1,7 @@
 package com.medcase.system.service;
 
 import java.util.List;
-import com.medcase.system.domain.SysPost;
+import com.medcase.system.entity.SysPostEntity;
 
 /**
  * 岗位信息 服务层
@@ -15,14 +15,15 @@ public interface ISysPostService {
      * @param post 岗位信息
      * @return 岗位列表
      */
-    public List<SysPost> selectPostList(SysPost post);
+    public List<SysPostEntity> selectPostList(
+            String postCode, String postName, String status);
 
     /**
      * 查询所有岗位
      * 
      * @return 岗位列表
      */
-    public List<SysPost> selectPostAll();
+    public List<SysPostEntity> selectPostAll();
 
     /**
      * 通过岗位ID查询岗位信息
@@ -30,7 +31,7 @@ public interface ISysPostService {
      * @param postId 岗位ID
      * @return 角色对象信息
      */
-    public SysPost selectPostById(Long postId);
+    public SysPostEntity selectPostById(Long postId);
 
     /**
      * 根据用户ID获取岗位选择框列表
@@ -46,7 +47,7 @@ public interface ISysPostService {
      * @param post 岗位信息
      * @return 结果
      */
-    public boolean checkPostNameUnique(SysPost post);
+    public boolean checkPostNameUnique(Long postId, String postName);
 
     /**
      * 校验岗位编码
@@ -54,7 +55,7 @@ public interface ISysPostService {
      * @param post 岗位信息
      * @return 结果
      */
-    public boolean checkPostCodeUnique(SysPost post);
+    public boolean checkPostCodeUnique(Long postId, String postCode);
 
     /**
      * 通过岗位ID查询岗位使用数量
@@ -86,7 +87,7 @@ public interface ISysPostService {
      * @param post 岗位信息
      * @return 结果
      */
-    public int insertPost(SysPost post);
+    public int insertPost(SysPostEntity post);
 
     /**
      * 修改保存岗位信息
@@ -94,5 +95,5 @@ public interface ISysPostService {
      * @param post 岗位信息
      * @return 结果
      */
-    public int updatePost(SysPost post);
+    public int updatePost(SysPostEntity post);
 }
