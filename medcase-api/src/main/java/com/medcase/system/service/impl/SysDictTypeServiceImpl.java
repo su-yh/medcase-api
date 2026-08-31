@@ -104,7 +104,7 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService {
     @Override
     public SysDictType selectDictTypeById(Long dictId) {
 
-        return SystemEntityConverter.toDomain(dictTypeMapper.selectDictTypeById(dictId));
+        return SystemEntityConverter.toDomain(dictTypeMapper.selectById(dictId));
     }
 
     /**
@@ -134,7 +134,7 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService {
 
                 throw ExceptionUtil.business(ErrorCodeEnums.DICT_TYPE_ASSIGNED_DELETE, dictType.getDictName());
             }
-            dictTypeMapper.deleteDictTypeById(dictId);
+            dictTypeMapper.deleteById(dictId);
             DictUtils.removeDictCache(dictType.getDictType());
         }
     }
@@ -186,7 +186,7 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService {
     public int insertDictType(SysDictType dict) {
 
         SysDictTypeEntity entity = SystemEntityConverter.toEntity(dict);
-        int row = dictTypeMapper.insertDictType(entity);
+        int row = dictTypeMapper.insert(entity);
         dict.setDictId(entity.getDictId());
         if (row > 0) {
 
@@ -207,7 +207,7 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService {
 
         SysDictType oldDict = selectDictTypeById(dict.getDictId());
         dictDataMapper.updateDictType(oldDict.getDictType(), dict.getDictType());
-        int row = dictTypeMapper.updateDictType(SystemEntityConverter.toEntity(dict));
+        int row = dictTypeMapper.updateById(SystemEntityConverter.toEntity(dict));
         if (row > 0) {
 
             List<SysDictData> dictDatas = selectDictDataByType(dict.getDictType());

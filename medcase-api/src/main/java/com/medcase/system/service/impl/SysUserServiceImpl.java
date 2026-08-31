@@ -129,7 +129,7 @@ public class SysUserServiceImpl implements ISysUserService {
     @Override
     public SysUser selectUserById(Long userId) {
 
-        return SystemEntityConverter.toDomain(userMapper.selectUserById(userId));
+        return SystemEntityConverter.toDomain(userMapper.selectById(userId));
     }
 
     /**
@@ -267,7 +267,7 @@ public class SysUserServiceImpl implements ISysUserService {
 
         user.setUserType(UserTypeEnums.ADMIN);
         SysUserEntity entity = SystemEntityConverter.toEntity(user);
-        int rows = userMapper.insertUser(entity);
+        int rows = userMapper.insert(entity);
         user.setUserId(entity.getUserId());
         // 新增用户岗位关联
         insertUserPost(user);
@@ -286,7 +286,7 @@ public class SysUserServiceImpl implements ISysUserService {
     public boolean registerUser(SysUser user) {
 
         user.setUserType(UserTypeEnums.ADMIN);
-        return userMapper.insertUser(SystemEntityConverter.toEntity(user)) > 0;
+        return userMapper.insert(SystemEntityConverter.toEntity(user)) > 0;
     }
 
     /**
@@ -308,7 +308,7 @@ public class SysUserServiceImpl implements ISysUserService {
         userPostMapper.deleteByUserId(userId);
         // 新增用户与岗位管理
         insertUserPost(user);
-        return userMapper.updateUser(SystemEntityConverter.toEntity(user));
+        return userMapper.updateById(SystemEntityConverter.toEntity(user));
     }
 
     /**
@@ -346,7 +346,7 @@ public class SysUserServiceImpl implements ISysUserService {
     @Override
     public int updateUserProfile(SysUser user) {
 
-        return userMapper.updateUser(SystemEntityConverter.toEntity(user));
+        return userMapper.updateById(SystemEntityConverter.toEntity(user));
     }
 
     /**

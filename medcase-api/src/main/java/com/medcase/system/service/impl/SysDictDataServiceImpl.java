@@ -56,7 +56,7 @@ public class SysDictDataServiceImpl implements ISysDictDataService {
     @Override
     public SysDictData selectDictDataById(Long dictCode) {
 
-        return SystemEntityConverter.toDomain(dictDataMapper.selectDictDataById(dictCode));
+        return SystemEntityConverter.toDomain(dictDataMapper.selectById(dictCode));
     }
 
     /**
@@ -70,7 +70,7 @@ public class SysDictDataServiceImpl implements ISysDictDataService {
         for (Long dictCode : dictCodes) {
 
             SysDictData data = selectDictDataById(dictCode);
-            dictDataMapper.deleteDictDataById(dictCode);
+            dictDataMapper.deleteById(dictCode);
             List<SysDictData> dictDatas = selectDictDataByType(data.getDictType());
             DictUtils.setDictCache(data.getDictType(), dictDatas);
         }
@@ -86,7 +86,7 @@ public class SysDictDataServiceImpl implements ISysDictDataService {
     public int insertDictData(SysDictData data) {
 
         SysDictDataEntity entity = SystemEntityConverter.toEntity(data);
-        int row = dictDataMapper.insertDictData(entity);
+        int row = dictDataMapper.insert(entity);
         data.setDictCode(entity.getDictCode());
         if (row > 0) {
 
@@ -105,7 +105,7 @@ public class SysDictDataServiceImpl implements ISysDictDataService {
     @Override
     public int updateDictData(SysDictData data) {
 
-        int row = dictDataMapper.updateDictData(SystemEntityConverter.toEntity(data));
+        int row = dictDataMapper.updateById(SystemEntityConverter.toEntity(data));
         if (row > 0) {
 
             List<SysDictData> dictDatas = selectDictDataByType(data.getDictType());

@@ -50,7 +50,7 @@ public class SysConfigServiceImpl implements ISysConfigService {
     @Override
     public SysConfig selectConfigById(Long configId) {
 
-        return SystemEntityConverter.toDomain(configMapper.selectConfigById(configId));
+        return SystemEntityConverter.toDomain(configMapper.selectById(configId));
     }
 
     /**
@@ -119,7 +119,7 @@ public class SysConfigServiceImpl implements ISysConfigService {
     public int insertConfig(SysConfig config) {
 
         SysConfigEntity entity = SystemEntityConverter.toEntity(config);
-        int row = configMapper.insertConfig(entity);
+        int row = configMapper.insert(entity);
         config.setConfigId(entity.getConfigId());
         if (row > 0) {
 
@@ -143,7 +143,7 @@ public class SysConfigServiceImpl implements ISysConfigService {
             redisCache.deleteObject(getCacheKey(temp.getConfigKey()));
         }
 
-        int row = configMapper.updateConfig(SystemEntityConverter.toEntity(config));
+        int row = configMapper.updateById(SystemEntityConverter.toEntity(config));
         if (row > 0) {
 
             redisCache.setCacheObject(getCacheKey(config.getConfigKey()), config.getConfigValue());
@@ -166,7 +166,7 @@ public class SysConfigServiceImpl implements ISysConfigService {
 
                 throw ExceptionUtil.business(ErrorCodeEnums.CONFIG_BUILTIN_DELETE, config.getConfigKey());
             }
-            configMapper.deleteConfigById(configId);
+            configMapper.deleteById(configId);
             redisCache.deleteObject(getCacheKey(config.getConfigKey()));
         }
     }
@@ -217,7 +217,7 @@ public class SysConfigServiceImpl implements ISysConfigService {
 
         Long configId = StringUtils.isNull(config.getConfigId()) ? -1L : config.getConfigId();
         SysConfig info = SystemEntityConverter.toDomain(
-                configMapper.selectConfigByKeyForUnique(config.getConfigKey()));
+                configMapper.selectConfigByKey(config.getConfigKey()));
         if (StringUtils.isNotNull(info) && info.getConfigId().longValue() != configId.longValue()) {
 
             return UserConstants.NOT_UNIQUE;

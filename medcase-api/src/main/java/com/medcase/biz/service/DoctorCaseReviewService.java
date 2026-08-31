@@ -48,7 +48,7 @@ public class DoctorCaseReviewService {
     }
 
     public DoctorCaseReviewVO detail(Long id) {
-        DoctorCaseEntity entity = doctorCaseAdminMapper.selectAdminCaseById(id);
+        DoctorCaseEntity entity = doctorCaseAdminMapper.selectById(id);
         return entity == null ? null : DoctorCaseReviewVO.fromEntity(entity);
     }
 

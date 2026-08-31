@@ -1,5 +1,6 @@
 package com.medcase.system.service.impl;
 
+import java.util.Arrays;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,7 +30,7 @@ public class SysLogininforServiceImpl implements ISysLogininforService {
     public void insertLogininfor(SysLogininfor logininfor) {
 
         SysLogininforEntity entity = SystemEntityConverter.toEntity(logininfor);
-        logininforMapper.insertLogininfor(entity);
+        logininforMapper.insert(entity);
         logininfor.setInfoId(entity.getInfoId());
     }
 
@@ -57,7 +58,7 @@ public class SysLogininforServiceImpl implements ISysLogininforService {
     @Override
     public int deleteLogininforByIds(Long[] infoIds) {
 
-        return logininforMapper.deleteLogininforByIds(infoIds);
+        return logininforMapper.deleteByIds(Arrays.asList(infoIds));
     }
 
     /**

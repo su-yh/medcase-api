@@ -21,10 +21,6 @@ public interface SysUserMapper extends BaseMapperX<SysUserEntity> {
                 .eq(SysUserEntity::getDelFlag, delFlag));
     }
 
-    default SysUserEntity selectUserById(Long userId) {
-        return selectById(userId);
-    }
-
     default SysUserEntity selectUserByUserNameAndType(
             String userName, UserTypeEnums userType, String delFlag) {
         return selectOne(build()
@@ -53,14 +49,6 @@ public interface SysUserMapper extends BaseMapperX<SysUserEntity> {
         return selectCount(build()
                 .eq(SysUserEntity::getDeptId, deptId)
                 .eq(SysUserEntity::getDelFlag, "0"));
-    }
-
-    default int insertUser(SysUserEntity entity) {
-        return insert(entity);
-    }
-
-    default int updateUser(SysUserEntity entity) {
-        return updateById(entity);
     }
 
     default int updateUserStatus(Long userId, String status) {

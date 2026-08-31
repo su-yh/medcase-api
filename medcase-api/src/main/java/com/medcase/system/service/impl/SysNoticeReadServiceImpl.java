@@ -32,7 +32,7 @@ public class SysNoticeReadServiceImpl implements ISysNoticeReadService {
         SysNoticeRead record = new SysNoticeRead();
         record.setNoticeId(noticeId);
         record.setUserId(userId);
-        noticeReadMapper.insertNoticeRead(SystemEntityConverter.toEntity(record));
+        noticeReadMapper.insert(SystemEntityConverter.toEntity(record));
     }
 
     /**

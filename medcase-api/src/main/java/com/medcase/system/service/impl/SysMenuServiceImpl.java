@@ -265,7 +265,7 @@ public class SysMenuServiceImpl implements ISysMenuService {
     @Override
     public SysMenu selectMenuById(Long menuId) {
 
-        return SystemEntityConverter.toDomain(menuMapper.selectMenuById(menuId));
+        return SystemEntityConverter.toDomain(menuMapper.selectById(menuId));
     }
 
     /**
@@ -301,7 +301,7 @@ public class SysMenuServiceImpl implements ISysMenuService {
     public int insertMenu(SysMenu menu) {
 
         SysMenuEntity entity = SystemEntityConverter.toEntity(menu);
-        int row = menuMapper.insertMenu(entity);
+        int row = menuMapper.insert(entity);
         menu.setMenuId(entity.getMenuId());
         return row;
     }
@@ -314,7 +314,7 @@ public class SysMenuServiceImpl implements ISysMenuService {
     @Override
     public int updateMenu(SysMenu menu) {
 
-        return menuMapper.updateMenu(SystemEntityConverter.toEntity(menu));
+        return menuMapper.updateById(SystemEntityConverter.toEntity(menu));
     }
 
     /**
@@ -351,7 +351,7 @@ public class SysMenuServiceImpl implements ISysMenuService {
     @Override
     public int deleteMenuById(Long menuId) {
 
-        return menuMapper.deleteMenuById(menuId);
+        return menuMapper.deleteById(menuId);
     }
 
     /**

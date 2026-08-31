@@ -29,7 +29,7 @@ public class SysOperLogServiceImpl implements ISysOperLogService {
     public void insertOperlog(SysOperLog operLog) {
 
         SysOperLogEntity entity = SystemEntityConverter.toEntity(operLog);
-        operLogMapper.insertOperLog(entity);
+        operLogMapper.insert(entity);
         operLog.setOperId(entity.getOperId());
     }
 
@@ -58,7 +58,7 @@ public class SysOperLogServiceImpl implements ISysOperLogService {
     @Override
     public int deleteOperLogByIds(Long[] operIds) {
 
-        return operLogMapper.deleteOperLogByIds(operIds);
+        return operLogMapper.deleteByIds(Arrays.asList(operIds));
     }
 
     /**
@@ -70,7 +70,7 @@ public class SysOperLogServiceImpl implements ISysOperLogService {
     @Override
     public SysOperLog selectOperLogById(Long operId) {
 
-        return SystemEntityConverter.toDomain(operLogMapper.selectOperLogById(operId));
+        return SystemEntityConverter.toDomain(operLogMapper.selectById(operId));
     }
 
     /**

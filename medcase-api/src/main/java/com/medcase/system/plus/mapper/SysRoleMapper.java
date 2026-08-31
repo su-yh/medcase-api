@@ -10,10 +10,6 @@ import java.util.Arrays;
 
 @Mapper
 public interface SysRoleMapper extends BaseMapperX<SysRoleEntity> {
-    default SysRoleEntity selectRoleById(Long roleId) {
-        return selectById(roleId);
-    }
-
     default SysRoleEntity selectRoleByName(String roleName) {
         return selectOne(build()
                 .eq(SysRoleEntity::getRoleName, roleName)
@@ -24,14 +20,6 @@ public interface SysRoleMapper extends BaseMapperX<SysRoleEntity> {
         return selectOne(build()
                 .eq(SysRoleEntity::getRoleKey, roleKey)
                 .eq(SysRoleEntity::getDelFlag, "0"));
-    }
-
-    default int insertRole(SysRoleEntity entity) {
-        return insert(entity);
-    }
-
-    default int updateRole(SysRoleEntity entity) {
-        return updateById(entity);
     }
 
     default int deleteRoleById(Long roleId) {

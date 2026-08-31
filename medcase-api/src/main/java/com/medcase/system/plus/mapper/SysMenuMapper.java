@@ -8,10 +8,6 @@ import org.apache.ibatis.annotations.Mapper;
 
 @Mapper
 public interface SysMenuMapper extends BaseMapperX<SysMenuEntity> {
-    default SysMenuEntity selectMenuById(Long menuId) {
-        return selectById(menuId);
-    }
-
     default int selectChildrenCount(Long menuId) {
         return Math.toIntExact(selectCount(
                 build().eq(SysMenuEntity::getParentId, menuId)));
@@ -24,21 +20,10 @@ public interface SysMenuMapper extends BaseMapperX<SysMenuEntity> {
         return selectOne(query);
     }
 
-    default int insertMenu(SysMenuEntity entity) {
-        return insert(entity);
-    }
-
-    default int updateMenu(SysMenuEntity entity) {
-        return updateById(entity);
-    }
-
     default int updateMenuSort(Long menuId, Integer orderNum) {
         return update(null, new LambdaUpdateWrapper<SysMenuEntity>()
                 .set(SysMenuEntity::getOrderNum, orderNum)
                 .eq(SysMenuEntity::getMenuId, menuId));
     }
 
-    default int deleteMenuById(Long menuId) {
-        return deleteById(menuId);
-    }
 }

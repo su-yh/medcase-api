@@ -11,10 +11,6 @@ import java.util.List;
 
 @Mapper
 public interface SysDeptMapper extends BaseMapperX<SysDeptEntity> {
-    default SysDeptEntity selectDeptById(Long deptId) {
-        return selectById(deptId);
-    }
-
     default int selectNormalChildrenCount(Long deptId) {
         return Math.toIntExact(selectCount(build()
                 .eq(SysDeptEntity::getStatus, "0")
@@ -38,14 +34,6 @@ public interface SysDeptMapper extends BaseMapperX<SysDeptEntity> {
                 .eq(SysDeptEntity::getParentId, parentId)
                 .eq(SysDeptEntity::getDelFlag, "0");
         return selectOne(query);
-    }
-
-    default int insertDept(SysDeptEntity entity) {
-        return insert(entity);
-    }
-
-    default int updateDept(SysDeptEntity entity) {
-        return updateById(entity);
     }
 
     default int updateParentStatusNormal(Collection<Long> deptIds) {

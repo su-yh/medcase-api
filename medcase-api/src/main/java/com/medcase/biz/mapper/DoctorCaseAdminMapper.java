@@ -25,13 +25,4 @@ public interface DoctorCaseAdminMapper extends BaseMapperX<DoctorCaseEntity> {
         return selectPage(pageParam, queryWrapper);
     }
 
-    default DoctorCaseEntity selectAdminCaseById(Long id) {
-        if (id == null) {
-            return null;
-        }
-
-        LambdaQueryWrapperX<DoctorCaseEntity> queryWrapper = build();
-        queryWrapper.eq(DoctorCaseEntity::getId, id);
-        return selectOne(queryWrapper);
-    }
 }

@@ -9,10 +9,6 @@ import java.util.List;
 
 @Mapper
 public interface SysNoticeReadMapper extends BaseMapperX<SysNoticeReadEntity> {
-    default int insertNoticeRead(SysNoticeReadEntity entity) {
-        return insert(entity);
-    }
-
     default void insertNoticeReadBatch(Collection<SysNoticeReadEntity> entities) {
         insertBatch(entities);
     }

@@ -140,7 +140,7 @@ public class SysRoleServiceImpl implements ISysRoleService {
     @Override
     public SysRole selectRoleById(Long roleId) {
 
-        return SystemEntityConverter.toDomain(roleMapper.selectRoleById(roleId));
+        return SystemEntityConverter.toDomain(roleMapper.selectById(roleId));
     }
 
     /**
@@ -241,7 +241,7 @@ public class SysRoleServiceImpl implements ISysRoleService {
     public int insertRole(SysRole role) {
 
         SysRoleEntity entity = SystemEntityConverter.toEntity(role);
-        int row = roleMapper.insertRole(entity);
+        int row = roleMapper.insert(entity);
         role.setRoleId(entity.getRoleId());
         return insertRoleMenu(role);
     }
@@ -256,7 +256,7 @@ public class SysRoleServiceImpl implements ISysRoleService {
     @Transactional
     public int updateRole(SysRole role) {
 
-        roleMapper.updateRole(SystemEntityConverter.toEntity(role));
+        roleMapper.updateById(SystemEntityConverter.toEntity(role));
         // 删除角色与菜单关联
         roleMenuMapper.deleteByRoleId(role.getRoleId());
         return insertRoleMenu(role);
@@ -271,7 +271,7 @@ public class SysRoleServiceImpl implements ISysRoleService {
     @Override
     public int updateRoleStatus(SysRole role) {
 
-        return roleMapper.updateRole(SystemEntityConverter.toEntity(role));
+        return roleMapper.updateById(SystemEntityConverter.toEntity(role));
     }
 
     /**
@@ -284,7 +284,7 @@ public class SysRoleServiceImpl implements ISysRoleService {
     @Transactional
     public int authDataScope(SysRole role) {
 
-        roleMapper.updateRole(SystemEntityConverter.toEntity(role));
+        roleMapper.updateById(SystemEntityConverter.toEntity(role));
         // 删除角色与部门关联
         roleDeptMapper.deleteByRoleId(role.getRoleId());
         // 新增角色和部门信息（数据权限）

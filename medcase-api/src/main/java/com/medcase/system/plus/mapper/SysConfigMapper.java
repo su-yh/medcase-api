@@ -10,10 +10,6 @@ import java.util.List;
 
 @Mapper
 public interface SysConfigMapper extends BaseMapperX<SysConfigEntity> {
-    default SysConfigEntity selectConfigById(Long configId) {
-        return selectById(configId);
-    }
-
     default SysConfigEntity selectConfigByKey(String configKey) {
         return selectOne(SysConfigEntity::getConfigKey, configKey);
     }
@@ -34,19 +30,4 @@ public interface SysConfigMapper extends BaseMapperX<SysConfigEntity> {
         return selectList(build());
     }
 
-    default int insertConfig(SysConfigEntity entity) {
-        return insert(entity);
-    }
-
-    default int updateConfig(SysConfigEntity entity) {
-        return updateById(entity);
-    }
-
-    default int deleteConfigById(Long configId) {
-        return deleteById(configId);
-    }
-
-    default SysConfigEntity selectConfigByKeyForUnique(String configKey) {
-        return selectConfigByKey(configKey);
-    }
 }

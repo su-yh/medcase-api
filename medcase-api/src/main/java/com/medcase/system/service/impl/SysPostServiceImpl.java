@@ -64,7 +64,7 @@ public class SysPostServiceImpl implements ISysPostService {
     @Override
     public SysPost selectPostById(Long postId) {
 
-        return SystemEntityConverter.toDomain(postMapper.selectPostById(postId));
+        return SystemEntityConverter.toDomain(postMapper.selectById(postId));
     }
 
     /**
@@ -138,7 +138,7 @@ public class SysPostServiceImpl implements ISysPostService {
     @Override
     public int deletePostById(Long postId) {
 
-        return postMapper.deletePostById(postId);
+        return postMapper.deleteById(postId);
     }
 
     /**
@@ -158,7 +158,7 @@ public class SysPostServiceImpl implements ISysPostService {
                 throw ExceptionUtil.business(ErrorCodeEnums.POST_ASSIGNED_DELETE, post.getPostName());
             }
         }
-        return postMapper.deletePostsByIds(postIds);
+        return postMapper.deleteByIds(Arrays.asList(postIds));
     }
 
     /**
@@ -171,7 +171,7 @@ public class SysPostServiceImpl implements ISysPostService {
     public int insertPost(SysPost post) {
 
         SysPostEntity entity = SystemEntityConverter.toEntity(post);
-        int row = postMapper.insertPost(entity);
+        int row = postMapper.insert(entity);
         post.setPostId(entity.getPostId());
         return row;
     }
@@ -185,6 +185,6 @@ public class SysPostServiceImpl implements ISysPostService {
     @Override
     public int updatePost(SysPost post) {
 
-        return postMapper.updatePost(SystemEntityConverter.toEntity(post));
+        return postMapper.updateById(SystemEntityConverter.toEntity(post));
     }
 }

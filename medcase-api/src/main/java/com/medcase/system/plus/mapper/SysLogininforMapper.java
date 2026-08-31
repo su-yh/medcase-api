@@ -5,7 +5,6 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.medcase.system.plus.entity.SysLogininforEntity;
 import org.apache.ibatis.annotations.Mapper;
 
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -22,14 +21,6 @@ public interface SysLogininforMapper extends BaseMapperX<SysLogininforEntity> {
                 .leIfPresent(SysLogininforEntity::getLoginTime, endTime)
                 .orderByDesc(SysLogininforEntity::getInfoId);
         return selectList(query);
-    }
-
-    default int insertLogininfor(SysLogininforEntity entity) {
-        return insert(entity);
-    }
-
-    default int deleteLogininforByIds(Long[] infoIds) {
-        return deleteBatchIds(Arrays.asList(infoIds));
     }
 
     default int cleanLogininfor() {

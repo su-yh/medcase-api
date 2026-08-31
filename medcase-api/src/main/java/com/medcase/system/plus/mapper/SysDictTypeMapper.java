@@ -29,23 +29,8 @@ public interface SysDictTypeMapper extends BaseMapperX<SysDictTypeEntity> {
         return selectList(build());
     }
 
-    default SysDictTypeEntity selectDictTypeById(Long dictId) {
-        return selectById(dictId);
-    }
-
     default SysDictTypeEntity selectDictTypeByType(String dictType) {
         return selectOne(SysDictTypeEntity::getDictType, dictType);
     }
 
-    default int insertDictType(SysDictTypeEntity entity) {
-        return insert(entity);
-    }
-
-    default int updateDictType(SysDictTypeEntity entity) {
-        return updateById(entity);
-    }
-
-    default int deleteDictTypeById(Long dictId) {
-        return deleteById(dictId);
-    }
 }

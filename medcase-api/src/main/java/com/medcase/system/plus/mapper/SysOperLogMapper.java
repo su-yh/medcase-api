@@ -5,7 +5,6 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.medcase.system.plus.entity.SysOperLogEntity;
 import org.apache.ibatis.annotations.Mapper;
 
-import java.util.Arrays;
 import java.util.List;
 
 @Mapper
@@ -25,18 +24,6 @@ public interface SysOperLogMapper extends BaseMapperX<SysOperLogEntity> {
                 .leIfPresent(SysOperLogEntity::getOperTime, endTime)
                 .orderByDesc(SysOperLogEntity::getOperId);
         return selectList(query);
-    }
-
-    default int insertOperLog(SysOperLogEntity entity) {
-        return insert(entity);
-    }
-
-    default int deleteOperLogByIds(Long[] operIds) {
-        return deleteBatchIds(Arrays.asList(operIds));
-    }
-
-    default SysOperLogEntity selectOperLogById(Long operId) {
-        return selectById(operId);
     }
 
     default int cleanOperLog() {

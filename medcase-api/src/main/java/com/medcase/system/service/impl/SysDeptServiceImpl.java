@@ -133,7 +133,7 @@ public class SysDeptServiceImpl implements ISysDeptService {
     @Override
     public SysDept selectDeptById(Long deptId) {
 
-        return SystemEntityConverter.toDomain(deptMapper.selectDeptById(deptId));
+        return SystemEntityConverter.toDomain(deptMapper.selectById(deptId));
     }
 
     /**
@@ -222,7 +222,7 @@ public class SysDeptServiceImpl implements ISysDeptService {
     @Override
     public int insertDept(SysDept dept) {
 
-        SysDept info = SystemEntityConverter.toDomain(deptMapper.selectDeptById(dept.getParentId()));
+        SysDept info = SystemEntityConverter.toDomain(deptMapper.selectById(dept.getParentId()));
         // 如果父节点不为正常状态,则不允许新增子节点
         if (!UserConstants.DEPT_NORMAL.equals(info.getStatus())) {
 
@@ -230,7 +230,7 @@ public class SysDeptServiceImpl implements ISysDeptService {
         }
         dept.setAncestors(info.getAncestors() + "," + dept.getParentId());
         SysDeptEntity entity = SystemEntityConverter.toEntity(dept);
-        int row = deptMapper.insertDept(entity);
+        int row = deptMapper.insert(entity);
         dept.setDeptId(entity.getDeptId());
         return row;
     }
@@ -245,9 +245,9 @@ public class SysDeptServiceImpl implements ISysDeptService {
     public int updateDept(SysDept dept) {
 
         SysDept newParentDept = SystemEntityConverter.toDomain(
-                deptMapper.selectDeptById(dept.getParentId()));
+                deptMapper.selectById(dept.getParentId()));
         SysDept oldDept = SystemEntityConverter.toDomain(
-                deptMapper.selectDeptById(dept.getDeptId()));
+                deptMapper.selectById(dept.getDeptId()));
         if (StringUtils.isNotNull(newParentDept) && StringUtils.isNotNull(oldDept)) {
 
             String newAncestors = newParentDept.getAncestors() + "," + newParentDept.getDeptId();
@@ -255,7 +255,7 @@ public class SysDeptServiceImpl implements ISysDeptService {
             dept.setAncestors(newAncestors);
             updateDeptChildren(dept.getDeptId(), newAncestors, oldAncestors);
         }
-        int result = deptMapper.updateDept(SystemEntityConverter.toEntity(dept));
+        int result = deptMapper.updateById(SystemEntityConverter.toEntity(dept));
         if (UserConstants.DEPT_NORMAL.equals(dept.getStatus()) && StringUtils.isNotEmpty(dept.getAncestors())
                 && !StringUtils.equals("0", dept.getAncestors())) {
 

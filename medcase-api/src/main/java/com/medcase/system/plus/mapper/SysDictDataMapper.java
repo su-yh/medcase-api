@@ -32,10 +32,6 @@ public interface SysDictDataMapper extends BaseMapperX<SysDictDataEntity> {
                 SysDictDataEntity::getDictValue, dictValue);
     }
 
-    default SysDictDataEntity selectDictDataById(Long dictCode) {
-        return selectById(dictCode);
-    }
-
     default Long countByDictType(String dictType) {
         return selectCount(SysDictDataEntity::getDictType, dictType);
     }
@@ -46,15 +42,4 @@ public interface SysDictDataMapper extends BaseMapperX<SysDictDataEntity> {
                 .eq(SysDictDataEntity::getDictType, oldDictType));
     }
 
-    default int insertDictData(SysDictDataEntity entity) {
-        return insert(entity);
-    }
-
-    default int updateDictData(SysDictDataEntity entity) {
-        return updateById(entity);
-    }
-
-    default int deleteDictDataById(Long dictCode) {
-        return deleteById(dictCode);
-    }
 }
