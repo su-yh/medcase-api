@@ -19,6 +19,12 @@ class DoctorPermissionServiceTest {
     }
 
     @Test
+    void approvedPatientPasses() {
+        assertTrue(doctorPermissionService.hasAnyStatus(
+                loginUser(UserTypeEnums.PATIENT, UserStatusEnums.OK), UserStatusEnums.OK));
+    }
+
+    @Test
     void doctorWithoutApprovalFails() {
         assertFalse(doctorPermissionService.hasAnyStatus(
                 loginUser(UserTypeEnums.DOCTOR, UserStatusEnums.REGISTER), UserStatusEnums.OK));
