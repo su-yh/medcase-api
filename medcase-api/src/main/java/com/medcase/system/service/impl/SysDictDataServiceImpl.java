@@ -5,6 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.medcase.common.core.domain.entity.SysDictData;
 import com.medcase.common.utils.DictUtils;
+import com.medcase.mp.mybatis.PageParam;
+import com.medcase.mp.mybatis.PageResult;
 import com.medcase.system.converter.SystemEntityConverter;
 import com.medcase.system.entity.SysDictDataEntity;
 import com.medcase.system.mapper.SysDictDataMapper;
@@ -31,6 +33,17 @@ public class SysDictDataServiceImpl implements ISysDictDataService {
 
         return SystemEntityConverter.copyList(dictDataMapper.selectDictDataList(
                 dictData.getDictType(), dictData.getDictLabel(), dictData.getStatus()), SysDictData.class);
+    }
+
+    @Override
+    public PageResult<SysDictData> selectPage(PageParam pageParam, SysDictData dictData) {
+
+        PageResult<SysDictDataEntity> entityPage = dictDataMapper.selectPage(
+                pageParam, dictData.getDictType(), dictData.getDictLabel(), dictData.getStatus());
+        PageResult<SysDictData> result = new PageResult<>();
+        result.setList(SystemEntityConverter.copyList(entityPage.getList(), SysDictData.class));
+        result.setTotal(entityPage.getTotal());
+        return result;
     }
 
     /**

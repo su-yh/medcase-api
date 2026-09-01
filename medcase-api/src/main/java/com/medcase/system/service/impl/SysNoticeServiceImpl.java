@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 import com.medcase.system.entity.SysNoticeEntity;
 import com.medcase.system.mapper.SysNoticeMapper;
 import com.medcase.system.service.ISysNoticeService;
+import com.medcase.mp.mybatis.PageParam;
+import com.medcase.mp.mybatis.PageResult;
 
 /**
  * 公告 服务层实现
@@ -37,10 +39,10 @@ public class SysNoticeServiceImpl implements ISysNoticeService {
      * @return 公告集合
      */
     @Override
-    public List<SysNoticeEntity> selectNoticeList(
-            String noticeTitle, String noticeType, String createBy) {
+    public PageResult<SysNoticeEntity> selectPage(
+            PageParam pageParam, String noticeTitle, String noticeType, String createBy) {
 
-        return noticeMapper.selectNoticeList(noticeTitle, noticeType, createBy);
+        return noticeMapper.selectPage(pageParam, noticeTitle, noticeType, createBy);
     }
 
     /**

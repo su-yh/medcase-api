@@ -7,6 +7,7 @@ import com.medcase.biz.controller.DoctorProfilePortalController;
 import com.medcase.biz.controller.DoctorUserAdminController;
 import com.medcase.mvc.response.R;
 import com.medcase.mp.mybatis.PageResult;
+import com.medcase.mp.mybatis.PageParam;
 import com.medcase.web.controller.common.CaptchaController;
 import com.medcase.web.controller.file.FileStorageController;
 import com.medcase.web.controller.monitor.CacheController;
@@ -101,7 +102,8 @@ class ControllerResponseContractTest {
             String requestTypeName, String responseTypeName) {
         Method method = findMethod(controllerType, methodName);
 
-        assertEquals(requestTypeName, method.getParameterTypes()[0].getName());
+        assertEquals(PageParam.class, method.getParameterTypes()[0]);
+        assertEquals(requestTypeName, method.getParameterTypes()[1].getName());
         assertEquals(PageResult.class, method.getReturnType());
 
         ParameterizedType pageResultType = (ParameterizedType) method.getGenericReturnType();

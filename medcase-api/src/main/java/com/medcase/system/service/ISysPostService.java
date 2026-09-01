@@ -1,6 +1,8 @@
 package com.medcase.system.service;
 
 import java.util.List;
+import com.medcase.mp.mybatis.PageParam;
+import com.medcase.mp.mybatis.PageResult;
 import com.medcase.system.entity.SysPostEntity;
 
 /**
@@ -15,8 +17,8 @@ public interface ISysPostService {
      * @param post 岗位信息
      * @return 岗位列表
      */
-    public List<SysPostEntity> selectPostList(
-            String postCode, String postName, String status);
+    public PageResult<SysPostEntity> selectPage(
+            PageParam pageParam, String postCode, String postName, String status);
 
     /**
      * 查询所有岗位

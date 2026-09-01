@@ -1,6 +1,8 @@
 package com.medcase.system.mapper;
 
 import com.medcase.mp.mybatis.BaseMapperX;
+import com.medcase.mp.mybatis.PageParam;
+import com.medcase.mp.mybatis.PageResult;
 import com.medcase.system.entity.SysPostEntity;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -8,9 +10,9 @@ import java.util.List;
 
 @Mapper
 public interface SysPostMapper extends BaseMapperX<SysPostEntity> {
-    default List<SysPostEntity> selectPostList(
-            String postCode, String postName, String status) {
-        return selectList(build()
+    default PageResult<SysPostEntity> selectPage(
+            PageParam pageParam, String postCode, String postName, String status) {
+        return selectPage(pageParam, build()
                 .likeIfPresent(SysPostEntity::getPostCode, postCode)
                 .likeIfPresent(SysPostEntity::getPostName, postName)
                 .eqIfPresent(SysPostEntity::getStatus, status));

@@ -13,6 +13,8 @@ import com.medcase.common.core.domain.entity.SysDictData;
 import com.medcase.common.core.domain.entity.SysDictType;
 import com.medcase.common.utils.DictUtils;
 import com.medcase.common.utils.StringUtils;
+import com.medcase.mp.mybatis.PageParam;
+import com.medcase.mp.mybatis.PageResult;
 import com.medcase.system.converter.SystemEntityConverter;
 import com.medcase.system.entity.SysDictTypeEntity;
 import com.medcase.system.mapper.SysDictDataMapper;
@@ -43,20 +45,18 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService {
         loadingDictCache();
     }
 
-    /**
-     * 根据条件分页查询字典类型
-     * 
-     * @param dictType 字典类型信息
-     * @return 字典类型集合信息
-     */
     @Override
-    public List<SysDictType> selectDictTypeList(SysDictType dictType) {
+    public PageResult<SysDictType> selectPage(PageParam pageParam, SysDictType dictType) {
 
         Object beginTime = dictType.getParams().get("beginTime");
         Object endTime = dictType.getParams().get("endTime");
-        return SystemEntityConverter.copyList(dictTypeMapper.selectDictTypeList(
-                dictType.getDictName(), dictType.getStatus(), dictType.getDictType(),
-                beginTime, endTime), SysDictType.class);
+        PageResult<SysDictTypeEntity> entityPage = dictTypeMapper.selectPage(
+                pageParam, dictType.getDictName(), dictType.getStatus(), dictType.getDictType(),
+                beginTime, endTime);
+        PageResult<SysDictType> result = new PageResult<>();
+        result.setList(SystemEntityConverter.copyList(entityPage.getList(), SysDictType.class));
+        result.setTotal(entityPage.getTotal());
+        return result;
     }
 
     /**

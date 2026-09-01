@@ -10,6 +10,8 @@ import com.medcase.common.constant.UserConstants;
 import com.medcase.common.core.redis.RedisCache;
 import com.medcase.common.core.text.Convert;
 import com.medcase.common.utils.StringUtils;
+import com.medcase.mp.mybatis.PageParam;
+import com.medcase.mp.mybatis.PageResult;
 import com.medcase.system.entity.SysConfigEntity;
 import com.medcase.system.mapper.SysConfigMapper;
 import com.medcase.system.service.ISysConfigService;
@@ -97,12 +99,12 @@ public class SysConfigServiceImpl implements ISysConfigService {
      * @return 参数配置集合
      */
     @Override
-    public List<SysConfigEntity> selectConfigList(
-            String configName, String configType, String configKey,
+    public PageResult<SysConfigEntity> selectPage(
+            PageParam pageParam, String configName, String configType, String configKey,
             String beginTime, String endTime) {
 
-        return configMapper.selectConfigList(
-                configName, configType, configKey,
+        return configMapper.selectPage(
+                pageParam, configName, configType, configKey,
                 parseDate(beginTime), parseDate(endTime));
     }
 

@@ -2,6 +2,8 @@ package com.medcase.system.mapper;
 
 import com.medcase.mp.mybatis.BaseMapperX;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.medcase.mp.mybatis.PageParam;
+import com.medcase.mp.mybatis.PageResult;
 import com.medcase.system.entity.SysDictTypeEntity;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -9,8 +11,8 @@ import java.util.List;
 
 @Mapper
 public interface SysDictTypeMapper extends BaseMapperX<SysDictTypeEntity> {
-    default List<SysDictTypeEntity> selectDictTypeList(
-            String dictName, String status, String dictType,
+    default PageResult<SysDictTypeEntity> selectPage(
+            PageParam pageParam, String dictName, String status, String dictType,
             Object beginTime, Object endTime) {
         LambdaQueryWrapper<SysDictTypeEntity> query = build()
                 .likeIfPresent(SysDictTypeEntity::getDictName, dictName)
@@ -22,7 +24,7 @@ public interface SysDictTypeMapper extends BaseMapperX<SysDictTypeEntity> {
                 .apply(endTime != null,
                         "DATE_FORMAT(create_time, '%Y%m%d') <= DATE_FORMAT({0}, '%Y%m%d')",
                         endTime);
-        return selectList(query);
+        return selectPage(pageParam, query);
     }
 
     default List<SysDictTypeEntity> selectAllDictTypes() {

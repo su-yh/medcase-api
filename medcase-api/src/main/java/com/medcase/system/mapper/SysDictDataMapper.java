@@ -3,6 +3,8 @@ package com.medcase.system.mapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.medcase.mp.mybatis.BaseMapperX;
+import com.medcase.mp.mybatis.PageParam;
+import com.medcase.mp.mybatis.PageResult;
 import com.medcase.system.entity.SysDictDataEntity;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -10,6 +12,16 @@ import java.util.List;
 
 @Mapper
 public interface SysDictDataMapper extends BaseMapperX<SysDictDataEntity> {
+    default PageResult<SysDictDataEntity> selectPage(
+            PageParam pageParam, String dictType, String dictLabel, String status) {
+        LambdaQueryWrapper<SysDictDataEntity> query = build()
+                .eqIfPresent(SysDictDataEntity::getDictType, dictType)
+                .likeIfPresent(SysDictDataEntity::getDictLabel, dictLabel)
+                .eqIfPresent(SysDictDataEntity::getStatus, status)
+                .orderByAsc(SysDictDataEntity::getDictSort);
+        return selectPage(pageParam, query);
+    }
+
     default List<SysDictDataEntity> selectDictDataList(
             String dictType, String dictLabel, String status) {
         LambdaQueryWrapper<SysDictDataEntity> query = build()

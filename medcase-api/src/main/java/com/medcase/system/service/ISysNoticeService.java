@@ -1,6 +1,8 @@
 package com.medcase.system.service;
 
 import java.util.List;
+import com.medcase.mp.mybatis.PageParam;
+import com.medcase.mp.mybatis.PageResult;
 import com.medcase.system.entity.SysNoticeEntity;
 
 /**
@@ -23,8 +25,8 @@ public interface ISysNoticeService {
      * @param notice 公告信息
      * @return 公告集合
      */
-    public List<SysNoticeEntity> selectNoticeList(
-            String noticeTitle, String noticeType, String createBy);
+    public PageResult<SysNoticeEntity> selectPage(
+            PageParam pageParam, String noticeTitle, String noticeType, String createBy);
 
     /**
      * 新增公告

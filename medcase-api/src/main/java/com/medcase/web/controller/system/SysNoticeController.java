@@ -23,6 +23,7 @@ import com.medcase.common.enums.BusinessType;
 import com.medcase.system.entity.SysNoticeEntity;
 import com.medcase.system.service.ISysNoticeReadService;
 import com.medcase.system.service.ISysNoticeService;
+import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
 import com.medcase.web.controller.system.dto.NoticeQueryRequest;
 import com.medcase.web.controller.system.dto.NoticeReadUserResponse;
@@ -50,15 +51,16 @@ public class SysNoticeController extends BaseController {
      */
     @PreAuthorize("@ss.hasPermi('system:notice:list')")
     @GetMapping("/list")
-    public PageResult<NoticeResponse> list(NoticeQueryRequest request) {
+    public PageResult<NoticeResponse> list(PageParam pageParam, NoticeQueryRequest request) {
 
-        startPage();
-        List<SysNoticeEntity> entities = noticeService.selectNoticeList(
-                request.getNoticeTitle(), request.getNoticeType(), request.getCreateBy());
-        List<NoticeResponse> list = entities.stream()
+        PageResult<SysNoticeEntity> entityPage = noticeService.selectPage(
+                pageParam, request.getNoticeTitle(), request.getNoticeType(), request.getCreateBy());
+        PageResult<NoticeResponse> result = new PageResult<>();
+        result.setList(entityPage.getList().stream()
                 .map(NoticeResponse::fromEntity)
-                .toList();
-        return new PageResult<>(list, new PageInfo<>(entities).getTotal());
+                .toList());
+        result.setTotal(entityPage.getTotal());
+        return result;
     }
 
     /**

@@ -2,6 +2,8 @@ package com.medcase.system.mapper;
 
 import com.medcase.mp.mybatis.BaseMapperX;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.medcase.mp.mybatis.PageParam;
+import com.medcase.mp.mybatis.PageResult;
 import com.medcase.system.entity.SysConfigEntity;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -14,8 +16,8 @@ public interface SysConfigMapper extends BaseMapperX<SysConfigEntity> {
         return selectOne(SysConfigEntity::getConfigKey, configKey);
     }
 
-    default List<SysConfigEntity> selectConfigList(
-            String configName, String configType, String configKey,
+    default PageResult<SysConfigEntity> selectPage(
+            PageParam pageParam, String configName, String configType, String configKey,
             Date beginTime, Date endTime) {
         LambdaQueryWrapper<SysConfigEntity> query = build()
                 .likeIfPresent(SysConfigEntity::getConfigName, configName)
@@ -23,7 +25,7 @@ public interface SysConfigMapper extends BaseMapperX<SysConfigEntity> {
                 .likeIfPresent(SysConfigEntity::getConfigKey, configKey)
                 .geIfPresent(SysConfigEntity::getCreateTime, beginTime)
                 .leIfPresent(SysConfigEntity::getCreateTime, endTime);
-        return selectList(query);
+        return selectPage(pageParam, query);
     }
 
     default List<SysConfigEntity> selectAllConfigs() {

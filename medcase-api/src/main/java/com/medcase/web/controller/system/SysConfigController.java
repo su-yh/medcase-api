@@ -3,9 +3,9 @@ package com.medcase.web.controller.system;
 import com.medcase.common.annotation.Log;
 import com.medcase.common.core.controller.BaseController;
 import com.medcase.common.enums.BusinessType;
-import com.github.pagehelper.PageInfo;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
+import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
 import com.medcase.system.entity.SysConfigEntity;
 import com.medcase.system.service.ISysConfigService;
@@ -24,8 +24,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-
 /**
  * 参数配置 信息操作处理
  * 
@@ -42,16 +40,17 @@ public class SysConfigController extends BaseController {
      */
     @PreAuthorize("@ss.hasPermi('system:config:list')")
     @GetMapping("/list")
-    public PageResult<ConfigResponse> list(ConfigQueryRequest request) {
+    public PageResult<ConfigResponse> list(PageParam pageParam, ConfigQueryRequest request) {
 
-        startPage();
-        List<SysConfigEntity> entities = configService.selectConfigList(
-                request.getConfigName(), request.getConfigType(), request.getConfigKey(),
+        PageResult<SysConfigEntity> entityPage = configService.selectPage(
+                pageParam, request.getConfigName(), request.getConfigType(), request.getConfigKey(),
                 request.getBeginTime(), request.getEndTime());
-        List<ConfigResponse> list = entities.stream()
+        PageResult<ConfigResponse> result = new PageResult<>();
+        result.setList(entityPage.getList().stream()
                 .map(ConfigResponse::fromEntity)
-                .toList();
-        return new PageResult<>(list, new PageInfo<>(entities).getTotal());
+                .toList());
+        result.setTotal(entityPage.getTotal());
+        return result;
     }
 
     /**

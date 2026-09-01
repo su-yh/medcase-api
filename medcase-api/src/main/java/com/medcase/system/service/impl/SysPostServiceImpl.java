@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.medcase.common.constant.UserConstants;
 import com.medcase.common.utils.StringUtils;
+import com.medcase.mp.mybatis.PageParam;
+import com.medcase.mp.mybatis.PageResult;
 import com.medcase.system.entity.SysPostEntity;
 import com.medcase.system.entity.SysUserPostEntity;
 import com.medcase.system.mapper.SysPostMapper;
@@ -34,10 +36,10 @@ public class SysPostServiceImpl implements ISysPostService {
      * @return 岗位信息集合
      */
     @Override
-    public List<SysPostEntity> selectPostList(
-            String postCode, String postName, String status) {
+    public PageResult<SysPostEntity> selectPage(
+            PageParam pageParam, String postCode, String postName, String status) {
 
-        return postMapper.selectPostList(postCode, postName, status);
+        return postMapper.selectPage(pageParam, postCode, postName, status);
     }
 
     /**

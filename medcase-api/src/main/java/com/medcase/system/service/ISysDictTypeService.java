@@ -3,6 +3,8 @@ package com.medcase.system.service;
 import java.util.List;
 import com.medcase.common.core.domain.entity.SysDictData;
 import com.medcase.common.core.domain.entity.SysDictType;
+import com.medcase.mp.mybatis.PageParam;
+import com.medcase.mp.mybatis.PageResult;
 
 /**
  * 字典 业务层
@@ -10,13 +12,7 @@ import com.medcase.common.core.domain.entity.SysDictType;
  */
 public interface ISysDictTypeService {
 
-    /**
-     * 根据条件分页查询字典类型
-     * 
-     * @param dictType 字典类型信息
-     * @return 字典类型集合信息
-     */
-    public List<SysDictType> selectDictTypeList(SysDictType dictType);
+    public PageResult<SysDictType> selectPage(PageParam pageParam, SysDictType dictType);
 
     /**
      * 根据所有字典类型

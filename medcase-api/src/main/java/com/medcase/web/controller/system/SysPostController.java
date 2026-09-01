@@ -1,7 +1,6 @@
 package com.medcase.web.controller.system;
 
 import java.util.List;
-import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -18,6 +17,7 @@ import com.medcase.common.core.controller.BaseController;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
 import com.medcase.common.enums.BusinessType;
+import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
 import com.medcase.system.entity.SysPostEntity;
 import com.medcase.system.service.ISysPostService;
@@ -41,15 +41,16 @@ public class SysPostController extends BaseController {
      */
     @PreAuthorize("@ss.hasPermi('system:post:list')")
     @GetMapping("/list")
-    public PageResult<PostResponse> list(PostQueryRequest request) {
+    public PageResult<PostResponse> list(PageParam pageParam, PostQueryRequest request) {
 
-        startPage();
-        List<SysPostEntity> entities = postService.selectPostList(
-                request.getPostCode(), request.getPostName(), request.getStatus());
-        List<PostResponse> list = entities.stream()
+        PageResult<SysPostEntity> entityPage = postService.selectPage(
+                pageParam, request.getPostCode(), request.getPostName(), request.getStatus());
+        PageResult<PostResponse> result = new PageResult<>();
+        result.setList(entityPage.getList().stream()
                 .map(PostResponse::fromEntity)
-                .toList();
-        return new PageResult<>(list, new PageInfo<>(entities).getTotal());
+                .toList());
+        result.setTotal(entityPage.getTotal());
+        return result;
     }
     
     /**

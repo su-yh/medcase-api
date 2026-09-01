@@ -2,6 +2,8 @@ package com.medcase.system.service;
 
 import java.util.List;
 import com.medcase.common.core.domain.entity.SysDictData;
+import com.medcase.mp.mybatis.PageParam;
+import com.medcase.mp.mybatis.PageResult;
 
 /**
  * 字典 业务层
@@ -16,6 +18,8 @@ public interface ISysDictDataService {
      * @return 字典数据集合信息
      */
     public List<SysDictData> selectDictDataList(SysDictData dictData);
+
+    public PageResult<SysDictData> selectPage(PageParam pageParam, SysDictData dictData);
 
     /**
      * 根据字典类型和字典键值查询字典数据信息

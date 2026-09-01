@@ -1,6 +1,8 @@
 package com.medcase.system.service;
 
 import java.util.List;
+import com.medcase.mp.mybatis.PageParam;
+import com.medcase.mp.mybatis.PageResult;
 import com.medcase.system.entity.SysConfigEntity;
 
 /**
@@ -38,8 +40,8 @@ public interface ISysConfigService {
      * @param config 参数配置信息
      * @return 参数配置集合
      */
-    public List<SysConfigEntity> selectConfigList(
-            String configName, String configType, String configKey,
+    public PageResult<SysConfigEntity> selectPage(
+            PageParam pageParam, String configName, String configType, String configKey,
             String beginTime, String endTime);
 
     /**

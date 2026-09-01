@@ -2,7 +2,6 @@ package com.medcase.web.controller.system;
 
 import java.util.ArrayList;
 import java.util.List;
-import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -21,6 +20,7 @@ import com.medcase.mvc.exception.ExceptionUtil;
 import com.medcase.common.core.domain.entity.SysDictData;
 import com.medcase.common.enums.BusinessType;
 import com.medcase.common.utils.StringUtils;
+import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
 import com.medcase.system.service.ISysDictDataService;
 import com.medcase.system.service.ISysDictTypeService;
@@ -41,11 +41,9 @@ public class SysDictDataController extends BaseController {
 
     @PreAuthorize("@ss.hasPermi('system:dict:list')")
     @GetMapping("/list")
-    public PageResult<SysDictData> list(SysDictData dictData) {
+    public PageResult<SysDictData> list(PageParam pageParam, SysDictData dictData) {
 
-        startPage();
-        List<SysDictData> list = dictDataService.selectDictDataList(dictData);
-        return new PageResult<>(list, new PageInfo<>(list).getTotal());
+        return dictDataService.selectPage(pageParam, dictData);
     }
 
     /**
