@@ -17,7 +17,7 @@ import java.util.List;
 public class DoctorCaseVO {
     private Long id;
 
-    private String doctorNickname;
+    private String userNickname;
 
     private String caseName;
 
@@ -44,7 +44,7 @@ public class DoctorCaseVO {
     public static DoctorCaseVO fromEntity(DoctorCaseEntity entity) {
         DoctorCaseVO result = new DoctorCaseVO();
         result.setId(entity.getId());
-        result.setDoctorNickname(entity.getDoctorNickname());
+        result.setUserNickname(entity.getUserNickname());
         result.setCaseName(entity.getCaseName());
         result.setContent(entity.getContent());
         result.setAttachments(entity.getAttachments());

@@ -16,6 +16,9 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.web.bind.annotation.RequestMapping;
+import jakarta.validation.Valid;
+
+import java.lang.reflect.Method;
 
 class DoctorProfilePortalControllerTest {
     private DoctorProfilePortalController doctorProfileController;
@@ -30,11 +33,19 @@ class DoctorProfilePortalControllerTest {
     }
 
     @Test
-    void profileControllerUsesIndependentDoctorProfileRoute() {
+    void profileControllerUsesSingleCaseProfileRoute() {
         RequestMapping mapping = DoctorProfilePortalController.class.getAnnotation(RequestMapping.class);
 
         assertNotNull(mapping);
-        assertEquals("/biz/doctor-profile", mapping.value()[0]);
+        assertEquals("/biz/case-profile", mapping.value()[0]);
+    }
+
+    @Test
+    void profileSubmitBindsValidatedRequest() throws NoSuchMethodException {
+        Method submit = DoctorProfilePortalController.class.getMethod(
+                "submit", LoginUser.class, DoctorProfileSubmitRequest.class);
+
+        assertNotNull(submit.getParameters()[1].getAnnotation(Valid.class));
     }
 
     @Test

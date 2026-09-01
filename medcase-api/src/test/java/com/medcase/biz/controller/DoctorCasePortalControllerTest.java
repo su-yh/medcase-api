@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 
 class DoctorCasePortalControllerTest {
     @Test
@@ -18,7 +19,7 @@ class DoctorCasePortalControllerTest {
 
         assertEquals("com.medcase.biz.controller",
                 DoctorCasePortalController.class.getPackageName());
-        assertEquals("/biz/cases", mapping.value()[0]);
+        assertArrayEquals(new String[] {"/biz/cases"}, mapping.value());
     }
 
     @Test

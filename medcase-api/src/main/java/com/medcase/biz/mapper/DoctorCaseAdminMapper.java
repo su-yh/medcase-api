@@ -21,6 +21,7 @@ public interface DoctorCaseAdminMapper extends BaseMapperX<DoctorCaseEntity> {
         queryWrapper.eqIfPresent(DoctorCaseEntity::getId, query.getId());
         queryWrapper.likeIfPresent(DoctorCaseEntity::getCaseName, query.getCaseName());
         queryWrapper.eqIfPresent(DoctorCaseEntity::getStatus, query.getStatus());
+        queryWrapper.eqIfPresent(DoctorCaseEntity::getUserType, query.getUserType());
         queryWrapper.orderByDesc(DoctorCaseEntity::getCreateTime);
         return selectPage(pageParam, queryWrapper);
     }

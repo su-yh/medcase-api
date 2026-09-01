@@ -16,6 +16,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import jakarta.validation.Valid;
 
 import java.lang.reflect.Method;
 
@@ -41,11 +42,11 @@ class DoctorAuthPortalControllerTest {
     }
 
     @Test
-    void authControllerUsesBizDoctorRoute() {
+    void authControllerUsesSingleBizCaseRoute() {
         RequestMapping mapping = DoctorAuthPortalController.class.getAnnotation(RequestMapping.class);
 
         assertNotNull(mapping);
-        assertEquals("/biz/doctor-auth", mapping.value()[0]);
+        assertArrayEquals(new String[] {"/biz/case-auth"}, mapping.value());
     }
 
     @Test
@@ -119,9 +120,8 @@ class DoctorAuthPortalControllerTest {
         Method register = DoctorAuthPortalController.class.getMethod(
                 "register", DoctorRegisterRequest.class);
 
-        assertNotNull(register.getParameterAnnotations()[0][0]);
-        assertEquals(RequestBody.class,
-                register.getParameterAnnotations()[0][0].annotationType());
+        assertNotNull(register.getParameters()[0].getAnnotation(RequestBody.class));
+        assertNotNull(register.getParameters()[0].getAnnotation(Valid.class));
     }
 
     private LoginUser doctorLoginUser() {

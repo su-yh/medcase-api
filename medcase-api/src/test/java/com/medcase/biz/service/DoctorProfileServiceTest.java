@@ -18,6 +18,9 @@ import com.medcase.common.enums.UserTypeEnums;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.AbstractBusinessException;
 import com.medcase.storage.pojo.FileAttachment;
+import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -26,13 +29,16 @@ import org.mockito.MockitoAnnotations;
 class DoctorProfileServiceTest {
     private DoctorProfileService doctorProfileService;
 
+    private Validator validator;
+
     @Mock
     private DoctorUserMapper doctorUserMapper;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        doctorProfileService = new DoctorProfileService(doctorUserMapper);
+        validator = Validation.buildDefaultValidatorFactory().getValidator();
+        doctorProfileService = new DoctorProfileService(doctorUserMapper, validator);
     }
 
     @Test
@@ -46,7 +52,7 @@ class DoctorProfileServiceTest {
         doctor.setIdCardFront(attachment("front"));
         doctor.setIdCardBack(attachment("back"));
         doctor.setQualificationCertificate(attachment("qualification"));
-        when(doctorUserMapper.selectDoctorById(12L)).thenReturn(doctor);
+        when(doctorUserMapper.selectUserById(12L, UserTypeEnums.DOCTOR)).thenReturn(doctor);
 
         DoctorProfileVO result = doctorProfileService.me(loginUser());
 
@@ -63,7 +69,7 @@ class DoctorProfileServiceTest {
     @Test
     void submitMovesRegisteredDoctorToPendingReview() {
         DoctorUserEntity doctor = doctor(UserStatusEnums.REGISTER);
-        when(doctorUserMapper.selectDoctorById(12L)).thenReturn(doctor);
+        when(doctorUserMapper.selectUserById(12L, UserTypeEnums.DOCTOR)).thenReturn(doctor);
         when(doctorUserMapper.updateById(doctor)).thenReturn(1);
         DoctorProfileSubmitRequest request = request("张医生", "13800000000");
         request.setSex("1");
@@ -80,7 +86,7 @@ class DoctorProfileServiceTest {
     @Test
     void submitMovesReviewFailedDoctorBackToPendingReview() {
         DoctorUserEntity doctor = doctor(UserStatusEnums.REVIEW_FAILED);
-        when(doctorUserMapper.selectDoctorById(12L)).thenReturn(doctor);
+        when(doctorUserMapper.selectUserById(12L, UserTypeEnums.DOCTOR)).thenReturn(doctor);
         when(doctorUserMapper.updateById(doctor)).thenReturn(1);
 
         doctorProfileService.submit(loginUser(), request("李医生", "13900000000"));
@@ -92,7 +98,7 @@ class DoctorProfileServiceTest {
     @Test
     void submitRejectsDoctorOutsideProfileSubmissionStatuses() {
         DoctorUserEntity doctor = doctor(UserStatusEnums.OK);
-        when(doctorUserMapper.selectDoctorById(12L)).thenReturn(doctor);
+        when(doctorUserMapper.selectUserById(12L, UserTypeEnums.DOCTOR)).thenReturn(doctor);
 
         AbstractBusinessException exception = assertThrows(
                 AbstractBusinessException.class,
@@ -100,6 +106,40 @@ class DoctorProfileServiceTest {
 
         assertEquals(ErrorCodeEnums.DOCTOR_PROFILE_SUBMIT_STATUS_NOT_MATCH, exception.getEc());
         verify(doctorUserMapper, never()).updateById(any(DoctorUserEntity.class));
+    }
+
+    @Test
+    void submitRejectsDoctorMissingQualificationByValidation() {
+        DoctorUserEntity doctor = doctor(UserStatusEnums.REGISTER);
+        when(doctorUserMapper.selectUserById(12L, UserTypeEnums.DOCTOR)).thenReturn(doctor);
+        DoctorProfileSubmitRequest request = request("张医生", "13800000000");
+        request.setQualificationCertificate(null);
+
+        ConstraintViolationException exception = assertThrows(
+                ConstraintViolationException.class,
+                () -> doctorProfileService.submit(loginUser(), request));
+
+        assertEquals("医师职业资格证图片不能为空",
+                exception.getConstraintViolations().iterator().next().getMessage());
+        verify(doctorUserMapper, never()).updateById(any(DoctorUserEntity.class));
+    }
+
+    @Test
+    void submitPatientDoesNotRequireDoctorQualification() {
+        DoctorUserEntity patient = doctor(UserStatusEnums.REGISTER);
+        patient.setUserType(UserTypeEnums.PATIENT);
+        LoginUser patientUser = loginUser(UserTypeEnums.PATIENT);
+        when(doctorUserMapper.selectUserById(12L, UserTypeEnums.PATIENT)).thenReturn(patient);
+        when(doctorUserMapper.updateById(patient)).thenReturn(1);
+        DoctorProfileSubmitRequest request = request("张患者", "13800000000");
+        request.setTitle(null);
+        request.setQualificationCertificate(null);
+
+        doctorProfileService.submit(patientUser, request);
+
+        assertEquals(null, patient.getTitle());
+        assertEquals(null, patient.getQualificationCertificate());
+        verify(doctorUserMapper).updateById(patient);
     }
 
     private DoctorProfileSubmitRequest request(String nickName, String phone) {
@@ -123,9 +163,13 @@ class DoctorProfileServiceTest {
     }
 
     private LoginUser loginUser() {
+        return loginUser(UserTypeEnums.DOCTOR);
+    }
+
+    private LoginUser loginUser(UserTypeEnums userType) {
         SysUser user = new SysUser();
         user.setUserId(12L);
-        user.setUserType(UserTypeEnums.DOCTOR);
+        user.setUserType(userType);
         LoginUser loginUser = new LoginUser();
         loginUser.setUserId(12L);
         loginUser.setUser(user);

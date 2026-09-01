@@ -13,7 +13,7 @@ public enum FileBusinessEnums implements BaseEnum {
     CASE("case", "病例"),
     AVATAR("avatar", "头像"),
     NOTICE("notice", "公告"),
-    DOCTOR_REGISTER("doctor-register", "医生注册");
+    CASE_REGISTER("case-register", "病例端注册");
 
     private final String code;
     private final String desc;

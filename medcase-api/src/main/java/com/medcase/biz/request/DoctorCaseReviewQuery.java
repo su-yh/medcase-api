@@ -1,6 +1,7 @@
 package com.medcase.biz.request;
 
 import com.medcase.biz.enums.DoctorCaseStatusEnums;
+import com.medcase.common.enums.UserTypeEnums;
 import lombok.Data;
 
 /**
@@ -15,4 +16,6 @@ public class DoctorCaseReviewQuery {
     private String caseName;
 
     private DoctorCaseStatusEnums status;
+
+    private UserTypeEnums userType;
 }

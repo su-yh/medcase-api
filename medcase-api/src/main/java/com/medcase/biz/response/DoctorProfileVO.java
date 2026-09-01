@@ -2,6 +2,7 @@ package com.medcase.biz.response;
 
 import com.medcase.biz.domain.DoctorUserEntity;
 import com.medcase.common.enums.UserStatusEnums;
+import com.medcase.common.enums.UserTypeEnums;
 import com.medcase.storage.pojo.FileAttachment;
 import lombok.Data;
 
@@ -19,6 +20,8 @@ public class DoctorProfileVO {
     private String sex;
 
     private String phone;
+
+    private UserTypeEnums userType;
 
     private String idCardNumber;
 
@@ -40,6 +43,7 @@ public class DoctorProfileVO {
         result.setNickName(doctor.getNickName());
         result.setSex(doctor.getSex());
         result.setPhone(doctor.getPhonenumber());
+        result.setUserType(doctor.getUserType());
         result.setIdCardNumber(doctor.getIdCardNumber());
         result.setTitle(doctor.getTitle());
         result.setIdCardFront(doctor.getIdCardFront());

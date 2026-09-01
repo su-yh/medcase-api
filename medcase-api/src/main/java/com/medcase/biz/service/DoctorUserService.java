@@ -32,9 +32,9 @@ public class DoctorUserService {
     private final DoctorUserMapper doctorUserMapper;
 
     public PageResult<DoctorUserVO> page(
-            PageParam pageParam, @NonNull DoctorUserQuery query) {
-        PageResult<DoctorUserEntity> pageResult = doctorUserMapper.selectDoctorPage(
-                pageParam, query);
+            PageParam pageParam, @NonNull DoctorUserQuery query, UserTypeEnums userType) {
+        PageResult<DoctorUserEntity> pageResult = doctorUserMapper.selectUserPage(
+                pageParam, query, userType);
         PageResult<DoctorUserVO> result = new PageResult<>();
         result.setTotal(pageResult.getTotal());
         result.setList(pageResult.getList().stream()
@@ -44,12 +44,16 @@ public class DoctorUserService {
     }
 
     public DoctorUserVO detail(Long userId) {
+        return detail(userId, UserTypeEnums.DOCTOR);
+    }
+
+    public DoctorUserVO detail(Long userId, UserTypeEnums userType) {
         if (userId == null) {
             return null;
         }
 
-        DoctorUserEntity user = doctorUserMapper.selectDoctorById(userId);
-        if (user == null || user.getUserType() != UserTypeEnums.DOCTOR) {
+        DoctorUserEntity user = doctorUserMapper.selectUserById(userId, userType);
+        if (user == null || user.getUserType() != userType) {
             return null;
         }
         return DoctorUserVO.fromEntity(user);
@@ -57,7 +61,12 @@ public class DoctorUserService {
 
     @Transactional(rollbackFor = Exception.class)
     public void review(Long userId, DoctorUserReviewRequest request) {
-        DoctorUserEntity user = doctorUserMapper.selectDoctorById(userId);
+        review(userId, request, UserTypeEnums.DOCTOR);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void review(Long userId, DoctorUserReviewRequest request, UserTypeEnums userType) {
+        DoctorUserEntity user = doctorUserMapper.selectUserById(userId, userType);
         if (user == null) {
             throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_USER_NOT_FOUND);
         }

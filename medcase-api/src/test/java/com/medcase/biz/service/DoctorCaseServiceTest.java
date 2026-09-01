@@ -18,6 +18,7 @@ import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.common.validation.groups.ValidationGroups;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.AbstractBusinessException;
+import com.medcase.common.enums.UserTypeEnums;
 import java.io.Serializable;
 import java.util.Date;
 import jakarta.validation.Validation;
@@ -54,8 +55,8 @@ class DoctorCaseServiceTest {
         ArgumentCaptor<DoctorCaseEntity> captor = ArgumentCaptor.forClass(DoctorCaseEntity.class);
         verify(doctorCaseMapper).insert(captor.capture());
         DoctorCaseEntity entity = captor.getValue();
-        assertEquals(12L, entity.getDoctorId());
-        assertEquals("doctor12", entity.getDoctorNickname());
+        assertEquals(12L, entity.getUserId());
+        assertEquals("doctor12", entity.getUserNickname());
         assertEquals("病例", entity.getCaseName());
         assertEquals("病例内容", entity.getContent());
         assertEquals(DoctorCaseStatusEnums.PENDING_REVIEW, entity.getStatus());
@@ -189,6 +190,7 @@ class DoctorCaseServiceTest {
         SysUser user = new SysUser();
         user.setUserId(userId);
         user.setNickName("doctor" + userId);
+        user.setUserType(UserTypeEnums.DOCTOR);
         LoginUser loginUser = new LoginUser();
         loginUser.setUserId(userId);
         loginUser.setUser(user);
@@ -206,7 +208,8 @@ class DoctorCaseServiceTest {
     private DoctorCaseEntity caseEntity(Long id, Long doctorId, DoctorCaseStatusEnums status) {
         DoctorCaseEntity entity = new DoctorCaseEntity();
         entity.setId(id);
-        entity.setDoctorId(doctorId);
+        entity.setUserId(doctorId);
+        entity.setUserType(UserTypeEnums.DOCTOR);
         entity.setStatus(status);
         return entity;
     }

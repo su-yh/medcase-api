@@ -67,12 +67,24 @@ public class SysUserController extends BaseController {
     }
 
     /**
-     * 根据用户编号获取详细信息
+     * 获取新增用户所需的基础数据。
      */
     @PreAuthorize("@ss.hasPermi('system:user:query')")
-    @GetMapping(value = { "/", "/{userId}" })
-    public UserDetailResponse getInfo(@PathVariable(value = "userId", required = false) Long userId) {
+    @GetMapping("/")
+    public UserDetailResponse getNewUserInfo() {
+        return buildUserDetailResponse(null);
+    }
 
+    /**
+     * 根据用户编号获取详细信息。
+     */
+    @PreAuthorize("@ss.hasPermi('system:user:query')")
+    @GetMapping("/{userId}")
+    public UserDetailResponse getInfo(@PathVariable Long userId) {
+        return buildUserDetailResponse(userId);
+    }
+
+    private UserDetailResponse buildUserDetailResponse(Long userId) {
         SysUser sysUser = null;
         List<Long> postIds = null;
         List<Long> roleIds = null;

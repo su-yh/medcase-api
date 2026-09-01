@@ -10,8 +10,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         where n.status = '0' and not exists (select 1 from sys_notice_read r where r.notice_id = n.notice_id and r.user_id = #{userId})
     </select>
 
-    <!-- 查询带已读状态的公告列表（直接在SQL中限制条数） -->
-    <select id="selectNoticeListWithReadStatus"
+    <!-- 查询公告列表（直接在SQL中限制条数） -->
+    <select id="selectTopNoticeList"
             resultType="com.medcase.web.controller.system.dto.NoticeTopItemResponse">
         select
             n.notice_id    as noticeId,
@@ -19,14 +19,22 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             n.notice_type  as noticeType,
             n.status,
             n.create_by    as createBy,
-            n.create_time  as createTime,
-            case when r.notice_id is not null then true else false end as read
+            n.create_time  as createTime
         from sys_notice n
-        left join sys_notice_read r
-            on r.notice_id = n.notice_id and r.user_id = #{userId}
         where n.status = '0'
         order by n.notice_id desc
         limit #{limit}
+    </select>
+
+    <!-- 查询当前用户已读公告ID -->
+    <select id="selectReadNoticeIds" resultType="java.lang.Long">
+        select r.notice_id
+        from sys_notice_read r
+        where r.user_id = #{userId}
+          and r.notice_id in
+        <foreach collection="noticeIds" item="noticeId" open="(" separator="," close=")">
+            #{noticeId}
+        </foreach>
     </select>
 
     <!-- 查询已阅读某公告的用户列表，支持按登录名/用户名模糊筛选 -->

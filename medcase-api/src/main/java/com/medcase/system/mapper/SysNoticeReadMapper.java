@@ -5,15 +5,20 @@ import com.medcase.system.entity.SysNoticeReadEntity;
 import com.medcase.web.controller.system.dto.NoticeReadUserResponse;
 import com.medcase.web.controller.system.dto.NoticeTopItemResponse;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 @Mapper
 public interface SysNoticeReadMapper extends BaseMapperX<SysNoticeReadEntity> {
     int selectUnreadCount(Long userId);
 
-    List<NoticeTopItemResponse> selectNoticeListWithReadStatus(Long userId, int limit);
+    List<NoticeTopItemResponse> selectTopNoticeList(@Param("limit") int limit);
+
+    Set<Long> selectReadNoticeIds(
+            @Param("userId") Long userId, @Param("noticeIds") Collection<Long> noticeIds);
 
     List<NoticeReadUserResponse> selectReadUsersByNoticeId(Long noticeId, String searchValue);
 

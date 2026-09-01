@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import com.medcase.biz.enums.DoctorCaseStatusEnums;
 import com.medcase.mp.entity.AbstractBaseEntity;
+import com.medcase.common.enums.UserTypeEnums;
 import com.medcase.storage.pojo.FileAttachment;
 import lombok.Data;
 
@@ -15,19 +16,21 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * 医生病例实体 medcase_doctor_case
+ * 病例实体 medcase_case
  *
  * @author suyh
  */
 @Data
-@TableName(value = "medcase_doctor_case", autoResultMap = true)
+@TableName(value = "medcase_case", autoResultMap = true)
 public class DoctorCaseEntity extends AbstractBaseEntity {
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
-    private Long doctorId;
+    private Long userId;
 
-    private String doctorNickname;
+    private String userNickname;
+
+    private UserTypeEnums userType;
 
     private String caseName;
 

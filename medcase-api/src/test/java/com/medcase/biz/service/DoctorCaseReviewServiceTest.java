@@ -19,6 +19,7 @@ import com.medcase.biz.response.DoctorCaseReviewVO;
 import com.medcase.biz.domain.DoctorCaseEntity;
 import com.medcase.biz.enums.DoctorCaseStatusEnums;
 import com.medcase.biz.mapper.DoctorCaseAdminMapper;
+import com.medcase.common.enums.UserTypeEnums;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -48,15 +49,17 @@ class DoctorCaseReviewServiceTest {
 
         DoctorCaseEntity entity = new DoctorCaseEntity();
         entity.setId(42L);
-        entity.setDoctorId(12L);
-        entity.setDoctorNickname("张医生");
+        entity.setUserId(12L);
+        entity.setUserNickname("张医生");
+        entity.setUserType(UserTypeEnums.DOCTOR);
         entity.setCaseName("高血压病例");
         entity.setContent("病例内容");
         entity.setStatus(DoctorCaseStatusEnums.PENDING_REVIEW);
         when(doctorCaseAdminMapper.selectAdminCasePage(any(PageParam.class), any(DoctorCaseReviewQuery.class)))
                 .thenReturn(new PageResult<>(List.of(entity), 1L));
 
-        PageResult<DoctorCaseReviewVO> result = doctorCaseReviewService.page(2, 20, query);
+        PageResult<DoctorCaseReviewVO> result =
+                doctorCaseReviewService.page(2, 20, query, UserTypeEnums.DOCTOR);
 
         ArgumentCaptor<PageParam> pageCaptor = ArgumentCaptor.forClass(PageParam.class);
         verify(doctorCaseAdminMapper).selectAdminCasePage(pageCaptor.capture(), any(DoctorCaseReviewQuery.class));
@@ -64,7 +67,7 @@ class DoctorCaseReviewServiceTest {
         assertEquals(20, pageCaptor.getValue().getPageSize());
         assertEquals(1L, result.getTotal());
         assertEquals(42L, result.getList().get(0).getId());
-        assertEquals("张医生", result.getList().get(0).getDoctorName());
+        assertEquals("张医生", result.getList().get(0).getUserName());
         assertEquals("高血压病例", result.getList().get(0).getCaseName());
         assertEquals("病例内容", result.getList().get(0).getContent());
         assertEquals("待审核", result.getList().get(0).getStatusDesc());
@@ -80,7 +83,8 @@ class DoctorCaseReviewServiceTest {
         doctorCaseReviewService.review(
                 42L,
                 reviewRequest(true, null),
-                adminUser);
+                adminUser,
+                UserTypeEnums.DOCTOR);
 
         verify(doctorCaseAdminMapper).updateById(entity);
         assertEquals(DoctorCaseStatusEnums.APPROVED_PENDING_SETTLEMENT, entity.getStatus());
@@ -94,7 +98,8 @@ class DoctorCaseReviewServiceTest {
                                 "review",
                                 Long.class,
                                 DoctorCaseReviewRequest.class,
-                                LoginUser.class)
+                                LoginUser.class,
+                                UserTypeEnums.class)
                         .getAnnotation(Transactional.class)
                         .annotationType());
     }
@@ -109,7 +114,8 @@ class DoctorCaseReviewServiceTest {
         doctorCaseReviewService.review(
                 42L,
                 reviewRequest(false, "请补充检查报告"),
-                adminUser);
+                adminUser,
+                UserTypeEnums.DOCTOR);
 
         verify(doctorCaseAdminMapper).updateById(entity);
         assertEquals(DoctorCaseStatusEnums.REVIEW_FAILED, entity.getStatus());
@@ -128,7 +134,8 @@ class DoctorCaseReviewServiceTest {
                 () -> doctorCaseReviewService.review(
                         42L,
                         reviewRequest(true, null),
-                        loginUser(7L, "管理员")));
+                        loginUser(7L, "管理员"),
+                        UserTypeEnums.DOCTOR));
 
         assertEquals(ErrorCodeEnums.DOCTOR_CASE_REVIEW_STATUS_NOT_MATCH, exception.getEc());
         verify(doctorCaseAdminMapper, never())
@@ -142,7 +149,8 @@ class DoctorCaseReviewServiceTest {
                 () -> doctorCaseReviewService.review(
                         42L,
                         reviewRequest(false, "  "),
-                        loginUser(7L, "管理员")));
+                        loginUser(7L, "管理员"),
+                        UserTypeEnums.DOCTOR));
 
         assertEquals(ErrorCodeEnums.DOCTOR_CASE_REVIEW_REASON_EMPTY, exception.getEc());
         verify(doctorCaseAdminMapper, never()).selectById(any());
@@ -155,7 +163,7 @@ class DoctorCaseReviewServiceTest {
         when(doctorCaseAdminMapper.selectById(42L)).thenReturn(entity);
         when(doctorCaseAdminMapper.updateById(entity)).thenReturn(1);
 
-        doctorCaseReviewService.settle(42L, adminUser);
+        doctorCaseReviewService.settle(42L, adminUser, UserTypeEnums.DOCTOR);
 
         verify(doctorCaseAdminMapper).updateById(entity);
         assertEquals(DoctorCaseStatusEnums.SETTLED, entity.getStatus());
@@ -170,7 +178,7 @@ class DoctorCaseReviewServiceTest {
 
         AbstractBusinessException exception = assertThrows(
                 AbstractBusinessException.class,
-                () -> doctorCaseReviewService.settle(42L, loginUser(7L, "管理员")));
+                () -> doctorCaseReviewService.settle(42L, loginUser(7L, "管理员"), UserTypeEnums.DOCTOR));
 
         assertEquals(ErrorCodeEnums.DOCTOR_CASE_SETTLE_STATUS_NOT_MATCH, exception.getEc());
         verify(doctorCaseAdminMapper, never()).updateById(any(DoctorCaseEntity.class));
@@ -197,6 +205,7 @@ class DoctorCaseReviewServiceTest {
         DoctorCaseEntity entity = new DoctorCaseEntity();
         entity.setId(id);
         entity.setStatus(status);
+        entity.setUserType(UserTypeEnums.DOCTOR);
         return entity;
     }
 }

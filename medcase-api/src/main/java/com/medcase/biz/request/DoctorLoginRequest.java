@@ -14,6 +14,8 @@ public class DoctorLoginRequest {
 
     private String password;
 
+    private String userType;
+
     private String code;
 
     private String uuid;

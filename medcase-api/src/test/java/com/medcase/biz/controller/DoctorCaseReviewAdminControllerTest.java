@@ -30,7 +30,7 @@ class DoctorCaseReviewAdminControllerTest {
 
         assertEquals("com.medcase.biz.controller",
                 DoctorCaseReviewAdminController.class.getPackageName());
-        assertEquals("/biz/case-review", mapping.value()[0]);
+        assertEquals("/biz/doctor-case", mapping.value()[0]);
         assertEquals(PageResult.class, list.getReturnType());
         assertEquals(DoctorCaseReviewVO.class, detail.getReturnType());
         assertEquals(void.class, review.getReturnType());

@@ -12,6 +12,10 @@ import com.medcase.common.utils.SecurityUtils;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.AbstractBusinessException;
 import com.medcase.storage.pojo.FileAttachment;
+import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.Valid;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,6 +25,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -38,6 +43,8 @@ import static org.mockito.Mockito.when;
 
 class DoctorAuthServiceTest {
     private DoctorAuthService doctorAuthService;
+
+    private Validator validator;
 
     @Mock
     private DoctorUserMapper doctorUserMapper;
@@ -57,8 +64,9 @@ class DoctorAuthServiceTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
+        validator = Validation.buildDefaultValidatorFactory().getValidator();
         doctorAuthService = new DoctorAuthService(
-                doctorUserMapper, loginService, permissionService, tokenService, smsCodeService);
+                doctorUserMapper, loginService, permissionService, tokenService, smsCodeService, validator);
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.setRemoteAddr("127.0.0.1");
         RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
@@ -74,8 +82,8 @@ class DoctorAuthServiceTest {
     void registerInsertsDoctorUserWithEncryptedPassword() {
         DoctorRegisterRequest registerRequest = registerRequest(
                 "doctor01", "secret123", "13800000000", "9999");
-        when(doctorUserMapper.usernameExists("doctor01")).thenReturn(false);
-        when(doctorUserMapper.phoneExists("13800000000")).thenReturn(false);
+        when(doctorUserMapper.usernameExists("doctor01", UserTypeEnums.DOCTOR)).thenReturn(false);
+        when(doctorUserMapper.phoneExists("13800000000", UserTypeEnums.DOCTOR)).thenReturn(false);
         when(doctorUserMapper.insert(any(DoctorUserEntity.class))).thenReturn(1);
         when(doctorUserMapper.updateById(any(DoctorUserEntity.class))).thenReturn(1);
 
@@ -92,21 +100,30 @@ class DoctorAuthServiceTest {
         assertEquals(null, user.getDelFlag());
         assertNotNull(user.getPwdUpdateDate());
         assertTrue(SecurityUtils.matchesPassword("secret123", user.getPassword()));
-        verify(doctorUserMapper).usernameExists("doctor01");
+        verify(doctorUserMapper).usernameExists("doctor01", UserTypeEnums.DOCTOR);
         verify(smsCodeService).verifyCode("13800000000", "123456");
+    }
+
+    @Test
+    void authServiceDoesNotDeclareValidationAnnotations() throws NoSuchMethodException {
+        assertEquals(null, DoctorAuthService.class.getAnnotation(Validated.class));
+        assertEquals(null, DoctorAuthService.class
+                .getMethod("register", DoctorRegisterRequest.class)
+                .getParameters()[0]
+                .getAnnotation(Valid.class));
     }
 
     @Test
     void registerRejectsDuplicateDoctorUsername() {
         DoctorRegisterRequest registerRequest = registerRequest(
                 "doctor01", "secret123", "13800000000", "9999");
-        when(doctorUserMapper.usernameExists("doctor01")).thenReturn(true);
+        when(doctorUserMapper.usernameExists("doctor01", UserTypeEnums.DOCTOR)).thenReturn(true);
 
         AbstractBusinessException exception = assertThrows(AbstractBusinessException.class, () -> doctorAuthService.register(registerRequest));
 
         assertEquals(ErrorCodeEnums.DOCTOR_REGISTER_USER_EXISTS, exception.getEc());
         verify(doctorUserMapper, never()).insert(any(DoctorUserEntity.class));
-        verify(doctorUserMapper).usernameExists("doctor01");
+        verify(doctorUserMapper).usernameExists("doctor01", UserTypeEnums.DOCTOR);
     }
 
     @Test
@@ -114,9 +131,10 @@ class DoctorAuthServiceTest {
         DoctorRegisterRequest registerRequest = registerRequest(
                 "", "secret123", "13800000000", "9999");
 
-        AbstractBusinessException exception = assertThrows(AbstractBusinessException.class, () -> doctorAuthService.register(registerRequest));
+        ConstraintViolationException exception = assertThrows(
+                ConstraintViolationException.class, () -> doctorAuthService.register(registerRequest));
 
-        assertEquals(ErrorCodeEnums.DOCTOR_REGISTER_USERNAME_EMPTY, exception.getEc());
+        assertTrue(exception.getMessage().contains("注册账号不能为空"));
         verify(doctorUserMapper, never()).insert(any(DoctorUserEntity.class));
     }
 
@@ -125,9 +143,10 @@ class DoctorAuthServiceTest {
         DoctorRegisterRequest registerRequest = registerRequest(
                 "doctor01", "", "13800000000", "9999");
 
-        AbstractBusinessException exception = assertThrows(AbstractBusinessException.class, () -> doctorAuthService.register(registerRequest));
+        ConstraintViolationException exception = assertThrows(
+                ConstraintViolationException.class, () -> doctorAuthService.register(registerRequest));
 
-        assertEquals(ErrorCodeEnums.DOCTOR_REGISTER_PASSWORD_EMPTY, exception.getEc());
+        assertTrue(exception.getMessage().contains("密码不能为空"));
         verify(doctorUserMapper, never()).insert(any(DoctorUserEntity.class));
     }
 
@@ -136,9 +155,10 @@ class DoctorAuthServiceTest {
         DoctorRegisterRequest registerRequest = registerRequest(
                 "d", "secret123", "13800000000", "9999");
 
-        AbstractBusinessException exception = assertThrows(AbstractBusinessException.class, () -> doctorAuthService.register(registerRequest));
+        ConstraintViolationException exception = assertThrows(
+                ConstraintViolationException.class, () -> doctorAuthService.register(registerRequest));
 
-        assertEquals(ErrorCodeEnums.DOCTOR_REGISTER_USERNAME_LENGTH_INVALID, exception.getEc());
+        assertTrue(exception.getMessage().contains("注册账号长度必须在"));
         verify(doctorUserMapper, never()).insert(any(DoctorUserEntity.class));
     }
 
@@ -147,9 +167,10 @@ class DoctorAuthServiceTest {
         DoctorRegisterRequest registerRequest = registerRequest(
                 "doctor01", "1234", "13800000000", "9999");
 
-        AbstractBusinessException exception = assertThrows(AbstractBusinessException.class, () -> doctorAuthService.register(registerRequest));
+        ConstraintViolationException exception = assertThrows(
+                ConstraintViolationException.class, () -> doctorAuthService.register(registerRequest));
 
-        assertEquals(ErrorCodeEnums.DOCTOR_REGISTER_PASSWORD_LENGTH_INVALID, exception.getEc());
+        assertTrue(exception.getMessage().contains("密码长度必须在"));
         verify(doctorUserMapper, never()).insert(any(DoctorUserEntity.class));
     }
 
@@ -157,14 +178,14 @@ class DoctorAuthServiceTest {
     void registerRejectsInsertFailure() {
         DoctorRegisterRequest registerRequest = registerRequest(
                 "doctor01", "secret123", "13800000000", "9999");
-        when(doctorUserMapper.usernameExists("doctor01")).thenReturn(false);
-        when(doctorUserMapper.phoneExists("13800000000")).thenReturn(false);
+        when(doctorUserMapper.usernameExists("doctor01", UserTypeEnums.DOCTOR)).thenReturn(false);
+        when(doctorUserMapper.phoneExists("13800000000", UserTypeEnums.DOCTOR)).thenReturn(false);
         when(doctorUserMapper.insert(any(DoctorUserEntity.class))).thenReturn(0);
 
         AbstractBusinessException exception = assertThrows(AbstractBusinessException.class, () -> doctorAuthService.register(registerRequest));
 
         assertEquals(ErrorCodeEnums.DOCTOR_REGISTER_FAILED, exception.getEc());
-        verify(doctorUserMapper).usernameExists("doctor01");
+        verify(doctorUserMapper).usernameExists("doctor01", UserTypeEnums.DOCTOR);
     }
 
     @Test
@@ -172,11 +193,11 @@ class DoctorAuthServiceTest {
         DoctorRegisterRequest registerRequest = registerRequest(
                 "doctor01", "secret123", "", "9999");
 
-        AbstractBusinessException exception = assertThrows(
-                AbstractBusinessException.class,
+        ConstraintViolationException exception = assertThrows(
+                ConstraintViolationException.class,
                 () -> doctorAuthService.register(registerRequest));
 
-        assertEquals(ErrorCodeEnums.DOCTOR_REGISTER_PHONE_EMPTY, exception.getEc());
+        assertTrue(exception.getMessage().contains("手机号不能为空"));
         verify(doctorUserMapper, never()).insert(any(DoctorUserEntity.class));
     }
 
@@ -186,11 +207,11 @@ class DoctorAuthServiceTest {
                 "doctor01", "secret123", "13800000000", "9999");
         registerRequest.setSex("");
 
-        AbstractBusinessException exception = assertThrows(
-                AbstractBusinessException.class,
+        ConstraintViolationException exception = assertThrows(
+                ConstraintViolationException.class,
                 () -> doctorAuthService.register(registerRequest));
 
-        assertEquals(ErrorCodeEnums.DOCTOR_REGISTER_SEX_EMPTY, exception.getEc());
+        assertTrue(exception.getMessage().contains("性别不能为空"));
         verify(doctorUserMapper, never()).insert(any(DoctorUserEntity.class));
     }
 
@@ -212,11 +233,11 @@ class DoctorAuthServiceTest {
         DoctorRegisterRequest registerRequest = registerRequest(
                 "doctor01", "secret123", "13800000000", "");
 
-        AbstractBusinessException exception = assertThrows(
-                AbstractBusinessException.class,
+        ConstraintViolationException exception = assertThrows(
+                ConstraintViolationException.class,
                 () -> doctorAuthService.register(registerRequest));
 
-        assertEquals(ErrorCodeEnums.DOCTOR_REGISTER_INVITE_CODE_EMPTY, exception.getEc());
+        assertTrue(exception.getMessage().contains("邀请人不能为空"));
         verify(doctorUserMapper, never()).insert(any(DoctorUserEntity.class));
     }
 
@@ -226,20 +247,55 @@ class DoctorAuthServiceTest {
                 "doctor01", "secret123", "13800000000", "9999");
         registerRequest.setIdCardFront(null);
 
-        AbstractBusinessException exception = assertThrows(
-                AbstractBusinessException.class,
+        ConstraintViolationException exception = assertThrows(
+                ConstraintViolationException.class,
                 () -> doctorAuthService.register(registerRequest));
 
-        assertEquals(ErrorCodeEnums.DOCTOR_REGISTER_ID_CARD_FRONT_EMPTY, exception.getEc());
+        assertTrue(exception.getMessage().contains("身份证正面图片不能为空"));
         verify(doctorUserMapper, never()).insert(any(DoctorUserEntity.class));
+    }
+
+    @Test
+    void registerRejectsDoctorWithoutQualificationByValidation() {
+        DoctorRegisterRequest registerRequest = registerRequest(
+                "doctor01", "secret123", "13800000000", "9999");
+        registerRequest.setQualificationCertificate(null);
+
+        ConstraintViolationException exception = assertThrows(
+                ConstraintViolationException.class,
+                () -> doctorAuthService.register(registerRequest));
+
+        assertTrue(exception.getMessage().contains("医师职业资格证图片不能为空"));
+        verify(doctorUserMapper, never()).insert(any(DoctorUserEntity.class));
+    }
+
+    @Test
+    void registerPatientDoesNotRequireDoctorQualification() {
+        DoctorRegisterRequest registerRequest = registerRequest(
+                "patient01", "secret123", "13800000000", "9999");
+        registerRequest.setUserType(UserTypeEnums.PATIENT);
+        registerRequest.setTitle(null);
+        registerRequest.setQualificationCertificate(null);
+        when(doctorUserMapper.usernameExists("patient01", UserTypeEnums.PATIENT)).thenReturn(false);
+        when(doctorUserMapper.phoneExists("13800000000", UserTypeEnums.PATIENT)).thenReturn(false);
+        when(doctorUserMapper.insert(any(DoctorUserEntity.class))).thenReturn(1);
+
+        doctorAuthService.register(registerRequest);
+
+        ArgumentCaptor<DoctorUserEntity> captor = ArgumentCaptor.forClass(DoctorUserEntity.class);
+        verify(doctorUserMapper).insert(captor.capture());
+        DoctorUserEntity user = captor.getValue();
+        assertEquals(UserTypeEnums.PATIENT, user.getUserType());
+        assertEquals(null, user.getTitle());
+        assertEquals(null, user.getQualificationCertificate());
     }
 
     @Test
     void registerRejectsDuplicateDoctorPhone() {
         DoctorRegisterRequest registerRequest = registerRequest(
                 "doctor01", "secret123", "13800000000", "9999");
-        when(doctorUserMapper.usernameExists("doctor01")).thenReturn(false);
-        when(doctorUserMapper.phoneExists("13800000000")).thenReturn(true);
+        when(doctorUserMapper.usernameExists("doctor01", UserTypeEnums.DOCTOR)).thenReturn(false);
+        when(doctorUserMapper.phoneExists("13800000000", UserTypeEnums.DOCTOR)).thenReturn(true);
 
         AbstractBusinessException exception = assertThrows(
                 AbstractBusinessException.class,
@@ -254,7 +310,7 @@ class DoctorAuthServiceTest {
         DoctorLoginRequest loginRequest = loginRequest("doctor01", "secret123");
         DoctorUserEntity doctor = doctorUser("doctor01", "secret123");
         doctor.setDelFlag(Boolean.FALSE);
-        when(doctorUserMapper.selectDoctorByUsername("doctor01")).thenReturn(doctor);
+        when(doctorUserMapper.selectUserByUsername("doctor01", UserTypeEnums.DOCTOR)).thenReturn(doctor);
         when(permissionService.getMenuPermission(any(SysUser.class))).thenReturn(Set.of("doctor:home"));
         when(tokenService.createToken(any(LoginUser.class))).thenReturn("doctor-token");
 
@@ -270,7 +326,7 @@ class DoctorAuthServiceTest {
         ArgumentCaptor<SysUser> sysUserCaptor = ArgumentCaptor.forClass(SysUser.class);
         verify(permissionService).getMenuPermission(sysUserCaptor.capture());
         assertEquals(Boolean.FALSE, sysUserCaptor.getValue().getDelFlag());
-        verify(doctorUserMapper).selectDoctorByUsername("doctor01");
+        verify(doctorUserMapper).selectUserByUsername("doctor01", UserTypeEnums.DOCTOR);
         verify(doctorUserMapper).updateById(any(DoctorUserEntity.class));
     }
 
@@ -279,7 +335,7 @@ class DoctorAuthServiceTest {
         DoctorLoginRequest loginRequest = loginRequest("doctor01", "secret123");
         DoctorUserEntity doctor = doctorUser("doctor01", "secret123");
         doctor.setDelFlag(Boolean.TRUE);
-        when(doctorUserMapper.selectDoctorByUsername("doctor01")).thenReturn(doctor);
+        when(doctorUserMapper.selectUserByUsername("doctor01", UserTypeEnums.DOCTOR)).thenReturn(doctor);
         when(permissionService.getMenuPermission(any(SysUser.class))).thenReturn(Set.of());
         when(tokenService.createToken(any(LoginUser.class))).thenReturn("doctor-token");
 
@@ -298,8 +354,8 @@ class DoctorAuthServiceTest {
         registerRequest.setSex("1");
         registerRequest.setIdCardNumber("110101199001011234");
         registerRequest.setTitle("主治医师");
-        when(doctorUserMapper.usernameExists("doctor01")).thenReturn(false);
-        when(doctorUserMapper.phoneExists("13800000000")).thenReturn(false);
+        when(doctorUserMapper.usernameExists("doctor01", UserTypeEnums.DOCTOR)).thenReturn(false);
+        when(doctorUserMapper.phoneExists("13800000000", UserTypeEnums.DOCTOR)).thenReturn(false);
         when(doctorUserMapper.insert(any(DoctorUserEntity.class))).thenAnswer(invocation -> {
             invocation.getArgument(0, DoctorUserEntity.class).setUserId(12L);
             return 1;
@@ -322,19 +378,19 @@ class DoctorAuthServiceTest {
     @Test
     void loginRejectsMissingDoctorUser() {
         DoctorLoginRequest loginRequest = loginRequest("sameName", "secret123");
-        when(doctorUserMapper.selectDoctorByUsername("sameName")).thenReturn(null);
+        when(doctorUserMapper.selectUserByUsername("sameName", UserTypeEnums.DOCTOR)).thenReturn(null);
 
         AbstractBusinessException exception = assertThrows(AbstractBusinessException.class, () -> doctorAuthService.login(loginRequest));
 
         assertEquals(ErrorCodeEnums.DOCTOR_LOGIN_USER_NOT_EXISTS, exception.getEc());
-        verify(doctorUserMapper).selectDoctorByUsername("sameName");
+        verify(doctorUserMapper).selectUserByUsername("sameName", UserTypeEnums.DOCTOR);
         verify(tokenService, never()).createToken(any(LoginUser.class));
     }
 
     @Test
     void loginCreatesTokenForPendingReviewDoctor() {
         DoctorLoginRequest loginRequest = loginRequest("doctor01", "secret123");
-        when(doctorUserMapper.selectDoctorByUsername("doctor01"))
+        when(doctorUserMapper.selectUserByUsername("doctor01", UserTypeEnums.DOCTOR))
                 .thenReturn(doctorUser("doctor01", "secret123", UserStatusEnums.PENDING_REVIEW));
         when(permissionService.getMenuPermission(any(SysUser.class))).thenReturn(Set.of());
         when(tokenService.createToken(any(LoginUser.class))).thenReturn("doctor-token");
@@ -348,7 +404,7 @@ class DoctorAuthServiceTest {
         DoctorLoginRequest loginRequest = loginRequest("doctor01", "secret123");
         DoctorUserEntity doctor = doctorUser(
                 "doctor01", "secret123", UserStatusEnums.REGISTER);
-        when(doctorUserMapper.selectDoctorByUsername("doctor01")).thenReturn(doctor);
+        when(doctorUserMapper.selectUserByUsername("doctor01", UserTypeEnums.DOCTOR)).thenReturn(doctor);
         when(permissionService.getMenuPermission(any(SysUser.class))).thenReturn(Set.of());
         when(tokenService.createToken(any(LoginUser.class))).thenReturn("doctor-token");
 
@@ -360,7 +416,7 @@ class DoctorAuthServiceTest {
     @Test
     void loginRejectsDisabledDoctor() {
         DoctorLoginRequest loginRequest = loginRequest("doctor01", "secret123");
-        when(doctorUserMapper.selectDoctorByUsername("doctor01"))
+        when(doctorUserMapper.selectUserByUsername("doctor01", UserTypeEnums.DOCTOR))
                 .thenReturn(doctorUser("doctor01", "secret123", UserStatusEnums.DISABLE));
 
         AbstractBusinessException exception =
@@ -373,7 +429,7 @@ class DoctorAuthServiceTest {
     @Test
     void loginCreatesTokenForDoctorWhoseReviewFailed() {
         DoctorLoginRequest loginRequest = loginRequest("doctor01", "secret123");
-        when(doctorUserMapper.selectDoctorByUsername("doctor01"))
+        when(doctorUserMapper.selectUserByUsername("doctor01", UserTypeEnums.DOCTOR))
                 .thenReturn(doctorUser("doctor01", "secret123", UserStatusEnums.REVIEW_FAILED));
         when(permissionService.getMenuPermission(any(SysUser.class))).thenReturn(Set.of());
         when(tokenService.createToken(any(LoginUser.class))).thenReturn("doctor-token");
@@ -385,12 +441,12 @@ class DoctorAuthServiceTest {
     @Test
     void loginRejectsWrongPassword() {
         DoctorLoginRequest loginRequest = loginRequest("doctor01", "badpass");
-        when(doctorUserMapper.selectDoctorByUsername("doctor01")).thenReturn(doctorUser("doctor01", "secret123"));
+        when(doctorUserMapper.selectUserByUsername("doctor01", UserTypeEnums.DOCTOR)).thenReturn(doctorUser("doctor01", "secret123"));
 
         AbstractBusinessException exception = assertThrows(AbstractBusinessException.class, () -> doctorAuthService.login(loginRequest));
 
         assertEquals(ErrorCodeEnums.DOCTOR_LOGIN_FAILED, exception.getEc());
-        verify(doctorUserMapper).selectDoctorByUsername("doctor01");
+        verify(doctorUserMapper).selectUserByUsername("doctor01", UserTypeEnums.DOCTOR);
         verify(tokenService, never()).createToken(any(LoginUser.class));
     }
 
@@ -415,7 +471,7 @@ class DoctorAuthServiceTest {
     void deleteAccountAllowsDoctorBeforeApproval() {
         DoctorUserEntity doctor = doctorUser(
                 "doctor01", "secret123", UserStatusEnums.REVIEW_FAILED);
-        when(doctorUserMapper.selectDoctorById(12L)).thenReturn(doctor);
+        when(doctorUserMapper.selectUserById(12L, UserTypeEnums.DOCTOR)).thenReturn(doctor);
         when(doctorUserMapper.deleteById(12L)).thenReturn(1);
 
         LoginUser loginUser = doctorLoginUser(12L, "doctor-login-token");
@@ -427,7 +483,7 @@ class DoctorAuthServiceTest {
 
     @Test
     void deleteAccountAllowsNormalDoctor() {
-        when(doctorUserMapper.selectDoctorById(12L))
+        when(doctorUserMapper.selectUserById(12L, UserTypeEnums.DOCTOR))
                 .thenReturn(doctorUser("doctor01", "secret123", UserStatusEnums.OK));
         when(doctorUserMapper.deleteById(12L)).thenReturn(1);
 
@@ -439,7 +495,7 @@ class DoctorAuthServiceTest {
 
     @Test
     void deleteAccountRejectsDisabledDoctor() {
-        when(doctorUserMapper.selectDoctorById(12L))
+        when(doctorUserMapper.selectUserById(12L, UserTypeEnums.DOCTOR))
                 .thenReturn(doctorUser("doctor01", "secret123", UserStatusEnums.DISABLE));
 
         AbstractBusinessException exception = assertThrows(
@@ -455,6 +511,7 @@ class DoctorAuthServiceTest {
         DoctorRegisterRequest registerRequest = new DoctorRegisterRequest();
         registerRequest.setUsername(username);
         registerRequest.setPassword(password);
+        registerRequest.setUserType(UserTypeEnums.DOCTOR);
         registerRequest.setPhone(phone);
         registerRequest.setInviteCode(inviteCode);
         registerRequest.setSmsCode("123456");

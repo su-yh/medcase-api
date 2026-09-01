@@ -20,18 +20,18 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/biz/doctor-profile")
+@RequestMapping("/biz/case-profile")
 public class DoctorProfilePortalController {
     private final DoctorProfileService doctorProfileService;
 
     @RequestMapping(method = RequestMethod.GET)
-    public DoctorProfileVO me(@CurrLoginUser(userType = UserTypeEnums.DOCTOR) LoginUser doctorUser) {
+    public DoctorProfileVO me(@CurrLoginUser(userType = {UserTypeEnums.DOCTOR, UserTypeEnums.PATIENT}) LoginUser doctorUser) {
         return doctorProfileService.me(doctorUser);
     }
 
     @RequestMapping(method = RequestMethod.POST)
     public void submit(
-            @CurrLoginUser(userType = UserTypeEnums.DOCTOR) LoginUser doctorUser,
+            @CurrLoginUser(userType = {UserTypeEnums.DOCTOR, UserTypeEnums.PATIENT}) LoginUser doctorUser,
             @RequestBody @Valid DoctorProfileSubmitRequest request) {
         doctorProfileService.submit(doctorUser, request);
     }

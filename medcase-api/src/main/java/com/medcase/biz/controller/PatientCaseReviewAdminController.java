@@ -1,15 +1,15 @@
 package com.medcase.biz.controller;
 
-import com.medcase.mp.mybatis.PageResult;
-import com.medcase.common.core.domain.model.LoginUser;
-import com.medcase.common.enums.UserTypeEnums;
-import com.medcase.biz.request.DoctorCaseReviewRequest;
 import com.medcase.biz.request.DoctorCaseReviewQuery;
+import com.medcase.biz.request.DoctorCaseReviewRequest;
 import com.medcase.biz.response.DoctorCaseReviewVO;
 import com.medcase.biz.service.DoctorCaseReviewService;
+import com.medcase.common.core.domain.model.LoginUser;
+import com.medcase.common.enums.UserTypeEnums;
+import com.medcase.mvc.authentication.annotation.CurrLoginUser;
+import com.medcase.mp.mybatis.PageResult;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import com.medcase.mvc.authentication.annotation.CurrLoginUser;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,45 +20,43 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * 医生病例管理。
- *
- * @author suyh
+ * 患者病例管理。
  */
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/biz/doctor-case")
-public class DoctorCaseReviewAdminController {
-    private final DoctorCaseReviewService doctorCaseReviewService;
+@RequestMapping("/biz/patient-case")
+public class PatientCaseReviewAdminController {
+    private final DoctorCaseReviewService caseService;
 
-    @PreAuthorize("@ss.hasPermi('doctor:case:list')")
+    @PreAuthorize("@ss.hasPermi('patient:case:list')")
     @GetMapping("/list")
     public PageResult<DoctorCaseReviewVO> list(
             @RequestParam(required = false) Integer pageNum,
             @RequestParam(required = false) Integer pageSize,
             DoctorCaseReviewQuery query) {
-        return doctorCaseReviewService.page(pageNum, pageSize, query, UserTypeEnums.DOCTOR);
+        return caseService.page(pageNum, pageSize, query, UserTypeEnums.PATIENT);
     }
 
-    @PreAuthorize("@ss.hasPermi('doctor:case:query')")
+    @PreAuthorize("@ss.hasPermi('patient:case:query')")
     @GetMapping("/{id}")
     public DoctorCaseReviewVO getInfo(@PathVariable Long id) {
-        return doctorCaseReviewService.detail(id, UserTypeEnums.DOCTOR);
+        return caseService.detail(id, UserTypeEnums.PATIENT);
     }
 
-    @PreAuthorize("@ss.hasPermi('doctor:case:review')")
+    @PreAuthorize("@ss.hasPermi('patient:case:review')")
     @PostMapping("/{id}/review")
     public void review(
             @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser adminUser,
             @PathVariable Long id,
             @Valid @RequestBody DoctorCaseReviewRequest request) {
-        doctorCaseReviewService.review(id, request, adminUser, UserTypeEnums.DOCTOR);
+        caseService.review(id, request, adminUser, UserTypeEnums.PATIENT);
     }
 
-    @PreAuthorize("@ss.hasPermi('doctor:case:settle')")
+    @PreAuthorize("@ss.hasPermi('patient:case:settle')")
     @PostMapping("/{id}/settle")
     public void settle(
             @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser adminUser,
             @PathVariable Long id) {
-        doctorCaseReviewService.settle(id, adminUser, UserTypeEnums.DOCTOR);
+        caseService.settle(id, adminUser, UserTypeEnums.PATIENT);
     }
 }

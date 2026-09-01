@@ -33,27 +33,31 @@ class FileStorageControllerTest {
         MockMultipartFile file = new MockMultipartFile(
                 "file", "id-card.png", "image/png", "content".getBytes());
         FileAttachment attachment = new FileAttachment();
-        attachment.setFilePath("doctor-register/20260829-01-0/id-card.png");
+        attachment.setFilePath("case-register/20260829-01-0/id-card.png");
         when(fileStorageService.upload(
-                file, FileBusinessEnums.DOCTOR_REGISTER, UserTypeEnums.DOCTOR, 0L))
+                file, FileBusinessEnums.CASE_REGISTER, UserTypeEnums.DOCTOR, 0L))
                 .thenReturn(attachment);
 
         Method method = FileStorageController.class.getDeclaredMethod(
-                "uploadDoctorRegistration", org.springframework.web.multipart.MultipartFile.class);
+                "uploadCaseRegistration", UserTypeEnums.class,
+                org.springframework.web.multipart.MultipartFile.class);
 
         assertNotNull(method.getAnnotation(Anonymous.class));
         PostMapping postMapping = method.getAnnotation(PostMapping.class);
         assertNotNull(postMapping);
-        assertEquals("/upload/doctor-register", postMapping.value()[0]);
-        RequestParam fileParameter = method.getParameters()[0].getAnnotation(RequestParam.class);
+        assertEquals("/upload/case-register", postMapping.value()[0]);
+        RequestParam userTypeParameter = method.getParameters()[0].getAnnotation(RequestParam.class);
+        assertNotNull(userTypeParameter);
+        assertEquals("userType", userTypeParameter.value());
+        RequestParam fileParameter = method.getParameters()[1].getAnnotation(RequestParam.class);
         assertNotNull(fileParameter);
         assertEquals("file", fileParameter.value());
 
-        FileAttachment result = (FileAttachment) method.invoke(controller, file);
+        FileAttachment result = (FileAttachment) method.invoke(controller, UserTypeEnums.DOCTOR, file);
 
         assertEquals(attachment, result);
         verify(fileStorageService).upload(
-                file, FileBusinessEnums.DOCTOR_REGISTER, UserTypeEnums.DOCTOR, 0L);
+                file, FileBusinessEnums.CASE_REGISTER, UserTypeEnums.DOCTOR, 0L);
     }
 
     @Test

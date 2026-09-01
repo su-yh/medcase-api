@@ -1,8 +1,9 @@
--- 医生端病例表
-create table medcase_doctor_case (
+-- 病例表
+create table medcase_case (
   id              bigint       not null auto_increment comment '主键ID',
-  doctor_id       bigint       not null comment '医生用户ID',
-  doctor_nickname varchar(64)  not null comment '医生昵称',
+  user_id         bigint       not null comment '用户ID',
+  user_nickname   varchar(64)  not null comment '用户昵称',
+  user_type       varchar(2)    not null comment '用户类型（01医生，02患者）',
   case_name       varchar(255) not null comment '病例名称',
   content         text         default null comment '病例内容',
   attachments     text         default null comment '病例附件JSON',
@@ -19,8 +20,8 @@ create table medcase_doctor_case (
   update_time     datetime(3)  default null comment '更新时间',
   delete_flag     tinyint      not null default 0 comment '删除标志（0代表存在 1代表删除）',
   primary key (id)
-) engine=innodb comment='医生病例表';
+) engine=innodb comment='病例表';
 
-create index idx_medcase_doctor_case_doctor_id on medcase_doctor_case (doctor_id);
-create index idx_medcase_doctor_case_status on medcase_doctor_case (status);
-create index idx_medcase_doctor_case_submit_time on medcase_doctor_case (submit_time);
+create index idx_medcase_case_user on medcase_case (user_id, user_type);
+create index idx_medcase_case_status on medcase_case (status);
+create index idx_medcase_case_submit_time on medcase_case (submit_time);

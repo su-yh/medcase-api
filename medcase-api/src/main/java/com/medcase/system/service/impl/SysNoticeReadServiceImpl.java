@@ -1,29 +1,33 @@
 package com.medcase.system.service.impl;
 
-import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import com.medcase.system.entity.SysNoticeReadEntity;
 import com.medcase.system.mapper.SysNoticeReadMapper;
 import com.medcase.system.service.ISysNoticeReadService;
 import com.medcase.web.controller.system.dto.NoticeReadUserResponse;
 import com.medcase.web.controller.system.dto.NoticeTopItemResponse;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * 公告已读记录 服务层实现
  */
 @Service
+@RequiredArgsConstructor
 public class SysNoticeReadServiceImpl implements ISysNoticeReadService {
 
-    @Autowired
-    private SysNoticeReadMapper noticeReadMapper;
+    private final SysNoticeReadMapper noticeReadMapper;
 
     /**
      * 标记已读
      */
     @Override
     public void markRead(Long noticeId, Long userId) {
-
         SysNoticeReadEntity record = new SysNoticeReadEntity();
         record.setNoticeId(noticeId);
         record.setUserId(userId);
@@ -35,7 +39,6 @@ public class SysNoticeReadServiceImpl implements ISysNoticeReadService {
      */
     @Override
     public int selectUnreadCount(Long userId) {
-
         return noticeReadMapper.selectUnreadCount(userId);
     }
 
@@ -44,8 +47,17 @@ public class SysNoticeReadServiceImpl implements ISysNoticeReadService {
      */
     @Override
     public List<NoticeTopItemResponse> selectNoticeListWithReadStatus(Long userId, int limit) {
+        List<NoticeTopItemResponse> notices = noticeReadMapper.selectTopNoticeList(limit);
+        if (notices.isEmpty()) {
+            return notices;
+        }
 
-        return noticeReadMapper.selectNoticeListWithReadStatus(userId, limit);
+        List<Long> noticeIds = notices.stream()
+                .map(NoticeTopItemResponse::getNoticeId)
+                .collect(Collectors.toList());
+        Set<Long> readNoticeIds = noticeReadMapper.selectReadNoticeIds(userId, noticeIds);
+        notices.forEach(notice -> notice.setRead(readNoticeIds.contains(notice.getNoticeId())));
+        return notices;
     }
 
     /**
@@ -53,14 +65,11 @@ public class SysNoticeReadServiceImpl implements ISysNoticeReadService {
      */
     @Override
     public void markReadBatch(Long userId, Long[] noticeIds) {
-
         if (noticeIds == null || noticeIds.length == 0) {
-
             return;
         }
-        List<SysNoticeReadEntity> list = new java.util.ArrayList<>(noticeIds.length);
+        List<SysNoticeReadEntity> list = new ArrayList<>(noticeIds.length);
         for (Long noticeId : noticeIds) {
-
             SysNoticeReadEntity entity = new SysNoticeReadEntity();
             entity.setNoticeId(noticeId);
             entity.setUserId(userId);
@@ -74,7 +83,6 @@ public class SysNoticeReadServiceImpl implements ISysNoticeReadService {
      */
     @Override
     public List<NoticeReadUserResponse> selectReadUsersByNoticeId(Long noticeId, String searchValue) {
-
         return noticeReadMapper.selectReadUsersByNoticeId(noticeId, searchValue);
     }
 
@@ -83,7 +91,6 @@ public class SysNoticeReadServiceImpl implements ISysNoticeReadService {
      */
     @Override
     public void deleteByNoticeIds(Long[] noticeIds) {
-
-        noticeReadMapper.deleteByNoticeIds(java.util.Arrays.asList(noticeIds));
+        noticeReadMapper.deleteByNoticeIds(Arrays.asList(noticeIds));
     }
 }

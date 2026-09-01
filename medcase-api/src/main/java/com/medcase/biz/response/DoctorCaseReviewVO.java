@@ -2,11 +2,13 @@ package com.medcase.biz.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.medcase.biz.domain.DoctorCaseEntity;
-import com.medcase.storage.pojo.FileAttachment;
 import com.medcase.biz.enums.DoctorCaseStatusEnums;
+import com.medcase.common.enums.UserTypeEnums;
+import com.medcase.storage.pojo.FileAttachment;
+import lombok.Data;
+
 import java.util.Date;
 import java.util.List;
-import lombok.Data;
 
 /**
  * 病例审核返回对象
@@ -17,9 +19,11 @@ import lombok.Data;
 public class DoctorCaseReviewVO {
     private Long id;
 
-    private Long doctorId;
+    private Long userId;
 
-    private String doctorName;
+    private String userName;
+
+    private UserTypeEnums userType;
 
     private String caseName;
 
@@ -56,8 +60,9 @@ public class DoctorCaseReviewVO {
     public static DoctorCaseReviewVO fromEntity(DoctorCaseEntity entity) {
         DoctorCaseReviewVO result = new DoctorCaseReviewVO();
         result.setId(entity.getId());
-        result.setDoctorId(entity.getDoctorId());
-        result.setDoctorName(entity.getDoctorNickname());
+        result.setUserId(entity.getUserId());
+        result.setUserName(entity.getUserNickname());
+        result.setUserType(entity.getUserType());
         result.setCaseName(entity.getCaseName());
         result.setContent(entity.getContent());
         result.setAttachments(entity.getAttachments());

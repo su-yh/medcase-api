@@ -53,12 +53,11 @@ public class FileStorageController {
     }
 
     @Anonymous
-    @PostMapping("/upload/doctor-register")
-    public FileAttachment uploadDoctorRegistration(
+    @PostMapping("/upload/case-register")
+    public FileAttachment uploadCaseRegistration(
+            @RequestParam("userType") UserTypeEnums userType,
             @RequestParam("file") MultipartFile file) {
-        FileAttachment attachment = fileStorageService.upload(
-                file, FileBusinessEnums.DOCTOR_REGISTER, UserTypeEnums.DOCTOR, 0L);
-        return attachment;
+        return fileStorageService.upload(file, FileBusinessEnums.CASE_REGISTER, userType, 0L);
     }
 
     @GetMapping("/download")

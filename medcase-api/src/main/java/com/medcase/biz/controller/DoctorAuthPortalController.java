@@ -9,10 +9,11 @@ import com.medcase.biz.service.DoctorRegisterSmsCodeService;
 import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.common.enums.UserTypeEnums;
 import com.medcase.mvc.authentication.annotation.CurrLoginUser;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,7 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
-@RequestMapping(value = "/biz/doctor-auth")
+@RequestMapping("/biz/case-auth")
 public class DoctorAuthPortalController {
     private final DoctorAuthService doctorAuthService;
 
@@ -41,7 +42,7 @@ public class DoctorAuthPortalController {
 
     @Anonymous
     @RequestMapping(value = "/register", method = RequestMethod.POST)
-    public void register(@RequestBody DoctorRegisterRequest registerBody) {
+    public void register(@RequestBody @Valid DoctorRegisterRequest registerBody) {
         log.trace("doctor auth controller register");
         doctorAuthService.register(registerBody);
     }
@@ -53,14 +54,14 @@ public class DoctorAuthPortalController {
     }
 
     @RequestMapping(value = "/logout", method = RequestMethod.POST)
-    public void logout(@CurrLoginUser(userType = UserTypeEnums.DOCTOR) LoginUser doctorUser) {
+    public void logout(@CurrLoginUser(userType = {UserTypeEnums.DOCTOR, UserTypeEnums.PATIENT}) LoginUser doctorUser) {
         log.trace("doctor auth controller logout");
         doctorAuthService.logout(doctorUser);
     }
 
     @DeleteMapping("/account")
     public void deleteAccount(
-            @CurrLoginUser(userType = UserTypeEnums.DOCTOR) LoginUser doctorUser) {
+            @CurrLoginUser(userType = {UserTypeEnums.DOCTOR, UserTypeEnums.PATIENT}) LoginUser doctorUser) {
         log.trace("doctor auth controller delete account, userId={}", doctorUser.getUserId());
         doctorAuthService.deleteAccount(doctorUser);
     }

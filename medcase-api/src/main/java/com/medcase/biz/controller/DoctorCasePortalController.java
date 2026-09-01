@@ -30,7 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
-@RequestMapping(value = "/biz/cases")
+@RequestMapping("/biz/cases")
 @Validated
 public class DoctorCasePortalController {
     private final DoctorCaseService doctorCaseService;
@@ -38,7 +38,7 @@ public class DoctorCasePortalController {
     @RequestMapping(method = RequestMethod.POST)
     @PreAuthorize("@dp.hasAnyStatus(#doctorUser, T(com.medcase.common.enums.UserStatusEnums).OK)")
     public void submit(
-            @CurrLoginUser(userType = UserTypeEnums.DOCTOR) LoginUser doctorUser,
+            @CurrLoginUser(userType = {UserTypeEnums.DOCTOR, UserTypeEnums.PATIENT}) LoginUser doctorUser,
             @RequestBody @Validated({ValidationGroups.Doctor.Submit.class, Default.class}) DoctorCaseSubmitRequest request) {
         log.trace("doctor case controller submit");
         doctorCaseService.submit(doctorUser, request);
@@ -47,7 +47,7 @@ public class DoctorCasePortalController {
     @RequestMapping(value = "/draft", method = RequestMethod.POST)
     @PreAuthorize("@dp.hasAnyStatus(#doctorUser, T(com.medcase.common.enums.UserStatusEnums).OK)")
     public void saveDraft(
-            @CurrLoginUser(userType = UserTypeEnums.DOCTOR) LoginUser doctorUser,
+            @CurrLoginUser(userType = {UserTypeEnums.DOCTOR, UserTypeEnums.PATIENT}) LoginUser doctorUser,
             @RequestBody DoctorCaseSubmitRequest request) {
         log.trace("doctor case controller saveDraft, request={}", request);
         doctorCaseService.saveDraft(doctorUser, request);
@@ -56,7 +56,7 @@ public class DoctorCasePortalController {
     @RequestMapping(method = RequestMethod.GET)
     @PreAuthorize("@dp.hasAnyStatus(#doctorUser, T(com.medcase.common.enums.UserStatusEnums).OK)")
     public PageResult<DoctorCaseVO> page(
-            @CurrLoginUser(userType = UserTypeEnums.DOCTOR) LoginUser doctorUser,
+            @CurrLoginUser(userType = {UserTypeEnums.DOCTOR, UserTypeEnums.PATIENT}) LoginUser doctorUser,
             PageParam pageParam, DoctorCasePageRequest request) {
         log.trace("doctor case controller page, request={}", request);
         return doctorCaseService.page(doctorUser, pageParam, request);
@@ -65,7 +65,7 @@ public class DoctorCasePortalController {
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     @PreAuthorize("@dp.hasAnyStatus(#doctorUser, T(com.medcase.common.enums.UserStatusEnums).OK)")
     public DoctorCaseVO detail(
-            @CurrLoginUser(userType = UserTypeEnums.DOCTOR) LoginUser doctorUser,
+            @CurrLoginUser(userType = {UserTypeEnums.DOCTOR, UserTypeEnums.PATIENT}) LoginUser doctorUser,
             @PathVariable Long id) {
         log.trace("doctor case controller detail, id={}", id);
         return doctorCaseService.detail(doctorUser, id);
@@ -74,7 +74,7 @@ public class DoctorCasePortalController {
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     @PreAuthorize("@dp.hasAnyStatus(#doctorUser, T(com.medcase.common.enums.UserStatusEnums).OK)")
     public void delete(
-            @CurrLoginUser(userType = UserTypeEnums.DOCTOR) LoginUser doctorUser,
+            @CurrLoginUser(userType = {UserTypeEnums.DOCTOR, UserTypeEnums.PATIENT}) LoginUser doctorUser,
             @PathVariable Long id) {
         log.trace("doctor case controller delete, id={}", id);
         doctorCaseService.delete(doctorUser, id);

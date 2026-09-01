@@ -11,7 +11,8 @@ import lombok.Getter;
 @Getter
 public enum UserTypeEnums implements BaseEnum {
     ADMIN("00", "后台用户"),
-    DOCTOR("01", "医生端用户"),
+    DOCTOR("01", "医生"),
+    PATIENT("02", "患者"),
     ;
 
     @EnumValue
@@ -27,5 +28,17 @@ public enum UserTypeEnums implements BaseEnum {
     @Override
     public String toString() {
         return String.format("%s(%s)", desc, code);
+    }
+
+    public static UserTypeEnums fromCode(String code) {
+        if (code == null) {
+            return null;
+        }
+        for (UserTypeEnums userType : values()) {
+            if (userType.code.equals(code)) {
+                return userType;
+            }
+        }
+        return null;
     }
 }

@@ -6,6 +6,7 @@ import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
 import com.medcase.biz.request.DoctorCasePageRequest;
 import com.medcase.biz.domain.DoctorCaseEntity;
+import com.medcase.common.enums.UserTypeEnums;
 import org.apache.ibatis.annotations.Mapper;
 
 /**
@@ -15,26 +16,16 @@ import org.apache.ibatis.annotations.Mapper;
  */
 @Mapper
 public interface DoctorCaseMapper extends BaseMapperX<DoctorCaseEntity> {
-    default PageResult<DoctorCaseEntity> selectDoctorCasePage(
-            PageParam pageParam, Long doctorId, DoctorCasePageRequest request) {
+    default PageResult<DoctorCaseEntity> selectCasePage(
+            PageParam pageParam, Long userId, UserTypeEnums userType, DoctorCasePageRequest request) {
         LambdaQueryWrapperX<DoctorCaseEntity> queryWrapper = build();
-        queryWrapper.eq(DoctorCaseEntity::getDoctorId, doctorId);
+        queryWrapper.eq(DoctorCaseEntity::getUserId, userId);
+        queryWrapper.eq(DoctorCaseEntity::getUserType, userType);
         queryWrapper.likeIfPresent(DoctorCaseEntity::getCaseName, request.getCaseNameLike());
         queryWrapper.eqIfPresent(DoctorCaseEntity::getStatus, request.getStatus());
         queryWrapper.geIfPresent(DoctorCaseEntity::getCreateTime, request.getCreateTimeLowerBound());
         queryWrapper.ltIfPresent(DoctorCaseEntity::getCreateTime, request.getCreateTimeUpperBound());
         queryWrapper.orderByDesc(DoctorCaseEntity::getCreateTime);
         return selectPage(pageParam, queryWrapper);
-    }
-
-    default DoctorCaseEntity selectDoctorCaseById(Long doctorId, Long id) {
-        if (doctorId == null || id == null) {
-            return null;
-        }
-
-        LambdaQueryWrapperX<DoctorCaseEntity> queryWrapper = build();
-        queryWrapper.eq(DoctorCaseEntity::getDoctorId, doctorId);
-        queryWrapper.eq(DoctorCaseEntity::getId, id);
-        return selectOne(queryWrapper);
     }
 }

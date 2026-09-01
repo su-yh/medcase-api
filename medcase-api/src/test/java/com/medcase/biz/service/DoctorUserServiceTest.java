@@ -24,6 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -64,13 +65,14 @@ class DoctorUserServiceTest {
         user.setIdCardBack(attachment("back"));
         user.setQualificationCertificate(attachment("qualification"));
         user.setStatus(UserStatusEnums.OK);
-        when(doctorUserMapper.selectDoctorPage(any(PageParam.class), org.mockito.ArgumentMatchers.same(query)))
+        when(doctorUserMapper.selectUserPage(
+                any(PageParam.class), org.mockito.ArgumentMatchers.same(query), eq(UserTypeEnums.DOCTOR)))
                 .thenReturn(new PageResult<>(List.of(user), 1L));
 
-        PageResult<DoctorUserVO> result = doctorUserService.page(new PageParam(), query);
+        PageResult<DoctorUserVO> result = doctorUserService.page(new PageParam(), query, UserTypeEnums.DOCTOR);
 
-        verify(doctorUserMapper).selectDoctorPage(
-                any(PageParam.class), org.mockito.ArgumentMatchers.same(query));
+        verify(doctorUserMapper).selectUserPage(
+                any(PageParam.class), org.mockito.ArgumentMatchers.same(query), eq(UserTypeEnums.DOCTOR));
         assertEquals(1L, result.getTotal());
         assertEquals(1L, result.getList().get(0).getId());
         assertEquals("张医生", result.getList().get(0).getNickName());
@@ -83,7 +85,7 @@ class DoctorUserServiceTest {
         DoctorUserEntity user = new DoctorUserEntity();
         user.setUserId(1L);
         user.setUserType(UserTypeEnums.ADMIN);
-        when(doctorUserMapper.selectDoctorById(1L)).thenReturn(user);
+        when(doctorUserMapper.selectUserById(1L, UserTypeEnums.DOCTOR)).thenReturn(user);
 
         assertNull(doctorUserService.detail(1L));
     }
@@ -99,7 +101,7 @@ class DoctorUserServiceTest {
         user.setIdCardFront(attachment("front"));
         user.setIdCardBack(attachment("back"));
         user.setQualificationCertificate(attachment("qualification"));
-        when(doctorUserMapper.selectDoctorById(1L)).thenReturn(user);
+        when(doctorUserMapper.selectUserById(1L, UserTypeEnums.DOCTOR)).thenReturn(user);
 
         DoctorUserVO result = doctorUserService.detail(1L);
 
@@ -113,7 +115,7 @@ class DoctorUserServiceTest {
         user.setUserId(1L);
         user.setUserType(UserTypeEnums.DOCTOR);
         user.setStatus(UserStatusEnums.PENDING_REVIEW);
-        when(doctorUserMapper.selectDoctorById(1L)).thenReturn(user);
+        when(doctorUserMapper.selectUserById(1L, UserTypeEnums.DOCTOR)).thenReturn(user);
         when(doctorUserMapper.updateById(user)).thenReturn(1);
 
         DoctorUserReviewRequest request = new DoctorUserReviewRequest();
@@ -131,7 +133,7 @@ class DoctorUserServiceTest {
         user.setUserId(1L);
         user.setUserType(UserTypeEnums.DOCTOR);
         user.setStatus(UserStatusEnums.REGISTER);
-        when(doctorUserMapper.selectDoctorById(1L)).thenReturn(user);
+        when(doctorUserMapper.selectUserById(1L, UserTypeEnums.DOCTOR)).thenReturn(user);
         when(doctorUserMapper.updateById(user)).thenReturn(1);
 
         DoctorUserReviewRequest request = new DoctorUserReviewRequest();
@@ -149,7 +151,7 @@ class DoctorUserServiceTest {
         user.setUserId(1L);
         user.setUserType(UserTypeEnums.DOCTOR);
         user.setStatus(UserStatusEnums.REGISTER);
-        when(doctorUserMapper.selectDoctorById(1L)).thenReturn(user);
+        when(doctorUserMapper.selectUserById(1L, UserTypeEnums.DOCTOR)).thenReturn(user);
         when(doctorUserMapper.updateById(user)).thenReturn(1);
 
         DoctorUserReviewRequest request = new DoctorUserReviewRequest();
@@ -170,7 +172,7 @@ class DoctorUserServiceTest {
         user.setUserId(1L);
         user.setUserType(UserTypeEnums.DOCTOR);
         user.setStatus(UserStatusEnums.PENDING_REVIEW);
-        when(doctorUserMapper.selectDoctorById(1L)).thenReturn(user);
+        when(doctorUserMapper.selectUserById(1L, UserTypeEnums.DOCTOR)).thenReturn(user);
 
         DoctorUserReviewRequest request = new DoctorUserReviewRequest();
         request.setApprove(false);
@@ -190,7 +192,7 @@ class DoctorUserServiceTest {
         user.setUserId(1L);
         user.setUserType(UserTypeEnums.DOCTOR);
         user.setStatus(UserStatusEnums.PENDING_REVIEW);
-        when(doctorUserMapper.selectDoctorById(1L)).thenReturn(user);
+        when(doctorUserMapper.selectUserById(1L, UserTypeEnums.DOCTOR)).thenReturn(user);
         when(doctorUserMapper.updateById(user)).thenReturn(1);
 
         DoctorUserReviewRequest request = new DoctorUserReviewRequest();
@@ -209,7 +211,7 @@ class DoctorUserServiceTest {
         user.setUserId(1L);
         user.setUserType(UserTypeEnums.DOCTOR);
         user.setStatus(UserStatusEnums.PENDING_REVIEW);
-        when(doctorUserMapper.selectDoctorById(1L)).thenReturn(user);
+        when(doctorUserMapper.selectUserById(1L, UserTypeEnums.DOCTOR)).thenReturn(user);
         when(doctorUserMapper.updateById(user)).thenReturn(1);
 
         DoctorUserReviewRequest request = new DoctorUserReviewRequest();
@@ -230,7 +232,7 @@ class DoctorUserServiceTest {
         user.setUserType(UserTypeEnums.DOCTOR);
         user.setStatus(UserStatusEnums.PENDING_REVIEW);
         user.setReviewReason("历史拒绝原因");
-        when(doctorUserMapper.selectDoctorById(1L)).thenReturn(user);
+        when(doctorUserMapper.selectUserById(1L, UserTypeEnums.DOCTOR)).thenReturn(user);
         when(doctorUserMapper.updateById(user)).thenReturn(1);
 
         DoctorUserReviewRequest request = new DoctorUserReviewRequest();

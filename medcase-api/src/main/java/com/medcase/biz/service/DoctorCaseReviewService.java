@@ -7,6 +7,7 @@ import com.medcase.biz.request.DoctorCaseReviewQuery;
 import com.medcase.biz.request.DoctorCaseReviewRequest;
 import com.medcase.biz.response.DoctorCaseReviewVO;
 import com.medcase.common.core.domain.model.LoginUser;
+import com.medcase.common.enums.UserTypeEnums;
 import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
@@ -32,7 +33,8 @@ public class DoctorCaseReviewService {
     private final DoctorCaseAdminMapper doctorCaseAdminMapper;
 
     public PageResult<DoctorCaseReviewVO> page(
-            Integer pageNum, Integer pageSize, DoctorCaseReviewQuery query) {
+            Integer pageNum, Integer pageSize, DoctorCaseReviewQuery query, UserTypeEnums userType) {
+        query.setUserType(userType);
         PageParam pageParam = new PageParam();
         pageParam.setPageNo(pageNum == null || pageNum < 1 ? PageParam.PAGE_NO : pageNum);
         pageParam.setPageSize(pageSize == null || pageSize < 1 ? PageParam.PAGE_SIZE : pageSize);
@@ -47,13 +49,17 @@ public class DoctorCaseReviewService {
         return result;
     }
 
-    public DoctorCaseReviewVO detail(Long id) {
+    public DoctorCaseReviewVO detail(Long id, UserTypeEnums userType) {
         DoctorCaseEntity entity = doctorCaseAdminMapper.selectById(id);
+        if (entity != null && entity.getUserType() != userType) {
+            return null;
+        }
         return entity == null ? null : DoctorCaseReviewVO.fromEntity(entity);
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void review(Long id, DoctorCaseReviewRequest request, LoginUser adminUser) {
+    public void review(
+            Long id, DoctorCaseReviewRequest request, LoginUser adminUser, UserTypeEnums userType) {
         DoctorCaseStatusEnums status = DoctorCaseStatusEnums.APPROVED_PENDING_SETTLEMENT;
         String reviewReason = APPROVED_REVIEW_REASON;
         if (!request.getApprove()) {
@@ -64,13 +70,16 @@ public class DoctorCaseReviewService {
             status = DoctorCaseStatusEnums.REVIEW_FAILED;
         }
 
-        updateReview(id, status, reviewReason, adminUser);
+        updateReview(id, status, reviewReason, adminUser, userType);
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void settle(Long id, LoginUser adminUser) {
+    public void settle(Long id, LoginUser adminUser, UserTypeEnums userType) {
         DoctorCaseEntity entity = doctorCaseAdminMapper.selectById(id);
         if (entity == null) {
+            throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_CASE_NOT_FOUND);
+        }
+        if (entity.getUserType() != userType) {
             throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_CASE_NOT_FOUND);
         }
         if (entity.getStatus() != DoctorCaseStatusEnums.APPROVED_PENDING_SETTLEMENT) {
@@ -89,9 +98,13 @@ public class DoctorCaseReviewService {
     }
 
     private void updateReview(
-            Long id, DoctorCaseStatusEnums status, String reviewReason, LoginUser adminUser) {
+            Long id, DoctorCaseStatusEnums status, String reviewReason,
+            LoginUser adminUser, UserTypeEnums userType) {
         DoctorCaseEntity entity = doctorCaseAdminMapper.selectById(id);
         if (entity == null) {
+            throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_CASE_NOT_FOUND);
+        }
+        if (entity.getUserType() != userType) {
             throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_CASE_NOT_FOUND);
         }
         if (entity.getStatus() != DoctorCaseStatusEnums.PENDING_REVIEW) {

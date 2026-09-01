@@ -1,5 +1,6 @@
 package com.medcase.biz.request;
 
+import com.medcase.common.validation.groups.ValidationGroups;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -28,8 +29,8 @@ public class DoctorProfileSubmitRequest {
     @Size(max = 30, message = "身份证号码不能超过30个字符")
     private String idCardNumber;
 
-    @NotBlank(message = "职称不能为空")
-    @Size(max = 50, message = "职称不能超过50个字符")
+    @NotBlank(message = "职称不能为空", groups = ValidationGroups.Doctor.Submit.class)
+    @Size(max = 30, message = "职称不能超过30个字符", groups = ValidationGroups.Doctor.Submit.class)
     private String title;
 
     @NotNull(message = "身份证正面图片不能为空")
@@ -38,6 +39,6 @@ public class DoctorProfileSubmitRequest {
     @NotNull(message = "身份证反面图片不能为空")
     private FileAttachment idCardBack;
 
-    @NotNull(message = "医师职业资格证图片不能为空")
+    @NotNull(message = "医师职业资格证图片不能为空", groups = ValidationGroups.Doctor.Submit.class)
     private FileAttachment qualificationCertificate;
 }
