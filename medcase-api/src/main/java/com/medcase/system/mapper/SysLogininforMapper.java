@@ -2,6 +2,8 @@ package com.medcase.system.mapper;
 
 import com.medcase.mp.mybatis.BaseMapperX;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.medcase.mp.mybatis.PageParam;
+import com.medcase.mp.mybatis.PageResult;
 import com.medcase.system.entity.SysLogininforEntity;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -9,8 +11,8 @@ import java.util.List;
 
 @Mapper
 public interface SysLogininforMapper extends BaseMapperX<SysLogininforEntity> {
-    default List<SysLogininforEntity> selectLogininforList(
-            String ipaddr, String status, String userName,
+    default PageResult<SysLogininforEntity> selectPage(
+            PageParam pageParam, String ipaddr, String status, String userName,
             String beginTime, String endTime) {
         LambdaQueryWrapper<SysLogininforEntity> query = build()
                 .likeIfPresent(SysLogininforEntity::getIpaddr, ipaddr)
@@ -19,7 +21,7 @@ public interface SysLogininforMapper extends BaseMapperX<SysLogininforEntity> {
                 .geIfPresent(SysLogininforEntity::getLoginTime, beginTime)
                 .leIfPresent(SysLogininforEntity::getLoginTime, endTime)
                 .orderByDesc(SysLogininforEntity::getInfoId);
-        return selectList(query);
+        return selectPage(pageParam, query);
     }
 
     default int cleanLogininfor() {

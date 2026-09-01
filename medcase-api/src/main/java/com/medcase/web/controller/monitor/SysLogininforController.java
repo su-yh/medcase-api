@@ -1,10 +1,10 @@
 package com.medcase.web.controller.monitor;
 
-import com.github.pagehelper.PageInfo;
 import com.medcase.common.annotation.Log;
 import com.medcase.common.core.controller.BaseController;
 import com.medcase.common.enums.BusinessType;
 import com.medcase.framework.web.service.SysPasswordService;
+import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
@@ -19,8 +19,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 /**
  * 系统访问记录
@@ -38,16 +36,17 @@ public class SysLogininforController extends BaseController {
 
     @PreAuthorize("@ss.hasPermi('monitor:logininfor:list')")
     @GetMapping("/list")
-    public PageResult<LogininforResponse> list(LogininforQueryRequest request) {
+    public PageResult<LogininforResponse> list(PageParam pageParam, LogininforQueryRequest request) {
 
-        startPage();
-        List<SysLogininforEntity> entities = logininforService.selectLogininforList(
-                request.getIpaddr(), request.getStatus(), request.getUserName(),
+        PageResult<SysLogininforEntity> entityPage = logininforService.selectPage(
+                pageParam, request.getIpaddr(), request.getStatus(), request.getUserName(),
                 request.getBeginTime(), request.getEndTime());
-        List<LogininforResponse> list = entities.stream()
+        PageResult<LogininforResponse> result = new PageResult<>();
+        result.setList(entityPage.getList().stream()
                 .map(LogininforResponse::new)
-                .toList();
-        return new PageResult<>(list, new PageInfo<>(entities).getTotal());
+                .toList());
+        result.setTotal(entityPage.getTotal());
+        return result;
     }
 
     @PreAuthorize("@ss.hasPermi('monitor:logininfor:remove')")

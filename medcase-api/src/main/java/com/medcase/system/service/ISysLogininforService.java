@@ -1,6 +1,8 @@
 package com.medcase.system.service;
 
 import java.util.List;
+import com.medcase.mp.mybatis.PageParam;
+import com.medcase.mp.mybatis.PageResult;
 import com.medcase.system.entity.SysLogininforEntity;
 
 /**
@@ -22,8 +24,8 @@ public interface ISysLogininforService {
      * @param logininfor 访问日志对象
      * @return 登录记录集合
      */
-    public List<SysLogininforEntity> selectLogininforList(
-            String ipaddr, String status, String userName,
+    public PageResult<SysLogininforEntity> selectPage(
+            PageParam pageParam, String ipaddr, String status, String userName,
             String beginTime, String endTime);
 
     /**

@@ -1,7 +1,5 @@
 package com.medcase.web.controller.monitor;
 
-import java.util.List;
-import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -14,6 +12,7 @@ import com.medcase.common.core.controller.BaseController;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
 import com.medcase.common.enums.BusinessType;
+import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
 import com.medcase.system.entity.SysOperLogEntity;
 import com.medcase.system.service.ISysOperLogService;
@@ -33,17 +32,18 @@ public class SysOperlogController extends BaseController {
 
     @PreAuthorize("@ss.hasPermi('monitor:operlog:list')")
     @GetMapping("/list")
-    public PageResult<OperLogResponse> list(OperLogQueryRequest request) {
+    public PageResult<OperLogResponse> list(PageParam pageParam, OperLogQueryRequest request) {
 
-        startPage();
-        List<SysOperLogEntity> entities = operLogService.selectOperLogList(
-                request.getOperIp(), request.getTitle(), request.getBusinessType(),
+        PageResult<SysOperLogEntity> entityPage = operLogService.selectPage(
+                pageParam, request.getOperIp(), request.getTitle(), request.getBusinessType(),
                 request.getStatus(), request.getOperName(),
                 request.getBeginTime(), request.getEndTime());
-        List<OperLogResponse> list = entities.stream()
+        PageResult<OperLogResponse> result = new PageResult<>();
+        result.setList(entityPage.getList().stream()
                 .map(OperLogResponse::new)
-                .toList();
-        return new PageResult<>(list, new PageInfo<>(entities).getTotal());
+                .toList());
+        result.setTotal(entityPage.getTotal());
+        return result;
     }
 
     @Log(title = "操作日志", businessType = BusinessType.DELETE)

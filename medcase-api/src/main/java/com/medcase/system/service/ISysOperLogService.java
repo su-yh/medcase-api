@@ -1,6 +1,8 @@
 package com.medcase.system.service;
 
 import java.util.List;
+import com.medcase.mp.mybatis.PageParam;
+import com.medcase.mp.mybatis.PageResult;
 import com.medcase.system.entity.SysOperLogEntity;
 
 /**
@@ -22,8 +24,8 @@ public interface ISysOperLogService {
      * @param operLog 操作日志对象
      * @return 操作日志集合
      */
-    public List<SysOperLogEntity> selectOperLogList(
-            String operIp, String title, Integer businessType,
+    public PageResult<SysOperLogEntity> selectPage(
+            PageParam pageParam, String operIp, String title, Integer businessType,
             Integer status, String operName, String beginTime, String endTime);
 
     /**

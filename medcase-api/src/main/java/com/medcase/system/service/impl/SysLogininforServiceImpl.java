@@ -4,6 +4,8 @@ import java.util.Arrays;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import com.medcase.mp.mybatis.PageParam;
+import com.medcase.mp.mybatis.PageResult;
 import com.medcase.system.entity.SysLogininforEntity;
 import com.medcase.system.mapper.SysLogininforMapper;
 import com.medcase.system.service.ISysLogininforService;
@@ -37,12 +39,12 @@ public class SysLogininforServiceImpl implements ISysLogininforService {
      * @return 登录记录集合
      */
     @Override
-    public List<SysLogininforEntity> selectLogininforList(
-            String ipaddr, String status, String userName,
+    public PageResult<SysLogininforEntity> selectPage(
+            PageParam pageParam, String ipaddr, String status, String userName,
             String beginTime, String endTime) {
 
-        return logininforMapper.selectLogininforList(
-                ipaddr, status, userName, beginTime, endTime);
+        return logininforMapper.selectPage(
+                pageParam, ipaddr, status, userName, beginTime, endTime);
     }
 
     /**

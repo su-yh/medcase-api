@@ -4,6 +4,8 @@ import java.util.Arrays;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import com.medcase.mp.mybatis.PageParam;
+import com.medcase.mp.mybatis.PageResult;
 import com.medcase.system.entity.SysOperLogEntity;
 import com.medcase.system.mapper.SysOperLogMapper;
 import com.medcase.system.service.ISysOperLogService;
@@ -36,12 +38,12 @@ public class SysOperLogServiceImpl implements ISysOperLogService {
      * @return 操作日志集合
      */
     @Override
-    public List<SysOperLogEntity> selectOperLogList(
-            String operIp, String title, Integer businessType,
+    public PageResult<SysOperLogEntity> selectPage(
+            PageParam pageParam, String operIp, String title, Integer businessType,
             Integer status, String operName, String beginTime, String endTime) {
 
-        return operLogMapper.selectOperLogList(
-                operIp, title, businessType, status, operName, beginTime, endTime);
+        return operLogMapper.selectPage(
+                pageParam, operIp, title, businessType, status, operName, beginTime, endTime);
     }
 
     /**
