@@ -1,12 +1,13 @@
 package com.medcase.biz.controller;
 
-import com.medcase.mp.mybatis.PageResult;
 import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.common.enums.UserTypeEnums;
 import com.medcase.biz.request.DoctorCaseReviewRequest;
 import com.medcase.biz.request.DoctorCaseReviewQuery;
 import com.medcase.biz.response.DoctorCaseReviewVO;
 import com.medcase.biz.service.DoctorCaseReviewService;
+import com.medcase.mp.mybatis.PageParam;
+import com.medcase.mp.mybatis.PageResult;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import com.medcase.mvc.authentication.annotation.CurrLoginUser;
@@ -16,7 +17,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -33,10 +33,9 @@ public class DoctorCaseReviewAdminController {
     @PreAuthorize("@ss.hasPermi('doctor:case:list')")
     @GetMapping("/list")
     public PageResult<DoctorCaseReviewVO> list(
-            @RequestParam(required = false) Integer pageNum,
-            @RequestParam(required = false) Integer pageSize,
+            PageParam pageParam,
             DoctorCaseReviewQuery query) {
-        return doctorCaseReviewService.page(pageNum, pageSize, query, UserTypeEnums.DOCTOR);
+        return doctorCaseReviewService.page(pageParam, query, UserTypeEnums.DOCTOR);
     }
 
     @PreAuthorize("@ss.hasPermi('doctor:case:query')")

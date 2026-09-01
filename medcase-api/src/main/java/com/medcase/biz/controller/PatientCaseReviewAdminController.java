@@ -7,6 +7,7 @@ import com.medcase.biz.service.DoctorCaseReviewService;
 import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.common.enums.UserTypeEnums;
 import com.medcase.mvc.authentication.annotation.CurrLoginUser;
+import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +17,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -31,10 +31,9 @@ public class PatientCaseReviewAdminController {
     @PreAuthorize("@ss.hasPermi('patient:case:list')")
     @GetMapping("/list")
     public PageResult<DoctorCaseReviewVO> list(
-            @RequestParam(required = false) Integer pageNum,
-            @RequestParam(required = false) Integer pageSize,
+            PageParam pageParam,
             DoctorCaseReviewQuery query) {
-        return caseService.page(pageNum, pageSize, query, UserTypeEnums.PATIENT);
+        return caseService.page(pageParam, query, UserTypeEnums.PATIENT);
     }
 
     @PreAuthorize("@ss.hasPermi('patient:case:query')")

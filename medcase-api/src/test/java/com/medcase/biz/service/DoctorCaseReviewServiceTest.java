@@ -41,7 +41,10 @@ class DoctorCaseReviewServiceTest {
     }
 
     @Test
-    void pageBuildsAdminPageParametersAndMapsCaseFields() {
+    void pageUsesProvidedPageParametersAndMapsCaseFields() {
+        PageParam pageParam = new PageParam();
+        pageParam.setPageNo(2);
+        pageParam.setPageSize(20);
         DoctorCaseReviewQuery query = new DoctorCaseReviewQuery();
         query.setId(42L);
         query.setCaseName("高血压");
@@ -59,12 +62,11 @@ class DoctorCaseReviewServiceTest {
                 .thenReturn(new PageResult<>(List.of(entity), 1L));
 
         PageResult<DoctorCaseReviewVO> result =
-                doctorCaseReviewService.page(2, 20, query, UserTypeEnums.DOCTOR);
+                doctorCaseReviewService.page(pageParam, query, UserTypeEnums.DOCTOR);
 
         ArgumentCaptor<PageParam> pageCaptor = ArgumentCaptor.forClass(PageParam.class);
         verify(doctorCaseAdminMapper).selectAdminCasePage(pageCaptor.capture(), any(DoctorCaseReviewQuery.class));
-        assertEquals(2, pageCaptor.getValue().getPageNo());
-        assertEquals(20, pageCaptor.getValue().getPageSize());
+        assertEquals(pageParam, pageCaptor.getValue());
         assertEquals(1, result.getTotal());
         assertEquals(42L, result.getList().get(0).getId());
         assertEquals("张医生", result.getList().get(0).getUserName());

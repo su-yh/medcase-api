@@ -33,12 +33,8 @@ public class DoctorCaseReviewService {
     private final DoctorCaseAdminMapper doctorCaseAdminMapper;
 
     public PageResult<DoctorCaseReviewVO> page(
-            Integer pageNum, Integer pageSize, DoctorCaseReviewQuery query, UserTypeEnums userType) {
+            PageParam pageParam, DoctorCaseReviewQuery query, UserTypeEnums userType) {
         query.setUserType(userType);
-        PageParam pageParam = new PageParam();
-        pageParam.setPageNo(pageNum == null || pageNum < 1 ? PageParam.PAGE_NO : pageNum);
-        pageParam.setPageSize(pageSize == null || pageSize < 1 ? PageParam.PAGE_SIZE : pageSize);
-
         PageResult<DoctorCaseEntity> pageResult =
                 doctorCaseAdminMapper.selectAdminCasePage(pageParam, query);
         PageResult<DoctorCaseReviewVO> result = new PageResult<>();

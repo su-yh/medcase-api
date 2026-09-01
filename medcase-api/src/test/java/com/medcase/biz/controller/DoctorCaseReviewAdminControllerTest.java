@@ -4,6 +4,7 @@ import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.biz.request.DoctorCaseReviewQuery;
 import com.medcase.biz.request.DoctorCaseReviewRequest;
 import com.medcase.biz.response.DoctorCaseReviewVO;
+import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,7 +22,7 @@ class DoctorCaseReviewAdminControllerTest {
     void reviewControllerSharesCaseInfoPackageAndUsesNewResponseTypes() throws NoSuchMethodException {
         RequestMapping mapping = DoctorCaseReviewAdminController.class.getAnnotation(RequestMapping.class);
         Method list = DoctorCaseReviewAdminController.class.getMethod(
-                "list", Integer.class, Integer.class, DoctorCaseReviewQuery.class);
+                "list", PageParam.class, DoctorCaseReviewQuery.class);
         Method detail = DoctorCaseReviewAdminController.class.getMethod("getInfo", Long.class);
         Method review = DoctorCaseReviewAdminController.class.getMethod(
                 "review", LoginUser.class, Long.class, DoctorCaseReviewRequest.class);
