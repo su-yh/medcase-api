@@ -143,6 +143,8 @@ public class SysUserController extends BaseController {
     @PutMapping
     public void edit(@Validated @RequestBody SysUser user) {
 
+        user.setPassword(null);
+
         userService.checkUserAllowed(user);
         userService.checkUserDataScope(user.getUserId());
         deptService.checkDeptDataScope(user.getDeptId());
