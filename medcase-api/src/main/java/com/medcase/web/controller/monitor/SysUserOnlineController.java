@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -19,9 +18,10 @@ import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.common.core.redis.RedisCache;
 import com.medcase.common.enums.BusinessType;
 import com.medcase.common.utils.StringUtils;
+import com.medcase.mp.mybatis.PageParam;
+import com.medcase.mp.mybatis.PageResult;
 import com.medcase.system.domain.SysUserOnline;
 import com.medcase.system.service.ISysUserOnlineService;
-import com.medcase.mp.mybatis.PageResult;
 
 /**
  * 在线用户监控
@@ -39,7 +39,7 @@ public class SysUserOnlineController extends BaseController {
 
     @PreAuthorize("@ss.hasPermi('monitor:online:list')")
     @GetMapping("/list")
-    public PageResult<SysUserOnline> list(String ipaddr, String userName) {
+    public PageResult<SysUserOnline> list(PageParam pageParam, String ipaddr, String userName) {
 
         Collection<String> keys = redisCache.keys(CacheConstants.LOGIN_TOKEN_KEY + "*");
         List<SysUserOnline> userOnlineList = new ArrayList<SysUserOnline>();
@@ -65,7 +65,7 @@ public class SysUserOnlineController extends BaseController {
         }
         Collections.reverse(userOnlineList);
         userOnlineList.removeAll(Collections.singleton(null));
-        return new PageResult<>(userOnlineList, new PageInfo<>(userOnlineList).getTotal());
+        return new PageResult<>(PageParam.doPageList(pageParam, userOnlineList), (long) userOnlineList.size());
     }
 
     /**
