@@ -3,6 +3,8 @@ package com.medcase.system.service;
 import java.util.Date;
 import java.util.List;
 import com.medcase.common.core.domain.entity.SysUser;
+import com.medcase.mp.mybatis.PageParam;
+import com.medcase.mp.mybatis.PageResult;
 import com.medcase.storage.pojo.FileAttachment;
 
 /**
@@ -13,6 +15,14 @@ public interface ISysUserService {
 
     /**
      * 根据条件分页查询用户列表
+     * 
+     * @param user 用户信息
+     * @return 用户信息集合信息
+     */
+    public PageResult<SysUser> selectPage(SysUser user, PageParam pageParam);
+
+    /**
+     * 根据条件查询用户列表
      * 
      * @param user 用户信息
      * @return 用户信息集合信息

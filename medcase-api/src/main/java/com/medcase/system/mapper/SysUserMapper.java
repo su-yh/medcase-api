@@ -1,13 +1,19 @@
 package com.medcase.system.mapper;
 
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.medcase.common.core.domain.entity.SysUser;
 import com.medcase.mp.mybatis.BaseMapperX;
 import com.medcase.mp.mybatis.LambdaQueryWrapperX;
+import com.medcase.mp.mybatis.MyBatisUtils;
+import com.medcase.mp.mybatis.PageParam;
+import com.medcase.mp.mybatis.PageResult;
 import com.medcase.common.enums.UserTypeEnums;
 import com.medcase.storage.pojo.FileAttachment;
 import com.medcase.system.entity.SysUserEntity;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -20,6 +26,14 @@ public interface SysUserMapper extends BaseMapperX<SysUserEntity> {
     List<SysUser> selectAllocatedList(SysUser user);
 
     List<SysUser> selectUnallocatedList(SysUser user);
+
+    default PageResult<SysUser> selectPage(PageParam pageParam, SysUser user) {
+        Page<SysUser> page = MyBatisUtils.buildPage(pageParam);
+        IPage<SysUser> userPage = selectUserPage(page, user);
+        return new PageResult<>(userPage.getRecords(), userPage.getTotal());
+    }
+
+    IPage<SysUser> selectUserPage(Page<SysUser> page, @Param("user") SysUser user);
 
     default SysUserEntity selectUserByUserName(
             String userName, String userType, String delFlag) {

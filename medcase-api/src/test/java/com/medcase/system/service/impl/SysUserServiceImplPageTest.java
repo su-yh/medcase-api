@@ -1,0 +1,59 @@
+package com.medcase.system.service.impl;
+
+import com.medcase.common.core.domain.entity.SysUser;
+import com.medcase.common.enums.UserTypeEnums;
+import com.medcase.mp.mybatis.PageParam;
+import com.medcase.mp.mybatis.PageResult;
+import com.medcase.system.mapper.SysUserMapper;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.test.util.ReflectionTestUtils;
+
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+class SysUserServiceImplPageTest {
+    private SysUserServiceImpl userService;
+
+    @Mock
+    private SysUserMapper userMapper;
+
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
+        userService = new SysUserServiceImpl();
+        ReflectionTestUtils.setField(userService, "userMapper", userMapper);
+    }
+
+    @Test
+    void selectPageDefaultsToAdminUserTypeAndReturnsPageResult() {
+        PageParam pageParam = new PageParam();
+        pageParam.setPageNo(2);
+        pageParam.setPageSize(10);
+        SysUser user = new SysUser();
+        user.setUserName("admin");
+
+        SysUser resultUser = new SysUser();
+        resultUser.setUserId(1L);
+        resultUser.setUserName("admin");
+        resultUser.setUserType(UserTypeEnums.ADMIN);
+
+        when(userMapper.selectPage(any(PageParam.class), any(SysUser.class)))
+                .thenReturn(new PageResult<>(List.of(resultUser), 1L));
+
+        PageResult<SysUser> result = userService.selectPage(user, pageParam);
+
+        ArgumentCaptor<SysUser> userCaptor = ArgumentCaptor.forClass(SysUser.class);
+        verify(userMapper).selectPage(any(PageParam.class), userCaptor.capture());
+        assertEquals(1, result.getTotal());
+        assertEquals(1L, result.getList().get(0).getUserId());
+        assertEquals(UserTypeEnums.ADMIN, userCaptor.getValue().getUserType());
+    }
+}

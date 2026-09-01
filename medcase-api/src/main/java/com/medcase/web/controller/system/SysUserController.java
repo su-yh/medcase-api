@@ -1,6 +1,5 @@
 package com.medcase.web.controller.system;
 
-import com.github.pagehelper.PageInfo;
 import com.medcase.common.annotation.Log;
 import com.medcase.common.core.controller.BaseController;
 import com.medcase.common.core.domain.entity.SysDept;
@@ -9,6 +8,7 @@ import com.medcase.common.core.domain.entity.SysUser;
 import com.medcase.common.enums.BusinessType;
 import com.medcase.common.utils.SecurityUtils;
 import com.medcase.common.utils.StringUtils;
+import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
@@ -60,11 +60,9 @@ public class SysUserController extends BaseController {
      */
     @PreAuthorize("@ss.hasPermi('system:user:list')")
     @GetMapping("/list")
-    public PageResult<SysUser> list(SysUser user) {
+    public PageResult<SysUser> list(PageParam pageParam, SysUser user) {
 
-        startPage();
-        List<SysUser> list = userService.selectUserList(user);
-        return new PageResult<>(list, new PageInfo<>(list).getTotal());
+        return userService.selectPage(user, pageParam);
     }
 
     /**

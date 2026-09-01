@@ -10,6 +10,8 @@ import com.medcase.common.utils.StringUtils;
 import com.medcase.common.utils.spring.SpringUtils;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
+import com.medcase.mp.mybatis.PageParam;
+import com.medcase.mp.mybatis.PageResult;
 import com.medcase.system.event.UserAvatarUploadedEvent;
 import com.medcase.system.converter.SystemEntityConverter;
 import com.medcase.system.entity.SysUserEntity;
@@ -63,6 +65,19 @@ public class SysUserServiceImpl implements ISysUserService {
     /**
      * 根据条件分页查询用户列表
      * 
+     * @param user 用户信息
+     * @return 用户信息集合信息
+     */
+    @Override
+    @DataScope(deptAlias = "d", userAlias = "u")
+    public PageResult<SysUser> selectPage(SysUser user, PageParam pageParam) {
+        useAdminUserTypeIfAbsent(user);
+        return userMapper.selectPage(pageParam, user);
+    }
+
+    /**
+     * 根据条件查询用户列表
+     *
      * @param user 用户信息
      * @return 用户信息集合信息
      */
