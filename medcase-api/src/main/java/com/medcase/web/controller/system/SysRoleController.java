@@ -1,7 +1,6 @@
 package com.medcase.web.controller.system;
 
 import java.util.List;
-import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -56,11 +55,10 @@ public class SysRoleController extends BaseController {
 
     @PreAuthorize("@ss.hasPermi('system:role:list')")
     @GetMapping("/list")
-    public PageResult<SysRole> list(SysRole role) {
+    public PageResult<SysRole> list(PageParam pageParam, SysRole role) {
 
-        startPage();
         List<SysRole> list = roleService.selectRoleList(role);
-        return new PageResult<>(list, new PageInfo<>(list).getTotal());
+        return new PageResult<>(PageParam.doPageList(pageParam, list), (long) list.size());
     }
 
     /**

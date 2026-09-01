@@ -6,15 +6,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
-import com.github.pagehelper.PageHelper;
 import com.medcase.common.core.domain.model.LoginUser;
-import com.medcase.common.core.page.PageDomain;
-import com.medcase.common.core.page.TableSupport;
 import com.medcase.common.utils.DateUtils;
-import com.medcase.common.utils.PageUtils;
 import com.medcase.common.utils.SecurityUtils;
 import com.medcase.common.utils.StringUtils;
-import com.medcase.common.utils.sql.SqlUtil;
 
 /**
  * web层通用数据处理
@@ -39,35 +34,6 @@ public class BaseController {
                 setValue(DateUtils.parseDate(text));
             }
         });
-    }
-
-    /**
-     * 设置请求分页数据
-     */
-    protected void startPage() {
-
-        PageUtils.startPage();
-    }
-
-    /**
-     * 设置请求排序数据
-     */
-    protected void startOrderBy() {
-
-        PageDomain pageDomain = TableSupport.buildPageRequest();
-        if (StringUtils.isNotEmpty(pageDomain.getOrderBy())) {
-
-            String orderBy = SqlUtil.escapeOrderBySql(pageDomain.getOrderBy());
-            PageHelper.orderBy(orderBy);
-        }
-    }
-
-    /**
-     * 清理分页的线程变量
-     */
-    protected void clearPage() {
-
-        PageUtils.clearPage();
     }
 
     /**

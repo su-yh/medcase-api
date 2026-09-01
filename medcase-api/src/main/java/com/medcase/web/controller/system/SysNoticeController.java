@@ -1,7 +1,6 @@
 package com.medcase.web.controller.system;
 
 import java.util.List;
-import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -146,12 +145,13 @@ public class SysNoticeController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:notice:list')")
     @GetMapping("/readUsers/list")
     @ResponseBody
-    public PageResult<NoticeReadUserResponse> readUsersList(Long noticeId, String searchValue) {
+    public PageResult<NoticeReadUserResponse> readUsersList(
+            PageParam pageParam, Long noticeId,
+            String searchValue) {
 
-        startPage();
         List<NoticeReadUserResponse> list = noticeReadService.selectReadUsersByNoticeId(
                 noticeId, searchValue);
-        return new PageResult<>(list, new PageInfo<>(list).getTotal());
+        return new PageResult<>(PageParam.doPageList(pageParam, list), (long) list.size());
     }
 
     /**
