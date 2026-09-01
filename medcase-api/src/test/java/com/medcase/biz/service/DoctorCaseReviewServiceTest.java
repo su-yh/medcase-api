@@ -65,7 +65,7 @@ class DoctorCaseReviewServiceTest {
         verify(doctorCaseAdminMapper).selectAdminCasePage(pageCaptor.capture(), any(DoctorCaseReviewQuery.class));
         assertEquals(2, pageCaptor.getValue().getPageNo());
         assertEquals(20, pageCaptor.getValue().getPageSize());
-        assertEquals(1L, result.getTotal());
+        assertEquals(1, result.getTotal());
         assertEquals(42L, result.getList().get(0).getId());
         assertEquals("张医生", result.getList().get(0).getUserName());
         assertEquals("高血压病例", result.getList().get(0).getCaseName());

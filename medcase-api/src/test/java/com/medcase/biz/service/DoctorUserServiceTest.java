@@ -73,7 +73,7 @@ class DoctorUserServiceTest {
 
         verify(doctorUserMapper).selectUserPage(
                 any(PageParam.class), org.mockito.ArgumentMatchers.same(query), eq(UserTypeEnums.DOCTOR));
-        assertEquals(1L, result.getTotal());
+        assertEquals(1, result.getTotal());
         assertEquals(1L, result.getList().get(0).getId());
         assertEquals("张医生", result.getList().get(0).getNickName());
         assertEquals("110101199001011234", result.getList().get(0).getIdCardNumber());
