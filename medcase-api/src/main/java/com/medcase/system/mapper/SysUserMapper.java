@@ -35,6 +35,22 @@ public interface SysUserMapper extends BaseMapperX<SysUserEntity> {
 
     IPage<SysUser> selectUserPage(Page<SysUser> page, @Param("user") SysUser user);
 
+    default PageResult<SysUser> selectAllocatedPage(PageParam pageParam, SysUser user) {
+        Page<SysUser> page = MyBatisUtils.buildPage(pageParam);
+        IPage<SysUser> userPage = selectAllocatedPage(page, user);
+        return new PageResult<>(userPage.getRecords(), userPage.getTotal());
+    }
+
+    IPage<SysUser> selectAllocatedPage(Page<SysUser> page, @Param("user") SysUser user);
+
+    default PageResult<SysUser> selectUnallocatedPage(PageParam pageParam, SysUser user) {
+        Page<SysUser> page = MyBatisUtils.buildPage(pageParam);
+        IPage<SysUser> userPage = selectUnallocatedPage(page, user);
+        return new PageResult<>(userPage.getRecords(), userPage.getTotal());
+    }
+
+    IPage<SysUser> selectUnallocatedPage(Page<SysUser> page, @Param("user") SysUser user);
+
     default SysUserEntity selectUserByUserName(
             String userName, String userType, String delFlag) {
         return selectOne(build()

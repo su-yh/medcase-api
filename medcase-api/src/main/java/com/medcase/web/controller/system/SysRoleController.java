@@ -23,6 +23,7 @@ import com.medcase.common.core.domain.entity.SysUser;
 import com.medcase.common.enums.BusinessType;
 import com.medcase.framework.web.service.SysPermissionService;
 import com.medcase.framework.web.service.TokenService;
+import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
 import com.medcase.system.service.ISysDeptService;
 import com.medcase.system.service.ISysRoleService;
@@ -180,11 +181,9 @@ public class SysRoleController extends BaseController {
      */
     @PreAuthorize("@ss.hasPermi('system:role:list')")
     @GetMapping("/authUser/allocatedList")
-    public PageResult<SysUser> allocatedList(SysUser user) {
+    public PageResult<SysUser> allocatedList(PageParam pageParam, SysUser user) {
 
-        startPage();
-        List<SysUser> list = userService.selectAllocatedList(user);
-        return new PageResult<>(list, new PageInfo<>(list).getTotal());
+        return userService.selectAllocatedPage(user, pageParam);
     }
 
     /**
@@ -192,11 +191,9 @@ public class SysRoleController extends BaseController {
      */
     @PreAuthorize("@ss.hasPermi('system:role:list')")
     @GetMapping("/authUser/unallocatedList")
-    public PageResult<SysUser> unallocatedList(SysUser user) {
+    public PageResult<SysUser> unallocatedList(PageParam pageParam, SysUser user) {
 
-        startPage();
-        List<SysUser> list = userService.selectUnallocatedList(user);
-        return new PageResult<>(list, new PageInfo<>(list).getTotal());
+        return userService.selectUnallocatedPage(user, pageParam);
     }
 
     /**

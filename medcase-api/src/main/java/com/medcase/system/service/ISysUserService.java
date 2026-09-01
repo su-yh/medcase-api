@@ -46,6 +46,24 @@ public interface ISysUserService {
     public List<SysUser> selectUnallocatedList(SysUser user);
 
     /**
+     * 根据条件分页查询已分配用户角色列表
+     *
+     * @param user 用户信息
+     * @param pageParam 分页参数
+     * @return 用户信息集合信息
+     */
+    public PageResult<SysUser> selectAllocatedPage(SysUser user, PageParam pageParam);
+
+    /**
+     * 根据条件分页查询未分配用户角色列表
+     *
+     * @param user 用户信息
+     * @param pageParam 分页参数
+     * @return 用户信息集合信息
+     */
+    public PageResult<SysUser> selectUnallocatedPage(SysUser user, PageParam pageParam);
+
+    /**
      * 通过用户名查询用户
      * @param userName 用户名
      * @param userType 用户类型

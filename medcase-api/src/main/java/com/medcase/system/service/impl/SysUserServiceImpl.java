@@ -114,6 +114,34 @@ public class SysUserServiceImpl implements ISysUserService {
         return userMapper.selectUnallocatedList(user);
     }
 
+    /**
+     * 根据条件分页查询已分配用户角色列表
+     *
+     * @param user 用户信息
+     * @param pageParam 分页参数
+     * @return 用户信息集合信息
+     */
+    @Override
+    @DataScope(deptAlias = "d", userAlias = "u")
+    public PageResult<SysUser> selectAllocatedPage(SysUser user, PageParam pageParam) {
+        useAdminUserTypeIfAbsent(user);
+        return userMapper.selectAllocatedPage(pageParam, user);
+    }
+
+    /**
+     * 根据条件分页查询未分配用户角色列表
+     *
+     * @param user 用户信息
+     * @param pageParam 分页参数
+     * @return 用户信息集合信息
+     */
+    @Override
+    @DataScope(deptAlias = "d", userAlias = "u")
+    public PageResult<SysUser> selectUnallocatedPage(SysUser user, PageParam pageParam) {
+        useAdminUserTypeIfAbsent(user);
+        return userMapper.selectUnallocatedPage(pageParam, user);
+    }
+
     private void useAdminUserTypeIfAbsent(SysUser user) {
         if (user != null && user.getUserType() == null) {
             user.setUserType(UserTypeEnums.ADMIN);
