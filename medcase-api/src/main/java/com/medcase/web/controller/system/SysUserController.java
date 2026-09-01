@@ -1,9 +1,25 @@
 package com.medcase.web.controller.system;
 
-import java.util.List;
-import java.util.stream.Collectors;
-import org.apache.commons.lang3.ArrayUtils;
 import com.github.pagehelper.PageInfo;
+import com.medcase.common.annotation.Log;
+import com.medcase.common.core.controller.BaseController;
+import com.medcase.common.core.domain.entity.SysDept;
+import com.medcase.common.core.domain.entity.SysRole;
+import com.medcase.common.core.domain.entity.SysUser;
+import com.medcase.common.enums.BusinessType;
+import com.medcase.common.utils.SecurityUtils;
+import com.medcase.common.utils.StringUtils;
+import com.medcase.mp.mybatis.PageResult;
+import com.medcase.mvc.constants.enums.ErrorCodeEnums;
+import com.medcase.mvc.exception.ExceptionUtil;
+import com.medcase.system.service.ISysDeptService;
+import com.medcase.system.service.ISysPostService;
+import com.medcase.system.service.ISysRoleService;
+import com.medcase.system.service.ISysUserService;
+import com.medcase.web.controller.system.dto.PostResponse;
+import com.medcase.web.controller.system.dto.UserAuthRoleResponse;
+import com.medcase.web.controller.system.dto.UserDetailResponse;
+import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -15,24 +31,9 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import com.medcase.common.annotation.Log;
-import com.medcase.common.core.controller.BaseController;
-import com.medcase.mvc.constants.enums.ErrorCodeEnums;
-import com.medcase.mvc.exception.ExceptionUtil;
-import com.medcase.common.core.domain.entity.SysDept;
-import com.medcase.common.core.domain.entity.SysRole;
-import com.medcase.common.core.domain.entity.SysUser;
-import com.medcase.common.enums.BusinessType;
-import com.medcase.common.utils.SecurityUtils;
-import com.medcase.common.utils.StringUtils;
-import com.medcase.system.service.ISysDeptService;
-import com.medcase.system.service.ISysPostService;
-import com.medcase.system.service.ISysRoleService;
-import com.medcase.system.service.ISysUserService;
-import com.medcase.mp.mybatis.PageResult;
-import com.medcase.web.controller.system.dto.UserAuthRoleResponse;
-import com.medcase.web.controller.system.dto.UserDetailResponse;
-import com.medcase.web.controller.system.dto.PostResponse;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 用户信息
@@ -93,7 +94,10 @@ public class SysUserController extends BaseController {
             userService.checkUserDataScope(userId);
             sysUser = userService.selectUserById(userId);
             postIds = postService.selectPostListByUserId(userId);
-            roleIds = sysUser.getRoles().stream().map(SysRole::getRoleId).collect(Collectors.toList());
+            List<SysRole> roles = sysUser.getRoles();
+            if (roles != null) {
+                roleIds = roles.stream().map(SysRole::getRoleId).collect(Collectors.toList());
+            }
         }
         List<SysRole> roles = roleService.selectRoleAll();
         List<SysRole> availableRoles = SecurityUtils.isAdmin(userId)
@@ -102,12 +106,7 @@ public class SysUserController extends BaseController {
         List<PostResponse> posts = postService.selectPostAll().stream()
                 .map(PostResponse::fromEntity)
                 .toList();
-        return new UserDetailResponse(
-                sysUser,
-                postIds,
-                roleIds,
-                availableRoles,
-                posts);
+        return new UserDetailResponse(sysUser, postIds, roleIds, availableRoles, posts);
     }
 
     /**
