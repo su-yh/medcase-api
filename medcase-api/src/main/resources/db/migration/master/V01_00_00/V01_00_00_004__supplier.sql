@@ -1,13 +1,4 @@
 -- 供应商关联
-alter table sys_user
-    add column supplier_id bigint default null comment '供应商ID' after nick_name;
-
--- 超级管理员不关联部门
-update sys_user
-set dept_id = null
-where user_id = 1
-  and user_name = 'admin';
-
 -- 供应商表
 create table medcase_supplier (
     id              bigint       not null auto_increment comment '供应商ID',
