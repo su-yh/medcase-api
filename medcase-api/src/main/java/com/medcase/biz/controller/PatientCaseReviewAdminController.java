@@ -1,9 +1,9 @@
 package com.medcase.biz.controller;
 
-import com.medcase.biz.request.DoctorCaseReviewQuery;
-import com.medcase.biz.request.DoctorCaseReviewRequest;
-import com.medcase.biz.response.DoctorCaseReviewVO;
-import com.medcase.biz.service.DoctorCaseReviewService;
+import com.medcase.biz.request.CaseReviewQuery;
+import com.medcase.biz.request.CaseReviewRequest;
+import com.medcase.biz.response.CaseReviewVO;
+import com.medcase.biz.service.CaseReviewService;
 import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.common.enums.UserTypeEnums;
 import com.medcase.mvc.authentication.annotation.CurrLoginUser;
@@ -26,19 +26,19 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RequestMapping("/biz/patient-case")
 public class PatientCaseReviewAdminController {
-    private final DoctorCaseReviewService caseService;
+    private final CaseReviewService caseService;
 
     @PreAuthorize("@ss.hasPermi('patient:case:list')")
     @GetMapping("/list")
-    public PageResult<DoctorCaseReviewVO> list(
+    public PageResult<CaseReviewVO> list(
             PageParam pageParam,
-            DoctorCaseReviewQuery query) {
+            CaseReviewQuery query) {
         return caseService.page(pageParam, query, UserTypeEnums.PATIENT);
     }
 
     @PreAuthorize("@ss.hasPermi('patient:case:query')")
     @GetMapping("/{id}")
-    public DoctorCaseReviewVO getInfo(@PathVariable Long id) {
+    public CaseReviewVO getInfo(@PathVariable Long id) {
         return caseService.detail(id, UserTypeEnums.PATIENT);
     }
 
@@ -47,7 +47,7 @@ public class PatientCaseReviewAdminController {
     public void review(
             @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser adminUser,
             @PathVariable Long id,
-            @Valid @RequestBody DoctorCaseReviewRequest request) {
+            @Valid @RequestBody CaseReviewRequest request) {
         caseService.review(id, request, adminUser, UserTypeEnums.PATIENT);
     }
 

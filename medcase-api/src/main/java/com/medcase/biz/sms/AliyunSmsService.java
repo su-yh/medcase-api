@@ -26,7 +26,7 @@ public class AliyunSmsService {
 
     public void sendVerificationCode(String phone, String code) {
         if (!smsProperties.isConfigured()) {
-            throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_REGISTER_SMS_CONFIG_MISSING);
+            throw ExceptionUtil.business(ErrorCodeEnums.USER_REGISTER_SMS_CONFIG_MISSING);
         }
 
         SendSmsRequest request = new SendSmsRequest()
@@ -43,13 +43,13 @@ public class AliyunSmsService {
                         response.getBody() == null ? null : response.getBody().getRequestId(),
                         responseCode,
                         response.getBody() == null ? null : response.getBody().getMessage());
-                throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_REGISTER_SMS_SEND_FAILED);
+                throw ExceptionUtil.business(ErrorCodeEnums.USER_REGISTER_SMS_SEND_FAILED);
             }
         } catch (AbstractBusinessException exception) {
             throw exception;
         } catch (Exception exception) {
             log.error("aliyun sms send failed, phone={}", phone, exception);
-            throw ExceptionUtil.business(ErrorCodeEnums.DOCTOR_REGISTER_SMS_SEND_FAILED);
+            throw ExceptionUtil.business(ErrorCodeEnums.USER_REGISTER_SMS_SEND_FAILED);
         }
     }
 

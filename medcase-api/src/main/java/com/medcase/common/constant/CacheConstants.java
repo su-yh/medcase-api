@@ -17,14 +17,14 @@ public class CacheConstants {
     public static final String CAPTCHA_CODE_KEY = "captcha_codes:";
 
     /**
-     * 医生注册短信验证码 Redis key
+     * 用户注册短信验证码 Redis key
      */
-    public static final String DOCTOR_REGISTER_SMS_CODE_KEY = "doctor_register:sms_code:";
+    public static final String USER_REGISTER_SMS_CODE_KEY = "user_register:sms_code:";
 
     /**
-     * 医生注册短信发送冷却 Redis key
+     * 用户注册短信发送冷却 Redis key
      */
-    public static final String DOCTOR_REGISTER_SMS_COOLDOWN_KEY = "doctor_register:sms_cooldown:";
+    public static final String USER_REGISTER_SMS_COOLDOWN_KEY = "user_register:sms_cooldown:";
 
     /**
      * 参数管理 cache key

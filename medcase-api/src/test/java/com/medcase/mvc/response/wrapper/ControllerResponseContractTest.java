@@ -1,9 +1,9 @@
 package com.medcase.mvc.response.wrapper;
 
-import com.medcase.biz.controller.DoctorAuthPortalController;
-import com.medcase.biz.controller.DoctorCasePortalController;
+import com.medcase.biz.controller.UserAuthPortalController;
+import com.medcase.biz.controller.CasePortalController;
 import com.medcase.biz.controller.DoctorCaseReviewAdminController;
-import com.medcase.biz.controller.DoctorProfilePortalController;
+import com.medcase.biz.controller.UserProfilePortalController;
 import com.medcase.biz.controller.DoctorUserAdminController;
 import com.medcase.mvc.response.R;
 import com.medcase.mp.mybatis.PageResult;
@@ -40,10 +40,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class ControllerResponseContractTest {
     private static final List<Class<?>> CONTROLLERS = List.of(
-            DoctorAuthPortalController.class,
-            DoctorCasePortalController.class,
+            UserAuthPortalController.class,
+            CasePortalController.class,
             DoctorCaseReviewAdminController.class,
-            DoctorProfilePortalController.class,
+            UserProfilePortalController.class,
             DoctorUserAdminController.class,
             CaptchaController.class,
             FileStorageController.class,

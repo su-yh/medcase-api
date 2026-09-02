@@ -43,7 +43,7 @@ class SysUserServiceImplUserTypeTest {
     }
 
     @Test
-    void checkPhoneUniquePreservesExplicitDoctorUserType() {
+    void checkPhoneUniquePreservesExplicitUserType() {
 
         when(userMapper.selectUserByPhoneAndType(any(), any(), any())).thenReturn(null);
         SysUser user = new SysUser();

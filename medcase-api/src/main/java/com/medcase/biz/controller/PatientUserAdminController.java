@@ -1,9 +1,9 @@
 package com.medcase.biz.controller;
 
-import com.medcase.biz.request.DoctorUserQuery;
-import com.medcase.biz.request.DoctorUserReviewRequest;
-import com.medcase.biz.response.DoctorUserVO;
-import com.medcase.biz.service.DoctorUserService;
+import com.medcase.biz.request.UserQuery;
+import com.medcase.biz.request.UserReviewRequest;
+import com.medcase.biz.response.UserVO;
+import com.medcase.biz.service.UserService;
 import com.medcase.common.enums.UserTypeEnums;
 import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
@@ -25,18 +25,18 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RequestMapping("/biz/patient-user")
 public class PatientUserAdminController {
-    private final DoctorUserService userService;
+    private final UserService userService;
 
     @PreAuthorize("@ss.hasPermi('patient:user:list')")
     @GetMapping("/list")
-    public PageResult<DoctorUserVO> list(
-            PageParam pageParam, @NonNull DoctorUserQuery query) {
+    public PageResult<UserVO> list(
+            PageParam pageParam, @NonNull UserQuery query) {
         return userService.page(pageParam, query, UserTypeEnums.PATIENT);
     }
 
     @PreAuthorize("@ss.hasPermi('patient:user:list')")
     @GetMapping("/{userId}")
-    public DoctorUserVO getInfo(@PathVariable Long userId) {
+    public UserVO getInfo(@PathVariable Long userId) {
         return userService.detail(userId, UserTypeEnums.PATIENT);
     }
 
@@ -44,7 +44,7 @@ public class PatientUserAdminController {
     @PostMapping("/{userId}/review")
     public void review(
             @PathVariable Long userId,
-            @Valid @RequestBody DoctorUserReviewRequest request) {
+            @Valid @RequestBody UserReviewRequest request) {
         userService.review(userId, request, UserTypeEnums.PATIENT);
     }
 }

@@ -2,7 +2,7 @@ package com.medcase.storage;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
-import com.medcase.biz.domain.DoctorCaseEntity;
+import com.medcase.biz.domain.CaseEntity;
 import com.medcase.storage.pojo.FileAttachment;
 import org.junit.jupiter.api.Test;
 
@@ -25,7 +25,7 @@ class JacksonTypeHandlerTest {
     @Test
     @SuppressWarnings("unchecked")
     void parsesAttachmentListJsonWithJacksonTypeHandler() throws NoSuchFieldException {
-        Field attachmentsField = DoctorCaseEntity.class.getDeclaredField("attachments");
+        Field attachmentsField = CaseEntity.class.getDeclaredField("attachments");
         TableField tableField = attachmentsField.getAnnotation(TableField.class);
         assertEquals(JacksonTypeHandler.class, tableField.typeHandler());
 

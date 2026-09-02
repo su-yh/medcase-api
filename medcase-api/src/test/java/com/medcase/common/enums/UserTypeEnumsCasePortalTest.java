@@ -1,6 +1,6 @@
 package com.medcase.common.enums;
 
-import com.medcase.biz.request.DoctorRegisterRequest;
+import com.medcase.biz.request.UserRegisterRequest;
 import com.medcase.common.utils.json.JsonUtils;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -15,11 +15,11 @@ class UserTypeEnumsCasePortalTest {
 
     @Test
     void bindsRegisterUserTypeFromJsonCode() throws NoSuchFieldException {
-        DoctorRegisterRequest request = JsonUtils.parseObject(
-                "{\"userType\":\"01\"}", DoctorRegisterRequest.class);
+        UserRegisterRequest request = JsonUtils.parseObject(
+                "{\"userType\":\"01\"}", UserRegisterRequest.class);
 
         assertEquals(UserTypeEnums.class,
-                DoctorRegisterRequest.class.getDeclaredField("userType").getType());
+                UserRegisterRequest.class.getDeclaredField("userType").getType());
         assertEquals(UserTypeEnums.DOCTOR, request.getUserType());
     }
 }
