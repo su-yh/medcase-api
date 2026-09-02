@@ -7,7 +7,6 @@ import com.medcase.storage.enums.FileBusinessEnums;
 import com.medcase.storage.pojo.FileAttachment;
 import com.medcase.storage.service.FileStorageService;
 import com.medcase.system.event.UserAvatarUploadedEvent;
-import com.medcase.common.annotation.Anonymous;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.ApplicationContext;
 import org.springframework.mock.web.MockMultipartFile;
@@ -26,40 +25,6 @@ import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
 
 class FileStorageControllerTest {
-    @Test
-    void doctorRegistrationUploadIsAnonymousAndUsesFixedUserIdentity() throws Exception {
-        FileStorageService fileStorageService = mock(FileStorageService.class);
-        FileStorageController controller = controller(fileStorageService);
-        MockMultipartFile file = new MockMultipartFile(
-                "file", "id-card.png", "image/png", "content".getBytes());
-        FileAttachment attachment = new FileAttachment();
-        attachment.setFilePath("case-register/20260829-01-0/id-card.png");
-        when(fileStorageService.upload(
-                file, FileBusinessEnums.CASE_REGISTER, UserTypeEnums.DOCTOR, 0L))
-                .thenReturn(attachment);
-
-        Method method = FileStorageController.class.getDeclaredMethod(
-                "uploadCaseRegistration", UserTypeEnums.class,
-                org.springframework.web.multipart.MultipartFile.class);
-
-        assertNotNull(method.getAnnotation(Anonymous.class));
-        PostMapping postMapping = method.getAnnotation(PostMapping.class);
-        assertNotNull(postMapping);
-        assertEquals("/upload/case-register", postMapping.value()[0]);
-        RequestParam userTypeParameter = method.getParameters()[0].getAnnotation(RequestParam.class);
-        assertNotNull(userTypeParameter);
-        assertEquals("userType", userTypeParameter.value());
-        RequestParam fileParameter = method.getParameters()[1].getAnnotation(RequestParam.class);
-        assertNotNull(fileParameter);
-        assertEquals("file", fileParameter.value());
-
-        FileAttachment result = (FileAttachment) method.invoke(controller, UserTypeEnums.DOCTOR, file);
-
-        assertEquals(attachment, result);
-        verify(fileStorageService).upload(
-                file, FileBusinessEnums.CASE_REGISTER, UserTypeEnums.DOCTOR, 0L);
-    }
-
     @Test
     void uploadUsesCaseBusinessFromQueryParameter() throws Exception {
         FileStorageService fileStorageService = mock(FileStorageService.class);

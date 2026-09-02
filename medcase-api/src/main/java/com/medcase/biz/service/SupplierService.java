@@ -40,11 +40,11 @@ public class SupplierService {
     @Transactional(rollbackFor = Exception.class)
     public void create(SupplierSaveRequest request, String username) {
         validateStatus(request.getStatus());
-        String nickName = request.getNickName().trim();
-        ensureNickNameUnique(null, nickName);
+        String name = request.getName().trim();
+        ensureNameUnique(null, name);
 
         SupplierEntity entity = toEntity(request);
-        entity.setNickName(nickName);
+        entity.setName(name);
         entity.setCreateBy(username);
         if (supplierMapper.insert(entity) <= 0) {
             throw ExceptionUtil.business(ErrorCodeEnums.SUPPLIER_OPERATION_FAILED);
@@ -58,11 +58,11 @@ public class SupplierService {
         }
 
         validateStatus(request.getStatus());
-        String nickName = request.getNickName().trim();
-        ensureNickNameUnique(request.getSupplierId(), nickName);
+        String name = request.getName().trim();
+        ensureNameUnique(request.getSupplierId(), name);
 
         SupplierEntity entity = toEntity(request);
-        entity.setNickName(nickName);
+        entity.setName(name);
         entity.setUpdateBy(username);
         if (supplierMapper.updateById(entity) <= 0) {
             throw ExceptionUtil.business(ErrorCodeEnums.SUPPLIER_OPERATION_FAILED);
@@ -88,9 +88,9 @@ public class SupplierService {
         }
     }
 
-    private void ensureNickNameUnique(Long supplierId, String nickName) {
-        if (supplierMapper.existsByNickName(nickName, supplierId)) {
-            throw ExceptionUtil.business(ErrorCodeEnums.SUPPLIER_NICKNAME_EXISTS, nickName);
+    private void ensureNameUnique(Long supplierId, String name) {
+        if (supplierMapper.existsByName(name, supplierId)) {
+            throw ExceptionUtil.business(ErrorCodeEnums.SUPPLIER_NICKNAME_EXISTS, name);
         }
     }
 

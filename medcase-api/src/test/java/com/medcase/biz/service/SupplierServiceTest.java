@@ -58,9 +58,9 @@ class SupplierServiceTest {
     }
 
     @Test
-    void createRejectsDuplicateNickname() {
+    void createRejectsDuplicateName() {
         SupplierSaveRequest request = validRequest();
-        when(supplierMapper.existsByNickName("供应商A", null)).thenReturn(true);
+        when(supplierMapper.existsByName("供应商A", null)).thenReturn(true);
 
         AbstractBusinessException exception = assertThrows(
                 AbstractBusinessException.class,
@@ -72,7 +72,7 @@ class SupplierServiceTest {
 
     private SupplierSaveRequest validRequest() {
         SupplierSaveRequest request = new SupplierSaveRequest();
-        request.setNickName("供应商A");
+        request.setName("供应商A");
         request.setSex("0");
         request.setPhone("13800000000");
         request.setIdCardNumber("110101199001011234");

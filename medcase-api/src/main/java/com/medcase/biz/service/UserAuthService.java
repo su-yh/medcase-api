@@ -1,7 +1,6 @@
 package com.medcase.biz.service;
 
 import com.medcase.biz.domain.UserEntity;
-import com.medcase.biz.domain.SupplierEntity;
 import com.medcase.biz.mapper.SupplierMapper;
 import com.medcase.biz.mapper.UserMapper;
 import com.medcase.biz.request.UserLoginRequest;
@@ -40,8 +39,6 @@ import java.util.Set;
 public class UserAuthService {
     private final UserMapper userMapper;
 
-    private final SupplierMapper supplierMapper;
-
     private final SysLoginService loginService;
 
     private final SysPermissionService permissionService;
@@ -62,11 +59,6 @@ public class UserAuthService {
         UserTypeEnums userType = registerBody.getUserType();
         log.info("user register request, username={}", username);
 
-        SupplierEntity supplier = supplierMapper.selectEnabledById(registerBody.getSupplierId());
-        if (supplier == null) {
-            throw ExceptionUtil.business(ErrorCodeEnums.USER_REGISTER_SUPPLIER_INVALID);
-        }
-
         if (userMapper.usernameExists(username, userType)) {
             throw ExceptionUtil.business(ErrorCodeEnums.USER_REGISTER_USER_EXISTS, username);
         }
@@ -79,17 +71,6 @@ public class UserAuthService {
         user.setUserName(username);
         user.setUserType(userType);
         user.setPhonenumber(phone);
-        user.setSupplierId(registerBody.getSupplierId());
-
-        user.setNickName(registerBody.getNickName().trim());
-        user.setSex(registerBody.getSex().trim());
-        user.setIdCardNumber(registerBody.getIdCardNumber().trim());
-        if (userType == UserTypeEnums.DOCTOR) {
-            user.setTitle(registerBody.getTitle().trim());
-            user.setQualificationCertificate(registerBody.getQualificationCertificate());
-        }
-        user.setIdCardFront(registerBody.getIdCardFront());
-        user.setIdCardBack(registerBody.getIdCardBack());
         user.setReviewReason(null);
         user.setStatus(UserStatusEnums.REGISTER);
         user.setPwdUpdateDate(DateUtils.getNowDate());
@@ -104,17 +85,6 @@ public class UserAuthService {
         Set<ConstraintViolation<UserRegisterRequest>> violations = validator.validate(request);
         if (!violations.isEmpty()) {
             throw new ConstraintViolationException(violations);
-        }
-
-        UserTypeEnums userType = request.getUserType();
-        if (userType != UserTypeEnums.DOCTOR && userType != UserTypeEnums.PATIENT) {
-            throw ExceptionUtil.business(ErrorCodeEnums.USER_TYPE_NOT_MATCH);
-        }
-        if (userType == UserTypeEnums.DOCTOR) {
-            violations = validator.validate(request, ValidationGroups.Doctor.Submit.class);
-            if (!violations.isEmpty()) {
-                throw new ConstraintViolationException(violations);
-            }
         }
     }
 

@@ -124,6 +124,16 @@ public class CaseService {
         return result;
     }
 
+    public PageResult<CaseVO> pageByUser(Long userId, PageParam pageParam, CasePageRequest request) {
+        PageResult<CaseEntity> pageResult = caseMapper.selectCasePage(pageParam, userId, request);
+        PageResult<CaseVO> result = new PageResult<>();
+        result.setTotal(pageResult.getTotal());
+        result.setList(pageResult.getList().stream()
+                .map(CaseVO::fromEntity)
+                .collect(Collectors.toList()));
+        return result;
+    }
+
     public CaseVO detail(LoginUser user, Long id) {
         UserTypeEnums userType = user.getUser().getUserType();
         CaseEntity entity = caseMapper.selectById(id);

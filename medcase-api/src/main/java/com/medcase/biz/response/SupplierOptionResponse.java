@@ -10,12 +10,12 @@ import lombok.Data;
 public class SupplierOptionResponse {
     private Long id;
 
-    private String nickName;
+    private String name;
 
     public static SupplierOptionResponse fromEntity(SupplierEntity entity) {
         SupplierOptionResponse response = new SupplierOptionResponse();
         response.setId(entity.getId());
-        response.setNickName(entity.getNickName());
+        response.setName(entity.getName());
         return response;
     }
 }

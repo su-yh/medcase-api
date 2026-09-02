@@ -28,4 +28,16 @@ public interface CaseMapper extends BaseMapperX<CaseEntity> {
         queryWrapper.orderByDesc(CaseEntity::getCreateTime);
         return selectPage(pageParam, queryWrapper);
     }
+
+    default PageResult<CaseEntity> selectCasePage(
+            PageParam pageParam, Long userId, CasePageRequest request) {
+        LambdaQueryWrapperX<CaseEntity> queryWrapper = build();
+        queryWrapper.eq(CaseEntity::getUserId, userId);
+        queryWrapper.likeIfPresent(CaseEntity::getCaseName, request.getCaseNameLike());
+        queryWrapper.eqIfPresent(CaseEntity::getStatus, request.getStatus());
+        queryWrapper.geIfPresent(CaseEntity::getCreateTime, request.getCreateTimeLowerBound());
+        queryWrapper.ltIfPresent(CaseEntity::getCreateTime, request.getCreateTimeUpperBound());
+        queryWrapper.orderByDesc(CaseEntity::getCreateTime);
+        return selectPage(pageParam, queryWrapper);
+    }
 }

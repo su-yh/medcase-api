@@ -20,20 +20,20 @@ public interface SupplierMapper extends BaseMapperX<SupplierEntity> {
 
     default PageResult<SupplierEntity> selectPage(PageParam pageParam, SupplierQuery query) {
         LambdaQueryWrapperX<SupplierEntity> queryWrapper = build()
-                .likeIfPresent(SupplierEntity::getNickName, query.getNickName())
+                .likeIfPresent(SupplierEntity::getName, query.getName())
                 .likeIfPresent(SupplierEntity::getPhonenumber, query.getPhone())
                 .eqIfPresent(SupplierEntity::getStatus, query.getStatus())
                 .orderByDesc(SupplierEntity::getCreateTime);
         return selectPage(pageParam, queryWrapper);
     }
 
-    default boolean existsByNickName(String nickName, Long id) {
-        if (!StringUtils.hasText(nickName)) {
+    default boolean existsByName(String name, Long id) {
+        if (!StringUtils.hasText(name)) {
             return false;
         }
 
         LambdaQueryWrapperX<SupplierEntity> queryWrapper = build()
-                .eq(SupplierEntity::getNickName, nickName)
+                .eq(SupplierEntity::getName, name)
                 .neIfPresent(SupplierEntity::getId, id);
         return exists(queryWrapper);
     }
@@ -50,7 +50,7 @@ public interface SupplierMapper extends BaseMapperX<SupplierEntity> {
     default List<SupplierEntity> selectEnabledList() {
         return selectList(build()
                 .eq(SupplierEntity::getStatus, UserConstants.NORMAL)
-                .orderByAsc(SupplierEntity::getNickName)
+                .orderByAsc(SupplierEntity::getName)
                 .orderByAsc(SupplierEntity::getId));
     }
 }

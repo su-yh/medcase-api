@@ -40,6 +40,14 @@ public interface UserMapper extends BaseMapperX<UserEntity> {
         return exists(queryWrapper);
     }
 
+    default UserEntity selectUserById(Long userId) {
+        if (userId == null) {
+            return null;
+        }
+
+        return selectById(userId);
+    }
+
     default UserEntity selectUserByUsername(String username, UserTypeEnums userType) {
         if (!StringUtils.hasText(username)) {
             return null;
@@ -62,9 +70,20 @@ public interface UserMapper extends BaseMapperX<UserEntity> {
         return selectOne(queryWrapper);
     }
 
+    default PageResult<UserEntity> selectUserPage(PageParam pageParam, @NonNull UserQuery query) {
+        LambdaQueryWrapperX<UserEntity> queryWrapper = build();
+        queryWrapper.eqIfPresent(UserEntity::getSupplierId, query.getSupplierId());
+        queryWrapper.likeIfPresent(UserEntity::getNickName, query.getNickName());
+        queryWrapper.likeIfPresent(UserEntity::getPhonenumber, query.getPhone());
+        queryWrapper.eqIfPresent(UserEntity::getStatus, query.getStatus());
+        queryWrapper.orderByDesc(UserEntity::getCreateTime);
+        return selectPage(pageParam, queryWrapper);
+    }
+
     default PageResult<UserEntity> selectUserPage(
             PageParam pageParam, @NonNull UserQuery query, UserTypeEnums userType) {
         LambdaQueryWrapperX<UserEntity> queryWrapper = build();
+        queryWrapper.eqIfPresent(UserEntity::getSupplierId, query.getSupplierId());
         queryWrapper.eq(UserEntity::getUserType, userType);
         queryWrapper.likeIfPresent(UserEntity::getNickName, query.getNickName());
         queryWrapper.likeIfPresent(UserEntity::getPhonenumber, query.getPhone());

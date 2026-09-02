@@ -9,6 +9,8 @@ import lombok.Data;
  */
 @Data
 public class UserQuery {
+    private Long supplierId;
+
     private String nickName;
 
     private String phone;

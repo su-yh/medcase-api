@@ -1,6 +1,7 @@
 package com.medcase.biz.domain;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.medcase.mp.entity.AbstractBaseEntity;
@@ -16,7 +17,8 @@ public class SupplierEntity extends AbstractBaseEntity {
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
-    private String nickName;
+    @TableField("nick_name")
+    private String name;
 
     private String sex;
 

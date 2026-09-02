@@ -1,6 +1,5 @@
 package com.medcase.web.controller.file;
 
-import com.medcase.common.annotation.Anonymous;
 import com.medcase.mvc.response.annotation.WrapperResponseAdvice;
 import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.common.enums.UserTypeEnums;
@@ -50,14 +49,6 @@ public class FileStorageController {
                     this, loginUser, attachment));
         }
         return attachment;
-    }
-
-    @Anonymous
-    @PostMapping("/upload/case-register")
-    public FileAttachment uploadCaseRegistration(
-            @RequestParam("userType") UserTypeEnums userType,
-            @RequestParam("file") MultipartFile file) {
-        return fileStorageService.upload(file, FileBusinessEnums.CASE_REGISTER, userType, 0L);
     }
 
     @GetMapping("/download")

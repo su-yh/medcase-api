@@ -7,7 +7,7 @@ import lombok.Data;
  */
 @Data
 public class SupplierQuery {
-    private String nickName;
+    private String name;
 
     private String phone;
 

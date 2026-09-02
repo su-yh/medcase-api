@@ -8,6 +8,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.medcase.biz.domain.UserEntity;
+import com.medcase.biz.domain.SupplierEntity;
+import com.medcase.biz.mapper.SupplierMapper;
 import com.medcase.biz.mapper.UserMapper;
 import com.medcase.biz.request.UserProfileSubmitRequest;
 import com.medcase.biz.response.UserProfileVO;
@@ -34,11 +36,15 @@ class UserProfileServiceTest {
     @Mock
     private UserMapper userMapper;
 
+    @Mock
+    private SupplierMapper supplierMapper;
+
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
         validator = Validation.buildDefaultValidatorFactory().getValidator();
-        userProfileService = new UserProfileService(userMapper, validator);
+        userProfileService = new UserProfileService(userMapper, supplierMapper, validator);
+        when(supplierMapper.selectEnabledById(1L)).thenReturn(enabledSupplier());
     }
 
     @Test
@@ -72,13 +78,11 @@ class UserProfileServiceTest {
         when(userMapper.selectUserById(12L, UserTypeEnums.DOCTOR)).thenReturn(doctor);
         when(userMapper.updateById(doctor)).thenReturn(1);
         UserProfileSubmitRequest request = request("张医生", "13800000000");
-        request.setSex("1");
-
         userProfileService.submit(loginUser(), request);
 
         assertEquals("张医生", doctor.getNickName());
-        assertEquals("1", doctor.getSex());
         assertEquals("13800000000", doctor.getPhonenumber());
+        assertEquals(1L, doctor.getSupplierId());
         assertEquals(UserStatusEnums.PENDING_REVIEW, doctor.getStatus());
         verify(userMapper).updateById(doctor);
     }
@@ -145,9 +149,9 @@ class UserProfileServiceTest {
     private UserProfileSubmitRequest request(String nickName, String phone) {
         UserProfileSubmitRequest request = new UserProfileSubmitRequest();
         request.setNickName(nickName);
-        request.setSex("1");
         request.setPhone(phone);
         request.setIdCardNumber("110101199001011234");
+        request.setSupplierId(1L);
         request.setTitle("主治医师");
         request.setIdCardFront(attachment("front"));
         request.setIdCardBack(attachment("back"));
@@ -182,5 +186,12 @@ class UserProfileServiceTest {
         doctor.setUserType(UserTypeEnums.DOCTOR);
         doctor.setStatus(status);
         return doctor;
+    }
+
+    private SupplierEntity enabledSupplier() {
+        SupplierEntity supplier = new SupplierEntity();
+        supplier.setId(1L);
+        supplier.setStatus("0");
+        return supplier;
     }
 }

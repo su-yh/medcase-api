@@ -45,7 +45,7 @@ create table sys_user (
   user_id           bigint      not null auto_increment    comment '用户ID',
   dept_id           bigint      default null               comment '部门ID',
   user_name         varchar(30)     not null                   comment '用户账号',
-  nick_name         varchar(30)     not null                   comment '用户昵称',
+  nick_name         varchar(30)                                comment '用户昵称',
   user_type         varchar(2)                                  comment '用户类型（00后台用户，01医生，02患者）',
   id_card_number    varchar(30)     default null               comment '身份证号码',
   id_card_front     text            default null               comment '身份证正面图片附件JSON',

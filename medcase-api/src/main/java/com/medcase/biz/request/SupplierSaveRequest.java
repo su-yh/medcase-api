@@ -12,9 +12,9 @@ import lombok.Data;
 public class SupplierSaveRequest {
     private Long supplierId;
 
-    @NotBlank(message = "供应商昵称不能为空")
-    @Size(max = 30, message = "供应商昵称不能超过30个字符")
-    private String nickName;
+    @NotBlank(message = "供应商姓名不能为空")
+    @Size(max = 30, message = "供应商姓名不能超过30个字符")
+    private String name;
 
     @NotBlank(message = "供应商性别不能为空")
     private String sex;

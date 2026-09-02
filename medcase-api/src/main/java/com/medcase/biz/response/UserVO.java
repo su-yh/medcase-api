@@ -3,6 +3,7 @@ package com.medcase.biz.response;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.medcase.biz.domain.UserEntity;
 import com.medcase.storage.pojo.FileAttachment;
+import com.medcase.common.enums.UserTypeEnums;
 import lombok.Data;
 
 import java.util.Date;
@@ -23,6 +24,10 @@ public class UserVO {
     private String idCardNumber;
 
     private String title;
+
+    private UserTypeEnums userType;
+
+    private Long supplierId;
 
     private FileAttachment idCardFront;
 
@@ -48,6 +53,8 @@ public class UserVO {
         result.setSex(user.getSex());
         result.setIdCardNumber(user.getIdCardNumber());
         result.setTitle(user.getTitle());
+        result.setUserType(user.getUserType());
+        result.setSupplierId(user.getSupplierId());
         result.setIdCardFront(user.getIdCardFront());
         result.setIdCardBack(user.getIdCardBack());
         result.setQualificationCertificate(user.getQualificationCertificate());

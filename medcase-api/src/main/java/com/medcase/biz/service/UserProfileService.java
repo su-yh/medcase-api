@@ -1,6 +1,8 @@
 package com.medcase.biz.service;
 
 import com.medcase.biz.domain.UserEntity;
+import com.medcase.biz.domain.SupplierEntity;
+import com.medcase.biz.mapper.SupplierMapper;
 import com.medcase.biz.mapper.UserMapper;
 import com.medcase.biz.request.UserProfileSubmitRequest;
 import com.medcase.biz.response.UserProfileVO;
@@ -28,6 +30,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class UserProfileService {
     private final UserMapper userMapper;
+    private final SupplierMapper supplierMapper;
 
     private final Validator validator;
 
@@ -39,14 +42,18 @@ public class UserProfileService {
     public void submit(LoginUser user, UserProfileSubmitRequest request) {
         UserEntity userEntity = requireUser(user);
         validateSubmitRequest(request, userEntity.getUserType());
+        SupplierEntity supplier = supplierMapper.selectEnabledById(request.getSupplierId());
+        if (supplier == null) {
+            throw ExceptionUtil.business(ErrorCodeEnums.USER_REGISTER_SUPPLIER_INVALID);
+        }
         if (userEntity.getStatus() != UserStatusEnums.REGISTER
                 && userEntity.getStatus() != UserStatusEnums.REVIEW_FAILED) {
             throw ExceptionUtil.business(ErrorCodeEnums.USER_PROFILE_SUBMIT_STATUS_NOT_MATCH);
         }
 
         userEntity.setNickName(request.getNickName().trim());
-        userEntity.setSex(request.getSex().trim());
         userEntity.setPhonenumber(request.getPhone().trim());
+        userEntity.setSupplierId(request.getSupplierId());
         userEntity.setIdCardNumber(request.getIdCardNumber().trim());
         userEntity.setIdCardFront(request.getIdCardFront());
         userEntity.setIdCardBack(request.getIdCardBack());

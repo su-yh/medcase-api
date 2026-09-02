@@ -12,7 +12,7 @@ import java.util.Date;
 public class SupplierResponse {
     private Long id;
 
-    private String nickName;
+    private String name;
 
     private String sex;
 
@@ -37,7 +37,7 @@ public class SupplierResponse {
     public static SupplierResponse fromEntity(SupplierEntity entity) {
         SupplierResponse response = new SupplierResponse();
         response.setId(entity.getId());
-        response.setNickName(entity.getNickName());
+        response.setName(entity.getName());
         response.setSex(entity.getSex());
         response.setPhone(entity.getPhonenumber());
         response.setEmail(entity.getEmail());

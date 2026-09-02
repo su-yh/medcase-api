@@ -43,6 +43,16 @@ public class UserService {
         return result;
     }
 
+    public PageResult<UserVO> page(PageParam pageParam, @NonNull UserQuery query) {
+        PageResult<UserEntity> pageResult = userMapper.selectUserPage(pageParam, query);
+        PageResult<UserVO> result = new PageResult<>();
+        result.setTotal(pageResult.getTotal());
+        result.setList(pageResult.getList().stream()
+                .map(UserVO::fromEntity)
+                .collect(Collectors.toList()));
+        return result;
+    }
+
     public UserVO detail(Long userId) {
         return detail(userId, UserTypeEnums.DOCTOR);
     }
@@ -57,6 +67,15 @@ public class UserService {
             return null;
         }
         return UserVO.fromEntity(user);
+    }
+
+    public UserVO detailAny(Long userId) {
+        if (userId == null) {
+            return null;
+        }
+
+        UserEntity user = userMapper.selectUserById(userId);
+        return user == null ? null : UserVO.fromEntity(user);
     }
 
     @Transactional(rollbackFor = Exception.class)

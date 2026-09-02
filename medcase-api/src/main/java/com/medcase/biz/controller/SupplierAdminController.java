@@ -1,12 +1,18 @@
 package com.medcase.biz.controller;
 
 import com.medcase.biz.domain.SupplierEntity;
+import com.medcase.biz.request.CasePageRequest;
 import com.medcase.biz.request.SupplierQuery;
 import com.medcase.biz.request.SupplierSaveRequest;
 import com.medcase.biz.request.SupplierStatusRequest;
+import com.medcase.biz.request.UserQuery;
 import com.medcase.biz.response.SupplierOptionResponse;
 import com.medcase.biz.response.SupplierResponse;
+import com.medcase.biz.response.UserVO;
+import com.medcase.biz.response.CaseVO;
+import com.medcase.biz.service.CaseService;
 import com.medcase.biz.service.SupplierService;
+import com.medcase.biz.service.UserService;
 import com.medcase.common.core.controller.BaseController;
 import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
@@ -29,6 +35,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/biz/supplier")
 public class SupplierAdminController extends BaseController {
     private final SupplierService supplierService;
+    private final UserService userService;
+    private final CaseService caseService;
 
     @PreAuthorize("@ss.hasPermi('supplier:list')")
     @GetMapping("/list")
@@ -67,5 +75,31 @@ public class SupplierAdminController extends BaseController {
             @PathVariable Long supplierId,
             @Valid @RequestBody SupplierStatusRequest request) {
         supplierService.updateStatus(supplierId, request, getUsername());
+    }
+
+    @PreAuthorize("@ss.hasPermi('supplier:query')")
+    @GetMapping("/{supplierId}/users")
+    public PageResult<UserVO> userList(
+            @PathVariable Long supplierId, PageParam pageParam, UserQuery query) {
+        query.setSupplierId(supplierId);
+        return userService.page(pageParam, query);
+    }
+
+    @PreAuthorize("@ss.hasPermi('supplier:query')")
+    @GetMapping("/{supplierId}/users/{userId}/cases")
+    public PageResult<CaseVO> caseList(
+            @PathVariable Long supplierId,
+            @PathVariable Long userId,
+            PageParam pageParam,
+            CasePageRequest request) {
+        SupplierEntity supplier = supplierService.detail(supplierId);
+        if (supplier == null) {
+            return PageResult.empty();
+        }
+        UserVO user = userService.detailAny(userId);
+        if (user == null || user.getSupplierId() == null || !user.getSupplierId().equals(supplierId)) {
+            return PageResult.empty();
+        }
+        return caseService.pageByUser(userId, pageParam, request);
     }
 }

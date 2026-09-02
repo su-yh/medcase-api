@@ -23,6 +23,8 @@ public class UserProfileVO {
 
     private UserTypeEnums userType;
 
+    private Long supplierId;
+
     private String idCardNumber;
 
     private String title;
@@ -44,6 +46,7 @@ public class UserProfileVO {
         result.setSex(user.getSex());
         result.setPhone(user.getPhonenumber());
         result.setUserType(user.getUserType());
+        result.setSupplierId(user.getSupplierId());
         result.setIdCardNumber(user.getIdCardNumber());
         result.setTitle(user.getTitle());
         result.setIdCardFront(user.getIdCardFront());
