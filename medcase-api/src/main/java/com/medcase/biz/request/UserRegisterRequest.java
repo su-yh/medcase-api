@@ -52,8 +52,8 @@ public class UserRegisterRequest {
     @Size(max = 30, message = "职称不能超过30个字符", groups = ValidationGroups.Doctor.Submit.class)
     private String title;
 
-    @NotBlank(message = "邀请人不能为空")
-    private String inviteCode;
+    @NotNull(message = "邀请人不能为空")
+    private Long supplierId;
 
     @NotNull(message = "身份证正面图片不能为空")
     private FileAttachment idCardFront;

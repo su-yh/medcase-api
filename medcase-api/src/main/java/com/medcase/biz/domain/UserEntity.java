@@ -31,6 +31,8 @@ public class UserEntity extends AbstractBaseEntity {
 
     private String nickName;
 
+    private Long supplierId;
+
     private String sex;
 
     private String idCardNumber;

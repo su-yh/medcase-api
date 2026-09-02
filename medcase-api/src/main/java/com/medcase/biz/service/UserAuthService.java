@@ -1,6 +1,8 @@
 package com.medcase.biz.service;
 
 import com.medcase.biz.domain.UserEntity;
+import com.medcase.biz.domain.SupplierEntity;
+import com.medcase.biz.mapper.SupplierMapper;
 import com.medcase.biz.mapper.UserMapper;
 import com.medcase.biz.request.UserLoginRequest;
 import com.medcase.biz.request.UserRegisterRequest;
@@ -36,9 +38,9 @@ import java.util.Set;
 @RequiredArgsConstructor
 @Slf4j
 public class UserAuthService {
-    private static final String REGISTER_INVITE_CODE = "9999";
-
     private final UserMapper userMapper;
+
+    private final SupplierMapper supplierMapper;
 
     private final SysLoginService loginService;
 
@@ -60,8 +62,9 @@ public class UserAuthService {
         UserTypeEnums userType = registerBody.getUserType();
         log.info("user register request, username={}", username);
 
-        if (!REGISTER_INVITE_CODE.equals(registerBody.getInviteCode())) {
-            throw ExceptionUtil.business(ErrorCodeEnums.USER_REGISTER_INVITE_CODE_INVALID);
+        SupplierEntity supplier = supplierMapper.selectEnabledById(registerBody.getSupplierId());
+        if (supplier == null) {
+            throw ExceptionUtil.business(ErrorCodeEnums.USER_REGISTER_SUPPLIER_INVALID);
         }
 
         if (userMapper.usernameExists(username, userType)) {
@@ -76,6 +79,7 @@ public class UserAuthService {
         user.setUserName(username);
         user.setUserType(userType);
         user.setPhonenumber(phone);
+        user.setSupplierId(registerBody.getSupplierId());
 
         user.setNickName(registerBody.getNickName().trim());
         user.setSex(registerBody.getSex().trim());

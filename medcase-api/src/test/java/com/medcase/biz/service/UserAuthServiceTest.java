@@ -1,7 +1,9 @@
 package com.medcase.biz.service;
 
 import com.medcase.biz.domain.UserEntity;
+import com.medcase.biz.domain.SupplierEntity;
 import com.medcase.biz.mapper.UserMapper;
+import com.medcase.biz.mapper.SupplierMapper;
 import com.medcase.biz.request.UserLoginRequest;
 import com.medcase.biz.request.UserRegisterRequest;
 import com.medcase.common.core.domain.entity.SysUser;
@@ -50,6 +52,9 @@ class UserAuthServiceTest {
     private UserMapper userMapper;
 
     @Mock
+    private SupplierMapper supplierMapper;
+
+    @Mock
     private com.medcase.framework.web.service.SysLoginService loginService;
 
     @Mock
@@ -65,8 +70,10 @@ class UserAuthServiceTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
         validator = Validation.buildDefaultValidatorFactory().getValidator();
+        when(supplierMapper.selectEnabledById(1L)).thenReturn(enabledSupplier());
         userAuthService = new UserAuthService(
-                userMapper, loginService, permissionService, tokenService, smsCodeService, validator);
+                userMapper, supplierMapper, loginService, permissionService,
+                tokenService, smsCodeService, validator);
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.setRemoteAddr("127.0.0.1");
         RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
@@ -81,7 +88,7 @@ class UserAuthServiceTest {
     @Test
     void registerInsertsUserWithEncryptedPassword() {
         UserRegisterRequest registerRequest = registerRequest(
-                "doctor01", "secret123", "13800000000", "9999");
+                "doctor01", "secret123", "13800000000", 1L);
         when(userMapper.usernameExists("doctor01", UserTypeEnums.DOCTOR)).thenReturn(false);
         when(userMapper.phoneExists("13800000000", UserTypeEnums.DOCTOR)).thenReturn(false);
         when(userMapper.insert(any(UserEntity.class))).thenReturn(1);
@@ -116,7 +123,7 @@ class UserAuthServiceTest {
     @Test
     void registerRejectsDuplicateUsername() {
         UserRegisterRequest registerRequest = registerRequest(
-                "doctor01", "secret123", "13800000000", "9999");
+                "doctor01", "secret123", "13800000000", 1L);
         when(userMapper.usernameExists("doctor01", UserTypeEnums.DOCTOR)).thenReturn(true);
 
         AbstractBusinessException exception = assertThrows(AbstractBusinessException.class, () -> userAuthService.register(registerRequest));
@@ -129,7 +136,7 @@ class UserAuthServiceTest {
     @Test
     void registerRejectsEmptyUsername() {
         UserRegisterRequest registerRequest = registerRequest(
-                "", "secret123", "13800000000", "9999");
+                null, "secret123", "13800000000", 1L);
 
         ConstraintViolationException exception = assertThrows(
                 ConstraintViolationException.class, () -> userAuthService.register(registerRequest));
@@ -141,7 +148,7 @@ class UserAuthServiceTest {
     @Test
     void registerRejectsEmptyPassword() {
         UserRegisterRequest registerRequest = registerRequest(
-                "doctor01", "", "13800000000", "9999");
+                "doctor01", null, "13800000000", 1L);
 
         ConstraintViolationException exception = assertThrows(
                 ConstraintViolationException.class, () -> userAuthService.register(registerRequest));
@@ -153,7 +160,7 @@ class UserAuthServiceTest {
     @Test
     void registerRejectsInvalidUsernameLength() {
         UserRegisterRequest registerRequest = registerRequest(
-                "d", "secret123", "13800000000", "9999");
+                "d", "secret123", "13800000000", 1L);
 
         ConstraintViolationException exception = assertThrows(
                 ConstraintViolationException.class, () -> userAuthService.register(registerRequest));
@@ -165,7 +172,7 @@ class UserAuthServiceTest {
     @Test
     void registerRejectsInvalidPasswordLength() {
         UserRegisterRequest registerRequest = registerRequest(
-                "doctor01", "1234", "13800000000", "9999");
+                "doctor01", "1234", "13800000000", 1L);
 
         ConstraintViolationException exception = assertThrows(
                 ConstraintViolationException.class, () -> userAuthService.register(registerRequest));
@@ -177,7 +184,7 @@ class UserAuthServiceTest {
     @Test
     void registerRejectsInsertFailure() {
         UserRegisterRequest registerRequest = registerRequest(
-                "doctor01", "secret123", "13800000000", "9999");
+                "doctor01", "secret123", "13800000000", 1L);
         when(userMapper.usernameExists("doctor01", UserTypeEnums.DOCTOR)).thenReturn(false);
         when(userMapper.phoneExists("13800000000", UserTypeEnums.DOCTOR)).thenReturn(false);
         when(userMapper.insert(any(UserEntity.class))).thenReturn(0);
@@ -191,7 +198,7 @@ class UserAuthServiceTest {
     @Test
     void registerRejectsEmptyPhone() {
         UserRegisterRequest registerRequest = registerRequest(
-                "doctor01", "secret123", "", "9999");
+                "doctor01", "secret123", null, 1L);
 
         ConstraintViolationException exception = assertThrows(
                 ConstraintViolationException.class,
@@ -204,8 +211,8 @@ class UserAuthServiceTest {
     @Test
     void registerRejectsEmptySex() {
         UserRegisterRequest registerRequest = registerRequest(
-                "doctor01", "secret123", "13800000000", "9999");
-        registerRequest.setSex("");
+                "doctor01", "secret123", "13800000000", 1L);
+        registerRequest.setSex(null);
 
         ConstraintViolationException exception = assertThrows(
                 ConstraintViolationException.class,
@@ -216,22 +223,36 @@ class UserAuthServiceTest {
     }
 
     @Test
-    void registerRejectsInvalidInviteCode() {
+    void registerRejectsInvalidSupplier() {
         UserRegisterRequest registerRequest = registerRequest(
-                "doctor01", "secret123", "13800000000", "1234");
+                "doctor01", "secret123", "13800000000", 2L);
 
         AbstractBusinessException exception = assertThrows(
                 AbstractBusinessException.class,
                 () -> userAuthService.register(registerRequest));
 
-        assertEquals(ErrorCodeEnums.USER_REGISTER_INVITE_CODE_INVALID, exception.getEc());
+        assertEquals(ErrorCodeEnums.USER_REGISTER_SUPPLIER_INVALID, exception.getEc());
         verify(userMapper, never()).insert(any(UserEntity.class));
     }
 
     @Test
-    void registerRejectsEmptyInviteCode() {
+    void registerRejectsDisabledSupplier() {
         UserRegisterRequest registerRequest = registerRequest(
-                "doctor01", "secret123", "13800000000", "");
+                "doctor01", "secret123", "13800000000", 1L);
+        when(supplierMapper.selectEnabledById(1L)).thenReturn(null);
+
+        AbstractBusinessException exception = assertThrows(
+                AbstractBusinessException.class,
+                () -> userAuthService.register(registerRequest));
+
+        assertEquals(ErrorCodeEnums.USER_REGISTER_SUPPLIER_INVALID, exception.getEc());
+        verify(userMapper, never()).insert(any(UserEntity.class));
+    }
+
+    @Test
+    void registerRejectsEmptySupplierId() {
+        UserRegisterRequest registerRequest = registerRequest(
+                "doctor01", "secret123", "13800000000", null);
 
         ConstraintViolationException exception = assertThrows(
                 ConstraintViolationException.class,
@@ -242,9 +263,17 @@ class UserAuthServiceTest {
     }
 
     @Test
+    void registrationUsesSupplierIdInsteadOfInviteCode() throws NoSuchFieldException {
+        assertEquals(Long.class, UserRegisterRequest.class
+                .getDeclaredField("supplierId").getType());
+        assertThrows(NoSuchFieldException.class,
+                () -> UserRegisterRequest.class.getDeclaredField("inviteCode"));
+    }
+
+    @Test
     void registerRejectsMissingRegistrationAttachment() {
         UserRegisterRequest registerRequest = registerRequest(
-                "doctor01", "secret123", "13800000000", "9999");
+                "doctor01", "secret123", "13800000000", 1L);
         registerRequest.setIdCardFront(null);
 
         ConstraintViolationException exception = assertThrows(
@@ -258,7 +287,7 @@ class UserAuthServiceTest {
     @Test
     void registerRejectsDoctorWithoutQualificationByValidation() {
         UserRegisterRequest registerRequest = registerRequest(
-                "doctor01", "secret123", "13800000000", "9999");
+                "doctor01", "secret123", "13800000000", 1L);
         registerRequest.setQualificationCertificate(null);
 
         ConstraintViolationException exception = assertThrows(
@@ -272,7 +301,7 @@ class UserAuthServiceTest {
     @Test
     void registerPatientDoesNotRequireDoctorQualification() {
         UserRegisterRequest registerRequest = registerRequest(
-                "patient01", "secret123", "13800000000", "9999");
+                "patient01", "secret123", "13800000000", 1L);
         registerRequest.setUserType(UserTypeEnums.PATIENT);
         registerRequest.setTitle(null);
         registerRequest.setQualificationCertificate(null);
@@ -293,7 +322,7 @@ class UserAuthServiceTest {
     @Test
     void registerRejectsDuplicateDoctorPhone() {
         UserRegisterRequest registerRequest = registerRequest(
-                "doctor01", "secret123", "13800000000", "9999");
+                "doctor01", "secret123", "13800000000", 1L);
         when(userMapper.usernameExists("doctor01", UserTypeEnums.DOCTOR)).thenReturn(false);
         when(userMapper.phoneExists("13800000000", UserTypeEnums.DOCTOR)).thenReturn(true);
 
@@ -349,7 +378,7 @@ class UserAuthServiceTest {
     @Test
     void registerStoresUserProfileAndRegistrationAttachments() {
         UserRegisterRequest registerRequest = registerRequest(
-                "doctor01", "secret123", "13800000000", "9999");
+                "doctor01", "secret123", "13800000000", 1L);
         registerRequest.setNickName("张医生");
         registerRequest.setSex("1");
         registerRequest.setIdCardNumber("110101199001011234");
@@ -507,13 +536,13 @@ class UserAuthServiceTest {
     }
 
     private UserRegisterRequest registerRequest(
-            String username, String password, String phone, String inviteCode) {
+            String username, String password, String phone, Long supplierId) {
         UserRegisterRequest registerRequest = new UserRegisterRequest();
         registerRequest.setUsername(username);
         registerRequest.setPassword(password);
         registerRequest.setUserType(UserTypeEnums.DOCTOR);
         registerRequest.setPhone(phone);
-        registerRequest.setInviteCode(inviteCode);
+        registerRequest.setSupplierId(supplierId);
         registerRequest.setSmsCode("123456");
         registerRequest.setNickName("张医生");
         registerRequest.setSex("1");
@@ -523,6 +552,14 @@ class UserAuthServiceTest {
         registerRequest.setIdCardBack(attachment("id-card-back.png"));
         registerRequest.setQualificationCertificate(attachment("qualification.png"));
         return registerRequest;
+    }
+
+    private SupplierEntity enabledSupplier() {
+        SupplierEntity supplier = new SupplierEntity();
+        supplier.setId(1L);
+        supplier.setNickName("供应商A");
+        supplier.setStatus("0");
+        return supplier;
     }
 
     private FileAttachment attachment(String filename) {

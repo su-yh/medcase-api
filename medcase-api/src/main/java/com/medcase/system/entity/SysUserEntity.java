@@ -28,6 +28,8 @@ public class SysUserEntity extends AbstractBaseEntity {
 
     private String nickName;
 
+    private Long supplierId;
+
     private UserTypeEnums userType;
 
     private String idCardNumber;
