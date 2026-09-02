@@ -32,7 +32,7 @@ insert into sys_menu
      is_frame, is_cache, menu_type, visible, status, perms, icon, create_by,
      create_time, update_by, update_time, remark)
 values
-    (2014, '供应商管理', 2003, 400, 'supplier', 'biz/supplier/index', '', 'Supplier',
+    (2014, '供应商管理', 2003, 300, 'supplier', 'biz/supplier/index', '', 'Supplier',
      1, 0, 'C', '0', '0', 'supplier:list', 'user', 'admin', sysdate(), '', null, '供应商管理菜单');
 
 insert into sys_menu

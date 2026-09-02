@@ -13,7 +13,7 @@ insert into sys_menu
      is_frame, is_cache, menu_type, visible, status, perms, icon, create_by,
      create_time, update_by, update_time, remark)
 values
-    (2001, '病例管理', 2003, 300, 'case', null, '', '',
+    (2001, '病例管理', 2003, 400, 'case', null, '', '',
      1, 0, 'M', '0', '0', '', 'people', 'admin', sysdate(), '', null, '病例管理目录');
 
 insert into sys_menu
