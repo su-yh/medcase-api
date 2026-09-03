@@ -1,5 +1,6 @@
 package com.medcase.biz.request;
 
+import com.medcase.biz.enums.SupplierStatusEnums;
 import lombok.Data;
 
 /**
@@ -11,5 +12,5 @@ public class SupplierQuery {
 
     private String phone;
 
-    private String status;
+    private SupplierStatusEnums status;
 }

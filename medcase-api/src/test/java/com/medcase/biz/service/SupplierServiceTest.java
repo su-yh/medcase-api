@@ -1,6 +1,7 @@
 package com.medcase.biz.service;
 
 import com.medcase.biz.domain.SupplierEntity;
+import com.medcase.biz.enums.SupplierStatusEnums;
 import com.medcase.biz.mapper.SupplierMapper;
 import com.medcase.biz.request.SupplierSaveRequest;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
@@ -32,7 +33,7 @@ class SupplierServiceTest {
     @Test
     void createRejectsInvalidStatus() {
         SupplierSaveRequest request = validRequest();
-        request.setStatus("2");
+        request.setStatus(null);
 
         AbstractBusinessException exception = assertThrows(
                 AbstractBusinessException.class,
@@ -46,7 +47,7 @@ class SupplierServiceTest {
     void updateRejectsInvalidStatus() {
         SupplierSaveRequest request = validRequest();
         request.setSupplierId(1L);
-        request.setStatus("2");
+        request.setStatus(null);
         when(supplierMapper.selectById(1L)).thenReturn(new SupplierEntity());
 
         AbstractBusinessException exception = assertThrows(
@@ -76,7 +77,7 @@ class SupplierServiceTest {
         request.setSex("0");
         request.setPhone("13800000000");
         request.setIdCardNumber("110101199001011234");
-        request.setStatus("0");
+        request.setStatus(SupplierStatusEnums.NORMAL);
         return request;
     }
 }

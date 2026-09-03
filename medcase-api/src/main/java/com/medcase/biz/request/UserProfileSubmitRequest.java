@@ -3,6 +3,7 @@ package com.medcase.biz.request;
 import com.medcase.common.validation.groups.ValidationGroups;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import com.medcase.storage.pojo.FileAttachment;
 import lombok.Data;
@@ -20,6 +21,7 @@ public class UserProfileSubmitRequest {
 
     @NotBlank(message = "手机号不能为空")
     @Size(max = 20, message = "手机号不能超过20个字符")
+    @Pattern(regexp = "^1[3-9]\\d{9}$", message = "手机号格式不正确")
     private String phone;
 
     @NotBlank(message = "身份证号码不能为空")

@@ -4,12 +4,15 @@ import com.medcase.biz.domain.UserEntity;
 import com.medcase.biz.domain.SupplierEntity;
 import com.medcase.biz.mapper.SupplierMapper;
 import com.medcase.biz.mapper.UserMapper;
+import com.medcase.biz.request.UserProfilePasswordRequest;
+import com.medcase.biz.request.UserProfilePhoneRequest;
 import com.medcase.biz.request.UserProfileSubmitRequest;
 import com.medcase.biz.response.UserProfileVO;
 import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.common.enums.UserStatusEnums;
 import com.medcase.common.enums.UserTypeEnums;
 import com.medcase.common.validation.groups.ValidationGroups;
+import com.medcase.common.utils.SecurityUtils;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
 import jakarta.validation.ConstraintViolation;
@@ -36,6 +39,46 @@ public class UserProfileService {
 
     public UserProfileVO me(LoginUser user) {
         return UserProfileVO.fromEntity(requireUser(user));
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void updatePhone(LoginUser user, UserProfilePhoneRequest request) {
+        UserEntity userEntity = requireUser(user);
+        String phone = request.getPhone().trim();
+        if (phone.equals(userEntity.getPhonenumber())) {
+            return;
+        }
+        if (userMapper.phoneExists(phone, userEntity.getUserType())) {
+            throw ExceptionUtil.business(ErrorCodeEnums.PROFILE_PHONE_EXISTS);
+        }
+
+        userEntity.setPhonenumber(phone);
+        if (userMapper.updateById(userEntity) <= 0) {
+            throw ExceptionUtil.business(ErrorCodeEnums.PROFILE_UPDATE_FAILED);
+        }
+        if (user.getUser() != null) {
+            user.getUser().setPhonenumber(phone);
+        }
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void updatePassword(LoginUser user, UserProfilePasswordRequest request) {
+        UserEntity userEntity = requireUser(user);
+        if (!SecurityUtils.matchesPassword(request.getOldPassword(), userEntity.getPassword())) {
+            throw ExceptionUtil.business(ErrorCodeEnums.PROFILE_OLD_PASSWORD_INVALID);
+        }
+        if (SecurityUtils.matchesPassword(request.getNewPassword(), userEntity.getPassword())) {
+            throw ExceptionUtil.business(ErrorCodeEnums.PROFILE_PASSWORD_SAME);
+        }
+
+        String password = SecurityUtils.encryptPassword(request.getNewPassword());
+        userEntity.setPassword(password);
+        if (userMapper.updateById(userEntity) <= 0) {
+            throw ExceptionUtil.business(ErrorCodeEnums.PROFILE_PASSWORD_UPDATE_FAILED);
+        }
+        if (user.getUser() != null) {
+            user.getUser().setPassword(password);
+        }
     }
 
     @Transactional(rollbackFor = Exception.class)

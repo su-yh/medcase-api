@@ -9,8 +9,11 @@ import static org.mockito.Mockito.when;
 
 import com.medcase.biz.domain.UserEntity;
 import com.medcase.biz.domain.SupplierEntity;
+import com.medcase.biz.enums.SupplierStatusEnums;
 import com.medcase.biz.mapper.SupplierMapper;
 import com.medcase.biz.mapper.UserMapper;
+import com.medcase.biz.request.UserProfilePasswordRequest;
+import com.medcase.biz.request.UserProfilePhoneRequest;
 import com.medcase.biz.request.UserProfileSubmitRequest;
 import com.medcase.biz.response.UserProfileVO;
 import com.medcase.common.core.domain.entity.SysUser;
@@ -19,6 +22,7 @@ import com.medcase.common.enums.UserStatusEnums;
 import com.medcase.common.enums.UserTypeEnums;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.AbstractBusinessException;
+import com.medcase.common.utils.SecurityUtils;
 import com.medcase.storage.pojo.FileAttachment;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Validation;
@@ -27,6 +31,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+
+import java.util.Arrays;
+import java.util.Set;
 
 class UserProfileServiceTest {
     private UserProfileService userProfileService;
@@ -100,6 +107,21 @@ class UserProfileServiceTest {
     }
 
     @Test
+    void submitAllowsChangingExistingNicknameAndPhoneAfterReviewFailed() {
+        UserEntity doctor = doctor(UserStatusEnums.REVIEW_FAILED);
+        doctor.setNickName("原姓名");
+        doctor.setPhonenumber("13800000000");
+        when(userMapper.selectUserById(12L, UserTypeEnums.DOCTOR)).thenReturn(doctor);
+        when(userMapper.updateById(doctor)).thenReturn(1);
+
+        userProfileService.submit(loginUser(), request("新姓名", "13900000000"));
+
+        assertEquals("新姓名", doctor.getNickName());
+        assertEquals("13900000000", doctor.getPhonenumber());
+        verify(userMapper).updateById(doctor);
+    }
+
+    @Test
     void submitRejectsDoctorOutsideProfileSubmissionStatuses() {
         UserEntity doctor = doctor(UserStatusEnums.OK);
         when(userMapper.selectUserById(12L, UserTypeEnums.DOCTOR)).thenReturn(doctor);
@@ -144,6 +166,66 @@ class UserProfileServiceTest {
         assertEquals(null, patient.getTitle());
         assertEquals(null, patient.getQualificationCertificate());
         verify(userMapper).updateById(patient);
+    }
+
+    @Test
+    void updatePhoneChangesOnlyPhoneForCurrentUser() {
+        UserEntity doctor = doctor(UserStatusEnums.OK);
+        doctor.setPhonenumber("13800000000");
+        when(userMapper.selectUserById(12L, UserTypeEnums.DOCTOR)).thenReturn(doctor);
+        when(userMapper.phoneExists("13900000000", UserTypeEnums.DOCTOR)).thenReturn(false);
+        when(userMapper.updateById(doctor)).thenReturn(1);
+
+        UserProfilePhoneRequest request = new UserProfilePhoneRequest();
+        request.setPhone("13900000000");
+
+        userProfileService.updatePhone(loginUser(), request);
+
+        assertEquals("13900000000", doctor.getPhonenumber());
+        verify(userMapper).updateById(doctor);
+    }
+
+    @Test
+    void updatePhoneRejectsDuplicatePhone() {
+        UserEntity doctor = doctor(UserStatusEnums.OK);
+        when(userMapper.selectUserById(12L, UserTypeEnums.DOCTOR)).thenReturn(doctor);
+        when(userMapper.phoneExists("13900000000", UserTypeEnums.DOCTOR)).thenReturn(true);
+
+        UserProfilePhoneRequest request = new UserProfilePhoneRequest();
+        request.setPhone("13900000000");
+
+        AbstractBusinessException exception = assertThrows(
+                AbstractBusinessException.class,
+                () -> userProfileService.updatePhone(loginUser(), request));
+
+        assertEquals(ErrorCodeEnums.PROFILE_PHONE_EXISTS, exception.getEc());
+        verify(userMapper, never()).updateById(any(UserEntity.class));
+    }
+
+    @Test
+    void updatePasswordVerifiesOldPasswordAndStoresEncryptedNewPassword() {
+        UserEntity doctor = doctor(UserStatusEnums.OK);
+        doctor.setPassword(SecurityUtils.encryptPassword("old-password"));
+        when(userMapper.selectUserById(12L, UserTypeEnums.DOCTOR)).thenReturn(doctor);
+        when(userMapper.updateById(doctor)).thenReturn(1);
+
+        UserProfilePasswordRequest request = new UserProfilePasswordRequest();
+        request.setOldPassword("old-password");
+        request.setNewPassword("new-password");
+
+        userProfileService.updatePassword(loginUser(), request);
+
+        assertEquals(true, SecurityUtils.matchesPassword("new-password", doctor.getPassword()));
+        verify(userMapper).updateById(doctor);
+    }
+
+    @Test
+    void updatePasswordRequestContainsOnlyOldAndNewPassword() {
+        assertEquals(
+                Set.of("oldPassword", "newPassword"),
+                Arrays.stream(UserProfilePasswordRequest.class.getDeclaredFields())
+                        .map(field -> field.getName())
+                        .collect(java.util.stream.Collectors.toSet()));
     }
 
     private UserProfileSubmitRequest request(String nickName, String phone) {
@@ -191,7 +273,7 @@ class UserProfileServiceTest {
     private SupplierEntity enabledSupplier() {
         SupplierEntity supplier = new SupplierEntity();
         supplier.setId(1L);
-        supplier.setStatus("0");
+        supplier.setStatus(SupplierStatusEnums.NORMAL);
         return supplier;
     }
 }

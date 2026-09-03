@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.medcase.biz.request.UserProfilePasswordRequest;
+import com.medcase.biz.request.UserProfilePhoneRequest;
 import com.medcase.biz.request.UserProfileSubmitRequest;
 import com.medcase.biz.response.UserProfileVO;
 import com.medcase.biz.service.UserProfileService;
@@ -16,6 +18,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import jakarta.validation.Valid;
 
 import java.lang.reflect.Method;
@@ -46,6 +49,19 @@ class UserProfilePortalControllerTest {
                 "submit", LoginUser.class, UserProfileSubmitRequest.class);
 
         assertNotNull(submit.getParameters()[1].getAnnotation(Valid.class));
+    }
+
+    @Test
+    void profileMaintenanceExposesPhoneAndPasswordPutEndpoints() throws NoSuchMethodException {
+        Method updatePhone = UserProfilePortalController.class.getMethod(
+                "updatePhone", LoginUser.class, UserProfilePhoneRequest.class);
+        Method updatePassword = UserProfilePortalController.class.getMethod(
+                "updatePassword", LoginUser.class, UserProfilePasswordRequest.class);
+
+        assertEquals("/phone", updatePhone.getAnnotation(PutMapping.class).value()[0]);
+        assertEquals("/password", updatePassword.getAnnotation(PutMapping.class).value()[0]);
+        assertNotNull(updatePhone.getParameters()[1].getAnnotation(Valid.class));
+        assertNotNull(updatePassword.getParameters()[1].getAnnotation(Valid.class));
     }
 
     @Test

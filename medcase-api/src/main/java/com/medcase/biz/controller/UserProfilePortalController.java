@@ -1,5 +1,7 @@
 package com.medcase.biz.controller;
 
+import com.medcase.biz.request.UserProfilePasswordRequest;
+import com.medcase.biz.request.UserProfilePhoneRequest;
 import com.medcase.biz.request.UserProfileSubmitRequest;
 import com.medcase.biz.response.UserProfileVO;
 import com.medcase.biz.service.UserProfileService;
@@ -9,6 +11,7 @@ import com.medcase.mvc.authentication.annotation.CurrLoginUser;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -34,5 +37,19 @@ public class UserProfilePortalController {
             @CurrLoginUser(userType = {UserTypeEnums.DOCTOR, UserTypeEnums.PATIENT}) LoginUser user,
             @RequestBody @Valid UserProfileSubmitRequest request) {
         userProfileService.submit(user, request);
+    }
+
+    @PutMapping("/phone")
+    public void updatePhone(
+            @CurrLoginUser(userType = {UserTypeEnums.DOCTOR, UserTypeEnums.PATIENT}) LoginUser user,
+            @RequestBody @Valid UserProfilePhoneRequest request) {
+        userProfileService.updatePhone(user, request);
+    }
+
+    @PutMapping("/password")
+    public void updatePassword(
+            @CurrLoginUser(userType = {UserTypeEnums.DOCTOR, UserTypeEnums.PATIENT}) LoginUser user,
+            @RequestBody @Valid UserProfilePasswordRequest request) {
+        userProfileService.updatePassword(user, request);
     }
 }

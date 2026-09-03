@@ -1,8 +1,8 @@
 package com.medcase.biz.mapper;
 
 import com.medcase.biz.domain.SupplierEntity;
+import com.medcase.biz.enums.SupplierStatusEnums;
 import com.medcase.biz.request.SupplierQuery;
-import com.medcase.common.constant.UserConstants;
 import com.medcase.mp.mybatis.BaseMapperX;
 import com.medcase.mp.mybatis.LambdaQueryWrapperX;
 import com.medcase.mp.mybatis.PageParam;
@@ -44,12 +44,12 @@ public interface SupplierMapper extends BaseMapperX<SupplierEntity> {
         }
         return selectOne(build()
                 .eq(SupplierEntity::getId, id)
-                .eq(SupplierEntity::getStatus, UserConstants.NORMAL));
+                .eq(SupplierEntity::getStatus, SupplierStatusEnums.NORMAL));
     }
 
     default List<SupplierEntity> selectEnabledList() {
         return selectList(build()
-                .eq(SupplierEntity::getStatus, UserConstants.NORMAL)
+                .eq(SupplierEntity::getStatus, SupplierStatusEnums.NORMAL)
                 .orderByAsc(SupplierEntity::getName)
                 .orderByAsc(SupplierEntity::getId));
     }

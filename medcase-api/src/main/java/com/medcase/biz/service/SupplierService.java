@@ -1,11 +1,11 @@
 package com.medcase.biz.service;
 
 import com.medcase.biz.domain.SupplierEntity;
+import com.medcase.biz.enums.SupplierStatusEnums;
 import com.medcase.biz.mapper.SupplierMapper;
 import com.medcase.biz.request.SupplierQuery;
 import com.medcase.biz.request.SupplierSaveRequest;
 import com.medcase.biz.request.SupplierStatusRequest;
-import com.medcase.common.constant.UserConstants;
 import com.medcase.common.utils.StringUtils;
 import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
@@ -74,8 +74,7 @@ public class SupplierService {
         if (supplierMapper.selectById(supplierId) == null) {
             throw ExceptionUtil.business(ErrorCodeEnums.SUPPLIER_NOT_FOUND);
         }
-        if (!UserConstants.NORMAL.equals(request.getStatus())
-                && !UserConstants.USER_DISABLE.equals(request.getStatus())) {
+        if (request.getStatus() == null) {
             throw ExceptionUtil.business(ErrorCodeEnums.SUPPLIER_STATUS_INVALID);
         }
 
@@ -94,8 +93,8 @@ public class SupplierService {
         }
     }
 
-    private void validateStatus(String status) {
-        if (!UserConstants.NORMAL.equals(status) && !UserConstants.USER_DISABLE.equals(status)) {
+    private void validateStatus(SupplierStatusEnums status) {
+        if (status == null) {
             throw ExceptionUtil.business(ErrorCodeEnums.SUPPLIER_STATUS_INVALID);
         }
     }
