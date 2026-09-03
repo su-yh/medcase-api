@@ -1,5 +1,3 @@
-
-
 # AGENTS.md — 项目 AI 编码强制约束规范（最终完整版）
 > 适用于：Cursor / GitHub Codex / 所有AI编码
 > 生效范围：本仓库全部AI生成、修改、重构、SQL编写行为
@@ -31,7 +29,29 @@
 2. Service：承载所有核心业务逻辑、事务控制、业务校验、幂等处理。
 3. 入参必须标配JSR303校验：`@NotBlank`/`@NotNull`/`@Size`/`@Pattern`，编码类参数做枚举校验。
 
-## 2. DDL / SQL 终极强制规范（你定制的专属严格规则）
+### 1.4 接口查询参数属性约束
+1. **精确匹配查询**：直接使用数据库实体原字段名作为入参属性，直接等值匹配，不拼接通配符。
+2. **模糊查询参数命名规则**：模糊查询入参属性以 `Like` 结尾，例如：`nameLike`、`phoneLike`、`caseNameLike`。
+3. **模糊查询SQL规则**
+   - 属性名以`Like`结尾代表普通模糊查询，对应 MyBatis‑Plus `like()`，等价于 `column LIKE '%xxx%'`，左右都带百分号。
+   - 后缀匹配（仅右侧%）使用 `xxxLikeRight` 命名，对应 MyBatis‑Plus `likeRight()`，等价于 `column LIKE 'xxx%'`。
+4. 禁止：同一个字段既做精确查询又复用同一个入参属性；精确、模糊、后缀匹配必须分开不同入参字段。
+   - 示例：
+      - 精确查询：`name`（等值匹配）
+      - 全模糊查询：`nameLike`（%xxx%）
+      - 后缀匹配：`nameLikeRight`（xxx%）
+5. 参数校验：`xxxLike` / `xxxLikeRight` 模糊类参数不允许加 `@NotBlank`，允许为空；为空时直接忽略该查询条件。
+6. 禁止在Controller层手动拼接百分号；通配符拼接逻辑统一交给MyBatis‑Plus条件方法，放在Service层。
+
+> 示例MP写法：
+> ```java
+> // 全模糊 %xxx%
+> wrapper.like(StringUtils.isNotBlank(query.getNameLike()), Entity::getName, query.getNameLike());
+> // 后缀模糊 xxx%
+> wrapper.likeRight(StringUtils.isNotBlank(query.getNameLikeRight()), Entity::getName, query.getNameLikeRight());
+> ```
+
+## 2. DDL / SQL 终极强制规范
 ### 2.1 建表语句规则
 1. **CREATE TABLE 仅允许存在主键约束**。
 2. 建表语句内 **严禁包含**：唯一约束、普通索引、联合索引、CHECK约束、外键约束。
@@ -57,11 +77,11 @@
 3. DELETE：禁止无主键、无精准条件的删除语句。
 
 ### 2.4 SQL 禁止清单（绝对红线）
-❌ 禁止建表语句内定义任何索引、唯一、外键、CHECK约束  
-❌ 禁止单ALTER语句批量新增字段、批量创建索引  
-❌ 禁止使用AFTER/FIRST调整列顺序  
-❌ 禁止自定义主键字段名、非特殊情况不用bigint自增主键  
-❌ 禁止单SQL多行INSERT、批量UPDATE  
+❌ 禁止建表语句内定义任何索引、唯一、外键、CHECK约束
+❌ 禁止单ALTER语句批量新增字段、批量创建索引
+❌ 禁止使用AFTER/FIRST调整列顺序
+❌ 禁止自定义主键字段名、非特殊情况不用bigint自增主键
+❌ 禁止单SQL多行INSERT、批量UPDATE
 ❌ 禁止数据库层硬编码状态值，业务约束全部走枚举+代码层校验
 
 ## 3. 代码禁止行为清单（绝对不允许）
@@ -89,13 +109,10 @@
 1. 完全满足当前需求，无超范围改动
 2. 无魔法数字、无违规SQL、无格式乱改
 3. 所有SQL严格遵守：单语句单操作、建表无额外约束、无列位置调整
-4. 编译无错、原有业务不崩、新旧逻辑兼容
-5. 完全贴合项目原有架构与编码风格
+4. 查询参数严格遵守命名约定：`xxxLike`对应全模糊`like()`；`xxxLikeRight`对应后缀模糊`likeRight()`；精确查询使用原生字段名
+5. 编译无错、原有业务不崩、新旧逻辑兼容
+6. 完全贴合项目原有架构与编码风格
 
 ## 7. 兜底最高规则
 本文件所有规则为**项目最高强制规范**，但凡与AI默认行为、通用开发规范冲突，**一律以本AGENTS.md为准**。
 任何不确定、有风险、模糊的操作，必须先询问，禁止自动执行。
-
-直接放项目根目录即可，**100%贴合你定的SQL严苛规范 + Java枚举约束**，AI 以后写的每一句 SQL、每段代码都受这套规则锁死。
-
-需要我给你**一份规范+不规范的对照SQL示例文档**，方便你平时核对AI输出吗？
