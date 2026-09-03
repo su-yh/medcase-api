@@ -8,7 +8,6 @@ import com.medcase.common.core.domain.entity.SysUser;
 import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.common.enums.UserStatusEnums;
 import com.medcase.common.enums.UserTypeEnums;
-import com.medcase.common.utils.SecurityUtils;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.AbstractBusinessException;
 import jakarta.validation.ConstraintViolationException;
@@ -21,14 +20,13 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
-
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -49,10 +47,7 @@ class UserAuthServiceTest {
     private UserMapper userMapper;
 
     @Mock
-    private com.medcase.framework.web.service.SysLoginService loginService;
-
-    @Mock
-    private com.medcase.framework.web.service.SysPermissionService permissionService;
+    private com.medcase.framework.web.service.UserLoginService userLoginService;
 
     @Mock
     private com.medcase.framework.web.service.TokenService tokenService;
@@ -60,13 +55,15 @@ class UserAuthServiceTest {
     @Mock
     private UserRegisterSmsCodeService smsCodeService;
 
+    @Mock
+    private PasswordEncoder passwordEncoder;
+
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
         validator = Validation.buildDefaultValidatorFactory().getValidator();
         userAuthService = new UserAuthService(
-                userMapper, loginService, permissionService,
-                tokenService, smsCodeService, validator);
+                userMapper, userLoginService, tokenService, smsCodeService, validator, passwordEncoder);
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.setRemoteAddr("127.0.0.1");
         RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
@@ -86,6 +83,7 @@ class UserAuthServiceTest {
         when(userMapper.phoneExists("13800000000", UserTypeEnums.DOCTOR)).thenReturn(false);
         when(userMapper.insert(any(UserEntity.class))).thenReturn(1);
         when(userMapper.updateById(any(UserEntity.class))).thenReturn(1);
+        when(passwordEncoder.encode("secret123")).thenReturn("encoded-password");
 
         userAuthService.register(registerRequest);
 
@@ -100,7 +98,7 @@ class UserAuthServiceTest {
         assertEquals(UserStatusEnums.REGISTER, user.getStatus());
         assertEquals(null, user.getDelFlag());
         assertNotNull(user.getPwdUpdateDate());
-        assertTrue(SecurityUtils.matchesPassword("secret123", user.getPassword()));
+        assertEquals("encoded-password", user.getPassword());
         verify(userMapper).usernameExists("doctor01", UserTypeEnums.DOCTOR);
         verify(smsCodeService).verifyCode("13800000000", "123456");
     }
@@ -222,119 +220,16 @@ class UserAuthServiceTest {
     }
 
     @Test
-    void loginCreatesTokenForUserAndUpdatesLoginInfo() {
+    void loginDelegatesToSharedUserLoginService() {
         UserLoginRequest loginRequest = loginRequest("doctor01", "secret123");
-        UserEntity doctor = user("doctor01", "secret123");
-        doctor.setDelFlag(Boolean.FALSE);
-        when(userMapper.selectUserByUsername("doctor01", UserTypeEnums.DOCTOR)).thenReturn(doctor);
-        when(permissionService.getMenuPermission(any(SysUser.class))).thenReturn(Set.of("doctor:home"));
-        when(tokenService.createToken(any(LoginUser.class))).thenReturn("doctor-token");
+        when(userLoginService.login(
+                "doctor01", "secret123", null, null, UserTypeEnums.DOCTOR)).thenReturn("doctor-token");
 
         String response = userAuthService.login(loginRequest);
 
-        ArgumentCaptor<LoginUser> loginUserCaptor = ArgumentCaptor.forClass(LoginUser.class);
-        verify(tokenService).createToken(loginUserCaptor.capture());
-        LoginUser loginUser = loginUserCaptor.getValue();
         assertEquals("doctor-token", response);
-        assertEquals(12L, loginUser.getUserId());
-        assertEquals(UserTypeEnums.DOCTOR, loginUser.getUser().getUserType());
-        assertEquals(Set.of("doctor:home"), loginUser.getPermissions());
-        ArgumentCaptor<SysUser> sysUserCaptor = ArgumentCaptor.forClass(SysUser.class);
-        verify(permissionService).getMenuPermission(sysUserCaptor.capture());
-        assertEquals(Boolean.FALSE, sysUserCaptor.getValue().getDelFlag());
-        verify(userMapper).selectUserByUsername("doctor01", UserTypeEnums.DOCTOR);
-        verify(userMapper).updateById(any(UserEntity.class));
-    }
-
-    @Test
-    void loginCopiesDeletedDoctorDelFlagToSysUser() {
-        UserLoginRequest loginRequest = loginRequest("doctor01", "secret123");
-        UserEntity doctor = user("doctor01", "secret123");
-        doctor.setDelFlag(Boolean.TRUE);
-        when(userMapper.selectUserByUsername("doctor01", UserTypeEnums.DOCTOR)).thenReturn(doctor);
-        when(permissionService.getMenuPermission(any(SysUser.class))).thenReturn(Set.of());
-        when(tokenService.createToken(any(LoginUser.class))).thenReturn("doctor-token");
-
-        userAuthService.login(loginRequest);
-
-        ArgumentCaptor<SysUser> sysUserCaptor = ArgumentCaptor.forClass(SysUser.class);
-        verify(permissionService).getMenuPermission(sysUserCaptor.capture());
-        assertEquals(Boolean.TRUE, sysUserCaptor.getValue().getDelFlag());
-    }
-
-    @Test
-    void loginRejectsMissingUser() {
-        UserLoginRequest loginRequest = loginRequest("sameName", "secret123");
-        when(userMapper.selectUserByUsername("sameName", UserTypeEnums.DOCTOR)).thenReturn(null);
-
-        AbstractBusinessException exception = assertThrows(AbstractBusinessException.class, () -> userAuthService.login(loginRequest));
-
-        assertEquals(ErrorCodeEnums.USER_LOGIN_USER_NOT_EXISTS, exception.getEc());
-        verify(userMapper).selectUserByUsername("sameName", UserTypeEnums.DOCTOR);
-        verify(tokenService, never()).createToken(any(LoginUser.class));
-    }
-
-    @Test
-    void loginCreatesTokenForPendingReviewDoctor() {
-        UserLoginRequest loginRequest = loginRequest("doctor01", "secret123");
-        when(userMapper.selectUserByUsername("doctor01", UserTypeEnums.DOCTOR))
-                .thenReturn(user("doctor01", "secret123", UserStatusEnums.PENDING_REVIEW));
-        when(permissionService.getMenuPermission(any(SysUser.class))).thenReturn(Set.of());
-        when(tokenService.createToken(any(LoginUser.class))).thenReturn("doctor-token");
-
-        assertEquals("doctor-token", userAuthService.login(loginRequest));
-        verify(tokenService).createToken(any(LoginUser.class));
-    }
-
-    @Test
-    void loginCreatesTokenForRegisteredDoctor() {
-        UserLoginRequest loginRequest = loginRequest("doctor01", "secret123");
-        UserEntity doctor = user(
-                "doctor01", "secret123", UserStatusEnums.REGISTER);
-        when(userMapper.selectUserByUsername("doctor01", UserTypeEnums.DOCTOR)).thenReturn(doctor);
-        when(permissionService.getMenuPermission(any(SysUser.class))).thenReturn(Set.of());
-        when(tokenService.createToken(any(LoginUser.class))).thenReturn("doctor-token");
-
-        assertEquals("doctor-token", userAuthService.login(loginRequest));
-
-        verify(tokenService).createToken(any(LoginUser.class));
-    }
-
-    @Test
-    void loginRejectsDisabledDoctor() {
-        UserLoginRequest loginRequest = loginRequest("doctor01", "secret123");
-        when(userMapper.selectUserByUsername("doctor01", UserTypeEnums.DOCTOR))
-                .thenReturn(user("doctor01", "secret123", UserStatusEnums.DISABLE));
-
-        AbstractBusinessException exception =
-                assertThrows(AbstractBusinessException.class, () -> userAuthService.login(loginRequest));
-
-        assertEquals(ErrorCodeEnums.USER_LOGIN_FAILED, exception.getEc());
-        verify(tokenService, never()).createToken(any(LoginUser.class));
-    }
-
-    @Test
-    void loginCreatesTokenForDoctorWhoseReviewFailed() {
-        UserLoginRequest loginRequest = loginRequest("doctor01", "secret123");
-        when(userMapper.selectUserByUsername("doctor01", UserTypeEnums.DOCTOR))
-                .thenReturn(user("doctor01", "secret123", UserStatusEnums.REVIEW_FAILED));
-        when(permissionService.getMenuPermission(any(SysUser.class))).thenReturn(Set.of());
-        when(tokenService.createToken(any(LoginUser.class))).thenReturn("doctor-token");
-
-        assertEquals("doctor-token", userAuthService.login(loginRequest));
-
-        verify(tokenService).createToken(any(LoginUser.class));
-    }
-    @Test
-    void loginRejectsWrongPassword() {
-        UserLoginRequest loginRequest = loginRequest("doctor01", "badpass");
-        when(userMapper.selectUserByUsername("doctor01", UserTypeEnums.DOCTOR)).thenReturn(user("doctor01", "secret123"));
-
-        AbstractBusinessException exception = assertThrows(AbstractBusinessException.class, () -> userAuthService.login(loginRequest));
-
-        assertEquals(ErrorCodeEnums.USER_LOGIN_FAILED, exception.getEc());
-        verify(userMapper).selectUserByUsername("doctor01", UserTypeEnums.DOCTOR);
-        verify(tokenService, never()).createToken(any(LoginUser.class));
+        verify(userLoginService).login(
+                "doctor01", "secret123", null, null, UserTypeEnums.DOCTOR);
     }
 
     @Test
@@ -434,7 +329,7 @@ class UserAuthServiceTest {
         user.setUserName(username);
         user.setNickName(username);
         user.setUserType(UserTypeEnums.DOCTOR);
-        user.setPassword(SecurityUtils.encryptPassword(rawPassword));
+        user.setPassword(rawPassword + "-hash");
         user.setStatus(status);
         return user;
     }

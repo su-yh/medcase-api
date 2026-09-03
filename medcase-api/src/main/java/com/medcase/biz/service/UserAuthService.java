@@ -5,16 +5,12 @@ import com.medcase.biz.mapper.SupplierMapper;
 import com.medcase.biz.mapper.UserMapper;
 import com.medcase.biz.request.UserLoginRequest;
 import com.medcase.biz.request.UserRegisterRequest;
-import com.medcase.common.core.domain.entity.SysUser;
 import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.common.enums.UserStatusEnums;
 import com.medcase.common.enums.UserTypeEnums;
 import com.medcase.common.utils.DateUtils;
-import com.medcase.common.utils.SecurityUtils;
-import com.medcase.common.utils.ip.IpUtils;
-import com.medcase.framework.web.service.SysLoginService;
-import com.medcase.framework.web.service.SysPermissionService;
 import com.medcase.framework.web.service.TokenService;
+import com.medcase.framework.web.service.UserLoginService;
 import com.medcase.common.validation.groups.ValidationGroups;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
@@ -24,6 +20,7 @@ import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Set;
@@ -39,15 +36,15 @@ import java.util.Set;
 public class UserAuthService {
     private final UserMapper userMapper;
 
-    private final SysLoginService loginService;
-
-    private final SysPermissionService permissionService;
+    private final UserLoginService userLoginService;
 
     private final TokenService tokenService;
 
     private final UserRegisterSmsCodeService smsCodeService;
 
     private final Validator validator;
+
+    private final PasswordEncoder passwordEncoder;
 
     @Transactional(rollbackFor = Exception.class)
     public void register(UserRegisterRequest registerBody) {
@@ -74,7 +71,7 @@ public class UserAuthService {
         user.setReviewReason(null);
         user.setStatus(UserStatusEnums.REGISTER);
         user.setPwdUpdateDate(DateUtils.getNowDate());
-        user.setPassword(SecurityUtils.encryptPassword(password));
+        user.setPassword(passwordEncoder.encode(password));
         if (userMapper.insert(user) <= 0) {
             throw ExceptionUtil.business(ErrorCodeEnums.USER_REGISTER_FAILED);
         }
@@ -89,37 +86,13 @@ public class UserAuthService {
     }
 
     public String login(UserLoginRequest loginBody) {
-        String username = loginBody.getUsername();
         UserTypeEnums userType = resolveUserType(loginBody.getUserType());
-        log.info("user login request, username={}", username);
-        loginService.validateCaptcha(username, loginBody.getCode(), loginBody.getUuid());
-        loginService.loginPreCheck(username, loginBody.getPassword());
-
-        UserEntity user = userMapper.selectUserByUsername(username, userType);
-        if (user == null) {
-            log.warn("user login failed, user not exists, username={}", username);
-            throw ExceptionUtil.business(ErrorCodeEnums.USER_LOGIN_USER_NOT_EXISTS);
-        } else if (!SecurityUtils.matchesPassword(loginBody.getPassword(), user.getPassword())) {
-            log.warn("user login failed, password mismatch, username={}", username);
-            throw ExceptionUtil.business(ErrorCodeEnums.USER_LOGIN_FAILED);
-        }
-        if (user.getStatus() == UserStatusEnums.DISABLE) {
-            log.warn("user login failed, user disabled, username={}",
-                    username);
-            throw ExceptionUtil.business(ErrorCodeEnums.USER_LOGIN_FAILED);
-        }
-
-        UserEntity updateUser = new UserEntity();
-        updateUser.setUserId(user.getUserId());
-        updateUser.setLoginIp(IpUtils.getIpAddr());
-        updateUser.setLoginDate(DateUtils.getNowDate());
-        userMapper.updateById(updateUser);
-        SysUser sysUser = toSysUser(user);
-        LoginUser loginUser = new LoginUser(
-                sysUser.getUserId(), null, sysUser,
-                permissionService.getMenuPermission(sysUser));
-        log.info("user login success, username={}, userId={}", username, user.getUserId());
-        return tokenService.createToken(loginUser);
+        return userLoginService.login(
+                loginBody.getUsername(),
+                loginBody.getPassword(),
+                loginBody.getCode(),
+                loginBody.getUuid(),
+                userType);
     }
 
     public void logout(LoginUser user) {
@@ -147,22 +120,6 @@ public class UserAuthService {
         tokenService.delLoginUser(user.getToken());
         log.info("user account deleted, username={}, userId={}",
                 currentUser.getUserName(), currentUser.getUserId());
-    }
-
-    private SysUser toSysUser(UserEntity user) {
-        SysUser sysUser = new SysUser();
-        sysUser.setUserId(user.getUserId());
-        sysUser.setUserName(user.getUserName());
-        sysUser.setNickName(user.getNickName());
-        sysUser.setSex(user.getSex());
-        sysUser.setUserType(user.getUserType());
-        sysUser.setPassword(user.getPassword());
-        sysUser.setStatus(user.getStatus().getCode());
-        sysUser.setDelFlag(user.getDelFlag());
-        sysUser.setLoginIp(user.getLoginIp());
-        sysUser.setLoginDate(user.getLoginDate());
-        sysUser.setPwdUpdateDate(user.getPwdUpdateDate());
-        return sysUser;
     }
 
     private UserTypeEnums resolveUserType(String userTypeCode) {

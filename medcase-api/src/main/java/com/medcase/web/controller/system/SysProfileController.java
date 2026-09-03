@@ -2,6 +2,7 @@ package com.medcase.web.controller.system;
 
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -15,7 +16,6 @@ import com.medcase.common.core.domain.entity.SysUser;
 import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.common.enums.BusinessType;
 import com.medcase.common.utils.DateUtils;
-import com.medcase.common.utils.SecurityUtils;
 import com.medcase.common.utils.StringUtils;
 import com.medcase.framework.web.service.TokenService;
 import com.medcase.system.service.ISysUserService;
@@ -34,6 +34,9 @@ public class SysProfileController extends BaseController {
 
     @Autowired
     private TokenService tokenService;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     /**
      * 个人信息
@@ -90,13 +93,13 @@ public class SysProfileController extends BaseController {
         Long userId = loginUser.getUserId();
         SysUser user = userService.selectUserById(userId);
         String password = user.getPassword();
-        if (!SecurityUtils.matchesPassword(oldPassword, password)) {
+        if (!passwordEncoder.matches(oldPassword, password)) {
             throw ExceptionUtil.business(ErrorCodeEnums.PROFILE_OLD_PASSWORD_INVALID);
         }
-        if (SecurityUtils.matchesPassword(newPassword, password)) {
+        if (passwordEncoder.matches(newPassword, password)) {
             throw ExceptionUtil.business(ErrorCodeEnums.PROFILE_PASSWORD_SAME);
         }
-        newPassword = SecurityUtils.encryptPassword(newPassword);
+        newPassword = passwordEncoder.encode(newPassword);
         if (userService.resetUserPwd(userId, newPassword) > 0) {
 
             // 更新缓存用户密码&密码最后更新时间

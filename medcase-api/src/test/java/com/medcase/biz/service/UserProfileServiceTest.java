@@ -31,6 +31,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Arrays;
 import java.util.Set;
@@ -46,11 +47,14 @@ class UserProfileServiceTest {
     @Mock
     private SupplierMapper supplierMapper;
 
+    @Mock
+    private PasswordEncoder passwordEncoder;
+
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
         validator = Validation.buildDefaultValidatorFactory().getValidator();
-        userProfileService = new UserProfileService(userMapper, supplierMapper, validator);
+        userProfileService = new UserProfileService(userMapper, supplierMapper, validator, passwordEncoder);
         when(supplierMapper.selectEnabledById(1L)).thenReturn(enabledSupplier());
     }
 
@@ -205,9 +209,12 @@ class UserProfileServiceTest {
     @Test
     void updatePasswordVerifiesOldPasswordAndStoresEncryptedNewPassword() {
         UserEntity doctor = doctor(UserStatusEnums.OK);
-        doctor.setPassword(SecurityUtils.encryptPassword("old-password"));
+        doctor.setPassword("old-password-hash");
         when(userMapper.selectUserById(12L, UserTypeEnums.DOCTOR)).thenReturn(doctor);
         when(userMapper.updateById(doctor)).thenReturn(1);
+        when(passwordEncoder.matches("old-password", "old-password-hash")).thenReturn(true);
+        when(passwordEncoder.matches("new-password", "old-password-hash")).thenReturn(false);
+        when(passwordEncoder.encode("new-password")).thenReturn("new-password-hash");
 
         UserProfilePasswordRequest request = new UserProfilePasswordRequest();
         request.setOldPassword("old-password");
@@ -215,7 +222,7 @@ class UserProfileServiceTest {
 
         userProfileService.updatePassword(loginUser(), request);
 
-        assertEquals(true, SecurityUtils.matchesPassword("new-password", doctor.getPassword()));
+        assertEquals("new-password-hash", doctor.getPassword());
         verify(userMapper).updateById(doctor);
     }
 

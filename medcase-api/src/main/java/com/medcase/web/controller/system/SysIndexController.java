@@ -2,6 +2,7 @@ package com.medcase.web.controller.system;
 
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,6 +24,9 @@ public class SysIndexController {
     @Autowired
     private ISysUserService userService;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     /**
      * 解锁屏幕
      */
@@ -38,7 +42,7 @@ public class SysIndexController {
         if (user == null) {
             throw ExceptionUtil.business(ErrorCodeEnums.SCREEN_UNLOCK_USER_NOT_FOUND);
         }
-        if (!SecurityUtils.matchesPassword(password, user.getPassword())) {
+        if (!passwordEncoder.matches(password, user.getPassword())) {
             throw ExceptionUtil.business(ErrorCodeEnums.SCREEN_UNLOCK_PASSWORD_INVALID);
         }
 

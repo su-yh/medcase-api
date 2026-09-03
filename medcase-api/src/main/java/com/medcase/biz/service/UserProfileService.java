@@ -12,7 +12,6 @@ import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.common.enums.UserStatusEnums;
 import com.medcase.common.enums.UserTypeEnums;
 import com.medcase.common.validation.groups.ValidationGroups;
-import com.medcase.common.utils.SecurityUtils;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
 import jakarta.validation.ConstraintViolation;
@@ -20,6 +19,7 @@ import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Set;
@@ -36,6 +36,8 @@ public class UserProfileService {
     private final SupplierMapper supplierMapper;
 
     private final Validator validator;
+
+    private final PasswordEncoder passwordEncoder;
 
     public UserProfileVO me(LoginUser user) {
         return UserProfileVO.fromEntity(requireUser(user));
@@ -64,14 +66,14 @@ public class UserProfileService {
     @Transactional(rollbackFor = Exception.class)
     public void updatePassword(LoginUser user, UserProfilePasswordRequest request) {
         UserEntity userEntity = requireUser(user);
-        if (!SecurityUtils.matchesPassword(request.getOldPassword(), userEntity.getPassword())) {
+        if (!passwordEncoder.matches(request.getOldPassword(), userEntity.getPassword())) {
             throw ExceptionUtil.business(ErrorCodeEnums.PROFILE_OLD_PASSWORD_INVALID);
         }
-        if (SecurityUtils.matchesPassword(request.getNewPassword(), userEntity.getPassword())) {
+        if (passwordEncoder.matches(request.getNewPassword(), userEntity.getPassword())) {
             throw ExceptionUtil.business(ErrorCodeEnums.PROFILE_PASSWORD_SAME);
         }
 
-        String password = SecurityUtils.encryptPassword(request.getNewPassword());
+        String password = passwordEncoder.encode(request.getNewPassword());
         userEntity.setPassword(password);
         if (userMapper.updateById(userEntity) <= 0) {
             throw ExceptionUtil.business(ErrorCodeEnums.PROFILE_PASSWORD_UPDATE_FAILED);

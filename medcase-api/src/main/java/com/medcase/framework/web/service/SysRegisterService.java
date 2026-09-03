@@ -1,6 +1,7 @@
 package com.medcase.framework.web.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import com.medcase.common.constant.CacheConstants;
 import com.medcase.common.constant.Constants;
@@ -12,7 +13,6 @@ import com.medcase.common.exception.user.CaptchaException;
 import com.medcase.common.exception.user.CaptchaExpireException;
 import com.medcase.common.utils.DateUtils;
 import com.medcase.common.utils.MessageUtils;
-import com.medcase.common.utils.SecurityUtils;
 import com.medcase.common.utils.StringUtils;
 import com.medcase.framework.manager.AsyncManager;
 import com.medcase.framework.manager.factory.AsyncFactory;
@@ -36,6 +36,9 @@ public class SysRegisterService {
 
     @Autowired
     private RedisCache redisCache;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     /**
      * 注册
@@ -75,7 +78,7 @@ public class SysRegisterService {
 
             sysUser.setNickName(username);
             sysUser.setPwdUpdateDate(DateUtils.getNowDate());
-            sysUser.setPassword(SecurityUtils.encryptPassword(password));
+            sysUser.setPassword(passwordEncoder.encode(password));
             boolean regFlag = userService.registerUser(sysUser);
             if (!regFlag) {
                 throw ExceptionUtil.business(ErrorCodeEnums.ADMIN_REGISTER_FAILED);

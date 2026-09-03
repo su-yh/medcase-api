@@ -22,6 +22,7 @@ import com.medcase.web.controller.system.dto.UserDetailResponse;
 import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -54,6 +55,9 @@ public class SysUserController extends BaseController {
 
     @Autowired
     private ISysPostService postService;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     /**
      * 获取用户列表
@@ -127,7 +131,7 @@ public class SysUserController extends BaseController {
             throw ExceptionUtil.business(ErrorCodeEnums.EMAIL_EXISTS, user.getUserName());
         }
         user.setCreateBy(getUsername());
-        user.setPassword(SecurityUtils.encryptPassword(user.getPassword()));
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         if (userService.insertUser(user) <= 0) {
             throw ExceptionUtil.business(ErrorCodeEnums.USER_OPERATION_FAILED);
         }
@@ -188,7 +192,7 @@ public class SysUserController extends BaseController {
 
         userService.checkUserAllowed(user);
         userService.checkUserDataScope(user.getUserId());
-        user.setPassword(SecurityUtils.encryptPassword(user.getPassword()));
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setUpdateBy(getUsername());
         if (userService.resetPwd(user) <= 0) {
             throw ExceptionUtil.business(ErrorCodeEnums.USER_OPERATION_FAILED);

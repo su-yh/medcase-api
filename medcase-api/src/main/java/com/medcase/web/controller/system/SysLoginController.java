@@ -6,12 +6,13 @@ import com.medcase.common.core.domain.entity.SysUser;
 import com.medcase.common.core.domain.model.LoginBody;
 import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.common.core.text.Convert;
+import com.medcase.common.enums.UserTypeEnums;
 import com.medcase.common.utils.DateUtils;
 import com.medcase.common.utils.SecurityUtils;
 import com.medcase.common.utils.StringUtils;
-import com.medcase.framework.web.service.SysLoginService;
 import com.medcase.framework.web.service.SysPermissionService;
 import com.medcase.framework.web.service.TokenService;
+import com.medcase.framework.web.service.UserLoginService;
 import com.medcase.system.domain.vo.RouterVo;
 import com.medcase.system.service.ISysConfigService;
 import com.medcase.system.service.ISysMenuService;
@@ -35,7 +36,7 @@ import java.util.Set;
 public class SysLoginController {
 
     @Autowired
-    private SysLoginService loginService;
+    private UserLoginService userLoginService;
 
     @Autowired
     private ISysMenuService menuService;
@@ -59,8 +60,12 @@ public class SysLoginController {
     public LoginResponse login(@RequestBody LoginBody loginBody) {
 
         // 生成令牌
-        String token = loginService.login(loginBody.getUsername(), loginBody.getPassword(), loginBody.getCode(),
-                loginBody.getUuid());
+        String token = userLoginService.login(
+                loginBody.getUsername(),
+                loginBody.getPassword(),
+                loginBody.getCode(),
+                loginBody.getUuid(),
+                UserTypeEnums.ADMIN);
         return new LoginResponse(token);
     }
 
