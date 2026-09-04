@@ -1,5 +1,17 @@
 package com.medcase.common.utils.http;
 
+import com.medcase.common.constant.Constants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.MediaType;
+import org.springframework.util.StringUtils;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,17 +23,6 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 import java.security.cert.X509Certificate;
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSession;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import com.medcase.common.constant.Constants;
-import com.medcase.common.utils.StringUtils;
-import org.springframework.http.MediaType;
 
 /**
  * 通用http发送方法
@@ -39,7 +40,7 @@ public class HttpUtils {
      */
     public static String sendGet(String url) {
 
-        return sendGet(url, StringUtils.EMPTY);
+        return sendGet(url, com.medcase.common.utils.StringUtils.EMPTY);
     }
 
     /**
@@ -68,7 +69,7 @@ public class HttpUtils {
         BufferedReader in = null;
         try {
 
-            String urlNameString = StringUtils.isNotBlank(param) ? url + "?" + param : url;
+            String urlNameString = StringUtils.hasText(param) ? url + "?" + param : url;
             log.info("sendGet - {}", urlNameString);
             URL realUrl = new URL(urlNameString);
             URLConnection connection = realUrl.openConnection();

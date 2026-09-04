@@ -29,7 +29,7 @@ public class XssFilter implements Filter {
     public void init(FilterConfig filterConfig) throws ServletException {
 
         String tempExcludes = filterConfig.getInitParameter("excludes");
-        if (StringUtils.isNotEmpty(tempExcludes)) {
+        if (org.springframework.util.StringUtils.hasText(tempExcludes)) {
 
             String[] urls = tempExcludes.split(",");
             for (String url : urls) {

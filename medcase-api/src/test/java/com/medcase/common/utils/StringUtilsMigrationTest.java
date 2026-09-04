@@ -1,0 +1,82 @@
+package com.medcase.common.utils;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import org.junit.jupiter.api.Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+class StringUtilsMigrationTest {
+
+    private static final Pattern LEGACY_STRING_CHECK = Pattern.compile(
+            "StringUtils\\.(isEmpty|isNotEmpty|isBlank|isNotBlank|hasText)\\s*\\(");
+
+    private static final String SPRING_STRING_UTILS_PREFIX =
+            "org.springframework.util.StringUtils.";
+
+    private static final Pattern IMPORT_SPRING_STRING_UTILS = Pattern.compile(
+            "import\\s+org\\.springframework\\.util\\.StringUtils;");
+
+    private static final Pattern IMPORT_LEGACY_STRING_UTILS = Pattern.compile(
+            "import\\s+com\\.medcase\\.common\\.utils\\.StringUtils;");
+
+    private static final Set<Path> COLLECTION_OR_ARRAY_CHECK_FILES = Set.of(
+            Paths.get("com/medcase/system/service/SysDictTypeService.java"),
+            Paths.get("com/medcase/system/service/SysDeptService.java"),
+            Paths.get("com/medcase/system/service/SysRoleService.java"),
+            Paths.get("com/medcase/system/service/SysUserService.java"),
+            Paths.get("com/medcase/common/utils/spring/SpringUtils.java"),
+            Paths.get("com/medcase/framework/aspectj/LogAspect.java"),
+            Paths.get("com/medcase/common/core/text/StrFormatter.java"),
+            Paths.get("com/medcase/framework/aspectj/DataScopeAspect.java"),
+            Paths.get("com/medcase/system/service/SysMenuService.java"));
+
+    @Test
+    void replacesLegacyStringChecksWithSpringStringUtils() throws IOException {
+
+        Path sourceRoot = Paths.get("src/main/java");
+        Set<Path> legacyFiles;
+        try (Stream<Path> paths = Files.walk(sourceRoot)) {
+
+            legacyFiles = paths
+                    .filter(path -> path.toString().endsWith(".java"))
+                    .filter(path -> containsLegacyStringCheck(readSource(path)))
+                    .map(sourceRoot::relativize)
+                    .collect(Collectors.toCollection(HashSet::new));
+        }
+
+        assertThat(legacyFiles).isEqualTo(COLLECTION_OR_ARRAY_CHECK_FILES);
+    }
+
+    private boolean containsLegacyStringCheck(String source) {
+
+        if (IMPORT_SPRING_STRING_UTILS.matcher(source).find()) {
+
+            return false;
+        }
+        String sourceWithoutSpringCalls = source.replace(SPRING_STRING_UTILS_PREFIX, "");
+        return IMPORT_LEGACY_STRING_UTILS.matcher(source).find()
+                && Arrays.stream(sourceWithoutSpringCalls.split("\\R"))
+                .anyMatch(line -> LEGACY_STRING_CHECK.matcher(line).find());
+    }
+
+    private String readSource(Path path) {
+
+        try {
+
+            return Files.readString(path);
+        }
+        catch (IOException e) {
+
+            throw new IllegalStateException("Unable to read source file: " + path, e);
+        }
+    }
+}

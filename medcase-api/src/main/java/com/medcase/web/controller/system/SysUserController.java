@@ -7,7 +7,6 @@ import com.medcase.common.core.domain.entity.SysRole;
 import com.medcase.common.core.domain.entity.SysUser;
 import com.medcase.common.enums.BusinessType;
 import com.medcase.common.utils.SecurityUtils;
-import com.medcase.common.utils.StringUtils;
 import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
@@ -23,6 +22,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -91,7 +91,7 @@ public class SysUserController extends BaseController {
         SysUser sysUser = null;
         List<Long> postIds = null;
         List<Long> roleIds = null;
-        if (StringUtils.isNotNull(userId)) {
+        if (com.medcase.common.utils.StringUtils.isNotNull(userId)) {
 
             userService.checkUserDataScope(userId);
             sysUser = userService.selectUserById(userId);
@@ -124,10 +124,10 @@ public class SysUserController extends BaseController {
         if (!userService.checkUserNameUnique(user)) {
             throw ExceptionUtil.business(ErrorCodeEnums.USERNAME_EXISTS, user.getUserName());
         }
-        else if (StringUtils.isNotEmpty(user.getPhonenumber()) && !userService.checkPhoneUnique(user)) {
+        else if (StringUtils.hasText(user.getPhonenumber()) && !userService.checkPhoneUnique(user)) {
             throw ExceptionUtil.business(ErrorCodeEnums.PHONE_EXISTS, user.getUserName());
         }
-        else if (StringUtils.isNotEmpty(user.getEmail()) && !userService.checkEmailUnique(user)) {
+        else if (StringUtils.hasText(user.getEmail()) && !userService.checkEmailUnique(user)) {
             throw ExceptionUtil.business(ErrorCodeEnums.EMAIL_EXISTS, user.getUserName());
         }
         user.setCreateBy(getUsername());
@@ -154,10 +154,10 @@ public class SysUserController extends BaseController {
         if (!userService.checkUserNameUnique(user)) {
             throw ExceptionUtil.business(ErrorCodeEnums.USERNAME_EXISTS, user.getUserName());
         }
-        else if (StringUtils.isNotEmpty(user.getPhonenumber()) && !userService.checkPhoneUnique(user)) {
+        else if (StringUtils.hasText(user.getPhonenumber()) && !userService.checkPhoneUnique(user)) {
             throw ExceptionUtil.business(ErrorCodeEnums.PHONE_EXISTS, user.getUserName());
         }
-        else if (StringUtils.isNotEmpty(user.getEmail()) && !userService.checkEmailUnique(user)) {
+        else if (StringUtils.hasText(user.getEmail()) && !userService.checkEmailUnique(user)) {
             throw ExceptionUtil.business(ErrorCodeEnums.EMAIL_EXISTS, user.getUserName());
         }
         user.setUpdateBy(getUsername());

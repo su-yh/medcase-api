@@ -16,10 +16,10 @@ import com.medcase.common.core.domain.entity.SysUser;
 import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.common.enums.BusinessType;
 import com.medcase.common.utils.DateUtils;
-import com.medcase.common.utils.StringUtils;
 import com.medcase.framework.web.service.TokenService;
 import com.medcase.system.service.SysUserService;
 import com.medcase.web.controller.system.dto.ProfileResponse;
+import org.springframework.util.StringUtils;
 
 /**
  * 个人信息 业务处理
@@ -65,10 +65,10 @@ public class SysProfileController extends BaseController {
         currentUser.setEmail(user.getEmail());
         currentUser.setPhonenumber(user.getPhonenumber());
         currentUser.setSex(user.getSex());
-        if (StringUtils.isNotEmpty(user.getPhonenumber()) && !userService.checkPhoneUnique(currentUser)) {
+        if (StringUtils.hasText(user.getPhonenumber()) && !userService.checkPhoneUnique(currentUser)) {
             throw ExceptionUtil.business(ErrorCodeEnums.PROFILE_PHONE_EXISTS, loginUser.getUsername());
         }
-        if (StringUtils.isNotEmpty(user.getEmail()) && !userService.checkEmailUnique(currentUser)) {
+        if (StringUtils.hasText(user.getEmail()) && !userService.checkEmailUnique(currentUser)) {
             throw ExceptionUtil.business(ErrorCodeEnums.PROFILE_EMAIL_EXISTS, loginUser.getUsername());
         }
         if (userService.updateUserProfile(currentUser) > 0) {

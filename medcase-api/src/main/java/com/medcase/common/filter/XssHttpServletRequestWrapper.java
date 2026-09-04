@@ -55,7 +55,7 @@ public class XssHttpServletRequestWrapper extends HttpServletRequestWrapper {
 
         // 为空，直接返回
         String json = IOUtils.toString(super.getInputStream(), "utf-8");
-        if (StringUtils.isEmpty(json)) {
+        if (!org.springframework.util.StringUtils.hasText(json)) {
 
             return super.getInputStream();
         }

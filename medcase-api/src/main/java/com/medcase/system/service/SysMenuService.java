@@ -94,7 +94,7 @@ public class SysMenuService {
         Set<String> permsSet = new HashSet<>();
         for (String perm : perms) {
 
-            if (StringUtils.isNotEmpty(perm)) {
+            if (org.springframework.util.StringUtils.hasText(perm)) {
 
                 permsSet.addAll(Arrays.asList(perm.trim().split(",")));
             }
@@ -113,7 +113,7 @@ public class SysMenuService {
         Set<String> permsSet = new HashSet<>();
         for (String perm : perms) {
 
-            if (StringUtils.isNotEmpty(perm)) {
+            if (org.springframework.util.StringUtils.hasText(perm)) {
 
                 permsSet.addAll(Arrays.asList(perm.trim().split(",")));
             }
@@ -361,7 +361,8 @@ public class SysMenuService {
         Long menuId = StringUtils.isNull(menu.getMenuId()) ? -1L : menu.getMenuId();
         Long parentId = menu.getParentId();
         String path = menu.getPath();
-        String routeName = StringUtils.isEmpty(menu.getRouteName()) ? path : menu.getRouteName();
+        String routeName = !org.springframework.util.StringUtils.hasText(menu.getRouteName())
+                ? path : menu.getRouteName();
         List<SysMenu> sysMenuList = menuMapper.selectMenusByPathOrRouteName(path, routeName);
         for (SysMenu sysMenu : sysMenuList) {
 
@@ -369,7 +370,8 @@ public class SysMenuService {
 
                 Long dbParentId = sysMenu.getParentId();
                 String dbPath = sysMenu.getPath();
-                String dbRouteName = StringUtils.isEmpty(sysMenu.getRouteName()) ? dbPath : sysMenu.getRouteName();
+                String dbRouteName = !org.springframework.util.StringUtils.hasText(sysMenu.getRouteName())
+                        ? dbPath : sysMenu.getRouteName();
                 if (StringUtils.equalsAnyIgnoreCase(path, dbPath) && parentId.longValue() == dbParentId.longValue()) {
 
                     log.warn("[同级路由冲突] 同级下已存在相同路由路径 '{}'，冲突菜单：{}", dbPath, sysMenu.getMenuName());
@@ -413,7 +415,7 @@ public class SysMenuService {
      */
     public String getRouteName(String name, String path) {
 
-        String routerName = StringUtils.isNotEmpty(name) ? name : path;
+        String routerName = org.springframework.util.StringUtils.hasText(name) ? name : path;
         return StringUtils.capitalize(routerName);
     }
 
@@ -452,15 +454,16 @@ public class SysMenuService {
     public String getComponent(SysMenu menu) {
 
         String component = UserConstants.LAYOUT;
-        if (StringUtils.isNotEmpty(menu.getComponent()) && !isMenuFrame(menu)) {
+        if (org.springframework.util.StringUtils.hasText(menu.getComponent()) && !isMenuFrame(menu)) {
 
             component = menu.getComponent();
         }
-        else if (StringUtils.isEmpty(menu.getComponent()) && menu.getParentId().intValue() != MENU_ROOT_ID && isInnerLink(menu)) {
+        else if (!org.springframework.util.StringUtils.hasText(menu.getComponent())
+                && menu.getParentId().intValue() != MENU_ROOT_ID && isInnerLink(menu)) {
 
             component = UserConstants.INNER_LINK;
         }
-        else if (StringUtils.isEmpty(menu.getComponent()) && isParentView(menu)) {
+        else if (!org.springframework.util.StringUtils.hasText(menu.getComponent()) && isParentView(menu)) {
 
             component = UserConstants.PARENT_VIEW;
         }

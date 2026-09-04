@@ -60,7 +60,7 @@ public class SysConfigService {
     public String selectConfigByKey(String configKey) {
 
         String configValue = Convert.toStr(redisCache.getCacheObject(getCacheKey(configKey)));
-        if (StringUtils.isNotEmpty(configValue)) {
+        if (org.springframework.util.StringUtils.hasText(configValue)) {
 
             return configValue;
         }
@@ -81,7 +81,7 @@ public class SysConfigService {
     public boolean selectCaptchaEnabled() {
 
         String captchaEnabled = selectConfigByKey("sys.account.captchaEnabled");
-        if (StringUtils.isEmpty(captchaEnabled)) {
+        if (!org.springframework.util.StringUtils.hasText(captchaEnabled)) {
 
             return true;
         }
@@ -219,6 +219,7 @@ public class SysConfigService {
     }
 
     private Date parseDate(String value) {
-        return StringUtils.isEmpty(value) ? null : com.medcase.common.utils.DateUtils.parseDate(value);
+        return !org.springframework.util.StringUtils.hasText(value)
+                ? null : com.medcase.common.utils.DateUtils.parseDate(value);
     }
 }

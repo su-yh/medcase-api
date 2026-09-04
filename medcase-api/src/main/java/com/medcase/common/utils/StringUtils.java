@@ -179,7 +179,7 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
      */
     public static String hide(CharSequence str, int startInclude, int endExclude) {
 
-        if (isEmpty(str)) {
+        if (!org.springframework.util.StringUtils.hasLength(str)) {
 
             return NULLSTR;
         }
@@ -299,7 +299,9 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
      */
     public static String substringBetweenLast(final String str, final String open, final String close) {
 
-        if (isEmpty(str) || isEmpty(open) || isEmpty(close)) {
+        if (!org.springframework.util.StringUtils.hasText(str)
+                || !org.springframework.util.StringUtils.hasText(open)
+                || !org.springframework.util.StringUtils.hasText(close)) {
 
             return NULLSTR;
         }
@@ -354,7 +356,7 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
      */
     public static String format(String template, Object... params) {
 
-        if (isEmpty(params) || isEmpty(template)) {
+        if (isEmpty(params) || !org.springframework.util.StringUtils.hasText(template)) {
 
             return template;
         }
@@ -408,20 +410,15 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
     public static final List<String> str2List(String str, String sep, boolean filterBlank, boolean trim) {
 
         List<String> list = new ArrayList<String>();
-        if (StringUtils.isEmpty(str)) {
+        if (!org.springframework.util.StringUtils.hasText(str)) {
 
             return list;
         }
 
-        // 过滤空白字符串
-        if (filterBlank && StringUtils.isBlank(str)) {
-
-            return list;
-        }
         String[] split = str.split(sep);
         for (String string : split) {
 
-            if (filterBlank && StringUtils.isBlank(string)) {
+            if (filterBlank && !org.springframework.util.StringUtils.hasText(string)) {
 
                 continue;
             }
@@ -745,7 +742,7 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
      */
     public static String lastStringDel(String str, String spit) {
 
-        if (!StringUtils.isEmpty(str) && str.endsWith(spit)) {
+        if (org.springframework.util.StringUtils.hasText(str) && str.endsWith(spit)) {
 
             return str.subSequence(0, str.length() - 1).toString();
         }
@@ -835,7 +832,7 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
      */
     public static boolean matches(String str, List<String> strs) {
 
-        if (isEmpty(str) || isEmpty(strs)) {
+        if (!org.springframework.util.StringUtils.hasText(str) || isEmpty(strs)) {
 
             return false;
         }

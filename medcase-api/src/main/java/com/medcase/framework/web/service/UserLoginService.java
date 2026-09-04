@@ -12,7 +12,6 @@ import com.medcase.common.enums.UserStatusEnums;
 import com.medcase.common.enums.UserTypeEnums;
 import com.medcase.common.utils.DateUtils;
 import com.medcase.common.utils.MessageUtils;
-import com.medcase.common.utils.StringUtils;
 import com.medcase.common.utils.ip.IpUtils;
 import com.medcase.framework.manager.AsyncManager;
 import com.medcase.framework.manager.factory.AsyncFactory;
@@ -24,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.util.StringUtils;
 import org.springframework.stereotype.Component;
 
 /**
@@ -68,7 +68,7 @@ public class UserLoginService {
             return;
         }
 
-        String verifyKey = CacheConstants.CAPTCHA_CODE_KEY + StringUtils.nvl(uuid, "");
+        String verifyKey = CacheConstants.CAPTCHA_CODE_KEY + com.medcase.common.utils.StringUtils.nvl(uuid, "");
         String captcha = redisCache.getCacheObject(verifyKey);
         if (captcha == null) {
             AsyncManager.me().execute(
@@ -86,7 +86,7 @@ public class UserLoginService {
     }
 
     public void loginPreCheck(String username, String password) {
-        if (StringUtils.isEmpty(username) || StringUtils.isEmpty(password)) {
+        if (!StringUtils.hasText(username) || !StringUtils.hasText(password)) {
             AsyncManager.me().execute(
                     AsyncFactory.recordLogininfor(username, Constants.LOGIN_FAIL, MessageUtils.message("not.null")));
             throw ExceptionUtil.business(ErrorCodeEnums.ADMIN_LOGIN_PARAMETER_EMPTY);
@@ -189,7 +189,7 @@ public class UserLoginService {
     }
 
     private String resolveExceptionMessage(Throwable throwable) {
-        if (StringUtils.isNotEmpty(throwable.getMessage())) {
+        if (StringUtils.hasText(throwable.getMessage())) {
             return throwable.getMessage();
         }
         return throwable.getClass().getSimpleName();

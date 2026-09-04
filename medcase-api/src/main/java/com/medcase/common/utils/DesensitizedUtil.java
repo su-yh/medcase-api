@@ -12,7 +12,7 @@ public class DesensitizedUtil {
      */
     public static String password(String password) {
 
-        if (StringUtils.isBlank(password)) {
+        if (!StringUtils.hasText(password)) {
 
             return StringUtils.EMPTY;
         }
@@ -26,7 +26,7 @@ public class DesensitizedUtil {
      */
     public static String carLicense(String carLicense) {
 
-        if (StringUtils.isBlank(carLicense)) {
+        if (!StringUtils.hasText(carLicense)) {
 
             return StringUtils.EMPTY;
         }

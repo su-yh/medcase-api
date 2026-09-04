@@ -2,7 +2,7 @@ package com.medcase.common.core.text;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import com.medcase.common.utils.StringUtils;
+import org.springframework.util.StringUtils;
 
 /**
  * 字符集工具类
@@ -32,7 +32,7 @@ public class CharsetKit {
      */
     public static Charset charset(String charset) {
 
-        return StringUtils.isEmpty(charset) ? Charset.defaultCharset() : Charset.forName(charset);
+        return !StringUtils.hasText(charset) ? Charset.defaultCharset() : Charset.forName(charset);
     }
 
     /**
@@ -68,7 +68,7 @@ public class CharsetKit {
             destCharset = StandardCharsets.UTF_8;
         }
 
-        if (StringUtils.isEmpty(source) || srcCharset.equals(destCharset)) {
+        if (!StringUtils.hasText(source) || srcCharset.equals(destCharset)) {
 
             return source;
         }

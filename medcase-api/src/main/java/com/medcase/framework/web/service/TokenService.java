@@ -63,7 +63,7 @@ public class TokenService {
 
         // 获取请求携带的令牌
         String token = getToken(request);
-        if (StringUtils.isNotEmpty(token)) {
+        if (org.springframework.util.StringUtils.hasText(token)) {
 
             try {
 
@@ -87,7 +87,7 @@ public class TokenService {
      */
     public void setLoginUser(LoginUser loginUser) {
 
-        if (StringUtils.isNotNull(loginUser) && StringUtils.isNotEmpty(loginUser.getToken())) {
+        if (StringUtils.isNotNull(loginUser) && org.springframework.util.StringUtils.hasText(loginUser.getToken())) {
 
             refreshToken(loginUser);
         }
@@ -107,7 +107,7 @@ public class TokenService {
      */
     public void delLoginUser(String token) {
 
-        if (StringUtils.isNotEmpty(token)) {
+        if (org.springframework.util.StringUtils.hasText(token)) {
 
             String userKey = getTokenKey(token);
             redisCache.deleteObject(userKey);
@@ -219,7 +219,7 @@ public class TokenService {
     private String getToken(HttpServletRequest request) {
 
         String token = request.getHeader(header);
-        if (StringUtils.isNotEmpty(token) && token.startsWith(Constants.TOKEN_PREFIX)) {
+        if (org.springframework.util.StringUtils.hasText(token) && token.startsWith(Constants.TOKEN_PREFIX)) {
 
             token = token.replace(Constants.TOKEN_PREFIX, "");
         }

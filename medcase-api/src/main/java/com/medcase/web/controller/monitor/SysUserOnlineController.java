@@ -46,15 +46,17 @@ public class SysUserOnlineController extends BaseController {
         for (String key : keys) {
 
             LoginUser user = redisCache.getCacheObject(key);
-            if (StringUtils.isNotEmpty(ipaddr) && StringUtils.isNotEmpty(userName)) {
+            if (org.springframework.util.StringUtils.hasText(ipaddr)
+                    && org.springframework.util.StringUtils.hasText(userName)) {
 
                 userOnlineList.add(userOnlineService.selectOnlineByInfo(ipaddr, userName, user));
             }
-            else if (StringUtils.isNotEmpty(ipaddr)) {
+            else if (org.springframework.util.StringUtils.hasText(ipaddr)) {
 
                 userOnlineList.add(userOnlineService.selectOnlineByIpaddr(ipaddr, user));
             }
-            else if (StringUtils.isNotEmpty(userName) && StringUtils.isNotNull(user.getUser())) {
+            else if (org.springframework.util.StringUtils.hasText(userName)
+                    && StringUtils.isNotNull(user.getUser())) {
 
                 userOnlineList.add(userOnlineService.selectOnlineByUserName(userName, user));
             }

@@ -1,6 +1,6 @@
 package com.medcase.common.utils.html;
 
-import com.medcase.common.utils.StringUtils;
+import org.springframework.util.StringUtils;
 
 /**
  * 转义和反转义工具类
@@ -68,9 +68,9 @@ public class EscapeUtil {
      */
     private static String encode(String text) {
 
-        if (StringUtils.isEmpty(text)) {
+        if (!StringUtils.hasText(text)) {
 
-            return StringUtils.EMPTY;
+            return "";
         }
 
         final StringBuilder tmp = new StringBuilder(text.length() * 6);
@@ -109,7 +109,7 @@ public class EscapeUtil {
      */
     public static String decode(String content) {
 
-        if (StringUtils.isEmpty(content)) {
+        if (!StringUtils.hasText(content)) {
 
             return content;
         }

@@ -1,10 +1,11 @@
 package com.medcase.common.utils.ip;
 
+import com.medcase.common.utils.ServletUtils;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.util.StringUtils;
+
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import jakarta.servlet.http.HttpServletRequest;
-import com.medcase.common.utils.ServletUtils;
-import com.medcase.common.utils.StringUtils;
 
 /**
  * 获取IP方法
@@ -87,7 +88,7 @@ public class IpUtils {
      */
     private static boolean internalIp(byte[] addr) {
 
-        if (StringUtils.isNull(addr) || addr.length < 2) {
+        if (com.medcase.common.utils.StringUtils.isNull(addr) || addr.length < 2) {
 
             return true;
         }
@@ -265,7 +266,7 @@ public class IpUtils {
                 }
             }
         }
-        return StringUtils.substring(ip, 0, 255);
+        return com.medcase.common.utils.StringUtils.substring(ip, 0, 255);
     }
 
     /**
@@ -276,7 +277,7 @@ public class IpUtils {
      */
     public static boolean isUnknown(String checkString) {
 
-        return StringUtils.isBlank(checkString) || "unknown".equalsIgnoreCase(checkString);
+        return !StringUtils.hasText(checkString) || "unknown".equalsIgnoreCase(checkString);
     }
 
     /**
@@ -284,7 +285,7 @@ public class IpUtils {
      */
     public static boolean isIP(String ip) {
 
-        return StringUtils.isNotBlank(ip) && ip.matches(REGX_IP);
+        return StringUtils.hasText(ip) && ip.matches(REGX_IP);
     }
 
     /**
@@ -292,7 +293,7 @@ public class IpUtils {
      */
     public static boolean isIpWildCard(String ip) {
 
-        return StringUtils.isNotBlank(ip) && ip.matches(REGX_IP_WILDCARD);
+        return StringUtils.hasText(ip) && ip.matches(REGX_IP_WILDCARD);
     }
 
     /**
@@ -319,7 +320,7 @@ public class IpUtils {
      */
     public static boolean isIPSegment(String ipSeg) {
 
-        return StringUtils.isNotBlank(ipSeg) && ipSeg.matches(REGX_IP_SEG);
+        return StringUtils.hasText(ipSeg) && ipSeg.matches(REGX_IP_SEG);
     }
 
     /**
@@ -356,7 +357,7 @@ public class IpUtils {
      */
     public static boolean isMatchedIp(String filter, String ip) {
 
-        if (StringUtils.isEmpty(filter) || StringUtils.isEmpty(ip)) {
+        if (!StringUtils.hasText(filter) || !StringUtils.hasText(ip)) {
 
             return false;
         }

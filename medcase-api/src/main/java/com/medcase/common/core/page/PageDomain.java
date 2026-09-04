@@ -1,6 +1,7 @@
 package com.medcase.common.core.page;
 
-import com.medcase.common.utils.StringUtils;
+
+import org.springframework.util.StringUtils;
 
 /**
  * 分页数据
@@ -24,11 +25,11 @@ public class PageDomain {
 
     public String getOrderBy() {
 
-        if (StringUtils.isEmpty(orderByColumn)) {
+        if (!StringUtils.hasText(orderByColumn)) {
 
             return "";
         }
-        return StringUtils.toUnderScoreCase(orderByColumn) + " " + isAsc;
+        return com.medcase.common.utils.StringUtils.toUnderScoreCase(orderByColumn) + " " + isAsc;
     }
 
     public Integer getPageNum() {
@@ -68,7 +69,7 @@ public class PageDomain {
 
     public void setIsAsc(String isAsc) {
 
-        if (StringUtils.isNotEmpty(isAsc)) {
+        if (StringUtils.hasText(isAsc)) {
 
             // 兼容前端排序类型
             if ("ascending".equals(isAsc)) {
@@ -85,7 +86,7 @@ public class PageDomain {
 
     public Boolean getReasonable() {
 
-        if (StringUtils.isNull(reasonable)) {
+        if (reasonable == null) {
 
             return Boolean.TRUE;
         }

@@ -1,6 +1,6 @@
 package com.medcase.common.xss;
 
-import com.medcase.common.utils.StringUtils;
+import org.springframework.util.StringUtils;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import java.util.regex.Matcher;
@@ -17,7 +17,7 @@ public class XssValidator implements ConstraintValidator<Xss, String> {
     @Override
     public boolean isValid(String value, ConstraintValidatorContext constraintValidatorContext) {
 
-        if (StringUtils.isBlank(value)) {
+        if (!StringUtils.hasText(value)) {
 
             return true;
         }

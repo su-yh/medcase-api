@@ -1,11 +1,5 @@
 package com.medcase.framework.aspectj;
 
-import java.util.ArrayList;
-import java.util.List;
-import org.aspectj.lang.JoinPoint;
-import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Before;
-import org.springframework.stereotype.Component;
 import com.medcase.common.annotation.DataScope;
 import com.medcase.common.constant.Constants;
 import com.medcase.common.constant.UserConstants;
@@ -17,6 +11,13 @@ import com.medcase.common.core.text.Convert;
 import com.medcase.common.utils.SecurityUtils;
 import com.medcase.common.utils.StringUtils;
 import com.medcase.framework.security.context.PermissionContextHolder;
+import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Before;
+import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 数据过滤处理
@@ -69,7 +70,7 @@ public class DataScopeAspect {
         List<String> conditions = new ArrayList<String>();
         List<String> scopeCustomIds = new ArrayList<String>();
         user.getRoles().forEach(role -> {
-            if (Constants.Dept.DATA_SCOPE_CUSTOM.equals(role.getDataScope()) && StringUtils.equals(role.getStatus(), UserConstants.ROLE_NORMAL) && (StringUtils.isEmpty(permission) || StringUtils.containsAny(role.getPermissions(), Convert.toStrArray(permission)))) {
+            if (Constants.Dept.DATA_SCOPE_CUSTOM.equals(role.getDataScope()) && StringUtils.equals(role.getStatus(), UserConstants.ROLE_NORMAL) && (!org.springframework.util.StringUtils.hasText(permission) || StringUtils.containsAny(role.getPermissions(), Convert.toStrArray(permission)))) {
 
                 scopeCustomIds.add(Convert.toStr(role.getRoleId()));
             }
@@ -82,7 +83,7 @@ public class DataScopeAspect {
 
                 continue;
             }
-            if (StringUtils.isNotEmpty(permission) && !StringUtils.containsAny(role.getPermissions(), Convert.toStrArray(permission))) {
+            if (org.springframework.util.StringUtils.hasText(permission) && !StringUtils.containsAny(role.getPermissions(), Convert.toStrArray(permission))) {
 
                 continue;
             }
@@ -114,7 +115,7 @@ public class DataScopeAspect {
             }
             else if (Constants.Dept.DATA_SCOPE_SELF.equals(dataScope)) {
 
-                if (StringUtils.isNotBlank(userAlias)) {
+                if (org.springframework.util.StringUtils.hasText(userAlias)) {
 
                     sqlString.append(StringUtils.format(" OR {}.{} = {} ", userAlias, userField, user.getUserId()));
                 }
@@ -128,12 +129,12 @@ public class DataScopeAspect {
         }
 
         // 角色都不包含传递过来的权限字符，这个时候sqlString也会为空，所以要限制一下,不查询任何数据
-        if (StringUtils.isEmpty(conditions)) {
+        if (com.medcase.common.utils.StringUtils.isEmpty(conditions)) {
 
             sqlString.append(StringUtils.format(" OR {}.{} = 0 ", deptAlias, deptField));
         }
 
-        if (StringUtils.isNotBlank(sqlString.toString())) {
+        if (org.springframework.util.StringUtils.hasText(sqlString.toString())) {
 
             Object params = joinPoint.getArgs()[0];
             if (StringUtils.isNotNull(params) && params instanceof BaseEntity) {

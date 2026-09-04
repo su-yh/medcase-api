@@ -47,7 +47,7 @@ public class SameUrlDataInterceptor extends RepeatSubmitInterceptor {
         }
 
         // body参数为空，获取Parameter的数据
-        if (StringUtils.isEmpty(nowParams)) {
+        if (!org.springframework.util.StringUtils.hasText(nowParams)) {
 
             nowParams = JsonUtils.toJSONString(request.getParameterMap());
         }

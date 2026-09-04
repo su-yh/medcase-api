@@ -1,8 +1,8 @@
 package com.medcase.common.utils.sql;
 
-import com.medcase.common.utils.StringUtils;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
+import org.springframework.util.StringUtils;
 
 /**
  * sql操作工具类
@@ -30,11 +30,11 @@ public class SqlUtil {
      */
     public static String escapeOrderBySql(String value) {
 
-        if (StringUtils.isNotEmpty(value) && !isValidOrderBySql(value)) {
+        if (StringUtils.hasText(value) && !isValidOrderBySql(value)) {
 
             throw ExceptionUtil.business(ErrorCodeEnums.SQL_ORDER_BY_INVALID);
         }
-        if (StringUtils.length(value) > ORDER_BY_MAX_LENGTH) {
+        if (com.medcase.common.utils.StringUtils.length(value) > ORDER_BY_MAX_LENGTH) {
 
             throw ExceptionUtil.business(ErrorCodeEnums.SQL_ORDER_BY_TOO_LONG);
         }
@@ -54,15 +54,15 @@ public class SqlUtil {
      */
     public static void filterKeyword(String value) {
 
-        if (StringUtils.isEmpty(value)) {
+        if (!StringUtils.hasText(value)) {
 
             return;
         }
         String normalizedValue = value.replaceAll("\\p{Z}|\\s", "");
-        String[] sqlKeywords = StringUtils.split(SQL_REGEX, "\\|");
+        String[] sqlKeywords = com.medcase.common.utils.StringUtils.split(SQL_REGEX, "\\|");
         for (String sqlKeyword : sqlKeywords) {
 
-            if (StringUtils.indexOfIgnoreCase(normalizedValue, sqlKeyword) > -1) {
+            if (com.medcase.common.utils.StringUtils.indexOfIgnoreCase(normalizedValue, sqlKeyword) > -1) {
 
                 throw ExceptionUtil.business(ErrorCodeEnums.SQL_KEYWORD_INVALID, sqlKeyword);
             }

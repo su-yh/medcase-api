@@ -1,10 +1,11 @@
 package com.medcase.common.utils.http;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import com.medcase.common.utils.StringUtils;
 import nl.basjes.parse.useragent.UserAgent;
 import nl.basjes.parse.useragent.UserAgentAnalyzer;
+import org.springframework.util.StringUtils;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * UserAgent解析工具类
@@ -49,7 +50,7 @@ public class UserAgentUtils {
 
         UserAgent.ImmutableUserAgent iua = userAgentAnalyzer.parse(userAgent);
         String agentNameVersion = iua.get(UserAgent.AGENT_NAME_VERSION).getValue();
-        if (StringUtils.isBlank(agentNameVersion) || agentNameVersion.contains("??")) {
+        if (!StringUtils.hasText(agentNameVersion) || agentNameVersion.contains("??")) {
 
             return formatBrowser(userAgent);
         }
@@ -63,7 +64,8 @@ public class UserAgentUtils {
 
         UserAgent.ImmutableUserAgent iua = userAgentAnalyzer.parse(userAgent);
         String operatingSystemNameVersion = iua.get(UserAgent.OPERATING_SYSTEM_NAME_VERSION).getValue();
-        if (StringUtils.isBlank(operatingSystemNameVersion) || operatingSystemNameVersion.contains("??")) {
+        if (!StringUtils.hasText(operatingSystemNameVersion)
+                || operatingSystemNameVersion.contains("??")) {
 
             return formatOperatingSystem(userAgent);
         }
@@ -192,9 +194,9 @@ public class UserAgentUtils {
      */
     private static String extractMajorVersion(String fullVersion) {
 
-        if (StringUtils.isEmpty(fullVersion)) {
+        if (!StringUtils.hasText(fullVersion)) {
 
-            return StringUtils.EMPTY;
+            return com.medcase.common.utils.StringUtils.EMPTY;
         }
         try {
 

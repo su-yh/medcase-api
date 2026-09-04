@@ -11,8 +11,8 @@ import com.medcase.mvc.exception.ExceptionUtil;
 import com.medcase.common.core.domain.entity.SysUser;
 import com.medcase.common.enums.UserTypeEnums;
 import com.medcase.common.utils.SecurityUtils;
-import com.medcase.common.utils.StringUtils;
 import com.medcase.system.service.SysUserService;
+import org.springframework.util.StringUtils;
 
 /**
  * 首页
@@ -34,7 +34,7 @@ public class SysIndexController {
     public void unlockScreen(@RequestBody Map<String, String> body) {
 
         String password = body.get("password");
-        if (StringUtils.isEmpty(password)) {
+        if (!StringUtils.hasText(password)) {
             throw ExceptionUtil.business(ErrorCodeEnums.SCREEN_UNLOCK_PASSWORD_EMPTY);
         }
         String username = SecurityUtils.getUsername();

@@ -82,7 +82,7 @@ public class SysDictTypeService {
 
         String cacheKey = CacheConstants.SYS_DICT_KEY + dictType;
         String arrayCache = redisCache.getCacheObject(cacheKey);
-        List<SysDictData> dictDatas = StringUtils.isNotEmpty(arrayCache)
+        List<SysDictData> dictDatas = org.springframework.util.StringUtils.hasText(arrayCache)
                 ? JsonUtils.parseArray(arrayCache, SysDictData.class) : null;
         if (StringUtils.isNotEmpty(dictDatas)) {
 
