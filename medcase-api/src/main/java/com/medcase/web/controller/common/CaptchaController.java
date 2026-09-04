@@ -8,7 +8,6 @@ import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
 import com.medcase.common.core.redis.RedisCache;
 import com.medcase.common.utils.sign.Base64;
-import com.medcase.common.utils.uuid.IdUtils;
 import com.medcase.system.service.SysConfigService;
 import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,7 +54,7 @@ public class CaptchaController {
         }
 
         // 保存验证码信息
-        String uuid = IdUtils.simpleUUID();
+        String uuid = java.util.UUID.randomUUID().toString().replace("-", "");
         String verifyKey = CacheConstants.CAPTCHA_CODE_KEY + uuid;
 
         String capStr = null, code = null;

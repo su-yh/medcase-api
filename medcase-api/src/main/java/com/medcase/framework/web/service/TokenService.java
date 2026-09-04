@@ -1,14 +1,5 @@
 package com.medcase.framework.web.service;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 import com.medcase.common.constant.CacheConstants;
 import com.medcase.common.constant.Constants;
 import com.medcase.common.core.domain.model.LoginUser;
@@ -17,13 +8,22 @@ import com.medcase.common.utils.ServletUtils;
 import com.medcase.common.utils.http.UserAgentUtils;
 import com.medcase.common.utils.ip.AddressUtils;
 import com.medcase.common.utils.ip.IpUtils;
-import com.medcase.common.utils.uuid.IdUtils;
 import com.medcase.system.event.UserAvatarUploadedEvent;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import jakarta.servlet.http.HttpServletRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.event.EventListener;
+import org.springframework.stereotype.Component;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * token验证处理
@@ -120,7 +120,7 @@ public class TokenService {
      */
     public String createToken(LoginUser loginUser) {
 
-        String token = IdUtils.randomUUID();
+        String token = java.util.UUID.randomUUID().toString();
         loginUser.setToken(token);
         setUserAgent(loginUser);
         refreshToken(loginUser);
