@@ -120,7 +120,7 @@ public class TokenService {
      */
     public String createToken(LoginUser loginUser) {
 
-        String token = IdUtils.fastUUID();
+        String token = IdUtils.randomUUID();
         loginUser.setToken(token);
         setUserAgent(loginUser);
         refreshToken(loginUser);
