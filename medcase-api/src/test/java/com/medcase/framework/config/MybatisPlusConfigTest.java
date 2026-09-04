@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.InnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
+import com.medcase.mp.config.MybatisPlusConfig;
 import com.medcase.storage.pojo.FileAttachment;
 import org.junit.jupiter.api.Test;
 

@@ -1,4 +1,4 @@
-package com.medcase.framework.config;
+package com.medcase.mp.config;
 
 import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;

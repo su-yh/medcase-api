@@ -1,17 +1,15 @@
 package com.medcase.common.utils;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
+import com.medcase.common.constant.Constants;
+import com.medcase.common.core.domain.model.LoginUser;
+import com.medcase.mvc.constants.enums.ErrorCodeEnums;
+import com.medcase.mvc.exception.ExceptionUtil;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.PatternMatchUtils;
 import org.springframework.util.StringUtils;
-import com.medcase.common.constant.Constants;
-import com.medcase.common.core.domain.entity.SysRole;
-import com.medcase.common.core.domain.model.LoginUser;
-import com.medcase.mvc.constants.enums.ErrorCodeEnums;
-import com.medcase.mvc.exception.ExceptionUtil;
+
+import java.util.Collection;
 
 /**
  * 安全服务工具类
@@ -131,32 +129,6 @@ public class SecurityUtils {
 
         return authorities.stream().filter(StringUtils::hasText)
                 .anyMatch(x -> Constants.ALL_PERMISSION.equals(x) || PatternMatchUtils.simpleMatch(x, permission));
-    }
-
-    /**
-     * 验证用户是否拥有某个角色
-     * 
-     * @param role 角色标识
-     * @return 用户是否具备某角色
-     */
-    public static boolean hasRole(String role) {
-
-        List<SysRole> roleList = getLoginUser().getUser().getRoles();
-        Collection<String> roles = roleList.stream().map(SysRole::getRoleKey).collect(Collectors.toSet());
-        return hasRole(roles, role);
-    }
-
-    /**
-     * 判断是否包含角色
-     * 
-     * @param roles 角色列表
-     * @param role 角色
-     * @return 用户是否具备某角色权限
-     */
-    public static boolean hasRole(Collection<String> roles, String role) {
-
-        return roles.stream().filter(StringUtils::hasText)
-                .anyMatch(x -> Constants.SUPER_ADMIN.equals(x) || PatternMatchUtils.simpleMatch(x, role));
     }
 
 }
