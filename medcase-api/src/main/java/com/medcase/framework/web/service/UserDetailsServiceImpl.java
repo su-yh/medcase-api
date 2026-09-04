@@ -4,7 +4,6 @@ import com.medcase.common.core.domain.entity.SysUser;
 import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.common.enums.UserTypeEnums;
 import com.medcase.common.enums.UserStatusEnums;
-import com.medcase.common.utils.StringUtils;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
 import com.medcase.system.service.SysUserService;
@@ -35,7 +34,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
         SysUser user = userService.selectUserByUserName(username, UserTypeEnums.ADMIN.getCode());
-        if (StringUtils.isNull(user)) {
+        if (user == null) {
 
             log.info("登录用户：{} 不存在.", username);
             throw ExceptionUtil.business(ErrorCodeEnums.ADMIN_LOGIN_FAILED);

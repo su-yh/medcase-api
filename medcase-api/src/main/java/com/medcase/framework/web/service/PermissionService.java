@@ -27,7 +27,7 @@ public class PermissionService {
             return false;
         }
         LoginUser loginUser = SecurityUtils.getLoginUser();
-        if (com.medcase.common.utils.StringUtils.isNull(loginUser) || CollectionUtils.isEmpty(loginUser.getPermissions())) {
+        if (loginUser == null || CollectionUtils.isEmpty(loginUser.getPermissions())) {
 
             return false;
         }
@@ -57,7 +57,7 @@ public class PermissionService {
             return false;
         }
         LoginUser loginUser = SecurityUtils.getLoginUser();
-        if (com.medcase.common.utils.StringUtils.isNull(loginUser) || CollectionUtils.isEmpty(loginUser.getPermissions())) {
+        if (loginUser == null || CollectionUtils.isEmpty(loginUser.getPermissions())) {
 
             return false;
         }
@@ -85,14 +85,15 @@ public class PermissionService {
             return false;
         }
         LoginUser loginUser = SecurityUtils.getLoginUser();
-        if (com.medcase.common.utils.StringUtils.isNull(loginUser) || CollectionUtils.isEmpty(loginUser.getUser().getRoles())) {
+        if (loginUser == null || CollectionUtils.isEmpty(loginUser.getUser().getRoles())) {
 
             return false;
         }
         for (SysRole sysRole : loginUser.getUser().getRoles()) {
 
             String roleKey = sysRole.getRoleKey();
-            if (Constants.SUPER_ADMIN.equals(roleKey) || roleKey.equals(com.medcase.common.utils.StringUtils.trim(role))) {
+            if (Constants.SUPER_ADMIN.equals(roleKey)
+                    || roleKey.equals(org.apache.commons.lang3.StringUtils.trimToEmpty(role))) {
 
                 return true;
             }
@@ -122,7 +123,7 @@ public class PermissionService {
             return false;
         }
         LoginUser loginUser = SecurityUtils.getLoginUser();
-        if (com.medcase.common.utils.StringUtils.isNull(loginUser) || CollectionUtils.isEmpty(loginUser.getUser().getRoles())) {
+        if (loginUser == null || CollectionUtils.isEmpty(loginUser.getUser().getRoles())) {
 
             return false;
         }
@@ -144,6 +145,7 @@ public class PermissionService {
      */
     private boolean hasPermissions(Set<String> permissions, String permission) {
 
-        return permissions.contains(Constants.ALL_PERMISSION) || permissions.contains(com.medcase.common.utils.StringUtils.trim(permission));
+        return permissions.contains(Constants.ALL_PERMISSION)
+                || permissions.contains(org.apache.commons.lang3.StringUtils.trimToEmpty(permission));
     }
 }

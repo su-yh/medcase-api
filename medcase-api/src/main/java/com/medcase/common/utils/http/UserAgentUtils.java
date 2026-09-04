@@ -196,7 +196,7 @@ public class UserAgentUtils {
 
         if (!StringUtils.hasText(fullVersion)) {
 
-            return com.medcase.common.utils.StringUtils.EMPTY;
+            return "";
         }
         try {
 

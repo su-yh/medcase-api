@@ -6,7 +6,6 @@ import org.slf4j.LoggerFactory;
 import com.medcase.common.constant.Constants;
 import com.medcase.common.utils.LogUtils;
 import com.medcase.common.utils.ServletUtils;
-import com.medcase.common.utils.StringUtils;
 import com.medcase.common.utils.http.UserAgentUtils;
 import com.medcase.common.utils.ip.AddressUtils;
 import com.medcase.common.utils.ip.IpUtils;
@@ -65,7 +64,8 @@ public class AsyncFactory {
                 logininfor.setOs(os);
                 logininfor.setMsg(message);
                 // 日志状态
-                if (StringUtils.equalsAny(status, Constants.LOGIN_SUCCESS, Constants.LOGOUT, Constants.REGISTER)) {
+                if (org.apache.commons.lang3.Strings.CS.equalsAny(
+                        status, Constants.LOGIN_SUCCESS, Constants.LOGOUT, Constants.REGISTER)) {
 
                     logininfor.setStatus(Constants.SUCCESS);
                 }

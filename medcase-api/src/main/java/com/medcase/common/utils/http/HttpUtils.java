@@ -40,7 +40,7 @@ public class HttpUtils {
      */
     public static String sendGet(String url) {
 
-        return sendGet(url, com.medcase.common.utils.StringUtils.EMPTY);
+        return sendGet(url, "");
     }
 
     /**

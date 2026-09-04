@@ -14,7 +14,6 @@ import com.medcase.common.constant.Constants;
 import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.common.core.redis.RedisCache;
 import com.medcase.common.utils.ServletUtils;
-import com.medcase.common.utils.StringUtils;
 import com.medcase.common.utils.http.UserAgentUtils;
 import com.medcase.common.utils.ip.AddressUtils;
 import com.medcase.common.utils.ip.IpUtils;
@@ -87,7 +86,7 @@ public class TokenService {
      */
     public void setLoginUser(LoginUser loginUser) {
 
-        if (StringUtils.isNotNull(loginUser) && org.springframework.util.StringUtils.hasText(loginUser.getToken())) {
+        if (loginUser != null && org.springframework.util.StringUtils.hasText(loginUser.getToken())) {
 
             refreshToken(loginUser);
         }

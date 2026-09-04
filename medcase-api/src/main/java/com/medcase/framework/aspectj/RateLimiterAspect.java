@@ -15,7 +15,6 @@ import org.springframework.data.redis.core.script.RedisScript;
 import org.springframework.stereotype.Component;
 import com.medcase.common.annotation.RateLimiter;
 import com.medcase.common.enums.LimitType;
-import com.medcase.common.utils.StringUtils;
 import com.medcase.common.utils.ip.IpUtils;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.AbstractBusinessException;
@@ -58,7 +57,7 @@ public class RateLimiterAspect {
         try {
 
             Long number = redisTemplate.execute(limitScript, keys, count, time);
-            if (StringUtils.isNull(number) || number.intValue() > count) {
+            if (number == null || number.intValue() > count) {
 
                 throw ExceptionUtil.business(ErrorCodeEnums.RATE_LIMIT_EXCEEDED);
             }

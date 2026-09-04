@@ -34,17 +34,6 @@ class StringUtilsMigrationTest {
     private static final Pattern IMPORT_LEGACY_STRING_UTILS = Pattern.compile(
             "import\\s+com\\.medcase\\.common\\.utils\\.StringUtils;");
 
-    private static final Set<Path> COLLECTION_OR_ARRAY_CHECK_FILES = Set.of(
-            Paths.get("com/medcase/system/service/SysDictTypeService.java"),
-            Paths.get("com/medcase/system/service/SysDeptService.java"),
-            Paths.get("com/medcase/system/service/SysRoleService.java"),
-            Paths.get("com/medcase/system/service/SysUserService.java"),
-            Paths.get("com/medcase/common/utils/spring/SpringUtils.java"),
-            Paths.get("com/medcase/framework/aspectj/LogAspect.java"),
-            Paths.get("com/medcase/common/core/text/StrFormatter.java"),
-            Paths.get("com/medcase/framework/aspectj/DataScopeAspect.java"),
-            Paths.get("com/medcase/system/service/SysMenuService.java"));
-
     @Test
     void replacesLegacyStringChecksWithSpringStringUtils() throws IOException {
 
@@ -59,7 +48,7 @@ class StringUtilsMigrationTest {
                     .collect(Collectors.toCollection(HashSet::new));
         }
 
-        assertThat(legacyFiles).isEqualTo(COLLECTION_OR_ARRAY_CHECK_FILES);
+        assertThat(legacyFiles).isEmpty();
     }
 
     @Test
@@ -72,6 +61,28 @@ class StringUtilsMigrationTest {
             legacyFiles = paths
                     .filter(path -> path.toString().endsWith(".java"))
                     .filter(path -> containsLegacySpringCompatibleMethod(readSource(path)))
+                    .map(sourceRoot::relativize)
+                    .collect(Collectors.toCollection(HashSet::new));
+        }
+
+        assertThat(legacyFiles).isEmpty();
+    }
+
+    @Test
+    void removesProjectStringUtilsReferences() throws IOException {
+
+        Path sourceRoot = Paths.get("src/main/java");
+        Set<Path> legacyFiles;
+        try (Stream<Path> paths = Files.walk(sourceRoot)) {
+
+            legacyFiles = paths
+                    .filter(path -> path.toString().endsWith(".java"))
+                    .filter(path -> !path.endsWith("common/utils/StringUtils.java"))
+                    .filter(path -> {
+                        String source = readSource(path);
+                        return source.contains("com.medcase.common.utils.StringUtils")
+                                || IMPORT_LEGACY_STRING_UTILS.matcher(source).find();
+                    })
                     .map(sourceRoot::relativize)
                     .collect(Collectors.toCollection(HashSet::new));
         }

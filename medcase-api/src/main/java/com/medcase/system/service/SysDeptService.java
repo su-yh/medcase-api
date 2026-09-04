@@ -15,7 +15,6 @@ import com.medcase.common.core.domain.entity.SysDept;
 import com.medcase.common.core.domain.entity.SysRole;
 import com.medcase.common.core.text.Convert;
 import com.medcase.common.utils.SecurityUtils;
-import com.medcase.common.utils.StringUtils;
 import com.medcase.common.utils.spring.SpringUtils;
 import com.medcase.system.converter.SystemEntityConverter;
 import com.medcase.system.entity.SysDeptEntity;
@@ -169,10 +168,10 @@ public class SysDeptService {
      */
     public boolean checkDeptNameUnique(SysDept dept) {
 
-        Long deptId = StringUtils.isNull(dept.getDeptId()) ? -1L : dept.getDeptId();
+        Long deptId = dept.getDeptId() == null ? -1L : dept.getDeptId();
         SysDept info = SystemEntityConverter.toDomain(
                 deptMapper.selectDeptByName(dept.getDeptName(), dept.getParentId()));
-        if (StringUtils.isNotNull(info) && info.getDeptId().longValue() != deptId.longValue()) {
+        if (info != null && info.getDeptId().longValue() != deptId.longValue()) {
 
             return UserConstants.NOT_UNIQUE;
         }
@@ -186,12 +185,12 @@ public class SysDeptService {
      */
     public void checkDeptDataScope(Long deptId) {
 
-        if (!SecurityUtils.isAdmin() && StringUtils.isNotNull(deptId)) {
+        if (!SecurityUtils.isAdmin() && deptId != null) {
 
             SysDept dept = new SysDept();
             dept.setDeptId(deptId);
             List<SysDept> depts = SpringUtils.getAopProxy(this).selectDeptList(dept);
-            if (StringUtils.isEmpty(depts)) {
+            if (org.springframework.util.CollectionUtils.isEmpty(depts)) {
 
                 throw ExceptionUtil.business(ErrorCodeEnums.DEPT_DATA_SCOPE_DENIED);
             }
@@ -231,7 +230,7 @@ public class SysDeptService {
                 deptMapper.selectById(dept.getParentId()));
         SysDept oldDept = SystemEntityConverter.toDomain(
                 deptMapper.selectById(dept.getDeptId()));
-        if (StringUtils.isNotNull(newParentDept) && StringUtils.isNotNull(oldDept)) {
+        if (newParentDept != null && oldDept != null) {
 
             String newAncestors = newParentDept.getAncestors() + "," + newParentDept.getDeptId();
             String oldAncestors = oldDept.getAncestors();
@@ -241,7 +240,7 @@ public class SysDeptService {
         int result = deptMapper.updateById(SystemEntityConverter.toEntity(dept));
         if (UserConstants.DEPT_NORMAL.equals(dept.getStatus())
                 && org.springframework.util.StringUtils.hasText(dept.getAncestors())
-                && !StringUtils.equals("0", dept.getAncestors())) {
+                && !"0".equals(dept.getAncestors())) {
 
             // 如果该部门是启用状态，则启用该部门的所有上级部门
             updateParentDeptStatusNormal(dept);
@@ -347,7 +346,7 @@ public class SysDeptService {
         while (it.hasNext()) {
 
             SysDept n = (SysDept) it.next();
-            if (StringUtils.isNotNull(n.getParentId()) && n.getParentId().longValue() == t.getDeptId().longValue()) {
+            if (n.getParentId() != null && n.getParentId().longValue() == t.getDeptId().longValue()) {
 
                 tlist.add(n);
             }

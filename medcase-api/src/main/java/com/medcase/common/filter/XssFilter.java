@@ -12,7 +12,6 @@ import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpMethod;
-import com.medcase.common.utils.StringUtils;
 
 /**
  * 防止XSS攻击的过滤器
@@ -59,11 +58,11 @@ public class XssFilter implements Filter {
         String url = request.getServletPath();
         String method = request.getMethod();
         // GET DELETE 不过滤
-        if (method == null || StringUtils.equalsAny(method, HttpMethod.GET.name(), HttpMethod.DELETE.name())) {
+        if (method == null || org.apache.commons.lang3.Strings.CS.equalsAny(method, HttpMethod.GET.name(), HttpMethod.DELETE.name())) {
 
             return true;
         }
-        return StringUtils.matches(url, excludes);
+        return excludes.stream().anyMatch(pattern -> new org.springframework.util.AntPathMatcher().match(pattern, url));
     }
 
     @Override

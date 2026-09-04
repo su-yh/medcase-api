@@ -34,7 +34,7 @@ public class SqlUtil {
 
             throw ExceptionUtil.business(ErrorCodeEnums.SQL_ORDER_BY_INVALID);
         }
-        if (com.medcase.common.utils.StringUtils.length(value) > ORDER_BY_MAX_LENGTH) {
+        if (value != null && value.length() > ORDER_BY_MAX_LENGTH) {
 
             throw ExceptionUtil.business(ErrorCodeEnums.SQL_ORDER_BY_TOO_LONG);
         }
@@ -62,7 +62,7 @@ public class SqlUtil {
         String[] sqlKeywords = StringUtils.tokenizeToStringArray(SQL_REGEX, "|", false, true);
         for (String sqlKeyword : sqlKeywords) {
 
-            if (com.medcase.common.utils.StringUtils.indexOfIgnoreCase(normalizedValue, sqlKeyword) > -1) {
+            if (org.apache.commons.lang3.Strings.CI.indexOf(normalizedValue, sqlKeyword) > -1) {
 
                 throw ExceptionUtil.business(ErrorCodeEnums.SQL_KEYWORD_INVALID, sqlKeyword);
             }

@@ -91,7 +91,7 @@ public class SysUserController extends BaseController {
         SysUser sysUser = null;
         List<Long> postIds = null;
         List<Long> roleIds = null;
-        if (com.medcase.common.utils.StringUtils.isNotNull(userId)) {
+        if (userId != null) {
 
             userService.checkUserDataScope(userId);
             sysUser = userService.selectUserById(userId);

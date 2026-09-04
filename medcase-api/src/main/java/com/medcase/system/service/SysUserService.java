@@ -6,7 +6,6 @@ import com.medcase.common.core.domain.entity.SysRole;
 import com.medcase.common.core.domain.entity.SysUser;
 import com.medcase.common.enums.UserTypeEnums;
 import com.medcase.common.utils.SecurityUtils;
-import com.medcase.common.utils.StringUtils;
 import com.medcase.common.utils.spring.SpringUtils;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
@@ -174,7 +173,7 @@ public class SysUserService {
         List<SysRole> list = roleMapper.selectRolesByUserName(userName);
         if (CollectionUtils.isEmpty(list)) {
 
-            return StringUtils.EMPTY;
+            return "";
         }
         return list.stream().map(SysRole::getRoleName).collect(Collectors.joining(","));
     }
@@ -190,7 +189,7 @@ public class SysUserService {
         List<SysPostEntity> list = postMapper.selectPostsByUserName(userName);
         if (CollectionUtils.isEmpty(list)) {
 
-            return StringUtils.EMPTY;
+            return "";
         }
         return list.stream().map(SysPostEntity::getPostName).collect(Collectors.joining(","));
     }
@@ -202,12 +201,12 @@ public class SysUserService {
      * @return 结果
      */
     public boolean checkUserNameUnique(SysUser user) {
-        Long userId = StringUtils.isNull(user.getUserId()) ? -1L : user.getUserId();
+        Long userId = user.getUserId() == null ? -1L : user.getUserId();
         useAdminUserTypeIfAbsent(user);
         SysUser info = SystemEntityConverter.toDomain(
                 userMapper.selectUserByUserNameAndType(
                         user.getUserName(), user.getUserType(), "0"));
-        if (StringUtils.isNotNull(info) && info.getUserId().longValue() != userId.longValue()) {
+        if (info != null && info.getUserId().longValue() != userId.longValue()) {
             return UserConstants.NOT_UNIQUE;
         }
         return UserConstants.UNIQUE;
@@ -220,12 +219,12 @@ public class SysUserService {
      * @return
      */
     public boolean checkPhoneUnique(SysUser user) {
-        Long userId = StringUtils.isNull(user.getUserId()) ? -1L : user.getUserId();
+        Long userId = user.getUserId() == null ? -1L : user.getUserId();
         useAdminUserTypeIfAbsent(user);
         SysUser info = SystemEntityConverter.toDomain(
                 userMapper.selectUserByPhoneAndType(
                         user.getPhonenumber(), user.getUserType(), "0"));
-        if (StringUtils.isNotNull(info) && info.getUserId().longValue() != userId.longValue()) {
+        if (info != null && info.getUserId().longValue() != userId.longValue()) {
             return UserConstants.NOT_UNIQUE;
         }
         return UserConstants.UNIQUE;
@@ -238,12 +237,12 @@ public class SysUserService {
      * @return
      */
     public boolean checkEmailUnique(SysUser user) {
-        Long userId = StringUtils.isNull(user.getUserId()) ? -1L : user.getUserId();
+        Long userId = user.getUserId() == null ? -1L : user.getUserId();
         useAdminUserTypeIfAbsent(user);
         SysUser info = SystemEntityConverter.toDomain(
                 userMapper.selectUserByEmailAndType(
                         user.getEmail(), user.getUserType(), "0"));
-        if (StringUtils.isNotNull(info) && info.getUserId().longValue() != userId.longValue()) {
+        if (info != null && info.getUserId().longValue() != userId.longValue()) {
             return UserConstants.NOT_UNIQUE;
         }
         return UserConstants.UNIQUE;
@@ -255,7 +254,7 @@ public class SysUserService {
      * @param user 用户信息
      */
     public void checkUserAllowed(SysUser user) {
-        if (StringUtils.isNotNull(user.getUserId()) && user.isAdmin()) {
+        if (user.getUserId() != null && user.isAdmin()) {
             throw ExceptionUtil.business(ErrorCodeEnums.SUPER_ADMIN_USER_OPERATION);
         }
     }
@@ -272,7 +271,7 @@ public class SysUserService {
             SysUser user = new SysUser();
             user.setUserId(userId);
             List<SysUser> users = SpringUtils.getAopProxy(this).selectUserList(user);
-            if (StringUtils.isEmpty(users)) {
+            if (org.springframework.util.CollectionUtils.isEmpty(users)) {
 
                 throw ExceptionUtil.business(ErrorCodeEnums.USER_DATA_SCOPE_DENIED);
             }
@@ -444,7 +443,7 @@ public class SysUserService {
     public void insertUserPost(SysUser user) {
 
         Long[] posts = user.getPostIds();
-        if (StringUtils.isNotEmpty(posts)) {
+        if (!org.springframework.util.ObjectUtils.isEmpty(posts)) {
 
             // 新增用户与岗位管理
             List<SysUserPostEntity> list = new ArrayList<>(posts.length);
@@ -467,7 +466,7 @@ public class SysUserService {
      */
     public void insertUserRole(Long userId, Long[] roleIds) {
 
-        if (StringUtils.isNotEmpty(roleIds)) {
+        if (!org.springframework.util.ObjectUtils.isEmpty(roleIds)) {
 
             // 新增用户与角色管理
             List<SysUserRoleEntity> list = new ArrayList<>(roleIds.length);

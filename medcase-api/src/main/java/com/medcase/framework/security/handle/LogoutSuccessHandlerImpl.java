@@ -13,7 +13,6 @@ import com.medcase.mvc.response.R;
 import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.common.utils.MessageUtils;
 import com.medcase.common.utils.ServletUtils;
-import com.medcase.common.utils.StringUtils;
 import com.medcase.common.utils.json.JsonUtils;
 import com.medcase.framework.manager.AsyncManager;
 import com.medcase.framework.manager.factory.AsyncFactory;
@@ -39,7 +38,7 @@ public class LogoutSuccessHandlerImpl implements LogoutSuccessHandler {
             throws IOException, ServletException {
 
         LoginUser loginUser = tokenService.getLoginUser(request);
-        if (StringUtils.isNotNull(loginUser)) {
+        if (loginUser != null) {
 
             String userName = loginUser.getUsername();
             // 删除用户缓存记录

@@ -94,7 +94,7 @@ public class ServletUtils {
         Map<String, String> params = new HashMap<>();
         for (Map.Entry<String, String[]> entry : getParams(request).entrySet()) {
 
-            params.put(entry.getKey(), StringUtils.join(entry.getValue(), ","));
+            params.put(entry.getKey(), org.apache.commons.lang3.StringUtils.join(entry.getValue(), ","));
         }
         return params;
     }
@@ -170,13 +170,13 @@ public class ServletUtils {
         }
 
         String uri = request.getRequestURI();
-        if (StringUtils.inStringIgnoreCase(uri, ".json", ".xml")) {
+        if (org.apache.commons.lang3.Strings.CI.equalsAny(uri, ".json", ".xml")) {
 
             return true;
         }
 
         String ajax = request.getParameter("__ajax");
-        return StringUtils.inStringIgnoreCase(ajax, "json", "xml");
+        return org.apache.commons.lang3.Strings.CI.equalsAny(ajax, "json", "xml");
     }
 
     /**
@@ -193,7 +193,7 @@ public class ServletUtils {
         }
         catch (UnsupportedEncodingException e) {
 
-            return StringUtils.EMPTY;
+            return "";
         }
     }
 
@@ -211,7 +211,7 @@ public class ServletUtils {
         }
         catch (UnsupportedEncodingException e) {
 
-            return StringUtils.EMPTY;
+            return "";
         }
     }
 }

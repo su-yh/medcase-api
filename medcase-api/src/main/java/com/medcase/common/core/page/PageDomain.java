@@ -29,7 +29,7 @@ public class PageDomain {
 
             return "";
         }
-        return com.medcase.common.utils.StringUtils.toUnderScoreCase(orderByColumn) + " " + isAsc;
+        return com.baomidou.mybatisplus.core.toolkit.StringUtils.camelToUnderline(orderByColumn) + " " + isAsc;
     }
 
     public Integer getPageNum() {

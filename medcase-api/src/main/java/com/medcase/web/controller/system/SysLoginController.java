@@ -9,7 +9,6 @@ import com.medcase.common.core.text.Convert;
 import com.medcase.common.enums.UserTypeEnums;
 import com.medcase.common.utils.DateUtils;
 import com.medcase.common.utils.SecurityUtils;
-import com.medcase.common.utils.StringUtils;
 import com.medcase.framework.web.service.SysPermissionService;
 import com.medcase.framework.web.service.TokenService;
 import com.medcase.framework.web.service.UserLoginService;
@@ -130,7 +129,7 @@ public class SysLoginController {
         Integer passwordValidateDays = Convert.toInt(configService.selectConfigByKey("sys.account.passwordValidateDays"));
         if (passwordValidateDays != null && passwordValidateDays > 0) {
 
-            if (StringUtils.isNull(pwdUpdateDate)) {
+            if (pwdUpdateDate == null) {
 
                 // 如果从未修改过初始密码，直接提醒过期
                 return true;

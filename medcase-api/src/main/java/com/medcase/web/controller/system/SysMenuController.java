@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.medcase.common.annotation.Log;
+import com.medcase.common.constant.Constants;
 import com.medcase.common.constant.UserConstants;
 import com.medcase.common.core.controller.BaseController;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
@@ -22,7 +23,6 @@ import com.medcase.common.core.domain.entity.SysMenu;
 import com.medcase.common.core.domain.TreeSelect;
 import com.medcase.web.controller.system.dto.MenuRoleTreeResponse;
 import com.medcase.common.enums.BusinessType;
-import com.medcase.common.utils.StringUtils;
 import com.medcase.system.service.SysMenuService;
 
 /**
@@ -89,7 +89,9 @@ public class SysMenuController extends BaseController {
         if (!menuService.checkMenuNameUnique(menu)) {
             throw ExceptionUtil.business(ErrorCodeEnums.MENU_NAME_EXISTS);
         }
-        else if (UserConstants.YES_FRAME.equals(menu.getIsFrame()) && !StringUtils.ishttp(menu.getPath())) {
+        else if (UserConstants.YES_FRAME.equals(menu.getIsFrame())
+                && !org.apache.commons.lang3.Strings.CS.startsWithAny(
+                menu.getPath(), Constants.HTTP, Constants.HTTPS)) {
             throw ExceptionUtil.business(ErrorCodeEnums.MENU_FRAME_URL_INVALID);
         }
         else if (!menuService.checkRouteConfigUnique(menu)) {
@@ -112,7 +114,9 @@ public class SysMenuController extends BaseController {
         if (!menuService.checkMenuNameUnique(menu)) {
             throw ExceptionUtil.business(ErrorCodeEnums.MENU_NAME_EXISTS);
         }
-        else if (UserConstants.YES_FRAME.equals(menu.getIsFrame()) && !StringUtils.ishttp(menu.getPath())) {
+        else if (UserConstants.YES_FRAME.equals(menu.getIsFrame())
+                && !org.apache.commons.lang3.Strings.CS.startsWithAny(
+                menu.getPath(), Constants.HTTP, Constants.HTTPS)) {
             throw ExceptionUtil.business(ErrorCodeEnums.MENU_FRAME_URL_INVALID);
         }
         else if (menu.getMenuId().equals(menu.getParentId())) {

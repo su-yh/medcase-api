@@ -19,7 +19,6 @@ import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
 import com.medcase.common.core.domain.entity.SysDictData;
 import com.medcase.common.enums.BusinessType;
-import com.medcase.common.utils.StringUtils;
 import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
 import com.medcase.system.service.SysDictDataService;
@@ -63,7 +62,7 @@ public class SysDictDataController extends BaseController {
     public List<SysDictData> dictType(@PathVariable String dictType) {
 
         List<SysDictData> data = dictTypeService.selectDictDataByType(dictType);
-        if (StringUtils.isNull(data)) {
+        if (data == null) {
 
             data = new ArrayList<SysDictData>();
         }

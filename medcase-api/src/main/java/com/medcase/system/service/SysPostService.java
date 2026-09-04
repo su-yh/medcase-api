@@ -5,7 +5,6 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.medcase.common.constant.UserConstants;
-import com.medcase.common.utils.StringUtils;
 import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
 import com.medcase.system.entity.SysPostEntity;
@@ -80,9 +79,9 @@ public class SysPostService {
      */
     public boolean checkPostNameUnique(Long postId, String postName) {
 
-        Long currentPostId = StringUtils.isNull(postId) ? -1L : postId;
+        Long currentPostId = postId == null ? -1L : postId;
         SysPostEntity info = postMapper.selectPostByName(postName);
-        if (StringUtils.isNotNull(info) && info.getPostId().longValue() != currentPostId.longValue()) {
+        if (info != null && info.getPostId().longValue() != currentPostId.longValue()) {
 
             return UserConstants.NOT_UNIQUE;
         }
@@ -97,9 +96,9 @@ public class SysPostService {
      */
     public boolean checkPostCodeUnique(Long postId, String postCode) {
 
-        Long currentPostId = StringUtils.isNull(postId) ? -1L : postId;
+        Long currentPostId = postId == null ? -1L : postId;
         SysPostEntity info = postMapper.selectPostByCode(postCode);
-        if (StringUtils.isNotNull(info) && info.getPostId().longValue() != currentPostId.longValue()) {
+        if (info != null && info.getPostId().longValue() != currentPostId.longValue()) {
 
             return UserConstants.NOT_UNIQUE;
         }

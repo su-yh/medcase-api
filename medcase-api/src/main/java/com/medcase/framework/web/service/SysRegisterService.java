@@ -96,7 +96,7 @@ public class SysRegisterService {
      */
     public void validateCaptcha(String code, String uuid) {
 
-        String verifyKey = CacheConstants.CAPTCHA_CODE_KEY + com.medcase.common.utils.StringUtils.nvl(uuid, "");
+        String verifyKey = CacheConstants.CAPTCHA_CODE_KEY + (uuid == null ? "" : uuid);
         String captcha = redisCache.getCacheObject(verifyKey);
         redisCache.deleteObject(verifyKey);
         if (captcha == null) {

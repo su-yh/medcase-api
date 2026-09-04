@@ -8,7 +8,6 @@ import com.medcase.common.enums.BusinessStatus;
 import com.medcase.common.filter.PropertyPreExcludeFilter;
 import com.medcase.common.utils.SecurityUtils;
 import com.medcase.common.utils.ServletUtils;
-import com.medcase.common.utils.StringUtils;
 import com.medcase.common.utils.ToolUtils;
 import com.medcase.common.utils.ip.IpUtils;
 import com.medcase.common.utils.json.JsonUtils;
@@ -98,12 +97,13 @@ public class LogAspect {
             // 请求的地址
             String ip = IpUtils.getIpAddr();
             operLog.setOperIp(ip);
-            operLog.setOperUrl(StringUtils.substring(ServletUtils.getRequest().getRequestURI(), 0, 255));
+            operLog.setOperUrl(org.apache.commons.lang3.StringUtils.substring(
+                    ServletUtils.getRequest().getRequestURI(), 0, 255));
             if (loginUser != null) {
 
                 operLog.setOperName(loginUser.getUsername());
                 SysUser currentUser = loginUser.getUser();
-                if (StringUtils.isNotNull(currentUser) && StringUtils.isNotNull(currentUser.getDept())) {
+                if (currentUser != null && currentUser.getDept() != null) {
 
                     operLog.setDeptName(currentUser.getDept().getDeptName());
                 }
@@ -112,7 +112,8 @@ public class LogAspect {
             if (e != null) {
 
                 operLog.setStatus(BusinessStatus.FAIL.ordinal());
-                operLog.setErrorMsg(StringUtils.substring(Convert.toStr(e.getMessage(), ToolUtils.getExceptionMessage(e)), 0, 2000));
+                operLog.setErrorMsg(org.apache.commons.lang3.StringUtils.substring(
+                        Convert.toStr(e.getMessage(), ToolUtils.getExceptionMessage(e)), 0, 2000));
             }
             // 设置方法名称
             String className = joinPoint.getTarget().getClass().getName();
@@ -161,9 +162,10 @@ public class LogAspect {
             setRequestValue(joinPoint, operLog, log.excludeParamNames());
         }
         // 是否需要保存response，参数和值
-        if (log.isSaveResponseData() && StringUtils.isNotNull(jsonResult)) {
+        if (log.isSaveResponseData() && jsonResult != null) {
 
-            operLog.setJsonResult(StringUtils.substring(JsonUtils.toJSONString(jsonResult), 0, 2000));
+            operLog.setJsonResult(org.apache.commons.lang3.StringUtils.substring(
+                    JsonUtils.toJSONString(jsonResult), 0, 2000));
         }
     }
 
@@ -177,14 +179,18 @@ public class LogAspect {
 
         String requestMethod = operLog.getRequestMethod();
         Map<?, ?> paramsMap = ServletUtils.getParamMap(ServletUtils.getRequest());
-        if (StringUtils.isEmpty(paramsMap) && StringUtils.equalsAny(requestMethod, HttpMethod.PUT.name(), HttpMethod.POST.name(), HttpMethod.DELETE.name())) {
+        if (org.springframework.util.CollectionUtils.isEmpty(paramsMap)
+                && org.apache.commons.lang3.Strings.CS.equalsAny(
+                requestMethod, HttpMethod.PUT.name(), HttpMethod.POST.name(), HttpMethod.DELETE.name())) {
 
             String params = argsArrayToString(joinPoint.getArgs(), excludeParamNames);
             operLog.setOperParam(params);
         }
         else {
 
-            operLog.setOperParam(StringUtils.substring(JsonUtils.toJSONString(paramsMap, excludePropertyPreFilter(excludeParamNames).getExcludes()), 0, PARAM_MAX_LENGTH));
+            operLog.setOperParam(org.apache.commons.lang3.StringUtils.substring(
+                    JsonUtils.toJSONString(paramsMap, excludePropertyPreFilter(excludeParamNames).getExcludes()),
+                    0, PARAM_MAX_LENGTH));
         }
     }
 
@@ -198,7 +204,7 @@ public class LogAspect {
 
             for (Object o : paramsArray) {
 
-                if (StringUtils.isNotNull(o) && !isFilterObject(o)) {
+                if (o != null && !isFilterObject(o)) {
 
                     try {
 
@@ -206,7 +212,8 @@ public class LogAspect {
                         params.append(jsonObj).append(" ");
                         if (params.length() >= PARAM_MAX_LENGTH) {
 
-                            return StringUtils.substring(params.toString(), 0, PARAM_MAX_LENGTH);
+                            return org.apache.commons.lang3.StringUtils.substring(
+                                    params.toString(), 0, PARAM_MAX_LENGTH);
                         }
                     }
                     catch (Exception e) {

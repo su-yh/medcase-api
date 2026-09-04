@@ -68,7 +68,7 @@ public class UserLoginService {
             return;
         }
 
-        String verifyKey = CacheConstants.CAPTCHA_CODE_KEY + com.medcase.common.utils.StringUtils.nvl(uuid, "");
+        String verifyKey = CacheConstants.CAPTCHA_CODE_KEY + (uuid == null ? "" : uuid);
         String captcha = redisCache.getCacheObject(verifyKey);
         if (captcha == null) {
             AsyncManager.me().execute(

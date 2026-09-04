@@ -20,7 +20,6 @@ import com.medcase.common.core.domain.entity.SysMenu;
 import com.medcase.common.core.domain.entity.SysRole;
 import com.medcase.common.core.text.Convert;
 import com.medcase.common.utils.SecurityUtils;
-import com.medcase.common.utils.StringUtils;
 import com.medcase.system.domain.vo.MetaVo;
 import com.medcase.system.domain.vo.RouterVo;
 import com.medcase.system.converter.SystemEntityConverter;
@@ -167,9 +166,12 @@ public class SysMenuService {
             router.setPath(getRouterPath(menu));
             router.setComponent(getComponent(menu));
             router.setQuery(menu.getQuery());
-            router.setMeta(new MetaVo(menu.getMenuName(), menu.getIcon(), StringUtils.equals("1", menu.getIsCache()), menu.getPath()));
+            router.setMeta(new MetaVo(
+                    menu.getMenuName(), menu.getIcon(), org.apache.commons.lang3.Strings.CS.equals("1", menu.getIsCache()),
+                    menu.getPath()));
             List<SysMenu> cMenus = menu.getChildren();
-            if (StringUtils.isNotEmpty(cMenus) && UserConstants.TYPE_DIR.equals(menu.getMenuType())) {
+            if (!org.springframework.util.CollectionUtils.isEmpty(cMenus)
+                    && UserConstants.TYPE_DIR.equals(menu.getMenuType())) {
 
                 router.setAlwaysShow(true);
                 router.setRedirect("noRedirect");
@@ -183,7 +185,9 @@ public class SysMenuService {
                 children.setPath(menu.getPath());
                 children.setComponent(menu.getComponent());
                 children.setName(getRouteName(menu.getRouteName(), menu.getPath()));
-                children.setMeta(new MetaVo(menu.getMenuName(), menu.getIcon(), StringUtils.equals("1", menu.getIsCache()), menu.getPath()));
+                children.setMeta(new MetaVo(
+                        menu.getMenuName(), menu.getIcon(),
+                        org.apache.commons.lang3.Strings.CS.equals("1", menu.getIsCache()), menu.getPath()));
                 children.setQuery(menu.getQuery());
                 childrenList.add(children);
                 router.setChildren(childrenList);
@@ -341,10 +345,10 @@ public class SysMenuService {
      */
     public boolean checkMenuNameUnique(SysMenu menu) {
 
-        Long menuId = StringUtils.isNull(menu.getMenuId()) ? -1L : menu.getMenuId();
+        Long menuId = menu.getMenuId() == null ? -1L : menu.getMenuId();
         SysMenu info = SystemEntityConverter.toDomain(
                 menuMapper.selectMenuByName(menu.getMenuName(), menu.getParentId()));
-        if (StringUtils.isNotNull(info) && info.getMenuId().longValue() != menuId.longValue()) {
+        if (info != null && info.getMenuId().longValue() != menuId.longValue()) {
 
             return UserConstants.NOT_UNIQUE;
         }
@@ -358,7 +362,7 @@ public class SysMenuService {
      */
     public boolean checkRouteConfigUnique(SysMenu menu) {
 
-        Long menuId = StringUtils.isNull(menu.getMenuId()) ? -1L : menu.getMenuId();
+        Long menuId = menu.getMenuId() == null ? -1L : menu.getMenuId();
         Long parentId = menu.getParentId();
         String path = menu.getPath();
         String routeName = !org.springframework.util.StringUtils.hasText(menu.getRouteName())
@@ -372,17 +376,19 @@ public class SysMenuService {
                 String dbPath = sysMenu.getPath();
                 String dbRouteName = !org.springframework.util.StringUtils.hasText(sysMenu.getRouteName())
                         ? dbPath : sysMenu.getRouteName();
-                if (StringUtils.equalsAnyIgnoreCase(path, dbPath) && parentId.longValue() == dbParentId.longValue()) {
+                if (org.apache.commons.lang3.Strings.CI.equalsAny(path, dbPath)
+                        && parentId.longValue() == dbParentId.longValue()) {
 
                     log.warn("[同级路由冲突] 同级下已存在相同路由路径 '{}'，冲突菜单：{}", dbPath, sysMenu.getMenuName());
                     return UserConstants.NOT_UNIQUE;
                 }
-                else if (StringUtils.equalsAnyIgnoreCase(path, dbPath) && parentId.longValue() == MENU_ROOT_ID) {
+                else if (org.apache.commons.lang3.Strings.CI.equalsAny(path, dbPath)
+                        && parentId.longValue() == MENU_ROOT_ID) {
 
                     log.warn("[根目录路由冲突] 根目录下路由 '{}' 必须唯一，已被菜单 '{}' 占用", path, sysMenu.getMenuName());
                     return UserConstants.NOT_UNIQUE;
                 }
-                else if (StringUtils.equalsAnyIgnoreCase(routeName, dbRouteName)) {
+                else if (org.apache.commons.lang3.Strings.CI.equalsAny(routeName, dbRouteName)) {
 
                     log.warn("[路由名称冲突] 路由名称 '{}' 需全局唯一，已被菜单 '{}' 使用", routeName, sysMenu.getMenuName());
                     return UserConstants.NOT_UNIQUE;
@@ -402,7 +408,7 @@ public class SysMenuService {
         // 非外链并且是一级目录（类型为目录）
         if (isMenuFrame(menu)) {
 
-            return StringUtils.EMPTY;
+            return "";
         }
         return getRouteName(menu.getRouteName(), menu.getPath());
     }
@@ -498,7 +504,9 @@ public class SysMenuService {
      */
     public boolean isInnerLink(SysMenu menu) {
 
-        return menu.getIsFrame().equals(UserConstants.NO_FRAME) && StringUtils.ishttp(menu.getPath());
+        return menu.getIsFrame().equals(UserConstants.NO_FRAME)
+                && org.apache.commons.lang3.Strings.CS.startsWithAny(
+                        menu.getPath(), Constants.HTTP, Constants.HTTPS);
     }
 
     /**
@@ -574,7 +582,8 @@ public class SysMenuService {
      */
     public String innerLinkReplaceEach(String path) {
 
-        return StringUtils.replaceEach(path, new String[] { Constants.HTTP, Constants.HTTPS, Constants.WWW, ".", ":" },
+        return org.apache.commons.lang3.StringUtils.replaceEach(
+                path, new String[] { Constants.HTTP, Constants.HTTPS, Constants.WWW, ".", ":" },
                 new String[] { "", "", "", "/", "/" });
     }
 }

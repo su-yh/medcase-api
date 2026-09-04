@@ -10,7 +10,6 @@ import com.medcase.common.constant.Constants;
 import com.medcase.common.constant.UserConstants;
 import com.medcase.common.core.domain.entity.SysRole;
 import com.medcase.common.core.domain.entity.SysUser;
-import com.medcase.common.utils.StringUtils;
 import com.medcase.system.service.SysMenuService;
 import com.medcase.system.service.SysRoleService;
 
@@ -67,7 +66,8 @@ public class SysPermissionService {
                 // 多角色设置permissions属性，以便数据权限匹配权限
                 for (SysRole role : roles) {
 
-                    if (StringUtils.equals(role.getStatus(), UserConstants.ROLE_NORMAL) && !role.isAdmin()) {
+                    if (org.apache.commons.lang3.Strings.CS.equals(role.getStatus(), UserConstants.ROLE_NORMAL)
+                            && !role.isAdmin()) {
 
                         Set<String> rolePerms = menuService.selectMenuPermsByRoleId(role.getRoleId());
                         role.setPermissions(rolePerms);

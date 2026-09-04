@@ -1,6 +1,5 @@
 package com.medcase.common.core.text;
 
-import com.medcase.common.utils.StringUtils;
 
 /**
  * 字符串格式化
@@ -28,7 +27,8 @@ public class StrFormatter {
      */
     public static String format(final String strPattern, final Object... argArray) {
 
-        if (!org.springframework.util.StringUtils.hasText(strPattern) || StringUtils.isEmpty(argArray)) {
+        if (!org.springframework.util.StringUtils.hasText(strPattern)
+                || org.springframework.util.ObjectUtils.isEmpty(argArray)) {
 
             return strPattern;
         }

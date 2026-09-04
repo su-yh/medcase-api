@@ -21,7 +21,6 @@ import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
 import com.medcase.common.core.domain.entity.SysDept;
 import com.medcase.common.enums.BusinessType;
-import com.medcase.common.utils.StringUtils;
 import com.medcase.system.service.SysDeptService;
 
 /**
@@ -105,7 +104,8 @@ public class SysDeptController extends BaseController {
         else if (dept.getParentId().equals(deptId)) {
             throw ExceptionUtil.business(ErrorCodeEnums.DEPT_PARENT_SELF);
         }
-        else if (StringUtils.equals(UserConstants.DEPT_DISABLE, dept.getStatus()) && deptService.selectNormalChildrenDeptById(deptId) > 0) {
+        else if (org.apache.commons.lang3.Strings.CS.equals(UserConstants.DEPT_DISABLE, dept.getStatus())
+                && deptService.selectNormalChildrenDeptById(deptId) > 0) {
             throw ExceptionUtil.business(ErrorCodeEnums.DEPT_ENABLED_CHILDREN);
         }
         dept.setUpdateBy(getUsername());

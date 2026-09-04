@@ -9,7 +9,6 @@ import com.medcase.common.constant.CacheConstants;
 import com.medcase.common.constant.UserConstants;
 import com.medcase.common.core.redis.RedisCache;
 import com.medcase.common.core.text.Convert;
-import com.medcase.common.utils.StringUtils;
 import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
 import com.medcase.system.entity.SysConfigEntity;
@@ -65,12 +64,12 @@ public class SysConfigService {
             return configValue;
         }
         SysConfigEntity config = configMapper.selectConfigByKey(configKey);
-        if (StringUtils.isNotNull(config)) {
+        if (config != null) {
 
             redisCache.setCacheObject(getCacheKey(configKey), config.getConfigValue());
             return config.getConfigValue();
         }
-        return StringUtils.EMPTY;
+        return "";
     }
 
     /**
@@ -128,7 +127,7 @@ public class SysConfigService {
     public int updateConfig(SysConfigEntity config) {
 
         SysConfigEntity temp = selectConfigById(config.getConfigId());
-        if (!StringUtils.equals(temp.getConfigKey(), config.getConfigKey())) {
+        if (!org.apache.commons.lang3.Strings.CS.equals(temp.getConfigKey(), config.getConfigKey())) {
 
             redisCache.deleteObject(getCacheKey(temp.getConfigKey()));
         }
@@ -151,7 +150,7 @@ public class SysConfigService {
         for (Long configId : configIds) {
 
             SysConfigEntity config = selectConfigById(configId);
-            if (StringUtils.equals(UserConstants.YES, config.getConfigType())) {
+            if (org.apache.commons.lang3.Strings.CS.equals(UserConstants.YES, config.getConfigType())) {
 
                 throw ExceptionUtil.business(ErrorCodeEnums.CONFIG_BUILTIN_DELETE, config.getConfigKey());
             }
@@ -198,9 +197,9 @@ public class SysConfigService {
      */
     public boolean checkConfigKeyUnique(Long configId, String configKey) {
 
-        Long currentConfigId = StringUtils.isNull(configId) ? -1L : configId;
+        Long currentConfigId = configId == null ? -1L : configId;
         SysConfigEntity info = configMapper.selectConfigByKey(configKey);
-        if (StringUtils.isNotNull(info) && info.getConfigId().longValue() != currentConfigId.longValue()) {
+        if (info != null && info.getConfigId().longValue() != currentConfigId.longValue()) {
 
             return UserConstants.NOT_UNIQUE;
         }

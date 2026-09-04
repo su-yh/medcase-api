@@ -12,7 +12,6 @@ import com.medcase.common.annotation.DataScope;
 import com.medcase.common.constant.UserConstants;
 import com.medcase.common.core.domain.entity.SysRole;
 import com.medcase.common.utils.SecurityUtils;
-import com.medcase.common.utils.StringUtils;
 import com.medcase.common.utils.spring.SpringUtils;
 import com.medcase.system.converter.SystemEntityConverter;
 import com.medcase.system.entity.SysRoleDeptEntity;
@@ -93,7 +92,7 @@ public class SysRoleService {
         Set<String> permsSet = new HashSet<>();
         for (SysRole perm : perms) {
 
-            if (StringUtils.isNotNull(perm)) {
+            if (perm != null) {
 
                 permsSet.addAll(Arrays.asList(perm.getRoleKey().trim().split(",")));
             }
@@ -141,10 +140,10 @@ public class SysRoleService {
      */
     public boolean checkRoleNameUnique(SysRole role) {
 
-        Long roleId = StringUtils.isNull(role.getRoleId()) ? -1L : role.getRoleId();
+        Long roleId = role.getRoleId() == null ? -1L : role.getRoleId();
         SysRole info = SystemEntityConverter.toDomain(
                 roleMapper.selectRoleByName(role.getRoleName()));
-        if (StringUtils.isNotNull(info) && info.getRoleId().longValue() != roleId.longValue()) {
+        if (info != null && info.getRoleId().longValue() != roleId.longValue()) {
 
             return UserConstants.NOT_UNIQUE;
         }
@@ -159,10 +158,10 @@ public class SysRoleService {
      */
     public boolean checkRoleKeyUnique(SysRole role) {
 
-        Long roleId = StringUtils.isNull(role.getRoleId()) ? -1L : role.getRoleId();
+        Long roleId = role.getRoleId() == null ? -1L : role.getRoleId();
         SysRole info = SystemEntityConverter.toDomain(
                 roleMapper.selectRoleByKey(role.getRoleKey()));
-        if (StringUtils.isNotNull(info) && info.getRoleId().longValue() != roleId.longValue()) {
+        if (info != null && info.getRoleId().longValue() != roleId.longValue()) {
 
             return UserConstants.NOT_UNIQUE;
         }
@@ -176,7 +175,7 @@ public class SysRoleService {
      */
     public void checkRoleAllowed(SysRole role) {
 
-        if (StringUtils.isNotNull(role.getRoleId()) && role.isAdmin()) {
+        if (role.getRoleId() != null && role.isAdmin()) {
 
             throw ExceptionUtil.business(ErrorCodeEnums.SUPER_ADMIN_ROLE_OPERATION);
         }
@@ -196,7 +195,7 @@ public class SysRoleService {
                 SysRole role = new SysRole();
                 role.setRoleId(roleId);
                 List<SysRole> roles = SpringUtils.getAopProxy(this).selectRoleList(role);
-                if (StringUtils.isEmpty(roles)) {
+                if (org.springframework.util.CollectionUtils.isEmpty(roles)) {
 
                     throw ExceptionUtil.business(ErrorCodeEnums.ROLE_DATA_SCOPE_DENIED);
                 }

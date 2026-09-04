@@ -88,7 +88,7 @@ public class IpUtils {
      */
     private static boolean internalIp(byte[] addr) {
 
-        if (com.medcase.common.utils.StringUtils.isNull(addr) || addr.length < 2) {
+        if (addr == null || addr.length < 2) {
 
             return true;
         }
@@ -266,7 +266,7 @@ public class IpUtils {
                 }
             }
         }
-        return com.medcase.common.utils.StringUtils.substring(ip, 0, 255);
+        return ip == null ? "" : ip.substring(0, Math.min(ip.length(), 255));
     }
 
     /**

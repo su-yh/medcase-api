@@ -13,7 +13,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.common.utils.SecurityUtils;
-import com.medcase.common.utils.StringUtils;
 import com.medcase.framework.web.service.TokenService;
 
 /**
@@ -31,7 +30,7 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         LoginUser loginUser = tokenService.getLoginUser(request);
-        if (StringUtils.isNotNull(loginUser) && StringUtils.isNull(SecurityUtils.getAuthentication())) {
+        if (loginUser != null && SecurityUtils.getAuthentication() == null) {
 
             tokenService.verifyToken(loginUser);
             UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(loginUser, null, loginUser.getAuthorities());

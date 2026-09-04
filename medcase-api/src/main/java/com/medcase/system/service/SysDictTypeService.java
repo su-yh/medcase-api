@@ -13,7 +13,6 @@ import com.medcase.common.constant.UserConstants;
 import com.medcase.common.core.domain.entity.SysDictData;
 import com.medcase.common.core.domain.entity.SysDictType;
 import com.medcase.common.core.redis.RedisCache;
-import com.medcase.common.utils.StringUtils;
 import com.medcase.common.utils.json.JsonUtils;
 import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
@@ -84,14 +83,14 @@ public class SysDictTypeService {
         String arrayCache = redisCache.getCacheObject(cacheKey);
         List<SysDictData> dictDatas = org.springframework.util.StringUtils.hasText(arrayCache)
                 ? JsonUtils.parseArray(arrayCache, SysDictData.class) : null;
-        if (StringUtils.isNotEmpty(dictDatas)) {
+        if (!org.springframework.util.CollectionUtils.isEmpty(dictDatas)) {
 
             return dictDatas;
         }
         dictDatas = SystemEntityConverter.copyList(
                 dictDataMapper.selectEnabledDictDataByType(dictType),
                 SysDictData.class);
-        if (StringUtils.isNotEmpty(dictDatas)) {
+        if (!org.springframework.util.CollectionUtils.isEmpty(dictDatas)) {
 
             redisCache.setCacheObject(cacheKey, JsonUtils.toJSONString(dictDatas));
             return dictDatas;
@@ -228,10 +227,10 @@ public class SysDictTypeService {
      */
     public boolean checkDictTypeUnique(SysDictType dict) {
 
-        Long dictId = StringUtils.isNull(dict.getDictId()) ? -1L : dict.getDictId();
+        Long dictId = dict.getDictId() == null ? -1L : dict.getDictId();
         SysDictType dictType = SystemEntityConverter.toDomain(
                 dictTypeMapper.selectDictTypeByType(dict.getDictType()));
-        if (StringUtils.isNotNull(dictType) && dictType.getDictId().longValue() != dictId.longValue()) {
+        if (dictType != null && dictType.getDictId().longValue() != dictId.longValue()) {
 
             return UserConstants.NOT_UNIQUE;
         }

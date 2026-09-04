@@ -17,7 +17,6 @@ import com.medcase.common.core.controller.BaseController;
 import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.common.core.redis.RedisCache;
 import com.medcase.common.enums.BusinessType;
-import com.medcase.common.utils.StringUtils;
 import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
 import com.medcase.system.domain.SysUserOnline;
@@ -56,7 +55,7 @@ public class SysUserOnlineController extends BaseController {
                 userOnlineList.add(userOnlineService.selectOnlineByIpaddr(ipaddr, user));
             }
             else if (org.springframework.util.StringUtils.hasText(userName)
-                    && StringUtils.isNotNull(user.getUser())) {
+                    && user.getUser() != null) {
 
                 userOnlineList.add(userOnlineService.selectOnlineByUserName(userName, user));
             }

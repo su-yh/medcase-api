@@ -1,6 +1,5 @@
 package com.medcase.system.domain.vo;
 
-import com.medcase.common.utils.StringUtils;
 import lombok.Data;
 
 /**
@@ -59,7 +58,8 @@ public class MetaVo {
         this.title = title;
         this.icon = icon;
         this.noCache = noCache;
-        if (StringUtils.ishttp(link)) {
+        if (org.apache.commons.lang3.Strings.CS.startsWithAny(
+                link, com.medcase.common.constant.Constants.HTTP, com.medcase.common.constant.Constants.HTTPS)) {
 
             this.link = link;
         }

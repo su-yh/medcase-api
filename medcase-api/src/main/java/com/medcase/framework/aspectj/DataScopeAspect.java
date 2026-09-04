@@ -9,7 +9,6 @@ import com.medcase.common.core.domain.entity.SysUser;
 import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.common.core.text.Convert;
 import com.medcase.common.utils.SecurityUtils;
-import com.medcase.common.utils.StringUtils;
 import com.medcase.framework.security.context.PermissionContextHolder;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
@@ -43,13 +42,14 @@ public class DataScopeAspect {
 
         // 获取当前的用户
         LoginUser loginUser = SecurityUtils.getLoginUser();
-        if (StringUtils.isNotNull(loginUser)) {
+        if (loginUser != null) {
 
             SysUser currentUser = loginUser.getUser();
             // 如果是超级管理员，则不过滤数据
-            if (StringUtils.isNotNull(currentUser) && !currentUser.isAdmin()) {
+            if (currentUser != null && !currentUser.isAdmin()) {
 
-                String permission = StringUtils.defaultIfEmpty(controllerDataScope.permission(), PermissionContextHolder.getContext());
+                String permission = org.apache.commons.lang3.StringUtils.defaultIfEmpty(
+                        controllerDataScope.permission(), PermissionContextHolder.getContext());
                 dataScopeFilter(joinPoint, currentUser, controllerDataScope.userAlias(), controllerDataScope.deptAlias(), controllerDataScope.userField(), controllerDataScope.deptField(), permission);
             }
         }
@@ -70,7 +70,11 @@ public class DataScopeAspect {
         List<String> conditions = new ArrayList<String>();
         List<String> scopeCustomIds = new ArrayList<String>();
         user.getRoles().forEach(role -> {
-            if (Constants.Dept.DATA_SCOPE_CUSTOM.equals(role.getDataScope()) && StringUtils.equals(role.getStatus(), UserConstants.ROLE_NORMAL) && (!org.springframework.util.StringUtils.hasText(permission) || StringUtils.containsAny(role.getPermissions(), Convert.toStrArray(permission)))) {
+            if (Constants.Dept.DATA_SCOPE_CUSTOM.equals(role.getDataScope())
+                    && org.apache.commons.lang3.Strings.CS.equals(role.getStatus(), UserConstants.ROLE_NORMAL)
+                    && (!org.springframework.util.StringUtils.hasText(permission)
+                    || org.springframework.util.CollectionUtils.containsAny(
+                    role.getPermissions(), java.util.Arrays.asList(Convert.toStrArray(permission))))) {
 
                 scopeCustomIds.add(Convert.toStr(role.getRoleId()));
             }
@@ -79,11 +83,14 @@ public class DataScopeAspect {
         for (SysRole role : user.getRoles()) {
 
             String dataScope = role.getDataScope();
-            if (conditions.contains(dataScope) || StringUtils.equals(role.getStatus(), UserConstants.ROLE_DISABLE)) {
+            if (conditions.contains(dataScope)
+                    || org.apache.commons.lang3.Strings.CS.equals(role.getStatus(), UserConstants.ROLE_DISABLE)) {
 
                 continue;
             }
-            if (org.springframework.util.StringUtils.hasText(permission) && !StringUtils.containsAny(role.getPermissions(), Convert.toStrArray(permission))) {
+            if (org.springframework.util.StringUtils.hasText(permission)
+                    && !org.springframework.util.CollectionUtils.containsAny(
+                    role.getPermissions(), java.util.Arrays.asList(Convert.toStrArray(permission)))) {
 
                 continue;
             }
@@ -98,46 +105,56 @@ public class DataScopeAspect {
                 if (scopeCustomIds.size() > 1) {
 
                     // 多个自定数据权限使用in查询，避免多次拼接。
-                    sqlString.append(StringUtils.format(" OR {}.{} IN ( SELECT dept_id FROM sys_role_dept WHERE role_id in ({}) ) ", deptAlias, deptField, String.join(",", scopeCustomIds)));
+                    sqlString.append(com.medcase.common.core.text.StrFormatter.format(
+                            " OR {}.{} IN ( SELECT dept_id FROM sys_role_dept WHERE role_id in ({}) ) ",
+                            deptAlias, deptField, String.join(",", scopeCustomIds)));
                 }
                 else {
 
-                    sqlString.append(StringUtils.format(" OR {}.{} IN ( SELECT dept_id FROM sys_role_dept WHERE role_id = {} ) ", deptAlias, deptField, role.getRoleId()));
+                    sqlString.append(com.medcase.common.core.text.StrFormatter.format(
+                            " OR {}.{} IN ( SELECT dept_id FROM sys_role_dept WHERE role_id = {} ) ",
+                            deptAlias, deptField, role.getRoleId()));
                 }
             }
             else if (Constants.Dept.DATA_SCOPE_DEPT.equals(dataScope)) {
 
-                sqlString.append(StringUtils.format(" OR {}.{} = {} ", deptAlias, deptField, user.getDeptId()));
+                sqlString.append(com.medcase.common.core.text.StrFormatter.format(
+                        " OR {}.{} = {} ", deptAlias, deptField, user.getDeptId()));
             }
             else if (Constants.Dept.DATA_SCOPE_DEPT_AND_CHILD.equals(dataScope)) {
 
-                sqlString.append(StringUtils.format(" OR {}.{} IN ( SELECT dept_id FROM sys_dept WHERE dept_id = {} or find_in_set( {} , ancestors ) )", deptAlias, deptField, user.getDeptId(), user.getDeptId()));
+                sqlString.append(com.medcase.common.core.text.StrFormatter.format(
+                        " OR {}.{} IN ( SELECT dept_id FROM sys_dept WHERE dept_id = {} or find_in_set( {} , ancestors ) )",
+                        deptAlias, deptField, user.getDeptId(), user.getDeptId()));
             }
             else if (Constants.Dept.DATA_SCOPE_SELF.equals(dataScope)) {
 
                 if (org.springframework.util.StringUtils.hasText(userAlias)) {
 
-                    sqlString.append(StringUtils.format(" OR {}.{} = {} ", userAlias, userField, user.getUserId()));
+                    sqlString.append(com.medcase.common.core.text.StrFormatter.format(
+                            " OR {}.{} = {} ", userAlias, userField, user.getUserId()));
                 }
                 else {
 
                     // 数据权限为仅本人且没有userAlias别名不查询任何数据
-                    sqlString.append(StringUtils.format(" OR {}.{} = 0 ", deptAlias, deptField));
+                    sqlString.append(com.medcase.common.core.text.StrFormatter.format(
+                            " OR {}.{} = 0 ", deptAlias, deptField));
                 }
             }
             conditions.add(dataScope);
         }
 
         // 角色都不包含传递过来的权限字符，这个时候sqlString也会为空，所以要限制一下,不查询任何数据
-        if (com.medcase.common.utils.StringUtils.isEmpty(conditions)) {
+        if (org.springframework.util.CollectionUtils.isEmpty(conditions)) {
 
-            sqlString.append(StringUtils.format(" OR {}.{} = 0 ", deptAlias, deptField));
+            sqlString.append(com.medcase.common.core.text.StrFormatter.format(
+                    " OR {}.{} = 0 ", deptAlias, deptField));
         }
 
         if (org.springframework.util.StringUtils.hasText(sqlString.toString())) {
 
             Object params = joinPoint.getArgs()[0];
-            if (StringUtils.isNotNull(params) && params instanceof BaseEntity) {
+            if (params != null && params instanceof BaseEntity) {
 
                 BaseEntity baseEntity = (BaseEntity) params;
                 baseEntity.getParams().put(DATA_SCOPE, " AND (" + sqlString.substring(4) + ")");
@@ -151,7 +168,7 @@ public class DataScopeAspect {
     private void clearDataScope(final JoinPoint joinPoint) {
 
         Object params = joinPoint.getArgs()[0];
-        if (StringUtils.isNotNull(params) && params instanceof BaseEntity) {
+        if (params != null && params instanceof BaseEntity) {
 
             BaseEntity baseEntity = (BaseEntity) params;
             baseEntity.getParams().put(DATA_SCOPE, "");

@@ -11,7 +11,6 @@ import com.medcase.common.annotation.RepeatSubmit;
 import com.medcase.common.constant.CacheConstants;
 import com.medcase.common.core.redis.RedisCache;
 import com.medcase.common.filter.RepeatedlyRequestWrapper;
-import com.medcase.common.utils.StringUtils;
 import com.medcase.common.utils.http.HttpHelper;
 import com.medcase.common.utils.json.JsonUtils;
 import com.medcase.framework.interceptor.RepeatSubmitInterceptor;
@@ -59,7 +58,7 @@ public class SameUrlDataInterceptor extends RepeatSubmitInterceptor {
         String url = request.getRequestURI();
 
         // 唯一值（没有消息头则使用请求地址）
-        String submitKey = StringUtils.trimToEmpty(request.getHeader(header));
+        String submitKey = org.apache.commons.lang3.StringUtils.trimToEmpty(request.getHeader(header));
 
         // 唯一标识（指定key + url + 消息头）
         String cacheRepeatKey = CacheConstants.REPEAT_SUBMIT_KEY + url + submitKey;

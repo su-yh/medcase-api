@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.medcase.common.constant.CacheConstants;
-import com.medcase.common.utils.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import com.medcase.system.domain.SysCache;
 import com.medcase.web.controller.monitor.dto.CacheCommandStat;
 import com.medcase.web.controller.monitor.dto.CacheInfoResponse;

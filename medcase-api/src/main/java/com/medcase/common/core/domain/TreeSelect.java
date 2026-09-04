@@ -7,7 +7,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.medcase.common.constant.UserConstants;
 import com.medcase.common.core.domain.entity.SysDept;
 import com.medcase.common.core.domain.entity.SysMenu;
-import com.medcase.common.utils.StringUtils;
 import lombok.Data;
 
 /**
@@ -41,7 +40,7 @@ public class TreeSelect implements Serializable {
 
         this.id = dept.getDeptId();
         this.label = dept.getDeptName();
-        this.disabled = StringUtils.equals(UserConstants.DEPT_DISABLE, dept.getStatus());
+        this.disabled = UserConstants.DEPT_DISABLE.equals(dept.getStatus());
         this.children = dept.getChildren().stream().map(TreeSelect::new).collect(Collectors.toList());
     }
 

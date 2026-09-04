@@ -2,7 +2,6 @@ package com.medcase.system.service;
 
 import org.springframework.stereotype.Service;
 import com.medcase.common.core.domain.model.LoginUser;
-import com.medcase.common.utils.StringUtils;
 import com.medcase.system.domain.SysUserOnline;
 
 /**
@@ -21,7 +20,7 @@ public class SysUserOnlineService {
      */
     public SysUserOnline selectOnlineByIpaddr(String ipaddr, LoginUser user) {
 
-        if (StringUtils.equals(ipaddr, user.getIpaddr())) {
+        if (java.util.Objects.equals(ipaddr, user.getIpaddr())) {
 
             return loginUserToUserOnline(user);
         }
@@ -37,7 +36,7 @@ public class SysUserOnlineService {
      */
     public SysUserOnline selectOnlineByUserName(String userName, LoginUser user) {
 
-        if (StringUtils.equals(userName, user.getUsername())) {
+        if (java.util.Objects.equals(userName, user.getUsername())) {
 
             return loginUserToUserOnline(user);
         }
@@ -54,7 +53,8 @@ public class SysUserOnlineService {
      */
     public SysUserOnline selectOnlineByInfo(String ipaddr, String userName, LoginUser user) {
 
-        if (StringUtils.equals(ipaddr, user.getIpaddr()) && StringUtils.equals(userName, user.getUsername())) {
+        if (java.util.Objects.equals(ipaddr, user.getIpaddr())
+                && java.util.Objects.equals(userName, user.getUsername())) {
 
             return loginUserToUserOnline(user);
         }
@@ -69,7 +69,7 @@ public class SysUserOnlineService {
      */
     public SysUserOnline loginUserToUserOnline(LoginUser user) {
 
-        if (StringUtils.isNull(user) || StringUtils.isNull(user.getUser())) {
+        if (user == null || user.getUser() == null) {
 
             return null;
         }
@@ -81,7 +81,7 @@ public class SysUserOnlineService {
         sysUserOnline.setBrowser(user.getBrowser());
         sysUserOnline.setOs(user.getOs());
         sysUserOnline.setLoginTime(user.getLoginTime());
-        if (StringUtils.isNotNull(user.getUser().getDept())) {
+        if (user.getUser().getDept() != null) {
 
             sysUserOnline.setDeptName(user.getUser().getDept().getDeptName());
         }
