@@ -17,12 +17,15 @@ import com.medcase.common.annotation.Log;
 import com.medcase.common.constant.Constants;
 import com.medcase.common.constant.UserConstants;
 import com.medcase.common.core.controller.BaseController;
+import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
 import com.medcase.common.core.domain.entity.SysMenu;
 import com.medcase.common.core.domain.TreeSelect;
 import com.medcase.web.controller.system.dto.MenuRoleTreeResponse;
 import com.medcase.common.enums.BusinessType;
+import com.medcase.common.enums.UserTypeEnums;
+import com.medcase.mvc.authentication.annotation.CurrLoginUser;
 import com.medcase.system.service.SysMenuService;
 
 /**
@@ -40,9 +43,11 @@ public class SysMenuController extends BaseController {
      */
     @PreAuthorize("@ss.hasPermi('system:menu:list')")
     @GetMapping("/list")
-    public List<SysMenu> list(SysMenu menu) {
+    public List<SysMenu> list(
+            SysMenu menu,
+            @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
 
-        List<SysMenu> menus = menuService.selectMenuList(menu, getUserId());
+        List<SysMenu> menus = menuService.selectMenuList(menu, loginUser.getUserId());
         return menus;
     }
 
@@ -60,9 +65,11 @@ public class SysMenuController extends BaseController {
      * 获取菜单下拉树列表
      */
     @GetMapping("/treeselect")
-    public List<TreeSelect> treeselect(SysMenu menu) {
+    public List<TreeSelect> treeselect(
+            SysMenu menu,
+            @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
 
-        List<SysMenu> menus = menuService.selectMenuList(menu, getUserId());
+        List<SysMenu> menus = menuService.selectMenuList(menu, loginUser.getUserId());
         return menuService.buildMenuTreeSelect(menus);
     }
 
@@ -70,9 +77,11 @@ public class SysMenuController extends BaseController {
      * 加载对应角色菜单列表树
      */
     @GetMapping(value = "/roleMenuTreeselect/{roleId}")
-    public MenuRoleTreeResponse roleMenuTreeselect(@PathVariable("roleId") Long roleId) {
+    public MenuRoleTreeResponse roleMenuTreeselect(
+            @PathVariable("roleId") Long roleId,
+            @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
 
-        List<SysMenu> menus = menuService.selectMenuList(getUserId());
+        List<SysMenu> menus = menuService.selectMenuList(loginUser.getUserId());
         return new MenuRoleTreeResponse(
                 menuService.selectMenuListByRoleId(roleId),
                 menuService.buildMenuTreeSelect(menus));
@@ -84,7 +93,9 @@ public class SysMenuController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:menu:add')")
     @Log(title = "菜单管理", businessType = BusinessType.INSERT)
     @PostMapping
-    public void add(@Validated @RequestBody SysMenu menu) {
+    public void add(
+            @Validated @RequestBody SysMenu menu,
+            @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
 
         if (!menuService.checkMenuNameUnique(menu)) {
             throw ExceptionUtil.business(ErrorCodeEnums.MENU_NAME_EXISTS);
@@ -97,7 +108,7 @@ public class SysMenuController extends BaseController {
         else if (!menuService.checkRouteConfigUnique(menu)) {
             throw ExceptionUtil.business(ErrorCodeEnums.MENU_ROUTE_EXISTS);
         }
-        menu.setCreateBy(getUsername());
+        menu.setCreateBy(loginUser.getUsername());
         if (menuService.insertMenu(menu) <= 0) {
             throw ExceptionUtil.business(ErrorCodeEnums.MENU_OPERATION_FAILED);
         }
@@ -109,7 +120,9 @@ public class SysMenuController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:menu:edit')")
     @Log(title = "菜单管理", businessType = BusinessType.UPDATE)
     @PutMapping
-    public void edit(@Validated @RequestBody SysMenu menu) {
+    public void edit(
+            @Validated @RequestBody SysMenu menu,
+            @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
 
         if (!menuService.checkMenuNameUnique(menu)) {
             throw ExceptionUtil.business(ErrorCodeEnums.MENU_NAME_EXISTS);
@@ -125,7 +138,7 @@ public class SysMenuController extends BaseController {
         else if (!menuService.checkRouteConfigUnique(menu)) {
             throw ExceptionUtil.business(ErrorCodeEnums.MENU_ROUTE_EXISTS);
         }
-        menu.setUpdateBy(getUsername());
+        menu.setUpdateBy(loginUser.getUsername());
         if (menuService.updateMenu(menu) <= 0) {
             throw ExceptionUtil.business(ErrorCodeEnums.MENU_OPERATION_FAILED);
         }

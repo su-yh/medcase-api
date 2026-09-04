@@ -9,8 +9,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
 import com.medcase.common.core.domain.entity.SysUser;
+import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.common.enums.UserTypeEnums;
-import com.medcase.common.utils.SecurityUtils;
+import com.medcase.mvc.authentication.annotation.CurrLoginUser;
 import com.medcase.system.service.SysUserService;
 import org.springframework.util.StringUtils;
 
@@ -31,14 +32,16 @@ public class SysIndexController {
      * 解锁屏幕
      */
     @PostMapping("/unlockscreen")
-    public void unlockScreen(@RequestBody Map<String, String> body) {
+    public void unlockScreen(
+            @RequestBody Map<String, String> body,
+            @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
 
         String password = body.get("password");
         if (!StringUtils.hasText(password)) {
             throw ExceptionUtil.business(ErrorCodeEnums.SCREEN_UNLOCK_PASSWORD_EMPTY);
         }
-        String username = SecurityUtils.getUsername();
-        SysUser user = userService.selectUserByUserName(username, UserTypeEnums.ADMIN.getCode());
+        SysUser user = userService.selectUserByUserName(
+                loginUser.getUsername(), UserTypeEnums.ADMIN.getCode());
         if (user == null) {
             throw ExceptionUtil.business(ErrorCodeEnums.SCREEN_UNLOCK_USER_NOT_FOUND);
         }

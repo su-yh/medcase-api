@@ -5,10 +5,13 @@ import com.medcase.common.core.controller.BaseController;
 import com.medcase.common.core.domain.entity.SysDept;
 import com.medcase.common.core.domain.entity.SysRole;
 import com.medcase.common.core.domain.entity.SysUser;
+import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.common.enums.BusinessType;
+import com.medcase.common.enums.UserTypeEnums;
 import com.medcase.common.utils.SecurityUtils;
 import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
+import com.medcase.mvc.authentication.annotation.CurrLoginUser;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
 import com.medcase.system.service.SysDeptService;
@@ -117,7 +120,9 @@ public class SysUserController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:user:add')")
     @Log(title = "用户管理", businessType = BusinessType.INSERT)
     @PostMapping
-    public void add(@Validated @RequestBody SysUser user) {
+    public void add(
+            @Validated @RequestBody SysUser user,
+            @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
 
         deptService.checkDeptDataScope(user.getDeptId());
         roleService.checkRoleDataScope(user.getRoleIds());
@@ -130,7 +135,7 @@ public class SysUserController extends BaseController {
         else if (StringUtils.hasText(user.getEmail()) && !userService.checkEmailUnique(user)) {
             throw ExceptionUtil.business(ErrorCodeEnums.EMAIL_EXISTS, user.getUserName());
         }
-        user.setCreateBy(getUsername());
+        user.setCreateBy(loginUser.getUsername());
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         if (userService.insertUser(user) <= 0) {
             throw ExceptionUtil.business(ErrorCodeEnums.USER_OPERATION_FAILED);
@@ -143,7 +148,9 @@ public class SysUserController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:user:edit')")
     @Log(title = "用户管理", businessType = BusinessType.UPDATE)
     @PutMapping
-    public void edit(@Validated @RequestBody SysUser user) {
+    public void edit(
+            @Validated @RequestBody SysUser user,
+            @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
 
         user.setPassword(null);
 
@@ -160,7 +167,7 @@ public class SysUserController extends BaseController {
         else if (StringUtils.hasText(user.getEmail()) && !userService.checkEmailUnique(user)) {
             throw ExceptionUtil.business(ErrorCodeEnums.EMAIL_EXISTS, user.getUserName());
         }
-        user.setUpdateBy(getUsername());
+        user.setUpdateBy(loginUser.getUsername());
         if (userService.updateUser(user) <= 0) {
             throw ExceptionUtil.business(ErrorCodeEnums.USER_OPERATION_FAILED);
         }
@@ -172,9 +179,11 @@ public class SysUserController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:user:remove')")
     @Log(title = "用户管理", businessType = BusinessType.DELETE)
     @DeleteMapping("/{userIds}")
-    public void remove(@PathVariable Long[] userIds) {
+    public void remove(
+            @PathVariable Long[] userIds,
+            @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
 
-        if (ArrayUtils.contains(userIds, getUserId())) {
+        if (ArrayUtils.contains(userIds, loginUser.getUserId())) {
             throw ExceptionUtil.business(ErrorCodeEnums.USER_CANNOT_DELETE_SELF);
         }
         if (userService.deleteUserByIds(userIds) <= 0) {
@@ -188,12 +197,14 @@ public class SysUserController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:user:resetPwd')")
     @Log(title = "用户管理", businessType = BusinessType.UPDATE)
     @PutMapping("/resetPwd")
-    public void resetPwd(@RequestBody SysUser user) {
+    public void resetPwd(
+            @RequestBody SysUser user,
+            @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
 
         userService.checkUserAllowed(user);
         userService.checkUserDataScope(user.getUserId());
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user.setUpdateBy(getUsername());
+        user.setUpdateBy(loginUser.getUsername());
         if (userService.resetPwd(user) <= 0) {
             throw ExceptionUtil.business(ErrorCodeEnums.USER_OPERATION_FAILED);
         }
@@ -205,11 +216,13 @@ public class SysUserController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:user:edit')")
     @Log(title = "用户管理", businessType = BusinessType.UPDATE)
     @PutMapping("/changeStatus")
-    public void changeStatus(@RequestBody SysUser user) {
+    public void changeStatus(
+            @RequestBody SysUser user,
+            @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
 
         userService.checkUserAllowed(user);
         userService.checkUserDataScope(user.getUserId());
-        user.setUpdateBy(getUsername());
+        user.setUpdateBy(loginUser.getUsername());
         if (userService.updateUserStatus(user) <= 0) {
             throw ExceptionUtil.business(ErrorCodeEnums.USER_OPERATION_FAILED);
         }

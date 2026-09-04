@@ -2,9 +2,12 @@ package com.medcase.web.controller.system;
 
 import com.medcase.common.annotation.Log;
 import com.medcase.common.core.controller.BaseController;
+import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.common.enums.BusinessType;
+import com.medcase.common.enums.UserTypeEnums;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
+import com.medcase.mvc.authentication.annotation.CurrLoginUser;
 import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
 import com.medcase.system.entity.SysConfigEntity;
@@ -78,13 +81,15 @@ public class SysConfigController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:config:add')")
     @Log(title = "参数管理", businessType = BusinessType.INSERT)
     @PostMapping
-    public void add(@Validated @RequestBody ConfigSaveRequest request) {
+    public void add(
+            @Validated @RequestBody ConfigSaveRequest request,
+            @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
 
         if (!configService.checkConfigKeyUnique(request.getConfigId(), request.getConfigKey())) {
             throw ExceptionUtil.business(ErrorCodeEnums.CONFIG_KEY_EXISTS);
         }
         SysConfigEntity config = toEntity(request);
-        config.setCreateBy(getUsername());
+        config.setCreateBy(loginUser.getUsername());
         if (configService.insertConfig(config) <= 0) {
             throw ExceptionUtil.business(ErrorCodeEnums.CONFIG_OPERATION_FAILED);
         }
@@ -96,13 +101,15 @@ public class SysConfigController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:config:edit')")
     @Log(title = "参数管理", businessType = BusinessType.UPDATE)
     @PutMapping
-    public void edit(@Validated @RequestBody ConfigSaveRequest request) {
+    public void edit(
+            @Validated @RequestBody ConfigSaveRequest request,
+            @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
 
         if (!configService.checkConfigKeyUnique(request.getConfigId(), request.getConfigKey())) {
             throw ExceptionUtil.business(ErrorCodeEnums.CONFIG_KEY_EXISTS);
         }
         SysConfigEntity config = toEntity(request);
-        config.setUpdateBy(getUsername());
+        config.setUpdateBy(loginUser.getUsername());
         if (configService.updateConfig(config) <= 0) {
             throw ExceptionUtil.business(ErrorCodeEnums.CONFIG_OPERATION_FAILED);
         }

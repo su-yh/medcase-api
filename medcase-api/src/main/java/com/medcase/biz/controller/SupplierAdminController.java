@@ -14,10 +14,13 @@ import com.medcase.biz.service.CaseService;
 import com.medcase.biz.service.SupplierService;
 import com.medcase.biz.service.UserService;
 import com.medcase.common.core.controller.BaseController;
+import com.medcase.common.core.domain.model.LoginUser;
+import com.medcase.common.enums.UserTypeEnums;
 import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import com.medcase.mvc.authentication.annotation.CurrLoginUser;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -59,22 +62,27 @@ public class SupplierAdminController extends BaseController {
 
     @PreAuthorize("@ss.hasPermi('supplier:add')")
     @PostMapping
-    public void add(@Valid @RequestBody SupplierSaveRequest request) {
-        supplierService.create(request, getUsername());
+    public void add(
+            @Valid @RequestBody SupplierSaveRequest request,
+            @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
+        supplierService.create(request, loginUser.getUsername());
     }
 
     @PreAuthorize("@ss.hasPermi('supplier:edit')")
     @PutMapping
-    public void edit(@Valid @RequestBody SupplierSaveRequest request) {
-        supplierService.update(request, getUsername());
+    public void edit(
+            @Valid @RequestBody SupplierSaveRequest request,
+            @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
+        supplierService.update(request, loginUser.getUsername());
     }
 
     @PreAuthorize("@ss.hasPermi('supplier:status')")
     @PutMapping("/{supplierId}/status")
     public void updateStatus(
             @PathVariable Long supplierId,
-            @Valid @RequestBody SupplierStatusRequest request) {
-        supplierService.updateStatus(supplierId, request, getUsername());
+            @Valid @RequestBody SupplierStatusRequest request,
+            @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
+        supplierService.updateStatus(supplierId, request, loginUser.getUsername());
     }
 
     @PreAuthorize("@ss.hasPermi('supplier:query')")

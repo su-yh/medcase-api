@@ -20,8 +20,11 @@ import com.medcase.common.core.domain.entity.SysDept;
 import com.medcase.common.core.domain.entity.SysRole;
 import com.medcase.common.core.domain.entity.SysUser;
 import com.medcase.common.enums.BusinessType;
+import com.medcase.common.enums.UserTypeEnums;
+import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.framework.web.service.SysPermissionService;
 import com.medcase.framework.web.service.TokenService;
+import com.medcase.mvc.authentication.annotation.CurrLoginUser;
 import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
 import com.medcase.system.service.SysDeptService;
@@ -78,7 +81,9 @@ public class SysRoleController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:role:add')")
     @Log(title = "角色管理", businessType = BusinessType.INSERT)
     @PostMapping
-    public void add(@Validated @RequestBody SysRole role) {
+    public void add(
+            @Validated @RequestBody SysRole role,
+            @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
 
         if (!roleService.checkRoleNameUnique(role)) {
             throw ExceptionUtil.business(ErrorCodeEnums.ROLE_NAME_EXISTS);
@@ -86,7 +91,7 @@ public class SysRoleController extends BaseController {
         else if (!roleService.checkRoleKeyUnique(role)) {
             throw ExceptionUtil.business(ErrorCodeEnums.ROLE_KEY_EXISTS);
         }
-        role.setCreateBy(getUsername());
+        role.setCreateBy(loginUser.getUsername());
         if (roleService.insertRole(role) <= 0) {
             throw ExceptionUtil.business(ErrorCodeEnums.OPERATION_FAILED);
         }
@@ -99,7 +104,9 @@ public class SysRoleController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:role:edit')")
     @Log(title = "角色管理", businessType = BusinessType.UPDATE)
     @PutMapping
-    public void edit(@Validated @RequestBody SysRole role) {
+    public void edit(
+            @Validated @RequestBody SysRole role,
+            @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
 
         roleService.checkRoleAllowed(role);
         roleService.checkRoleDataScope(role.getRoleId());
@@ -109,7 +116,7 @@ public class SysRoleController extends BaseController {
         else if (!roleService.checkRoleKeyUnique(role)) {
             throw ExceptionUtil.business(ErrorCodeEnums.ROLE_KEY_EXISTS);
         }
-        role.setUpdateBy(getUsername());
+        role.setUpdateBy(loginUser.getUsername());
         
         if (roleService.updateRole(role) > 0) {
 
@@ -141,11 +148,13 @@ public class SysRoleController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:role:edit')")
     @Log(title = "角色管理", businessType = BusinessType.UPDATE)
     @PutMapping("/changeStatus")
-    public void changeStatus(@RequestBody SysRole role) {
+    public void changeStatus(
+            @RequestBody SysRole role,
+            @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
 
         roleService.checkRoleAllowed(role);
         roleService.checkRoleDataScope(role.getRoleId());
-        role.setUpdateBy(getUsername());
+        role.setUpdateBy(loginUser.getUsername());
         if (roleService.updateRoleStatus(role) <= 0) {
             throw ExceptionUtil.business(ErrorCodeEnums.ROLE_STATUS_UPDATE_FAILED);
         }

@@ -17,6 +17,8 @@ import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.common.enums.BusinessType;
 import com.medcase.common.utils.DateUtils;
 import com.medcase.framework.web.service.TokenService;
+import com.medcase.common.enums.UserTypeEnums;
+import com.medcase.mvc.authentication.annotation.CurrLoginUser;
 import com.medcase.system.service.SysUserService;
 import com.medcase.web.controller.system.dto.ProfileResponse;
 import org.springframework.util.StringUtils;
@@ -42,9 +44,9 @@ public class SysProfileController extends BaseController {
      * 个人信息
      */
     @GetMapping
-    public ProfileResponse profile() {
+    public ProfileResponse profile(
+            @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
 
-        LoginUser loginUser = getLoginUser();
         SysUser user = loginUser.getUser();
         return new ProfileResponse(
                 user,
@@ -57,9 +59,10 @@ public class SysProfileController extends BaseController {
      */
     @Log(title = "个人信息", businessType = BusinessType.UPDATE)
     @PutMapping
-    public void updateProfile(@RequestBody SysUser user) {
+    public void updateProfile(
+            @RequestBody SysUser user,
+            @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
 
-        LoginUser loginUser = getLoginUser();
         SysUser currentUser = loginUser.getUser();
         currentUser.setNickName(user.getNickName());
         currentUser.setEmail(user.getEmail());
@@ -85,11 +88,12 @@ public class SysProfileController extends BaseController {
      */
     @Log(title = "个人信息", businessType = BusinessType.UPDATE)
     @PutMapping("/updatePwd")
-    public void updatePwd(@RequestBody Map<String, String> params) {
+    public void updatePwd(
+            @RequestBody Map<String, String> params,
+            @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
 
         String oldPassword = params.get("oldPassword");
         String newPassword = params.get("newPassword");
-        LoginUser loginUser = getLoginUser();
         Long userId = loginUser.getUserId();
         SysUser user = userService.selectUserById(userId);
         String password = user.getPassword();

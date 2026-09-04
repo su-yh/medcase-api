@@ -14,11 +14,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.medcase.common.annotation.Log;
 import com.medcase.common.core.controller.BaseController;
+import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
 import com.medcase.common.enums.BusinessType;
+import com.medcase.common.enums.UserTypeEnums;
 import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
+import com.medcase.mvc.authentication.annotation.CurrLoginUser;
 import com.medcase.system.entity.SysPostEntity;
 import com.medcase.system.service.SysPostService;
 import com.medcase.web.controller.system.dto.PostQueryRequest;
@@ -69,7 +72,9 @@ public class SysPostController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:post:add')")
     @Log(title = "岗位管理", businessType = BusinessType.INSERT)
     @PostMapping
-    public void add(@Validated @RequestBody PostSaveRequest request) {
+    public void add(
+            @Validated @RequestBody PostSaveRequest request,
+            @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
 
         if (!postService.checkPostNameUnique(request.getPostId(), request.getPostName())) {
             throw ExceptionUtil.business(ErrorCodeEnums.POST_NAME_EXISTS);
@@ -78,7 +83,7 @@ public class SysPostController extends BaseController {
             throw ExceptionUtil.business(ErrorCodeEnums.POST_CODE_EXISTS);
         }
         SysPostEntity post = toEntity(request);
-        post.setCreateBy(getUsername());
+        post.setCreateBy(loginUser.getUsername());
         if (postService.insertPost(post) <= 0) {
             throw ExceptionUtil.business(ErrorCodeEnums.POST_OPERATION_FAILED);
         }
@@ -90,7 +95,9 @@ public class SysPostController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:post:edit')")
     @Log(title = "岗位管理", businessType = BusinessType.UPDATE)
     @PutMapping
-    public void edit(@Validated @RequestBody PostSaveRequest request) {
+    public void edit(
+            @Validated @RequestBody PostSaveRequest request,
+            @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
 
         if (!postService.checkPostNameUnique(request.getPostId(), request.getPostName())) {
             throw ExceptionUtil.business(ErrorCodeEnums.POST_NAME_EXISTS);
@@ -99,7 +106,7 @@ public class SysPostController extends BaseController {
             throw ExceptionUtil.business(ErrorCodeEnums.POST_CODE_EXISTS);
         }
         SysPostEntity post = toEntity(request);
-        post.setUpdateBy(getUsername());
+        post.setUpdateBy(loginUser.getUsername());
         if (postService.updatePost(post) <= 0) {
             throw ExceptionUtil.business(ErrorCodeEnums.POST_OPERATION_FAILED);
         }

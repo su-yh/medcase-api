@@ -14,12 +14,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.medcase.common.annotation.Log;
 import com.medcase.common.core.controller.BaseController;
+import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
 import com.medcase.common.core.domain.entity.SysDictType;
 import com.medcase.common.enums.BusinessType;
+import com.medcase.common.enums.UserTypeEnums;
 import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
+import com.medcase.mvc.authentication.annotation.CurrLoginUser;
 import com.medcase.system.service.SysDictTypeService;
 
 /**
@@ -56,12 +59,14 @@ public class SysDictTypeController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:dict:add')")
     @Log(title = "字典类型", businessType = BusinessType.INSERT)
     @PostMapping
-    public void add(@Validated @RequestBody SysDictType dict) {
+    public void add(
+            @Validated @RequestBody SysDictType dict,
+            @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
 
         if (!dictTypeService.checkDictTypeUnique(dict)) {
             throw ExceptionUtil.business(ErrorCodeEnums.DICT_TYPE_EXISTS);
         }
-        dict.setCreateBy(getUsername());
+        dict.setCreateBy(loginUser.getUsername());
         if (dictTypeService.insertDictType(dict) <= 0) {
             throw ExceptionUtil.business(ErrorCodeEnums.DICT_OPERATION_FAILED);
         }
@@ -73,12 +78,14 @@ public class SysDictTypeController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:dict:edit')")
     @Log(title = "字典类型", businessType = BusinessType.UPDATE)
     @PutMapping
-    public void edit(@Validated @RequestBody SysDictType dict) {
+    public void edit(
+            @Validated @RequestBody SysDictType dict,
+            @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
 
         if (!dictTypeService.checkDictTypeUnique(dict)) {
             throw ExceptionUtil.business(ErrorCodeEnums.DICT_TYPE_EXISTS);
         }
-        dict.setUpdateBy(getUsername());
+        dict.setUpdateBy(loginUser.getUsername());
         if (dictTypeService.updateDictType(dict) <= 0) {
             throw ExceptionUtil.business(ErrorCodeEnums.DICT_OPERATION_FAILED);
         }

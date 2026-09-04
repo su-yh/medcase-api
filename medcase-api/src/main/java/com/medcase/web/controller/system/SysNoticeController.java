@@ -19,6 +19,9 @@ import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
 import com.medcase.common.core.text.Convert;
 import com.medcase.common.enums.BusinessType;
+import com.medcase.common.enums.UserTypeEnums;
+import com.medcase.common.core.domain.model.LoginUser;
+import com.medcase.mvc.authentication.annotation.CurrLoginUser;
 import com.medcase.system.entity.SysNoticeEntity;
 import com.medcase.system.service.SysNoticeReadService;
 import com.medcase.system.service.SysNoticeService;
@@ -77,10 +80,12 @@ public class SysNoticeController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:notice:add')")
     @Log(title = "通知公告", businessType = BusinessType.INSERT)
     @PostMapping
-    public void add(@Validated @RequestBody NoticeSaveRequest request) {
+    public void add(
+            @Validated @RequestBody NoticeSaveRequest request,
+            @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
 
         SysNoticeEntity notice = toEntity(request);
-        notice.setCreateBy(getUsername());
+        notice.setCreateBy(loginUser.getUsername());
         if (noticeService.insertNotice(notice) <= 0) {
             throw ExceptionUtil.business(ErrorCodeEnums.NOTICE_OPERATION_FAILED);
         }
@@ -92,10 +97,12 @@ public class SysNoticeController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:notice:edit')")
     @Log(title = "通知公告", businessType = BusinessType.UPDATE)
     @PutMapping
-    public void edit(@Validated @RequestBody NoticeSaveRequest request) {
+    public void edit(
+            @Validated @RequestBody NoticeSaveRequest request,
+            @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
 
         SysNoticeEntity notice = toEntity(request);
-        notice.setUpdateBy(getUsername());
+        notice.setUpdateBy(loginUser.getUsername());
         if (noticeService.updateNotice(notice) <= 0) {
             throw ExceptionUtil.business(ErrorCodeEnums.NOTICE_OPERATION_FAILED);
         }
@@ -106,10 +113,11 @@ public class SysNoticeController extends BaseController {
      */
     @GetMapping("/listTop")
     @ResponseBody
-    public NoticeTopResponse listTop() {
+    public NoticeTopResponse listTop(
+            @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
 
-        Long userId = getUserId();
-        List<NoticeTopItemResponse> list = noticeReadService.selectNoticeListWithReadStatus(userId, 5);
+        List<NoticeTopItemResponse> list = noticeReadService.selectNoticeListWithReadStatus(
+                loginUser.getUserId(), 5);
         long unreadCount = list.stream()
                 .filter(item -> !item.isRead())
                 .count();
@@ -121,10 +129,11 @@ public class SysNoticeController extends BaseController {
      */
     @PostMapping("/markRead")
     @ResponseBody
-    public void markRead(Long noticeId) {
+    public void markRead(
+            Long noticeId,
+            @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
 
-        Long userId = getUserId();
-        noticeReadService.markRead(noticeId, userId);
+        noticeReadService.markRead(noticeId, loginUser.getUserId());
     }
 
     /**
@@ -132,11 +141,12 @@ public class SysNoticeController extends BaseController {
      */
     @PostMapping("/markReadAll")
     @ResponseBody
-    public void markReadAll(String ids) {
+    public void markReadAll(
+            String ids,
+            @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
 
-        Long userId = getUserId();
         Long[] noticeIds = Convert.toLongArray(ids);
-        noticeReadService.markReadBatch(userId, noticeIds);
+        noticeReadService.markReadBatch(loginUser.getUserId(), noticeIds);
     }
 
     /**

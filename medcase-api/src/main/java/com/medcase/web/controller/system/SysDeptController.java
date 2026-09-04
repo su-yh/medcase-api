@@ -17,11 +17,14 @@ import org.springframework.web.bind.annotation.RestController;
 import com.medcase.common.annotation.Log;
 import com.medcase.common.constant.UserConstants;
 import com.medcase.common.core.controller.BaseController;
+import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
 import com.medcase.common.core.domain.entity.SysDept;
 import com.medcase.common.enums.BusinessType;
+import com.medcase.common.enums.UserTypeEnums;
 import com.medcase.system.service.SysDeptService;
+import com.medcase.mvc.authentication.annotation.CurrLoginUser;
 
 /**
  * 部门信息
@@ -77,12 +80,14 @@ public class SysDeptController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:dept:add')")
     @Log(title = "部门管理", businessType = BusinessType.INSERT)
     @PostMapping
-    public void add(@Validated @RequestBody SysDept dept) {
+    public void add(
+            @Validated @RequestBody SysDept dept,
+            @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
 
         if (!deptService.checkDeptNameUnique(dept)) {
             throw ExceptionUtil.business(ErrorCodeEnums.DEPT_NAME_EXISTS);
         }
-        dept.setCreateBy(getUsername());
+        dept.setCreateBy(loginUser.getUsername());
         if (deptService.insertDept(dept) <= 0) {
             throw ExceptionUtil.business(ErrorCodeEnums.DEPT_OPERATION_FAILED);
         }
@@ -94,7 +99,9 @@ public class SysDeptController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:dept:edit')")
     @Log(title = "部门管理", businessType = BusinessType.UPDATE)
     @PutMapping
-    public void edit(@Validated @RequestBody SysDept dept) {
+    public void edit(
+            @Validated @RequestBody SysDept dept,
+            @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
 
         Long deptId = dept.getDeptId();
         deptService.checkDeptDataScope(deptId);
@@ -108,7 +115,7 @@ public class SysDeptController extends BaseController {
                 && deptService.selectNormalChildrenDeptById(deptId) > 0) {
             throw ExceptionUtil.business(ErrorCodeEnums.DEPT_ENABLED_CHILDREN);
         }
-        dept.setUpdateBy(getUsername());
+        dept.setUpdateBy(loginUser.getUsername());
         if (deptService.updateDept(dept) <= 0) {
             throw ExceptionUtil.business(ErrorCodeEnums.DEPT_OPERATION_FAILED);
         }

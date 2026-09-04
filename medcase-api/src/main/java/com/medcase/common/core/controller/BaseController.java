@@ -1,8 +1,6 @@
 package com.medcase.common.core.controller;
 
-import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.common.utils.DateUtils;
-import com.medcase.common.utils.SecurityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.WebDataBinder;
@@ -36,35 +34,4 @@ public class BaseController {
         });
     }
 
-    /**
-     * 获取用户缓存信息
-     */
-    public LoginUser getLoginUser() {
-
-        return SecurityUtils.getLoginUser();
-    }
-
-    /**
-     * 获取登录用户id
-     */
-    public Long getUserId() {
-
-        return getLoginUser().getUserId();
-    }
-
-    /**
-     * 获取登录部门id
-     */
-    public Long getDeptId() {
-
-        return getLoginUser().getDeptId();
-    }
-
-    /**
-     * 获取登录用户名
-     */
-    public String getUsername() {
-
-        return getLoginUser().getUsername();
-    }
 }
