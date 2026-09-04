@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import com.medcase.common.annotation.Log;
-import com.medcase.common.core.controller.BaseController;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
 import com.medcase.common.core.text.Convert;
@@ -40,7 +39,7 @@ import com.medcase.web.controller.system.dto.NoticeTopResponse;
  */
 @RestController
 @RequestMapping("/system/notice")
-public class SysNoticeController extends BaseController {
+public class SysNoticeController {
 
     @Autowired
     private SysNoticeService noticeService;

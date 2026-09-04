@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.medcase.common.annotation.Log;
-import com.medcase.common.core.controller.BaseController;
 import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
@@ -33,7 +32,7 @@ import com.medcase.system.service.SysDictTypeService;
  */
 @RestController
 @RequestMapping("/system/dict/data")
-public class SysDictDataController extends BaseController {
+public class SysDictDataController {
 
     @Autowired
     private SysDictDataService dictDataService;

@@ -1,7 +1,6 @@
 package com.medcase.web.controller.monitor;
 
 import com.medcase.common.annotation.Log;
-import com.medcase.common.core.controller.BaseController;
 import com.medcase.common.enums.BusinessType;
 import com.medcase.framework.web.service.SysPasswordService;
 import com.medcase.mp.mybatis.PageParam;
@@ -26,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/monitor/logininfor")
-public class SysLogininforController extends BaseController {
+public class SysLogininforController {
 
     @Autowired
     private SysLogininforService logininforService;

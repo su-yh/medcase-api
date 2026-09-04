@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.medcase.common.annotation.Log;
 import com.medcase.common.constant.Constants;
 import com.medcase.common.constant.UserConstants;
-import com.medcase.common.core.controller.BaseController;
 import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
@@ -33,7 +32,7 @@ import com.medcase.system.service.SysMenuService;
  */
 @RestController
 @RequestMapping("/system/menu")
-public class SysMenuController extends BaseController {
+public class SysMenuController {
 
     @Autowired
     private SysMenuService menuService;

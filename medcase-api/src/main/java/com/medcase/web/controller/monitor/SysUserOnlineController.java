@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.medcase.common.annotation.Log;
 import com.medcase.common.constant.CacheConstants;
-import com.medcase.common.core.controller.BaseController;
 import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.common.core.redis.RedisCache;
 import com.medcase.common.enums.BusinessType;
@@ -28,7 +27,7 @@ import com.medcase.system.service.SysUserOnlineService;
  */
 @RestController
 @RequestMapping("/monitor/online")
-public class SysUserOnlineController extends BaseController {
+public class SysUserOnlineController {
 
     @Autowired
     private SysUserOnlineService userOnlineService;

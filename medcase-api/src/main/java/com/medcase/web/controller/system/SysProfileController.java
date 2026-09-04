@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.medcase.common.annotation.Log;
-import com.medcase.common.core.controller.BaseController;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
 import com.medcase.common.core.domain.entity.SysUser;
@@ -29,7 +28,7 @@ import org.springframework.util.StringUtils;
  */
 @RestController
 @RequestMapping("/system/user/profile")
-public class SysProfileController extends BaseController {
+public class SysProfileController {
 
     @Autowired
     private SysUserService userService;

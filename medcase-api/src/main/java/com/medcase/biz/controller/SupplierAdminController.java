@@ -13,7 +13,6 @@ import com.medcase.biz.response.CaseVO;
 import com.medcase.biz.service.CaseService;
 import com.medcase.biz.service.SupplierService;
 import com.medcase.biz.service.UserService;
-import com.medcase.common.core.controller.BaseController;
 import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.common.enums.UserTypeEnums;
 import com.medcase.mp.mybatis.PageParam;
@@ -36,7 +35,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/biz/supplier")
-public class SupplierAdminController extends BaseController {
+public class SupplierAdminController {
     private final SupplierService supplierService;
     private final UserService userService;
     private final CaseService caseService;

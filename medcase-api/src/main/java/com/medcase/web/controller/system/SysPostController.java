@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.medcase.common.annotation.Log;
-import com.medcase.common.core.controller.BaseController;
 import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
@@ -34,7 +33,7 @@ import com.medcase.web.controller.system.dto.PostSaveRequest;
  */
 @RestController
 @RequestMapping("/system/post")
-public class SysPostController extends BaseController {
+public class SysPostController {
 
     @Autowired
     private SysPostService postService;

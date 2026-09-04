@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.medcase.common.annotation.Log;
 import com.medcase.common.constant.UserConstants;
-import com.medcase.common.core.controller.BaseController;
 import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
@@ -32,7 +31,7 @@ import com.medcase.mvc.authentication.annotation.CurrLoginUser;
  */
 @RestController
 @RequestMapping("/system/dept")
-public class SysDeptController extends BaseController {
+public class SysDeptController {
 
     @Autowired
     private SysDeptService deptService;

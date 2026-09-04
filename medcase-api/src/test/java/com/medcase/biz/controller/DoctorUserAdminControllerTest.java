@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.lang.reflect.Method;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class DoctorUserAdminControllerTest {
     @Test
@@ -27,7 +27,6 @@ class DoctorUserAdminControllerTest {
         assertEquals(PageResult.class, list.getReturnType());
         assertEquals(UserVO.class, detail.getReturnType());
         assertEquals(void.class, review.getReturnType());
-        assertFalse(DoctorUserAdminController.class.getSuperclass().getName()
-                .equals("com.medcase.common.core.controller.BaseController"));
+        assertEquals(Object.class, DoctorUserAdminController.class.getSuperclass());
     }
 }

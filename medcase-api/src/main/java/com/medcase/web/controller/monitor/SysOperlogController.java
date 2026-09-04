@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.medcase.common.annotation.Log;
-import com.medcase.common.core.controller.BaseController;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
 import com.medcase.common.enums.BusinessType;
@@ -25,7 +24,7 @@ import com.medcase.web.controller.monitor.dto.OperLogResponse;
  */
 @RestController
 @RequestMapping("/monitor/operlog")
-public class SysOperlogController extends BaseController {
+public class SysOperlogController {
 
     @Autowired
     private SysOperLogService operLogService;

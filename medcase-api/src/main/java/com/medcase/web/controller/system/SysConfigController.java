@@ -1,7 +1,6 @@
 package com.medcase.web.controller.system;
 
 import com.medcase.common.annotation.Log;
-import com.medcase.common.core.controller.BaseController;
 import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.common.enums.BusinessType;
 import com.medcase.common.enums.UserTypeEnums;
@@ -33,7 +32,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/system/config")
-public class SysConfigController extends BaseController {
+public class SysConfigController {
 
     @Autowired
     private SysConfigService configService;

@@ -1,7 +1,6 @@
 package com.medcase.web.controller.system;
 
 import com.medcase.common.annotation.Log;
-import com.medcase.common.core.controller.BaseController;
 import com.medcase.common.core.domain.entity.SysDept;
 import com.medcase.common.core.domain.entity.SysRole;
 import com.medcase.common.core.domain.entity.SysUser;
@@ -45,7 +44,7 @@ import java.util.stream.Collectors;
  */
 @RestController
 @RequestMapping("/system/user")
-public class SysUserController extends BaseController {
+public class SysUserController {
 
     @Autowired
     private SysUserService userService;

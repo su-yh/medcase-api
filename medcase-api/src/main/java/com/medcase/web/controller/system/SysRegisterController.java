@@ -5,7 +5,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import com.medcase.common.annotation.Anonymous;
-import com.medcase.common.core.controller.BaseController;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
 import com.medcase.common.core.domain.model.RegisterBody;
@@ -17,7 +16,7 @@ import com.medcase.system.service.SysConfigService;
  * 
  */
 @RestController
-public class SysRegisterController extends BaseController {
+public class SysRegisterController {
 
     @Autowired
     private SysRegisterService registerService;
