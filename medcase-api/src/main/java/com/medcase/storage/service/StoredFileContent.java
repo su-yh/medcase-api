@@ -1,7 +1,8 @@
 package com.medcase.storage.service;
 
 import com.medcase.storage.pojo.FileAttachment;
-import lombok.Data;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -12,7 +13,8 @@ import java.io.InputStream;
  *
  * @author suyh
  */
-@Data
+@RequiredArgsConstructor
+@Getter
 public class StoredFileContent implements Closeable {
     private final FileAttachment file;
     private final InputStream inputStream;

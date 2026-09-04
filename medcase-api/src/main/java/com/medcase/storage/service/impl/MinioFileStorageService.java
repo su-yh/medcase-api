@@ -109,11 +109,7 @@ public class MinioFileStorageService implements FileStorageService {
     }
 
     private String bucket() {
-        String bucket = properties.getMinio().getBucket();
-        if (bucket == null || bucket.isBlank()) {
-            throw ExceptionUtil.business(ErrorCodeEnums.ATTACHMENT_BUCKET_NOT_CONFIGURED);
-        }
-        return bucket;
+        return properties.getMinio().getBucket();
     }
 
     private String objectName(String filePath) {
