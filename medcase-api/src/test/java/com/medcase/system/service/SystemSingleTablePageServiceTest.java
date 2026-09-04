@@ -16,13 +16,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class SystemSingleTablePageServiceTest {
     @Test
     void simpleSingleTableServicesExposePageMethods() throws NoSuchMethodException {
-        assertPageMethod(ISysConfigService.class, SysConfigEntity.class,
+        assertPageMethod(SysConfigService.class, SysConfigEntity.class,
                 String.class, String.class, String.class, String.class, String.class);
-        assertPageMethod(ISysDictDataService.class, SysDictData.class, SysDictData.class);
-        assertPageMethod(ISysDictTypeService.class, SysDictType.class, SysDictType.class);
-        assertPageMethod(ISysPostService.class, SysPostEntity.class,
+        assertPageMethod(SysDictDataService.class, SysDictData.class, SysDictData.class);
+        assertPageMethod(SysDictTypeService.class, SysDictType.class, SysDictType.class);
+        assertPageMethod(SysPostService.class, SysPostEntity.class,
                 String.class, String.class, String.class);
-        assertPageMethod(ISysNoticeService.class, SysNoticeEntity.class,
+        assertPageMethod(SysNoticeService.class, SysNoticeEntity.class,
                 String.class, String.class, String.class);
     }
 

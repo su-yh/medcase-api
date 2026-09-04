@@ -5,7 +5,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
-import com.medcase.common.exception.UtilException;
 
 /**
  * 提供通用唯一识别码（universally unique identifier）（UUID）实现
@@ -466,7 +465,7 @@ public final class UUID implements java.io.Serializable, Comparable<UUID> {
         }
         catch (NoSuchAlgorithmException e) {
 
-            throw new UtilException(e);
+            throw new IllegalStateException(e);
         }
     }
 

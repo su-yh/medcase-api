@@ -22,8 +22,8 @@ import com.medcase.common.enums.BusinessType;
 import com.medcase.common.utils.StringUtils;
 import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
-import com.medcase.system.service.ISysDictDataService;
-import com.medcase.system.service.ISysDictTypeService;
+import com.medcase.system.service.SysDictDataService;
+import com.medcase.system.service.SysDictTypeService;
 
 /**
  * 数据字典信息
@@ -34,10 +34,10 @@ import com.medcase.system.service.ISysDictTypeService;
 public class SysDictDataController extends BaseController {
 
     @Autowired
-    private ISysDictDataService dictDataService;
+    private SysDictDataService dictDataService;
 
     @Autowired
-    private ISysDictTypeService dictTypeService;
+    private SysDictTypeService dictTypeService;
 
     @PreAuthorize("@ss.hasPermi('system:dict:list')")
     @GetMapping("/list")

@@ -1,4 +1,4 @@
-package com.medcase.system.service.impl;
+package com.medcase.system.service;
 
 import com.medcase.system.mapper.SysNoticeReadMapper;
 import com.medcase.web.controller.system.dto.NoticeTopItemResponse;
@@ -14,8 +14,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
-class SysNoticeReadServiceImplTest {
-    private SysNoticeReadServiceImpl noticeReadService;
+class SysNoticeReadServiceTest {
+    private SysNoticeReadService noticeReadService;
 
     @Mock
     private SysNoticeReadMapper noticeReadMapper;
@@ -23,7 +23,7 @@ class SysNoticeReadServiceImplTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        noticeReadService = new SysNoticeReadServiceImpl(noticeReadMapper);
+        noticeReadService = new SysNoticeReadService(noticeReadMapper);
     }
 
     @Test

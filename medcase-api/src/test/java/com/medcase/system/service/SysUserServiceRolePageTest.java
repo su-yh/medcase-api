@@ -1,4 +1,4 @@
-package com.medcase.system.service.impl;
+package com.medcase.system.service;
 
 import com.medcase.common.core.domain.entity.SysUser;
 import com.medcase.common.enums.UserTypeEnums;
@@ -19,8 +19,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-class SysUserServiceImplRolePageTest {
-    private SysUserServiceImpl userService;
+class SysUserServiceRolePageTest {
+    private SysUserService userService;
 
     @Mock
     private SysUserMapper userMapper;
@@ -28,7 +28,7 @@ class SysUserServiceImplRolePageTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        userService = new SysUserServiceImpl();
+        userService = new SysUserService();
         ReflectionTestUtils.setField(userService, "userMapper", userMapper);
     }
 

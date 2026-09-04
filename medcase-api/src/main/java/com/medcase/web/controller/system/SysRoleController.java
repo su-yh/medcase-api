@@ -24,9 +24,9 @@ import com.medcase.framework.web.service.SysPermissionService;
 import com.medcase.framework.web.service.TokenService;
 import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
-import com.medcase.system.service.ISysDeptService;
-import com.medcase.system.service.ISysRoleService;
-import com.medcase.system.service.ISysUserService;
+import com.medcase.system.service.SysDeptService;
+import com.medcase.system.service.SysRoleService;
+import com.medcase.system.service.SysUserService;
 import com.medcase.web.controller.system.dto.RoleUserRequest;
 import com.medcase.web.controller.system.dto.RoleDeptTreeResponse;
 
@@ -39,7 +39,7 @@ import com.medcase.web.controller.system.dto.RoleDeptTreeResponse;
 public class SysRoleController extends BaseController {
 
     @Autowired
-    private ISysRoleService roleService;
+    private SysRoleService roleService;
 
     @Autowired
     private TokenService tokenService;
@@ -48,10 +48,10 @@ public class SysRoleController extends BaseController {
     private SysPermissionService permissionService;
 
     @Autowired
-    private ISysUserService userService;
+    private SysUserService userService;
 
     @Autowired
-    private ISysDeptService deptService;
+    private SysDeptService deptService;
 
     @PreAuthorize("@ss.hasPermi('system:role:list')")
     @GetMapping("/list")

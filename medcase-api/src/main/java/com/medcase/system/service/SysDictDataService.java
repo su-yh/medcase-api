@@ -1,4 +1,4 @@
-package com.medcase.system.service.impl;
+package com.medcase.system.service;
 
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,14 +12,13 @@ import com.medcase.mp.mybatis.PageResult;
 import com.medcase.system.converter.SystemEntityConverter;
 import com.medcase.system.entity.SysDictDataEntity;
 import com.medcase.system.mapper.SysDictDataMapper;
-import com.medcase.system.service.ISysDictDataService;
 
 /**
  * 字典 业务层处理
  * 
  */
 @Service
-public class SysDictDataServiceImpl implements ISysDictDataService {
+public class SysDictDataService {
 
     @Autowired
     private SysDictDataMapper dictDataMapper;
@@ -33,14 +32,12 @@ public class SysDictDataServiceImpl implements ISysDictDataService {
      * @param dictData 字典数据信息
      * @return 字典数据集合信息
      */
-    @Override
     public List<SysDictData> selectDictDataList(SysDictData dictData) {
 
         return SystemEntityConverter.copyList(dictDataMapper.selectDictDataList(
                 dictData.getDictType(), dictData.getDictLabel(), dictData.getStatus()), SysDictData.class);
     }
 
-    @Override
     public PageResult<SysDictData> selectPage(PageParam pageParam, SysDictData dictData) {
 
         PageResult<SysDictDataEntity> entityPage = dictDataMapper.selectPage(
@@ -58,7 +55,6 @@ public class SysDictDataServiceImpl implements ISysDictDataService {
      * @param dictValue 字典键值
      * @return 字典标签
      */
-    @Override
     public String selectDictLabel(String dictType, String dictValue) {
 
         SysDictDataEntity entity = dictDataMapper.selectDictLabel(dictType, dictValue);
@@ -71,7 +67,6 @@ public class SysDictDataServiceImpl implements ISysDictDataService {
      * @param dictCode 字典数据ID
      * @return 字典数据
      */
-    @Override
     public SysDictData selectDictDataById(Long dictCode) {
 
         return SystemEntityConverter.toDomain(dictDataMapper.selectById(dictCode));
@@ -82,7 +77,6 @@ public class SysDictDataServiceImpl implements ISysDictDataService {
      * 
      * @param dictCodes 需要删除的字典数据ID
      */
-    @Override
     public void deleteDictDataByIds(Long[] dictCodes) {
 
         for (Long dictCode : dictCodes) {
@@ -102,7 +96,6 @@ public class SysDictDataServiceImpl implements ISysDictDataService {
      * @param data 字典数据信息
      * @return 结果
      */
-    @Override
     public int insertDictData(SysDictData data) {
 
         SysDictDataEntity entity = SystemEntityConverter.toEntity(data);
@@ -124,7 +117,6 @@ public class SysDictDataServiceImpl implements ISysDictDataService {
      * @param data 字典数据信息
      * @return 结果
      */
-    @Override
     public int updateDictData(SysDictData data) {
 
         int row = dictDataMapper.updateById(SystemEntityConverter.toEntity(data));

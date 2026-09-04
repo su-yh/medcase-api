@@ -11,8 +11,8 @@ import com.medcase.common.constant.UserConstants;
 import com.medcase.common.core.domain.entity.SysRole;
 import com.medcase.common.core.domain.entity.SysUser;
 import com.medcase.common.utils.StringUtils;
-import com.medcase.system.service.ISysMenuService;
-import com.medcase.system.service.ISysRoleService;
+import com.medcase.system.service.SysMenuService;
+import com.medcase.system.service.SysRoleService;
 
 /**
  * 用户权限处理
@@ -21,10 +21,10 @@ import com.medcase.system.service.ISysRoleService;
 public class SysPermissionService {
 
     @Autowired
-    private ISysRoleService roleService;
+    private SysRoleService roleService;
 
     @Autowired
-    private ISysMenuService menuService;
+    private SysMenuService menuService;
 
     /**
      * 获取角色数据权限

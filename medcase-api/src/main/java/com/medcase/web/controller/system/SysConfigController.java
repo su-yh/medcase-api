@@ -8,7 +8,7 @@ import com.medcase.mvc.exception.ExceptionUtil;
 import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
 import com.medcase.system.entity.SysConfigEntity;
-import com.medcase.system.service.ISysConfigService;
+import com.medcase.system.service.SysConfigService;
 import com.medcase.web.controller.system.dto.ConfigQueryRequest;
 import com.medcase.web.controller.system.dto.ConfigResponse;
 import com.medcase.web.controller.system.dto.ConfigSaveRequest;
@@ -33,7 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class SysConfigController extends BaseController {
 
     @Autowired
-    private ISysConfigService configService;
+    private SysConfigService configService;
 
     /**
      * 获取参数配置列表

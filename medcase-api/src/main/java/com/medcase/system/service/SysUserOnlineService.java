@@ -1,17 +1,16 @@
-package com.medcase.system.service.impl;
+package com.medcase.system.service;
 
 import org.springframework.stereotype.Service;
 import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.common.utils.StringUtils;
 import com.medcase.system.domain.SysUserOnline;
-import com.medcase.system.service.ISysUserOnlineService;
 
 /**
  * 在线用户 服务层处理
  * 
  */
 @Service
-public class SysUserOnlineServiceImpl implements ISysUserOnlineService {
+public class SysUserOnlineService {
 
     /**
      * 通过登录地址查询信息
@@ -20,7 +19,6 @@ public class SysUserOnlineServiceImpl implements ISysUserOnlineService {
      * @param user 用户信息
      * @return 在线用户信息
      */
-    @Override
     public SysUserOnline selectOnlineByIpaddr(String ipaddr, LoginUser user) {
 
         if (StringUtils.equals(ipaddr, user.getIpaddr())) {
@@ -37,7 +35,6 @@ public class SysUserOnlineServiceImpl implements ISysUserOnlineService {
      * @param user 用户信息
      * @return 在线用户信息
      */
-    @Override
     public SysUserOnline selectOnlineByUserName(String userName, LoginUser user) {
 
         if (StringUtils.equals(userName, user.getUsername())) {
@@ -55,7 +52,6 @@ public class SysUserOnlineServiceImpl implements ISysUserOnlineService {
      * @param user 用户信息
      * @return 在线用户信息
      */
-    @Override
     public SysUserOnline selectOnlineByInfo(String ipaddr, String userName, LoginUser user) {
 
         if (StringUtils.equals(ipaddr, user.getIpaddr()) && StringUtils.equals(userName, user.getUsername())) {
@@ -71,7 +67,6 @@ public class SysUserOnlineServiceImpl implements ISysUserOnlineService {
      * @param user 用户信息
      * @return 在线用户
      */
-    @Override
     public SysUserOnline loginUserToUserOnline(LoginUser user) {
 
         if (StringUtils.isNull(user) || StringUtils.isNull(user.getUser())) {

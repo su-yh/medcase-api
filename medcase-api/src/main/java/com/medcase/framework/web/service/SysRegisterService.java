@@ -9,8 +9,6 @@ import com.medcase.common.constant.UserConstants;
 import com.medcase.common.core.domain.entity.SysUser;
 import com.medcase.common.core.domain.model.RegisterBody;
 import com.medcase.common.core.redis.RedisCache;
-import com.medcase.common.exception.user.CaptchaException;
-import com.medcase.common.exception.user.CaptchaExpireException;
 import com.medcase.common.utils.DateUtils;
 import com.medcase.common.utils.MessageUtils;
 import com.medcase.common.utils.StringUtils;
@@ -18,8 +16,8 @@ import com.medcase.framework.manager.AsyncManager;
 import com.medcase.framework.manager.factory.AsyncFactory;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
-import com.medcase.system.service.ISysConfigService;
-import com.medcase.system.service.ISysUserService;
+import com.medcase.system.service.SysConfigService;
+import com.medcase.system.service.SysUserService;
 
 /**
  * 注册校验方法
@@ -29,10 +27,10 @@ import com.medcase.system.service.ISysUserService;
 public class SysRegisterService {
 
     @Autowired
-    private ISysUserService userService;
+    private SysUserService userService;
 
     @Autowired
-    private ISysConfigService configService;
+    private SysConfigService configService;
 
     @Autowired
     private RedisCache redisCache;
@@ -104,11 +102,11 @@ public class SysRegisterService {
         redisCache.deleteObject(verifyKey);
         if (captcha == null) {
 
-            throw new CaptchaExpireException();
+            throw ExceptionUtil.business(ErrorCodeEnums.CAPTCHA_EXPIRED);
         }
         if (!code.equalsIgnoreCase(captcha)) {
 
-            throw new CaptchaException();
+            throw ExceptionUtil.business(ErrorCodeEnums.CAPTCHA_INVALID);
         }
     }
 }

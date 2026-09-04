@@ -15,6 +15,9 @@ public enum ErrorCodeEnums implements IErrorCode {
     SERVICE_ERROR("error.code.service.error", "服务错误"),
     SYSTEM_UNSUPPORTED("error.code.system.unsupported", "Not Supported: {0}"),
     RATE_LIMIT_EXCEEDED("error.code.rate.limit.exceeded", "访问过于频繁，请稍候再试"),
+    SQL_ORDER_BY_INVALID("error.code.sql.order.by.invalid", "参数不符合规范，不能进行查询"),
+    SQL_ORDER_BY_TOO_LONG("error.code.sql.order.by.too.long", "参数已超过最大限制，不能进行查询"),
+    SQL_KEYWORD_INVALID("error.code.sql.keyword.invalid", "请求参数包含敏感关键词'{0}'，可能存在安全风险"),
     ATTACHMENT_EMPTY("error.code.attachment.empty", "上传附件不能为空"),
     ATTACHMENT_UPLOAD_FAILED("error.code.attachment.upload.failed", "附件上传失败"),
     ATTACHMENT_DOWNLOAD_FAILED("error.code.attachment.download.failed", "附件下载失败"),
@@ -79,6 +82,8 @@ public enum ErrorCodeEnums implements IErrorCode {
     USER_REGISTER_ID_CARD_BACK_EMPTY("error.code.doctor.register.id.card.back.empty", "身份证反面图片不能为空"),
     USER_REGISTER_QUALIFICATION_CERTIFICATE_EMPTY(
             "error.code.doctor.register.qualification.certificate.empty", "医师职业资格证图片不能为空"),
+    CAPTCHA_INVALID("error.code.captcha.invalid", "验证码错误"),
+    CAPTCHA_EXPIRED("error.code.captcha.expired", "验证码已失效"),
     USER_LOGIN_USER_NOT_EXISTS("error.code.doctor.login.user.not.exists", "医生账号不存在"),
     CASE_NOT_FOUND("error.code.doctor.case.not.found", "病例不存在"),
     CASE_SUBMIT_FAILED("error.code.doctor.case.submit.failed", "病例提交失败，请稍后重试"),

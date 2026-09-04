@@ -9,7 +9,7 @@ import com.medcase.mp.mybatis.PageResult;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
 import com.medcase.system.entity.SysLogininforEntity;
-import com.medcase.system.service.ISysLogininforService;
+import com.medcase.system.service.SysLogininforService;
 import com.medcase.web.controller.monitor.dto.LogininforQueryRequest;
 import com.medcase.web.controller.monitor.dto.LogininforResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class SysLogininforController extends BaseController {
 
     @Autowired
-    private ISysLogininforService logininforService;
+    private SysLogininforService logininforService;
 
     @Autowired
     private SysPasswordService passwordService;

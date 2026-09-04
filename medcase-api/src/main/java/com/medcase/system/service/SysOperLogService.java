@@ -1,4 +1,4 @@
-package com.medcase.system.service.impl;
+package com.medcase.system.service;
 
 import java.util.Arrays;
 import java.util.List;
@@ -8,14 +8,13 @@ import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
 import com.medcase.system.entity.SysOperLogEntity;
 import com.medcase.system.mapper.SysOperLogMapper;
-import com.medcase.system.service.ISysOperLogService;
 
 /**
  * 操作日志 服务层处理
  * 
  */
 @Service
-public class SysOperLogServiceImpl implements ISysOperLogService {
+public class SysOperLogService {
 
     @Autowired
     private SysOperLogMapper operLogMapper;
@@ -25,7 +24,6 @@ public class SysOperLogServiceImpl implements ISysOperLogService {
      * 
      * @param operLog 操作日志对象
      */
-    @Override
     public void insertOperlog(SysOperLogEntity operLog) {
 
         operLogMapper.insert(operLog);
@@ -37,7 +35,6 @@ public class SysOperLogServiceImpl implements ISysOperLogService {
      * @param operLog 操作日志对象
      * @return 操作日志集合
      */
-    @Override
     public PageResult<SysOperLogEntity> selectPage(
             PageParam pageParam, String operIp, String title, Integer businessType,
             Integer status, String operName, String beginTime, String endTime) {
@@ -52,7 +49,6 @@ public class SysOperLogServiceImpl implements ISysOperLogService {
      * @param operIds 需要删除的操作日志ID
      * @return 结果
      */
-    @Override
     public int deleteOperLogByIds(Long[] operIds) {
 
         return operLogMapper.deleteByIds(Arrays.asList(operIds));
@@ -64,7 +60,6 @@ public class SysOperLogServiceImpl implements ISysOperLogService {
      * @param operId 操作ID
      * @return 操作日志对象
      */
-    @Override
     public SysOperLogEntity selectOperLogById(Long operId) {
 
         return operLogMapper.selectById(operId);
@@ -73,7 +68,6 @@ public class SysOperLogServiceImpl implements ISysOperLogService {
     /**
      * 清空操作日志
      */
-    @Override
     public void cleanOperLog() {
 
         operLogMapper.cleanOperLog();

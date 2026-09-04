@@ -4,40 +4,25 @@ import com.medcase.common.core.domain.entity.SysDept;
 import com.medcase.common.core.domain.entity.SysUser;
 import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.common.enums.UserTypeEnums;
-import com.medcase.system.service.ISysUserService;
+import com.medcase.system.service.SysUserService;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 class UserDetailsServiceImplTest {
     @Test
     void loadUserByUsernameUsesAdminUserType() throws Exception {
-        AtomicReference<String> usernameRef = new AtomicReference<>();
-        AtomicReference<String> userTypeRef = new AtomicReference<>();
-
-        ISysUserService userService = (ISysUserService) Proxy.newProxyInstance(
-                ISysUserService.class.getClassLoader(),
-                new Class[] {ISysUserService.class},
-                new InvocationHandler() {
-                    @Override
-                    public Object invoke(Object proxy, Method method, Object[] args) {
-                        if ("selectUserByUserName".equals(method.getName())) {
-                            usernameRef.set((String) args[0]);
-                            userTypeRef.set((String) args[1]);
-                            return adminUser();
-                        }
-                        throw new UnsupportedOperationException(method.getName());
-                    }
-                });
+        SysUserService userService = Mockito.mock(SysUserService.class);
+        when(userService.selectUserByUserName("suyunhong", UserTypeEnums.ADMIN.getCode()))
+                .thenReturn(adminUser());
 
         UserDetailsServiceImpl service = new UserDetailsServiceImpl();
         setField(service, "userService", userService);
@@ -46,8 +31,7 @@ class UserDetailsServiceImplTest {
         UserDetails userDetails = service.loadUserByUsername("suyunhong");
 
         assertInstanceOf(LoginUser.class, userDetails);
-        assertEquals("suyunhong", usernameRef.get());
-        assertEquals(UserTypeEnums.ADMIN.getCode(), userTypeRef.get());
+        verify(userService).selectUserByUserName("suyunhong", UserTypeEnums.ADMIN.getCode());
         assertSame(UserTypeEnums.ADMIN, ((LoginUser) userDetails).getUser().getUserType());
     }
 

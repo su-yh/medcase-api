@@ -1,4 +1,4 @@
-package com.medcase.system.service.impl;
+package com.medcase.system.service;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,7 +28,6 @@ import com.medcase.system.entity.SysMenuEntity;
 import com.medcase.system.mapper.SysMenuMapper;
 import com.medcase.system.mapper.SysRoleMenuMapper;
 import com.medcase.system.mapper.SysRoleMapper;
-import com.medcase.system.service.ISysMenuService;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
 
@@ -36,9 +35,9 @@ import com.medcase.mvc.exception.ExceptionUtil;
  * 菜单 业务层处理
  */
 @Service
-public class SysMenuServiceImpl implements ISysMenuService {
+public class SysMenuService {
 
-    private static final Logger log = LoggerFactory.getLogger(SysMenuServiceImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(SysMenuService.class);
 
     public static final String PREMISSION_STRING = "perms[\"{0}\"]";
 
@@ -58,7 +57,6 @@ public class SysMenuServiceImpl implements ISysMenuService {
      * @param userId 用户ID
      * @return 菜单列表
      */
-    @Override
     public List<SysMenu> selectMenuList(Long userId) {
 
         return selectMenuList(new SysMenu(), userId);
@@ -69,7 +67,6 @@ public class SysMenuServiceImpl implements ISysMenuService {
      * @param menu 菜单信息
      * @return 菜单列表
      */
-    @Override
     public List<SysMenu> selectMenuList(SysMenu menu, Long userId) {
 
         List<SysMenu> menuList = null;
@@ -91,7 +88,6 @@ public class SysMenuServiceImpl implements ISysMenuService {
      * @param userId 用户ID
      * @return 权限列表
      */
-    @Override
     public Set<String> selectMenuPermsByUserId(Long userId) {
 
         List<String> perms = menuMapper.selectMenuPermsByUserId(userId);
@@ -111,7 +107,6 @@ public class SysMenuServiceImpl implements ISysMenuService {
      * @param roleId 角色ID
      * @return 权限列表
      */
-    @Override
     public Set<String> selectMenuPermsByRoleId(Long roleId) {
 
         List<String> perms = menuMapper.selectMenuPermsByRoleId(roleId);
@@ -131,7 +126,6 @@ public class SysMenuServiceImpl implements ISysMenuService {
      * @param userId 用户名称
      * @return 菜单列表
      */
-    @Override
     public List<SysMenu> selectMenuTreeByUserId(Long userId) {
 
         List<SysMenu> menus = null;
@@ -151,7 +145,6 @@ public class SysMenuServiceImpl implements ISysMenuService {
      * @param roleId 角色ID
      * @return 选中菜单列表
      */
-    @Override
     public List<Long> selectMenuListByRoleId(Long roleId) {
 
         SysRole role = SystemEntityConverter.toDomain(roleMapper.selectById(roleId));
@@ -163,7 +156,6 @@ public class SysMenuServiceImpl implements ISysMenuService {
      * @param menus 菜单列表
      * @return 路由列表
      */
-    @Override
     public List<RouterVo> buildMenus(List<SysMenu> menus) {
 
         List<RouterVo> routers = new LinkedList<RouterVo>();
@@ -220,7 +212,6 @@ public class SysMenuServiceImpl implements ISysMenuService {
      * @param menus 菜单列表
      * @return 树结构列表
      */
-    @Override
     public List<SysMenu> buildMenuTree(List<SysMenu> menus) {
 
         List<SysMenu> returnList = new ArrayList<SysMenu>();
@@ -247,7 +238,6 @@ public class SysMenuServiceImpl implements ISysMenuService {
      * @param menus 菜单列表
      * @return 下拉树结构列表
      */
-    @Override
     public List<TreeSelect> buildMenuTreeSelect(List<SysMenu> menus) {
 
         List<SysMenu> menuTrees = buildMenuTree(menus);
@@ -259,7 +249,6 @@ public class SysMenuServiceImpl implements ISysMenuService {
      * @param menuId 菜单ID
      * @return 菜单信息
      */
-    @Override
     public SysMenu selectMenuById(Long menuId) {
 
         return SystemEntityConverter.toDomain(menuMapper.selectById(menuId));
@@ -270,7 +259,6 @@ public class SysMenuServiceImpl implements ISysMenuService {
      * @param menuId 菜单ID
      * @return 结果
      */
-    @Override
     public boolean hasChildByMenuId(Long menuId) {
 
         int result = menuMapper.selectChildrenCount(menuId);
@@ -282,7 +270,6 @@ public class SysMenuServiceImpl implements ISysMenuService {
      * @param menuId 菜单ID
      * @return 结果
      */
-    @Override
     public boolean checkMenuExistRole(Long menuId) {
 
         int result = Math.toIntExact(roleMenuMapper.countByMenuId(menuId));
@@ -294,7 +281,6 @@ public class SysMenuServiceImpl implements ISysMenuService {
      * @param menu 菜单信息
      * @return 结果
      */
-    @Override
     public int insertMenu(SysMenu menu) {
 
         SysMenuEntity entity = SystemEntityConverter.toEntity(menu);
@@ -308,7 +294,6 @@ public class SysMenuServiceImpl implements ISysMenuService {
      * @param menu 菜单信息
      * @return 结果
      */
-    @Override
     public int updateMenu(SysMenu menu) {
 
         return menuMapper.updateById(SystemEntityConverter.toEntity(menu));
@@ -319,7 +304,6 @@ public class SysMenuServiceImpl implements ISysMenuService {
      * @param menuIds 菜单ID
      * @param orderNums 排序ID
      */
-    @Override
     @Transactional
     public void updateMenuSort(String[] menuIds, String[] orderNums) {
 
@@ -345,7 +329,6 @@ public class SysMenuServiceImpl implements ISysMenuService {
      * @param menuId 菜单ID
      * @return 结果
      */
-    @Override
     public int deleteMenuById(Long menuId) {
 
         return menuMapper.deleteById(menuId);
@@ -356,7 +339,6 @@ public class SysMenuServiceImpl implements ISysMenuService {
      * @param menu 菜单信息
      * @return 结果
      */
-    @Override
     public boolean checkMenuNameUnique(SysMenu menu) {
 
         Long menuId = StringUtils.isNull(menu.getMenuId()) ? -1L : menu.getMenuId();
@@ -374,7 +356,6 @@ public class SysMenuServiceImpl implements ISysMenuService {
      * @param menu 菜单信息
      * @return 结果
      */
-    @Override
     public boolean checkRouteConfigUnique(SysMenu menu) {
 
         Long menuId = StringUtils.isNull(menu.getMenuId()) ? -1L : menu.getMenuId();

@@ -13,8 +13,8 @@ import com.medcase.common.utils.ip.IpUtils;
 import com.medcase.common.utils.spring.SpringUtils;
 import com.medcase.system.entity.SysLogininforEntity;
 import com.medcase.system.entity.SysOperLogEntity;
-import com.medcase.system.service.ISysLogininforService;
-import com.medcase.system.service.ISysOperLogService;
+import com.medcase.system.service.SysLogininforService;
+import com.medcase.system.service.SysOperLogService;
 
 /**
  * 异步工厂（产生任务用）
@@ -74,7 +74,7 @@ public class AsyncFactory {
                     logininfor.setStatus(Constants.FAIL);
                 }
                 // 插入数据
-                SpringUtils.getBean(ISysLogininforService.class).insertLogininfor(logininfor);
+                SpringUtils.getBean(SysLogininforService.class).insertLogininfor(logininfor);
             }
         };
     }
@@ -94,7 +94,7 @@ public class AsyncFactory {
 
                 // 远程查询操作地点
                 operLog.setOperLocation(AddressUtils.getRealAddressByIP(operLog.getOperIp()));
-                SpringUtils.getBean(ISysOperLogService.class).insertOperlog(operLog);
+                SpringUtils.getBean(SysOperLogService.class).insertOperlog(operLog);
             }
         };
     }

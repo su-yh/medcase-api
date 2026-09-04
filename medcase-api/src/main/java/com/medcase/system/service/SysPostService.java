@@ -1,4 +1,4 @@
-package com.medcase.system.service.impl;
+package com.medcase.system.service;
 
 import java.util.Arrays;
 import java.util.List;
@@ -12,7 +12,6 @@ import com.medcase.system.entity.SysPostEntity;
 import com.medcase.system.entity.SysUserPostEntity;
 import com.medcase.system.mapper.SysPostMapper;
 import com.medcase.system.mapper.SysUserPostMapper;
-import com.medcase.system.service.ISysPostService;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
 
@@ -21,7 +20,7 @@ import com.medcase.mvc.exception.ExceptionUtil;
  * 
  */
 @Service
-public class SysPostServiceImpl implements ISysPostService {
+public class SysPostService {
 
     @Autowired
     private SysPostMapper postMapper;
@@ -35,7 +34,6 @@ public class SysPostServiceImpl implements ISysPostService {
      * @param post 岗位信息
      * @return 岗位信息集合
      */
-    @Override
     public PageResult<SysPostEntity> selectPage(
             PageParam pageParam, String postCode, String postName, String status) {
 
@@ -47,7 +45,6 @@ public class SysPostServiceImpl implements ISysPostService {
      * 
      * @return 岗位列表
      */
-    @Override
     public List<SysPostEntity> selectPostAll() {
 
         return postMapper.selectAllPosts();
@@ -59,7 +56,6 @@ public class SysPostServiceImpl implements ISysPostService {
      * @param postId 岗位ID
      * @return 角色对象信息
      */
-    @Override
     public SysPostEntity selectPostById(Long postId) {
 
         return postMapper.selectById(postId);
@@ -71,7 +67,6 @@ public class SysPostServiceImpl implements ISysPostService {
      * @param userId 用户ID
      * @return 选中岗位ID列表
      */
-    @Override
     public List<Long> selectPostListByUserId(Long userId) {
 
         return postMapper.selectPostListByUserId(userId);
@@ -83,7 +78,6 @@ public class SysPostServiceImpl implements ISysPostService {
      * @param post 岗位信息
      * @return 结果
      */
-    @Override
     public boolean checkPostNameUnique(Long postId, String postName) {
 
         Long currentPostId = StringUtils.isNull(postId) ? -1L : postId;
@@ -101,7 +95,6 @@ public class SysPostServiceImpl implements ISysPostService {
      * @param post 岗位信息
      * @return 结果
      */
-    @Override
     public boolean checkPostCodeUnique(Long postId, String postCode) {
 
         Long currentPostId = StringUtils.isNull(postId) ? -1L : postId;
@@ -119,7 +112,6 @@ public class SysPostServiceImpl implements ISysPostService {
      * @param postId 岗位ID
      * @return 结果
      */
-    @Override
     public int countUserPostById(Long postId) {
 
         return Math.toIntExact(userPostMapper.countByPostId(postId));
@@ -131,7 +123,6 @@ public class SysPostServiceImpl implements ISysPostService {
      * @param postId 岗位ID
      * @return 结果
      */
-    @Override
     public int deletePostById(Long postId) {
 
         return postMapper.deleteById(postId);
@@ -143,7 +134,6 @@ public class SysPostServiceImpl implements ISysPostService {
      * @param postIds 需要删除的岗位ID
      * @return 结果
      */
-    @Override
     public int deletePostByIds(Long[] postIds) {
 
         for (Long postId : postIds) {
@@ -163,7 +153,6 @@ public class SysPostServiceImpl implements ISysPostService {
      * @param post 岗位信息
      * @return 结果
      */
-    @Override
     public int insertPost(SysPostEntity post) {
 
         int row = postMapper.insert(post);
@@ -176,7 +165,6 @@ public class SysPostServiceImpl implements ISysPostService {
      * @param post 岗位信息
      * @return 结果
      */
-    @Override
     public int updatePost(SysPostEntity post) {
 
         return postMapper.updateById(post);

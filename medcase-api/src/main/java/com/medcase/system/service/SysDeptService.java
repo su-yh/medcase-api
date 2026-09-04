@@ -1,4 +1,4 @@
-package com.medcase.system.service.impl;
+package com.medcase.system.service;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,7 +22,6 @@ import com.medcase.system.entity.SysDeptEntity;
 import com.medcase.system.mapper.SysDeptMapper;
 import com.medcase.system.mapper.SysRoleMapper;
 import com.medcase.system.mapper.SysUserMapper;
-import com.medcase.system.service.ISysDeptService;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
 
@@ -31,7 +30,7 @@ import com.medcase.mvc.exception.ExceptionUtil;
  * 
  */
 @Service
-public class SysDeptServiceImpl implements ISysDeptService {
+public class SysDeptService {
 
     @Autowired
     private SysDeptMapper deptMapper;
@@ -48,7 +47,6 @@ public class SysDeptServiceImpl implements ISysDeptService {
      * @param dept 部门信息
      * @return 部门信息集合
      */
-    @Override
     @DataScope(deptAlias = "d")
     public List<SysDept> selectDeptList(SysDept dept) {
 
@@ -61,7 +59,6 @@ public class SysDeptServiceImpl implements ISysDeptService {
      * @param dept 部门信息
      * @return 部门树信息集合
      */
-    @Override
     public List<TreeSelect> selectDeptTreeList(SysDept dept) {
 
         List<SysDept> depts = SpringUtils.getAopProxy(this).selectDeptList(dept);
@@ -74,7 +71,6 @@ public class SysDeptServiceImpl implements ISysDeptService {
      * @param depts 部门列表
      * @return 树结构列表
      */
-    @Override
     public List<SysDept> buildDeptTree(List<SysDept> depts) {
 
         List<SysDept> returnList = new ArrayList<SysDept>();
@@ -101,7 +97,6 @@ public class SysDeptServiceImpl implements ISysDeptService {
      * @param depts 部门列表
      * @return 下拉树结构列表
      */
-    @Override
     public List<TreeSelect> buildDeptTreeSelect(List<SysDept> depts) {
 
         List<SysDept> deptTrees = buildDeptTree(depts);
@@ -114,7 +109,6 @@ public class SysDeptServiceImpl implements ISysDeptService {
      * @param roleId 角色ID
      * @return 选中部门列表
      */
-    @Override
     public List<Long> selectDeptListByRoleId(Long roleId) {
 
         SysRole role = SystemEntityConverter.toDomain(roleMapper.selectById(roleId));
@@ -127,7 +121,6 @@ public class SysDeptServiceImpl implements ISysDeptService {
      * @param deptId 部门ID
      * @return 部门信息
      */
-    @Override
     public SysDept selectDeptById(Long deptId) {
 
         return SystemEntityConverter.toDomain(deptMapper.selectById(deptId));
@@ -139,7 +132,6 @@ public class SysDeptServiceImpl implements ISysDeptService {
      * @param deptId 部门ID
      * @return 子部门数
      */
-    @Override
     public int selectNormalChildrenDeptById(Long deptId) {
 
         return deptMapper.selectNormalChildrenCount(deptId);
@@ -151,7 +143,6 @@ public class SysDeptServiceImpl implements ISysDeptService {
      * @param deptId 部门ID
      * @return 结果
      */
-    @Override
     public boolean hasChildByDeptId(Long deptId) {
 
         int result = deptMapper.selectChildrenCount(deptId);
@@ -164,7 +155,6 @@ public class SysDeptServiceImpl implements ISysDeptService {
      * @param deptId 部门ID
      * @return 结果 true 存在 false 不存在
      */
-    @Override
     public boolean checkDeptExistUser(Long deptId) {
 
         int result = Math.toIntExact(userMapper.countByDeptId(deptId));
@@ -177,7 +167,6 @@ public class SysDeptServiceImpl implements ISysDeptService {
      * @param dept 部门信息
      * @return 结果
      */
-    @Override
     public boolean checkDeptNameUnique(SysDept dept) {
 
         Long deptId = StringUtils.isNull(dept.getDeptId()) ? -1L : dept.getDeptId();
@@ -195,7 +184,6 @@ public class SysDeptServiceImpl implements ISysDeptService {
      * 
      * @param deptId 部门id
      */
-    @Override
     public void checkDeptDataScope(Long deptId) {
 
         if (!SecurityUtils.isAdmin() && StringUtils.isNotNull(deptId)) {
@@ -216,7 +204,6 @@ public class SysDeptServiceImpl implements ISysDeptService {
      * @param dept 部门信息
      * @return 结果
      */
-    @Override
     public int insertDept(SysDept dept) {
 
         SysDept info = SystemEntityConverter.toDomain(deptMapper.selectById(dept.getParentId()));
@@ -238,7 +225,6 @@ public class SysDeptServiceImpl implements ISysDeptService {
      * @param dept 部门信息
      * @return 结果
      */
-    @Override
     public int updateDept(SysDept dept) {
 
         SysDept newParentDept = SystemEntityConverter.toDomain(
@@ -305,7 +291,6 @@ public class SysDeptServiceImpl implements ISysDeptService {
      * @param deptIds 部门ID数组
      * @param orderNums 排序数组
      */
-    @Override
     @Transactional
     public void updateDeptSort(String[] deptIds, String[] orderNums) {
 
@@ -329,7 +314,6 @@ public class SysDeptServiceImpl implements ISysDeptService {
      * @param deptId 部门ID
      * @return 结果
      */
-    @Override
     public int deleteDeptById(Long deptId) {
 
         return deptMapper.deleteDeptById(deptId);

@@ -5,7 +5,7 @@ import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.framework.web.service.TokenService;
 import com.medcase.storage.pojo.FileAttachment;
 import com.medcase.system.mapper.SysUserMapper;
-import com.medcase.system.service.impl.SysUserServiceImpl;
+import com.medcase.system.service.SysUserService;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -22,7 +22,7 @@ class UserAvatarUploadedEventListenerTest {
     @Test
     void databaseListenerUpdatesAvatarByEventData() {
         SysUserMapper userMapper = mock(SysUserMapper.class);
-        SysUserServiceImpl userService = new SysUserServiceImpl();
+        SysUserService userService = new SysUserService();
         ReflectionTestUtils.setField(userService, "userMapper", userMapper);
         UserAvatarUploadedEvent event = event();
         when(userMapper.updateUserAvatar(12L, event.getAttachment())).thenReturn(1);

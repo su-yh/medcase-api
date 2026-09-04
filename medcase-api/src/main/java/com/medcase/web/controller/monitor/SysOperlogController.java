@@ -15,7 +15,7 @@ import com.medcase.common.enums.BusinessType;
 import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
 import com.medcase.system.entity.SysOperLogEntity;
-import com.medcase.system.service.ISysOperLogService;
+import com.medcase.system.service.SysOperLogService;
 import com.medcase.web.controller.monitor.dto.OperLogQueryRequest;
 import com.medcase.web.controller.monitor.dto.OperLogResponse;
 
@@ -28,7 +28,7 @@ import com.medcase.web.controller.monitor.dto.OperLogResponse;
 public class SysOperlogController extends BaseController {
 
     @Autowired
-    private ISysOperLogService operLogService;
+    private SysOperLogService operLogService;
 
     @PreAuthorize("@ss.hasPermi('monitor:operlog:list')")
     @GetMapping("/list")

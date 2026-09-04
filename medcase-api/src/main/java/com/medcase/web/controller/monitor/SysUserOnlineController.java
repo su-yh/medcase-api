@@ -21,7 +21,7 @@ import com.medcase.common.utils.StringUtils;
 import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
 import com.medcase.system.domain.SysUserOnline;
-import com.medcase.system.service.ISysUserOnlineService;
+import com.medcase.system.service.SysUserOnlineService;
 
 /**
  * 在线用户监控
@@ -32,7 +32,7 @@ import com.medcase.system.service.ISysUserOnlineService;
 public class SysUserOnlineController extends BaseController {
 
     @Autowired
-    private ISysUserOnlineService userOnlineService;
+    private SysUserOnlineService userOnlineService;
 
     @Autowired
     private RedisCache redisCache;

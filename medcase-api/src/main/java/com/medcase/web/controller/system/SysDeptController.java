@@ -22,7 +22,7 @@ import com.medcase.mvc.exception.ExceptionUtil;
 import com.medcase.common.core.domain.entity.SysDept;
 import com.medcase.common.enums.BusinessType;
 import com.medcase.common.utils.StringUtils;
-import com.medcase.system.service.ISysDeptService;
+import com.medcase.system.service.SysDeptService;
 
 /**
  * 部门信息
@@ -33,7 +33,7 @@ import com.medcase.system.service.ISysDeptService;
 public class SysDeptController extends BaseController {
 
     @Autowired
-    private ISysDeptService deptService;
+    private SysDeptService deptService;
 
     /**
      * 获取部门列表

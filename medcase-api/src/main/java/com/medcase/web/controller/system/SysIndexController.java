@@ -12,7 +12,7 @@ import com.medcase.common.core.domain.entity.SysUser;
 import com.medcase.common.enums.UserTypeEnums;
 import com.medcase.common.utils.SecurityUtils;
 import com.medcase.common.utils.StringUtils;
-import com.medcase.system.service.ISysUserService;
+import com.medcase.system.service.SysUserService;
 
 /**
  * 首页
@@ -22,7 +22,7 @@ import com.medcase.system.service.ISysUserService;
 public class SysIndexController {
 
     @Autowired
-    private ISysUserService userService;
+    private SysUserService userService;
 
     @Autowired
     private PasswordEncoder passwordEncoder;

@@ -1,4 +1,4 @@
-package com.medcase.system.service.impl;
+package com.medcase.system.service;
 
 import java.util.Collection;
 import java.util.List;
@@ -14,7 +14,6 @@ import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
 import com.medcase.system.entity.SysConfigEntity;
 import com.medcase.system.mapper.SysConfigMapper;
-import com.medcase.system.service.ISysConfigService;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
 import java.util.Date;
@@ -24,7 +23,7 @@ import java.util.Date;
  * 
  */
 @Service
-public class SysConfigServiceImpl implements ISysConfigService {
+public class SysConfigService {
 
     @Autowired
     private SysConfigMapper configMapper;
@@ -47,7 +46,6 @@ public class SysConfigServiceImpl implements ISysConfigService {
      * @param configId 参数配置ID
      * @return 参数配置信息
      */
-    @Override
     public SysConfigEntity selectConfigById(Long configId) {
 
         return configMapper.selectById(configId);
@@ -59,7 +57,6 @@ public class SysConfigServiceImpl implements ISysConfigService {
      * @param configKey 参数key
      * @return 参数键值
      */
-    @Override
     public String selectConfigByKey(String configKey) {
 
         String configValue = Convert.toStr(redisCache.getCacheObject(getCacheKey(configKey)));
@@ -81,7 +78,6 @@ public class SysConfigServiceImpl implements ISysConfigService {
      * 
      * @return true开启，false关闭
      */
-    @Override
     public boolean selectCaptchaEnabled() {
 
         String captchaEnabled = selectConfigByKey("sys.account.captchaEnabled");
@@ -98,7 +94,6 @@ public class SysConfigServiceImpl implements ISysConfigService {
      * @param config 参数配置信息
      * @return 参数配置集合
      */
-    @Override
     public PageResult<SysConfigEntity> selectPage(
             PageParam pageParam, String configName, String configType, String configKey,
             String beginTime, String endTime) {
@@ -114,7 +109,6 @@ public class SysConfigServiceImpl implements ISysConfigService {
      * @param config 参数配置信息
      * @return 结果
      */
-    @Override
     public int insertConfig(SysConfigEntity config) {
 
         int row = configMapper.insert(config);
@@ -131,7 +125,6 @@ public class SysConfigServiceImpl implements ISysConfigService {
      * @param config 参数配置信息
      * @return 结果
      */
-    @Override
     public int updateConfig(SysConfigEntity config) {
 
         SysConfigEntity temp = selectConfigById(config.getConfigId());
@@ -153,7 +146,6 @@ public class SysConfigServiceImpl implements ISysConfigService {
      * 
      * @param configIds 需要删除的参数ID
      */
-    @Override
     public void deleteConfigByIds(Long[] configIds) {
 
         for (Long configId : configIds) {
@@ -171,7 +163,6 @@ public class SysConfigServiceImpl implements ISysConfigService {
     /**
      * 加载参数缓存数据
      */
-    @Override
     public void loadingConfigCache() {
 
         List<SysConfigEntity> configs = configMapper.selectAllConfigs();
@@ -184,7 +175,6 @@ public class SysConfigServiceImpl implements ISysConfigService {
     /**
      * 清空参数缓存数据
      */
-    @Override
     public void clearConfigCache() {
 
         Collection<String> keys = redisCache.keys(CacheConstants.SYS_CONFIG_KEY + "*");
@@ -194,7 +184,6 @@ public class SysConfigServiceImpl implements ISysConfigService {
     /**
      * 重置参数缓存数据
      */
-    @Override
     public void resetConfigCache() {
 
         clearConfigCache();
@@ -207,7 +196,6 @@ public class SysConfigServiceImpl implements ISysConfigService {
      * @param config 参数配置信息
      * @return 结果
      */
-    @Override
     public boolean checkConfigKeyUnique(Long configId, String configKey) {
 
         Long currentConfigId = StringUtils.isNull(configId) ? -1L : configId;

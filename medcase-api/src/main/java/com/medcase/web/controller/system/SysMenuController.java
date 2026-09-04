@@ -23,7 +23,7 @@ import com.medcase.common.core.domain.TreeSelect;
 import com.medcase.web.controller.system.dto.MenuRoleTreeResponse;
 import com.medcase.common.enums.BusinessType;
 import com.medcase.common.utils.StringUtils;
-import com.medcase.system.service.ISysMenuService;
+import com.medcase.system.service.SysMenuService;
 
 /**
  * 菜单信息
@@ -33,7 +33,7 @@ import com.medcase.system.service.ISysMenuService;
 public class SysMenuController extends BaseController {
 
     @Autowired
-    private ISysMenuService menuService;
+    private SysMenuService menuService;
 
     /**
      * 获取菜单列表

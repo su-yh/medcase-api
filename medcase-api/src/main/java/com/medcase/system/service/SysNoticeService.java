@@ -1,4 +1,4 @@
-package com.medcase.system.service.impl;
+package com.medcase.system.service;
 
 import java.util.Arrays;
 import java.util.List;
@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.medcase.system.entity.SysNoticeEntity;
 import com.medcase.system.mapper.SysNoticeMapper;
-import com.medcase.system.service.ISysNoticeService;
 import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
 
@@ -15,7 +14,7 @@ import com.medcase.mp.mybatis.PageResult;
  * 
  */
 @Service
-public class SysNoticeServiceImpl implements ISysNoticeService {
+public class SysNoticeService {
 
     @Autowired
     private SysNoticeMapper noticeMapper;
@@ -26,7 +25,6 @@ public class SysNoticeServiceImpl implements ISysNoticeService {
      * @param noticeId 公告ID
      * @return 公告信息
      */
-    @Override
     public SysNoticeEntity selectNoticeById(Long noticeId) {
 
         return noticeMapper.selectById(noticeId);
@@ -38,7 +36,6 @@ public class SysNoticeServiceImpl implements ISysNoticeService {
      * @param notice 公告信息
      * @return 公告集合
      */
-    @Override
     public PageResult<SysNoticeEntity> selectPage(
             PageParam pageParam, String noticeTitle, String noticeType, String createBy) {
 
@@ -51,7 +48,6 @@ public class SysNoticeServiceImpl implements ISysNoticeService {
      * @param notice 公告信息
      * @return 结果
      */
-    @Override
     public int insertNotice(SysNoticeEntity notice) {
 
         return noticeMapper.insert(notice);
@@ -63,7 +59,6 @@ public class SysNoticeServiceImpl implements ISysNoticeService {
      * @param notice 公告信息
      * @return 结果
      */
-    @Override
     public int updateNotice(SysNoticeEntity notice) {
 
         return noticeMapper.updateById(notice);
@@ -75,7 +70,6 @@ public class SysNoticeServiceImpl implements ISysNoticeService {
      * @param noticeId 公告ID
      * @return 结果
      */
-    @Override
     public int deleteNoticeById(Long noticeId) {
 
         return noticeMapper.deleteById(noticeId);
@@ -87,7 +81,6 @@ public class SysNoticeServiceImpl implements ISysNoticeService {
      * @param noticeIds 需要删除的公告ID
      * @return 结果
      */
-    @Override
     public int deleteNoticeByIds(Long[] noticeIds) {
 
         return noticeMapper.deleteByIds(Arrays.asList(noticeIds));

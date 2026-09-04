@@ -1,7 +1,8 @@
 package com.medcase.common.utils.sql;
 
-import com.medcase.common.exception.UtilException;
 import com.medcase.common.utils.StringUtils;
+import com.medcase.mvc.constants.enums.ErrorCodeEnums;
+import com.medcase.mvc.exception.ExceptionUtil;
 
 /**
  * sql操作工具类
@@ -31,11 +32,11 @@ public class SqlUtil {
 
         if (StringUtils.isNotEmpty(value) && !isValidOrderBySql(value)) {
 
-            throw new UtilException("参数不符合规范，不能进行查询");
+            throw ExceptionUtil.business(ErrorCodeEnums.SQL_ORDER_BY_INVALID);
         }
         if (StringUtils.length(value) > ORDER_BY_MAX_LENGTH) {
 
-            throw new UtilException("参数已超过最大限制，不能进行查询");
+            throw ExceptionUtil.business(ErrorCodeEnums.SQL_ORDER_BY_TOO_LONG);
         }
         return value;
     }
@@ -63,7 +64,7 @@ public class SqlUtil {
 
             if (StringUtils.indexOfIgnoreCase(normalizedValue, sqlKeyword) > -1) {
 
-                throw new UtilException("请求参数包含敏感关键词'" + sqlKeyword + "'，可能存在安全风险");
+                throw ExceptionUtil.business(ErrorCodeEnums.SQL_KEYWORD_INVALID, sqlKeyword);
             }
         }
     }

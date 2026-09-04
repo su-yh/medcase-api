@@ -7,7 +7,7 @@ import com.medcase.common.enums.UserStatusEnums;
 import com.medcase.common.utils.StringUtils;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
-import com.medcase.system.service.ISysUserService;
+import com.medcase.system.service.SysUserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +26,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     private static final Logger log = LoggerFactory.getLogger(UserDetailsServiceImpl.class);
 
     @Autowired
-    private ISysUserService userService;
+    private SysUserService userService;
     
     @Autowired
     private SysPermissionService permissionService;

@@ -1,4 +1,4 @@
-package com.medcase.system.service.impl;
+package com.medcase.system.service;
 
 import com.medcase.common.annotation.DataScope;
 import com.medcase.common.constant.UserConstants;
@@ -23,8 +23,6 @@ import com.medcase.system.mapper.SysRoleMapper;
 import com.medcase.system.mapper.SysUserMapper;
 import com.medcase.system.mapper.SysUserPostMapper;
 import com.medcase.system.mapper.SysUserRoleMapper;
-import com.medcase.system.service.ISysDeptService;
-import com.medcase.system.service.ISysUserService;
 import com.medcase.storage.pojo.FileAttachment;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
@@ -42,7 +40,7 @@ import java.util.stream.Collectors;
  * 
  */
 @Service
-public class SysUserServiceImpl implements ISysUserService {
+public class SysUserService {
 
     @Autowired
     private SysUserMapper userMapper;
@@ -60,7 +58,7 @@ public class SysUserServiceImpl implements ISysUserService {
     private SysUserPostMapper userPostMapper;
 
     @Autowired
-    private ISysDeptService deptService;
+    private SysDeptService deptService;
 
     /**
      * 根据条件分页查询用户列表
@@ -68,7 +66,6 @@ public class SysUserServiceImpl implements ISysUserService {
      * @param user 用户信息
      * @return 用户信息集合信息
      */
-    @Override
     @DataScope(deptAlias = "d", userAlias = "u")
     public PageResult<SysUser> selectPage(SysUser user, PageParam pageParam) {
         useAdminUserTypeIfAbsent(user);
@@ -81,7 +78,6 @@ public class SysUserServiceImpl implements ISysUserService {
      * @param user 用户信息
      * @return 用户信息集合信息
      */
-    @Override
     @DataScope(deptAlias = "d", userAlias = "u")
     public List<SysUser> selectUserList(SysUser user) {
         useAdminUserTypeIfAbsent(user);
@@ -94,7 +90,6 @@ public class SysUserServiceImpl implements ISysUserService {
      * @param user 用户信息
      * @return 用户信息集合信息
      */
-    @Override
     @DataScope(deptAlias = "d", userAlias = "u")
     public List<SysUser> selectAllocatedList(SysUser user) {
         useAdminUserTypeIfAbsent(user);
@@ -107,7 +102,6 @@ public class SysUserServiceImpl implements ISysUserService {
      * @param user 用户信息
      * @return 用户信息集合信息
      */
-    @Override
     @DataScope(deptAlias = "d", userAlias = "u")
     public List<SysUser> selectUnallocatedList(SysUser user) {
         useAdminUserTypeIfAbsent(user);
@@ -121,7 +115,6 @@ public class SysUserServiceImpl implements ISysUserService {
      * @param pageParam 分页参数
      * @return 用户信息集合信息
      */
-    @Override
     @DataScope(deptAlias = "d", userAlias = "u")
     public PageResult<SysUser> selectAllocatedPage(SysUser user, PageParam pageParam) {
         useAdminUserTypeIfAbsent(user);
@@ -135,7 +128,6 @@ public class SysUserServiceImpl implements ISysUserService {
      * @param pageParam 分页参数
      * @return 用户信息集合信息
      */
-    @Override
     @DataScope(deptAlias = "d", userAlias = "u")
     public PageResult<SysUser> selectUnallocatedPage(SysUser user, PageParam pageParam) {
         useAdminUserTypeIfAbsent(user);
@@ -154,7 +146,6 @@ public class SysUserServiceImpl implements ISysUserService {
      * @param userName 用户名
      * @return 用户对象信息
      */
-    @Override
     public SysUser selectUserByUserName(String userName, String userType) {
 
         return SystemEntityConverter.toDomain(
@@ -167,7 +158,6 @@ public class SysUserServiceImpl implements ISysUserService {
      * @param userId 用户ID
      * @return 用户对象信息
      */
-    @Override
     public SysUser selectUserById(Long userId) {
 
         return SystemEntityConverter.toDomain(userMapper.selectById(userId));
@@ -179,7 +169,6 @@ public class SysUserServiceImpl implements ISysUserService {
      * @param userName 用户名
      * @return 结果
      */
-    @Override
     public String selectUserRoleGroup(String userName) {
 
         List<SysRole> list = roleMapper.selectRolesByUserName(userName);
@@ -196,7 +185,6 @@ public class SysUserServiceImpl implements ISysUserService {
      * @param userName 用户名
      * @return 结果
      */
-    @Override
     public String selectUserPostGroup(String userName) {
 
         List<SysPostEntity> list = postMapper.selectPostsByUserName(userName);
@@ -213,7 +201,6 @@ public class SysUserServiceImpl implements ISysUserService {
      * @param user 用户信息
      * @return 结果
      */
-    @Override
     public boolean checkUserNameUnique(SysUser user) {
         Long userId = StringUtils.isNull(user.getUserId()) ? -1L : user.getUserId();
         useAdminUserTypeIfAbsent(user);
@@ -232,7 +219,6 @@ public class SysUserServiceImpl implements ISysUserService {
      * @param user 用户信息
      * @return
      */
-    @Override
     public boolean checkPhoneUnique(SysUser user) {
         Long userId = StringUtils.isNull(user.getUserId()) ? -1L : user.getUserId();
         useAdminUserTypeIfAbsent(user);
@@ -251,7 +237,6 @@ public class SysUserServiceImpl implements ISysUserService {
      * @param user 用户信息
      * @return
      */
-    @Override
     public boolean checkEmailUnique(SysUser user) {
         Long userId = StringUtils.isNull(user.getUserId()) ? -1L : user.getUserId();
         useAdminUserTypeIfAbsent(user);
@@ -269,7 +254,6 @@ public class SysUserServiceImpl implements ISysUserService {
      * 
      * @param user 用户信息
      */
-    @Override
     public void checkUserAllowed(SysUser user) {
         if (StringUtils.isNotNull(user.getUserId()) && user.isAdmin()) {
             throw ExceptionUtil.business(ErrorCodeEnums.SUPER_ADMIN_USER_OPERATION);
@@ -281,7 +265,6 @@ public class SysUserServiceImpl implements ISysUserService {
      * 
      * @param userId 用户id
      */
-    @Override
     public void checkUserDataScope(Long userId) {
 
         if (!SecurityUtils.isAdmin()) {
@@ -302,7 +285,6 @@ public class SysUserServiceImpl implements ISysUserService {
      * @param user 用户信息
      * @return 结果
      */
-    @Override
     @Transactional
     public int insertUser(SysUser user) {
 
@@ -323,7 +305,6 @@ public class SysUserServiceImpl implements ISysUserService {
      * @param user 用户信息
      * @return 结果
      */
-    @Override
     public boolean registerUser(SysUser user) {
 
         user.setUserType(UserTypeEnums.ADMIN);
@@ -336,7 +317,6 @@ public class SysUserServiceImpl implements ISysUserService {
      * @param user 用户信息
      * @return 结果
      */
-    @Override
     @Transactional
     public int updateUser(SysUser user) {
 
@@ -358,7 +338,6 @@ public class SysUserServiceImpl implements ISysUserService {
      * @param userId 用户ID
      * @param roleIds 角色组
      */
-    @Override
     @Transactional
     public void insertUserAuth(Long userId, Long[] roleIds) {
 
@@ -372,7 +351,6 @@ public class SysUserServiceImpl implements ISysUserService {
      * @param user 用户信息
      * @return 结果
      */
-    @Override
     public int updateUserStatus(SysUser user) {
 
         return userMapper.updateUserStatus(user.getUserId(), user.getStatus());
@@ -384,7 +362,6 @@ public class SysUserServiceImpl implements ISysUserService {
      * @param user 用户信息
      * @return 结果
      */
-    @Override
     public int updateUserProfile(SysUser user) {
 
         return userMapper.updateById(SystemEntityConverter.toEntity(user));
@@ -397,7 +374,6 @@ public class SysUserServiceImpl implements ISysUserService {
      * @param avatar 头像地址
      * @return 结果
      */
-    @Override
     public boolean updateUserAvatar(Long userId, FileAttachment avatar) {
 
         return userMapper.updateUserAvatar(userId, avatar) > 0;
@@ -432,7 +408,6 @@ public class SysUserServiceImpl implements ISysUserService {
      * @param user 用户信息
      * @return 结果
      */
-    @Override
     public int resetPwd(SysUser user) {
 
         return userMapper.resetUserPassword(
@@ -446,7 +421,6 @@ public class SysUserServiceImpl implements ISysUserService {
      * @param password 密码
      * @return 结果
      */
-    @Override
     public int resetUserPwd(Long userId, String password) {
 
         return userMapper.resetUserPassword(userId, password, new Date());
@@ -514,7 +488,6 @@ public class SysUserServiceImpl implements ISysUserService {
      * @param userId 用户ID
      * @return 结果
      */
-    @Override
     @Transactional
     public int deleteUserById(Long userId) {
 
@@ -531,7 +504,6 @@ public class SysUserServiceImpl implements ISysUserService {
      * @param userIds 需要删除的用户ID
      * @return 结果
      */
-    @Override
     @Transactional
     public int deleteUserByIds(Long[] userIds) {
 

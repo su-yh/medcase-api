@@ -7,8 +7,8 @@ import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.common.enums.UserStatusEnums;
 import com.medcase.common.enums.UserTypeEnums;
 import com.medcase.common.core.redis.RedisCache;
-import com.medcase.system.service.ISysConfigService;
-import com.medcase.system.service.ISysUserService;
+import com.medcase.system.service.SysConfigService;
+import com.medcase.system.service.SysUserService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -40,10 +40,10 @@ class UserLoginServiceTest {
     private RedisCache redisCache;
 
     @Mock
-    private ISysUserService userService;
+    private SysUserService userService;
 
     @Mock
-    private ISysConfigService configService;
+    private SysConfigService configService;
 
     @Mock
     private SysPasswordService passwordService;

@@ -20,7 +20,7 @@ import com.medcase.common.enums.BusinessType;
 import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
 import com.medcase.system.entity.SysPostEntity;
-import com.medcase.system.service.ISysPostService;
+import com.medcase.system.service.SysPostService;
 import com.medcase.web.controller.system.dto.PostQueryRequest;
 import com.medcase.web.controller.system.dto.PostResponse;
 import com.medcase.web.controller.system.dto.PostSaveRequest;
@@ -34,7 +34,7 @@ import com.medcase.web.controller.system.dto.PostSaveRequest;
 public class SysPostController extends BaseController {
 
     @Autowired
-    private ISysPostService postService;
+    private SysPostService postService;
 
     /**
      * 获取岗位列表

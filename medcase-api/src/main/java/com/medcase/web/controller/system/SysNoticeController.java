@@ -20,8 +20,8 @@ import com.medcase.mvc.exception.ExceptionUtil;
 import com.medcase.common.core.text.Convert;
 import com.medcase.common.enums.BusinessType;
 import com.medcase.system.entity.SysNoticeEntity;
-import com.medcase.system.service.ISysNoticeReadService;
-import com.medcase.system.service.ISysNoticeService;
+import com.medcase.system.service.SysNoticeReadService;
+import com.medcase.system.service.SysNoticeService;
 import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
 import com.medcase.web.controller.system.dto.NoticeQueryRequest;
@@ -40,10 +40,10 @@ import com.medcase.web.controller.system.dto.NoticeTopResponse;
 public class SysNoticeController extends BaseController {
 
     @Autowired
-    private ISysNoticeService noticeService;
+    private SysNoticeService noticeService;
 
     @Autowired
-    private ISysNoticeReadService noticeReadService;
+    private SysNoticeReadService noticeReadService;
 
     /**
      * 获取通知公告列表

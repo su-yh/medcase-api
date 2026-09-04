@@ -1,4 +1,4 @@
-package com.medcase.system.service.impl;
+package com.medcase.system.service;
 
 import java.util.Comparator;
 import java.util.List;
@@ -21,7 +21,6 @@ import com.medcase.system.converter.SystemEntityConverter;
 import com.medcase.system.entity.SysDictTypeEntity;
 import com.medcase.system.mapper.SysDictDataMapper;
 import com.medcase.system.mapper.SysDictTypeMapper;
-import com.medcase.system.service.ISysDictTypeService;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
 
@@ -30,7 +29,7 @@ import com.medcase.mvc.exception.ExceptionUtil;
  * 
  */
 @Service
-public class SysDictTypeServiceImpl implements ISysDictTypeService {
+public class SysDictTypeService {
 
     @Autowired
     private SysDictTypeMapper dictTypeMapper;
@@ -50,7 +49,6 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService {
         loadingDictCache();
     }
 
-    @Override
     public PageResult<SysDictType> selectPage(PageParam pageParam, SysDictType dictType) {
 
         Object beginTime = dictType.getParams().get("beginTime");
@@ -69,7 +67,6 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService {
      * 
      * @return 字典类型集合信息
      */
-    @Override
     public List<SysDictType> selectDictTypeAll() {
 
         return SystemEntityConverter.copyList(dictTypeMapper.selectAllDictTypes(), SysDictType.class);
@@ -81,7 +78,6 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService {
      * @param dictType 字典类型
      * @return 字典数据集合信息
      */
-    @Override
     public List<SysDictData> selectDictDataByType(String dictType) {
 
         String cacheKey = CacheConstants.SYS_DICT_KEY + dictType;
@@ -109,7 +105,6 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService {
      * @param dictId 字典类型ID
      * @return 字典类型
      */
-    @Override
     public SysDictType selectDictTypeById(Long dictId) {
 
         return SystemEntityConverter.toDomain(dictTypeMapper.selectById(dictId));
@@ -121,7 +116,6 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService {
      * @param dictType 字典类型
      * @return 字典类型
      */
-    @Override
     public SysDictType selectDictTypeByType(String dictType) {
 
         return SystemEntityConverter.toDomain(dictTypeMapper.selectDictTypeByType(dictType));
@@ -132,7 +126,6 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService {
      * 
      * @param dictIds 需要删除的字典ID
      */
-    @Override
     public void deleteDictTypeByIds(Long[] dictIds) {
 
         for (Long dictId : dictIds) {
@@ -150,7 +143,6 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService {
     /**
      * 加载字典缓存数据
      */
-    @Override
     public void loadingDictCache() {
 
         SysDictData dictData = new SysDictData();
@@ -172,7 +164,6 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService {
     /**
      * 清空字典缓存数据
      */
-    @Override
     public void clearDictCache() {
 
         redisCache.deleteObject(redisCache.keys(CacheConstants.SYS_DICT_KEY + "*"));
@@ -181,7 +172,6 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService {
     /**
      * 重置字典缓存数据
      */
-    @Override
     public void resetDictCache() {
 
         clearDictCache();
@@ -194,7 +184,6 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService {
      * @param dict 字典类型信息
      * @return 结果
      */
-    @Override
     public int insertDictType(SysDictType dict) {
 
         SysDictTypeEntity entity = SystemEntityConverter.toEntity(dict);
@@ -215,7 +204,6 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService {
      * @param dict 字典类型信息
      * @return 结果
      */
-    @Override
     @Transactional
     public int updateDictType(SysDictType dict) {
 
@@ -238,7 +226,6 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService {
      * @param dict 字典类型
      * @return 结果
      */
-    @Override
     public boolean checkDictTypeUnique(SysDictType dict) {
 
         Long dictId = StringUtils.isNull(dict.getDictId()) ? -1L : dict.getDictId();

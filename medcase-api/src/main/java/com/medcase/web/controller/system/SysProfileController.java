@@ -18,7 +18,7 @@ import com.medcase.common.enums.BusinessType;
 import com.medcase.common.utils.DateUtils;
 import com.medcase.common.utils.StringUtils;
 import com.medcase.framework.web.service.TokenService;
-import com.medcase.system.service.ISysUserService;
+import com.medcase.system.service.SysUserService;
 import com.medcase.web.controller.system.dto.ProfileResponse;
 
 /**
@@ -30,7 +30,7 @@ import com.medcase.web.controller.system.dto.ProfileResponse;
 public class SysProfileController extends BaseController {
 
     @Autowired
-    private ISysUserService userService;
+    private SysUserService userService;
 
     @Autowired
     private TokenService tokenService;

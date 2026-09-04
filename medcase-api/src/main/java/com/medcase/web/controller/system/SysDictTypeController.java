@@ -20,7 +20,7 @@ import com.medcase.common.core.domain.entity.SysDictType;
 import com.medcase.common.enums.BusinessType;
 import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
-import com.medcase.system.service.ISysDictTypeService;
+import com.medcase.system.service.SysDictTypeService;
 
 /**
  * 数据字典信息
@@ -31,7 +31,7 @@ import com.medcase.system.service.ISysDictTypeService;
 public class SysDictTypeController extends BaseController {
 
     @Autowired
-    private ISysDictTypeService dictTypeService;
+    private SysDictTypeService dictTypeService;
 
     @PreAuthorize("@ss.hasPermi('system:dict:list')")
     @GetMapping("/list")

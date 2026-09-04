@@ -10,7 +10,7 @@ import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
 import com.medcase.common.core.domain.model.RegisterBody;
 import com.medcase.framework.web.service.SysRegisterService;
-import com.medcase.system.service.ISysConfigService;
+import com.medcase.system.service.SysConfigService;
 
 /**
  * 注册验证
@@ -23,7 +23,7 @@ public class SysRegisterController extends BaseController {
     private SysRegisterService registerService;
 
     @Autowired
-    private ISysConfigService configService;
+    private SysConfigService configService;
 
     @Anonymous
     @PostMapping("/register")

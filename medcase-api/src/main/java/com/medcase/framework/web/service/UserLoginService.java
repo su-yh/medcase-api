@@ -18,8 +18,8 @@ import com.medcase.framework.manager.AsyncManager;
 import com.medcase.framework.manager.factory.AsyncFactory;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
-import com.medcase.system.service.ISysConfigService;
-import com.medcase.system.service.ISysUserService;
+import com.medcase.system.service.SysConfigService;
+import com.medcase.system.service.SysUserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -37,9 +37,9 @@ public class UserLoginService {
 
     private final RedisCache redisCache;
 
-    private final ISysUserService userService;
+    private final SysUserService userService;
 
-    private final ISysConfigService configService;
+    private final SysConfigService configService;
 
     private final SysPasswordService passwordService;
 
@@ -72,13 +72,15 @@ public class UserLoginService {
         String captcha = redisCache.getCacheObject(verifyKey);
         if (captcha == null) {
             AsyncManager.me().execute(
-                    AsyncFactory.recordLogininfor(username, Constants.LOGIN_FAIL, MessageUtils.message("user.jcaptcha.expire")));
+                    AsyncFactory.recordLogininfor(
+                            username, Constants.LOGIN_FAIL, ErrorCodeEnums.ADMIN_LOGIN_CAPTCHA_EXPIRED.getMsg()));
             throw ExceptionUtil.business(ErrorCodeEnums.ADMIN_LOGIN_CAPTCHA_EXPIRED);
         }
         redisCache.deleteObject(verifyKey);
         if (!code.equalsIgnoreCase(captcha)) {
             AsyncManager.me().execute(
-                    AsyncFactory.recordLogininfor(username, Constants.LOGIN_FAIL, MessageUtils.message("user.jcaptcha.error")));
+                    AsyncFactory.recordLogininfor(
+                            username, Constants.LOGIN_FAIL, ErrorCodeEnums.ADMIN_LOGIN_CAPTCHA_INVALID.getMsg()));
             throw ExceptionUtil.business(ErrorCodeEnums.ADMIN_LOGIN_CAPTCHA_INVALID);
         }
     }

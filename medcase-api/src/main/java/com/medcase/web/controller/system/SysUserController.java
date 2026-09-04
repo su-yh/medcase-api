@@ -12,10 +12,10 @@ import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
-import com.medcase.system.service.ISysDeptService;
-import com.medcase.system.service.ISysPostService;
-import com.medcase.system.service.ISysRoleService;
-import com.medcase.system.service.ISysUserService;
+import com.medcase.system.service.SysDeptService;
+import com.medcase.system.service.SysPostService;
+import com.medcase.system.service.SysRoleService;
+import com.medcase.system.service.SysUserService;
 import com.medcase.web.controller.system.dto.PostResponse;
 import com.medcase.web.controller.system.dto.UserAuthRoleResponse;
 import com.medcase.web.controller.system.dto.UserDetailResponse;
@@ -45,16 +45,16 @@ import java.util.stream.Collectors;
 public class SysUserController extends BaseController {
 
     @Autowired
-    private ISysUserService userService;
+    private SysUserService userService;
 
     @Autowired
-    private ISysRoleService roleService;
+    private SysRoleService roleService;
 
     @Autowired
-    private ISysDeptService deptService;
+    private SysDeptService deptService;
 
     @Autowired
-    private ISysPostService postService;
+    private SysPostService postService;
 
     @Autowired
     private PasswordEncoder passwordEncoder;

@@ -1,4 +1,4 @@
-package com.medcase.system.service.impl;
+package com.medcase.system.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
@@ -18,11 +18,11 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.test.util.ReflectionTestUtils;
 
-class SysDictTypeServiceImplDictCacheTest {
+class SysDictTypeServiceDictCacheTest {
 
     private static final String DICT_TYPE = "sys_user_sex";
 
-    private SysDictTypeServiceImpl dictTypeService;
+    private SysDictTypeService dictTypeService;
 
     @Mock
     private SysDictTypeMapper dictTypeMapper;
@@ -37,7 +37,7 @@ class SysDictTypeServiceImplDictCacheTest {
     void setUp() {
 
         MockitoAnnotations.openMocks(this);
-        dictTypeService = new SysDictTypeServiceImpl();
+        dictTypeService = new SysDictTypeService();
         ReflectionTestUtils.setField(dictTypeService, "dictTypeMapper", dictTypeMapper);
         ReflectionTestUtils.setField(dictTypeService, "dictDataMapper", dictDataMapper);
         ReflectionTestUtils.setField(dictTypeService, "redisCache", redisCache);

@@ -9,7 +9,7 @@ import com.medcase.mvc.exception.ExceptionUtil;
 import com.medcase.common.core.redis.RedisCache;
 import com.medcase.common.utils.sign.Base64;
 import com.medcase.common.utils.uuid.IdUtils;
-import com.medcase.system.service.ISysConfigService;
+import com.medcase.system.service.SysConfigService;
 import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.FastByteArrayOutputStream;
@@ -39,7 +39,7 @@ public class CaptchaController {
     private RedisCache redisCache;
     
     @Autowired
-    private ISysConfigService configService;
+    private SysConfigService configService;
 
     /**
      * 生成验证码

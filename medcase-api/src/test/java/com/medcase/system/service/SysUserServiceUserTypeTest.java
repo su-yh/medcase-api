@@ -1,4 +1,4 @@
-package com.medcase.system.service.impl;
+package com.medcase.system.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -14,9 +14,9 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.test.util.ReflectionTestUtils;
 
-class SysUserServiceImplUserTypeTest {
+class SysUserServiceUserTypeTest {
 
-    private SysUserServiceImpl userService;
+    private SysUserService userService;
 
     @Mock
     private SysUserMapper userMapper;
@@ -25,7 +25,7 @@ class SysUserServiceImplUserTypeTest {
     void setUp() {
 
         MockitoAnnotations.openMocks(this);
-        userService = new SysUserServiceImpl();
+        userService = new SysUserService();
         ReflectionTestUtils.setField(userService, "userMapper", userMapper);
     }
 

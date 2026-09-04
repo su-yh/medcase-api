@@ -13,9 +13,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class SystemMonitorPageServiceTest {
     @Test
     void monitorServicesShouldUsePageParam() throws NoSuchMethodException {
-        assertPageMethod(ISysLogininforService.class, SysLogininforEntity.class,
+        assertPageMethod(SysLogininforService.class, SysLogininforEntity.class,
                 String.class, String.class, String.class, String.class, String.class);
-        assertPageMethod(ISysOperLogService.class, SysOperLogEntity.class,
+        assertPageMethod(SysOperLogService.class, SysOperLogEntity.class,
                 String.class, String.class, Integer.class, Integer.class, String.class, String.class, String.class);
     }
 

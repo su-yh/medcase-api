@@ -14,8 +14,8 @@ import com.medcase.framework.web.service.SysPermissionService;
 import com.medcase.framework.web.service.TokenService;
 import com.medcase.framework.web.service.UserLoginService;
 import com.medcase.system.domain.vo.RouterVo;
-import com.medcase.system.service.ISysConfigService;
-import com.medcase.system.service.ISysMenuService;
+import com.medcase.system.service.SysConfigService;
+import com.medcase.system.service.SysMenuService;
 import com.medcase.web.controller.system.dto.LoginResponse;
 import com.medcase.web.controller.system.dto.LoginUserInfoResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +39,7 @@ public class SysLoginController {
     private UserLoginService userLoginService;
 
     @Autowired
-    private ISysMenuService menuService;
+    private SysMenuService menuService;
 
     @Autowired
     private SysPermissionService permissionService;
@@ -48,7 +48,7 @@ public class SysLoginController {
     private TokenService tokenService;
 
     @Autowired
-    private ISysConfigService configService;
+    private SysConfigService configService;
 
     /**
      * 登录方法
