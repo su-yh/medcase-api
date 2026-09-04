@@ -8,11 +8,13 @@ import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.medcase.common.constant.CacheConstants;
 import com.medcase.common.constant.UserConstants;
 import com.medcase.common.core.domain.entity.SysDictData;
 import com.medcase.common.core.domain.entity.SysDictType;
-import com.medcase.common.utils.DictUtils;
+import com.medcase.common.core.redis.RedisCache;
 import com.medcase.common.utils.StringUtils;
+import com.medcase.common.utils.json.JsonUtils;
 import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
 import com.medcase.system.converter.SystemEntityConverter;
@@ -35,6 +37,9 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService {
 
     @Autowired
     private SysDictDataMapper dictDataMapper;
+
+    @Autowired
+    private RedisCache redisCache;
 
     /**
      * 项目启动时，初始化字典到缓存
@@ -79,7 +84,10 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService {
     @Override
     public List<SysDictData> selectDictDataByType(String dictType) {
 
-        List<SysDictData> dictDatas = DictUtils.getDictCache(dictType);
+        String cacheKey = CacheConstants.SYS_DICT_KEY + dictType;
+        String arrayCache = redisCache.getCacheObject(cacheKey);
+        List<SysDictData> dictDatas = StringUtils.isNotEmpty(arrayCache)
+                ? JsonUtils.parseArray(arrayCache, SysDictData.class) : null;
         if (StringUtils.isNotEmpty(dictDatas)) {
 
             return dictDatas;
@@ -89,7 +97,7 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService {
                 SysDictData.class);
         if (StringUtils.isNotEmpty(dictDatas)) {
 
-            DictUtils.setDictCache(dictType, dictDatas);
+            redisCache.setCacheObject(cacheKey, JsonUtils.toJSONString(dictDatas));
             return dictDatas;
         }
         return null;
@@ -135,7 +143,7 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService {
                 throw ExceptionUtil.business(ErrorCodeEnums.DICT_TYPE_ASSIGNED_DELETE, dictType.getDictName());
             }
             dictTypeMapper.deleteById(dictId);
-            DictUtils.removeDictCache(dictType.getDictType());
+            redisCache.deleteObject(CacheConstants.SYS_DICT_KEY + dictType.getDictType());
         }
     }
 
@@ -153,7 +161,11 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService {
                 SysDictData.class).stream().collect(Collectors.groupingBy(SysDictData::getDictType));
         for (Map.Entry<String, List<SysDictData>> entry : dictDataMap.entrySet()) {
 
-            DictUtils.setDictCache(entry.getKey(), entry.getValue().stream().sorted(Comparator.comparing(SysDictData::getDictSort)).collect(Collectors.toList()));
+            redisCache.setCacheObject(
+                    CacheConstants.SYS_DICT_KEY + entry.getKey(),
+                    JsonUtils.toJSONString(entry.getValue().stream()
+                            .sorted(Comparator.comparing(SysDictData::getDictSort))
+                            .collect(Collectors.toList())));
         }
     }
 
@@ -163,7 +175,7 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService {
     @Override
     public void clearDictCache() {
 
-        DictUtils.clearDictCache();
+        redisCache.deleteObject(redisCache.keys(CacheConstants.SYS_DICT_KEY + "*"));
     }
 
     /**
@@ -190,7 +202,9 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService {
         dict.setDictId(entity.getDictId());
         if (row > 0) {
 
-            DictUtils.setDictCache(dict.getDictType(), null);
+            redisCache.setCacheObject(
+                    CacheConstants.SYS_DICT_KEY + dict.getDictType(),
+                    JsonUtils.toJSONString(null));
         }
         return row;
     }
@@ -211,7 +225,9 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService {
         if (row > 0) {
 
             List<SysDictData> dictDatas = selectDictDataByType(dict.getDictType());
-            DictUtils.setDictCache(dict.getDictType(), dictDatas);
+            redisCache.setCacheObject(
+                    CacheConstants.SYS_DICT_KEY + dict.getDictType(),
+                    JsonUtils.toJSONString(dictDatas));
         }
         return row;
     }
