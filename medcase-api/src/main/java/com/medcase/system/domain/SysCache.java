@@ -1,7 +1,7 @@
 package com.medcase.system.domain;
 
-import com.medcase.common.utils.StringUtils;
 import lombok.Data;
+import org.springframework.util.StringUtils;
 
 /**
  * 缓存信息

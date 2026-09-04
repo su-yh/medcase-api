@@ -416,7 +416,7 @@ public class SysMenuService {
     public String getRouteName(String name, String path) {
 
         String routerName = org.springframework.util.StringUtils.hasText(name) ? name : path;
-        return StringUtils.capitalize(routerName);
+        return org.springframework.util.StringUtils.capitalize(routerName);
     }
 
     /**

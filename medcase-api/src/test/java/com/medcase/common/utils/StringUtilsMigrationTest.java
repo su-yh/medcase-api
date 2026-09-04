@@ -19,6 +19,12 @@ class StringUtilsMigrationTest {
     private static final Pattern LEGACY_STRING_CHECK = Pattern.compile(
             "StringUtils\\.(isEmpty|isNotEmpty|isBlank|isNotBlank|hasText)\\s*\\(");
 
+    private static final Pattern SPRING_REPLACEABLE_METHOD = Pattern.compile(
+            "(?<![\\w.])StringUtils\\.(startsWithIgnoreCase|replace|capitalize|split)\\s*\\(");
+
+    private static final Pattern FULLY_QUALIFIED_LEGACY_SPLIT = Pattern.compile(
+            "com\\.medcase\\.common\\.utils\\.StringUtils\\.split\\s*\\(");
+
     private static final String SPRING_STRING_UTILS_PREFIX =
             "org.springframework.util.StringUtils.";
 
@@ -54,6 +60,30 @@ class StringUtilsMigrationTest {
         }
 
         assertThat(legacyFiles).isEqualTo(COLLECTION_OR_ARRAY_CHECK_FILES);
+    }
+
+    @Test
+    void replacesSpringCompatibleStringUtilsMethods() throws IOException {
+
+        Path sourceRoot = Paths.get("src/main/java");
+        Set<Path> legacyFiles;
+        try (Stream<Path> paths = Files.walk(sourceRoot)) {
+
+            legacyFiles = paths
+                    .filter(path -> path.toString().endsWith(".java"))
+                    .filter(path -> containsLegacySpringCompatibleMethod(readSource(path)))
+                    .map(sourceRoot::relativize)
+                    .collect(Collectors.toCollection(HashSet::new));
+        }
+
+        assertThat(legacyFiles).isEmpty();
+    }
+
+    private boolean containsLegacySpringCompatibleMethod(String source) {
+
+        return (IMPORT_LEGACY_STRING_UTILS.matcher(source).find()
+                && SPRING_REPLACEABLE_METHOD.matcher(source).find())
+                || FULLY_QUALIFIED_LEGACY_SPLIT.matcher(source).find();
     }
 
     private boolean containsLegacyStringCheck(String source) {

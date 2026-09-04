@@ -8,9 +8,9 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.util.StringUtils;
 import com.medcase.common.filter.RepeatableFilter;
 import com.medcase.common.filter.XssFilter;
-import com.medcase.common.utils.StringUtils;
 
 /**
  * Filter配置
@@ -33,7 +33,7 @@ public class FilterConfig {
         FilterRegistrationBean registration = new FilterRegistrationBean();
         registration.setDispatcherTypes(DispatcherType.REQUEST);
         registration.setFilter(new XssFilter());
-        registration.addUrlPatterns(StringUtils.split(urlPatterns, ","));
+        registration.addUrlPatterns(StringUtils.tokenizeToStringArray(urlPatterns, ",", false, true));
         registration.setName("xssFilter");
         registration.setOrder(FilterRegistrationBean.HIGHEST_PRECEDENCE);
         Map<String, String> initParameters = new HashMap<String, String>();

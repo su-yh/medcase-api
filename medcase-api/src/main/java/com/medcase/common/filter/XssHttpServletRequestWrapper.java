@@ -9,7 +9,7 @@ import jakarta.servlet.http.HttpServletRequestWrapper;
 import org.apache.commons.io.IOUtils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import com.medcase.common.utils.StringUtils;
+import org.springframework.util.StringUtils;
 import com.medcase.common.utils.html.EscapeUtil;
 
 /**

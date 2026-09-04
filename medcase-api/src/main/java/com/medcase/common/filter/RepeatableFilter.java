@@ -9,7 +9,7 @@ import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.MediaType;
-import com.medcase.common.utils.StringUtils;
+import org.springframework.util.StringUtils;
 
 /**
  * Repeatable 过滤器

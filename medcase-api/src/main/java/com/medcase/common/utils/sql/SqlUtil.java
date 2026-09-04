@@ -59,7 +59,7 @@ public class SqlUtil {
             return;
         }
         String normalizedValue = value.replaceAll("\\p{Z}|\\s", "");
-        String[] sqlKeywords = com.medcase.common.utils.StringUtils.split(SQL_REGEX, "\\|");
+        String[] sqlKeywords = StringUtils.tokenizeToStringArray(SQL_REGEX, "|", false, true);
         for (String sqlKeyword : sqlKeywords) {
 
             if (com.medcase.common.utils.StringUtils.indexOfIgnoreCase(normalizedValue, sqlKeyword) > -1) {

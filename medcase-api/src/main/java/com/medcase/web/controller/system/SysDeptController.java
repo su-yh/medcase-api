@@ -54,7 +54,10 @@ public class SysDeptController extends BaseController {
     public List<SysDept> excludeChild(@PathVariable(value = "deptId", required = false) Long deptId) {
 
         List<SysDept> depts = deptService.selectDeptList(new SysDept());
-        depts.removeIf(d -> d.getDeptId().intValue() == deptId || ArrayUtils.contains(StringUtils.split(d.getAncestors(), ","), deptId + ""));
+        depts.removeIf(d -> d.getDeptId().intValue() == deptId
+                || ArrayUtils.contains(
+                org.springframework.util.StringUtils.tokenizeToStringArray(d.getAncestors(), ",", false, true),
+                deptId + ""));
         return depts;
     }
 
