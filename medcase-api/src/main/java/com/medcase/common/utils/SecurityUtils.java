@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.PatternMatchUtils;
+import org.springframework.util.StringUtils;
 import com.medcase.common.constant.Constants;
 import com.medcase.common.core.domain.entity.SysRole;
 import com.medcase.common.core.domain.model.LoginUser;
