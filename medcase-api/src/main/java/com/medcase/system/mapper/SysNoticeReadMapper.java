@@ -20,7 +20,8 @@ public interface SysNoticeReadMapper extends BaseMapperX<SysNoticeReadEntity> {
     Set<Long> selectReadNoticeIds(
             @Param("userId") Long userId, @Param("noticeIds") Collection<Long> noticeIds);
 
-    List<NoticeReadUserResponse> selectReadUsersByNoticeId(Long noticeId, String searchValue);
+    List<NoticeReadUserResponse> selectReadUsersByNoticeId(
+            @Param("noticeId") Long noticeId, @Param("nickNameLike") String nickNameLike);
 
     default void insertNoticeReadBatch(Collection<SysNoticeReadEntity> entities) {
         insertBatch(entities);

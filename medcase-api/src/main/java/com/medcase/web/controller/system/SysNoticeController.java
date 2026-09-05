@@ -156,10 +156,10 @@ public class SysNoticeController {
     @ResponseBody
     public PageResult<NoticeReadUserResponse> readUsersList(
             PageParam pageParam, Long noticeId,
-            String searchValue) {
+            String nickNameLike) {
 
         List<NoticeReadUserResponse> list = noticeReadService.selectReadUsersByNoticeId(
-                noticeId, searchValue);
+                noticeId, nickNameLike);
         return new PageResult<>(PageParam.doPageList(pageParam, list), (long) list.size());
     }
 

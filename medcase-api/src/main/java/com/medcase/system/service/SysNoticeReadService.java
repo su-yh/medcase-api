@@ -76,8 +76,8 @@ public class SysNoticeReadService {
     /**
      * 查询已阅读某公告的用户列表
      */
-    public List<NoticeReadUserResponse> selectReadUsersByNoticeId(Long noticeId, String searchValue) {
-        return noticeReadMapper.selectReadUsersByNoticeId(noticeId, searchValue);
+    public List<NoticeReadUserResponse> selectReadUsersByNoticeId(Long noticeId, String nickNameLike) {
+        return noticeReadMapper.selectReadUsersByNoticeId(noticeId, nickNameLike);
     }
 
     /**
