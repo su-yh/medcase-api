@@ -2,10 +2,10 @@ package com.medcase.system.service;
 
 import com.medcase.common.constant.UserConstants;
 import com.medcase.common.core.domain.entity.SysRole;
-import com.medcase.mvc.constants.enums.ErrorCodeEnums;
-import com.medcase.mvc.exception.ExceptionUtil;
 import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
+import com.medcase.mvc.constants.enums.ErrorCodeEnums;
+import com.medcase.mvc.exception.ExceptionUtil;
 import com.medcase.system.converter.SystemEntityConverter;
 import com.medcase.system.entity.SysRoleEntity;
 import com.medcase.system.entity.SysRoleMenuEntity;
@@ -54,11 +54,11 @@ public class SysRoleService {
      * @param userId 用户ID
      * @return 角色列表
      */
-    public List<SysRole> selectRolesByUserId(Long userId) {
+    public List<SysRoleEntity> selectRolesByUserId(Long userId) {
 
         List<SysRole> userRoles = roleMapper.selectRolePermissionByUserId(userId);
-        List<SysRole> roles = selectRoleAll();
-        for (SysRole role : roles) {
+        List<SysRoleEntity> roles = selectRoleAll();
+        for (SysRoleEntity role : roles) {
 
             for (SysRole userRole : userRoles) {
 
@@ -97,9 +97,8 @@ public class SysRoleService {
      * 
      * @return 角色列表
      */
-    public List<SysRole> selectRoleAll() {
-        List<SysRoleEntity> list = roleMapper.selectList();
-        return SystemEntityConverter.copyList(list, SysRole.class);
+    public List<SysRoleEntity> selectRoleAll() {
+        return roleMapper.selectList();
     }
 
     /**
@@ -108,9 +107,9 @@ public class SysRoleService {
      * @param roleId 角色ID
      * @return 角色对象信息
      */
-    public SysRole selectRoleById(Long roleId) {
+    public SysRoleEntity selectRoleById(Long roleId) {
 
-        return SystemEntityConverter.toDomain(roleMapper.selectById(roleId));
+        return roleMapper.selectById(roleId);
     }
 
     /**
@@ -237,7 +236,7 @@ public class SysRoleService {
 
         for (Long roleId : roleIds) {
 
-            SysRole role = selectRoleById(roleId);
+            SysRoleEntity role = selectRoleById(roleId);
             if (countUserRoleByRoleId(roleId) > 0) {
 
                 throw ExceptionUtil.business(ErrorCodeEnums.ROLE_ASSIGNED_DELETE, role.getRoleName());

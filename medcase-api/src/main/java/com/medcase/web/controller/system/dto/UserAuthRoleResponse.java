@@ -1,8 +1,8 @@
 package com.medcase.web.controller.system.dto;
 
 import java.util.List;
-import com.medcase.common.core.domain.entity.SysRole;
 import com.medcase.common.core.domain.entity.SysUser;
+import com.medcase.system.entity.SysRoleEntity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -14,5 +14,5 @@ import lombok.Getter;
 public class UserAuthRoleResponse {
 
     private SysUser user;
-    private List<SysRole> roles;
+    private List<SysRoleEntity> roles;
 }

@@ -16,6 +16,7 @@ import com.medcase.system.service.SysDeptService;
 import com.medcase.system.service.SysPostService;
 import com.medcase.system.service.SysRoleService;
 import com.medcase.system.service.SysUserService;
+import com.medcase.system.entity.SysRoleEntity;
 import com.medcase.web.controller.system.dto.DeptQueryRequest;
 import com.medcase.web.controller.system.dto.PostResponse;
 import com.medcase.web.controller.system.dto.UserAuthRoleResponse;
@@ -107,7 +108,7 @@ public class SysUserController {
                 roleIds = roles.stream().map(SysRole::getRoleId).collect(Collectors.toList());
             }
         }
-        List<SysRole> availableRoles = roleService.selectRoleAll();
+        List<SysRoleEntity> availableRoles = roleService.selectRoleAll();
         List<PostResponse> posts = postService.selectPostAll().stream()
                 .map(PostResponse::fromEntity)
                 .toList();
@@ -229,9 +230,8 @@ public class SysUserController {
     public UserAuthRoleResponse authRole(@PathVariable("userId") Long userId) {
 
         SysUser user = userService.selectUserById(userId);
-        List<SysRole> roles = roleService.selectRolesByUserId(userId);
-        List<SysRole> availableRoles = roles;
-        return new UserAuthRoleResponse(user, availableRoles);
+        List<SysRoleEntity> roles = roleService.selectRolesByUserId(userId);
+        return new UserAuthRoleResponse(user, roles);
     }
 
     /**

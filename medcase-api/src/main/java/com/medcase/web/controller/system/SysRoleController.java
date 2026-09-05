@@ -65,7 +65,7 @@ public class SysRoleController {
      */
     @PreAuthorize("@ss.hasPermi('system:role:query')")
     @GetMapping(value = "/{roleId}")
-    public SysRole getInfo(@PathVariable Long roleId) {
+    public SysRoleEntity getInfo(@PathVariable Long roleId) {
 
         return roleService.selectRoleById(roleId);
     }
@@ -154,7 +154,7 @@ public class SysRoleController {
      */
     @PreAuthorize("@ss.hasPermi('system:role:query')")
     @GetMapping("/optionselect")
-    public List<SysRole> optionselect() {
+    public List<SysRoleEntity> optionselect() {
 
         return roleService.selectRoleAll();
     }
