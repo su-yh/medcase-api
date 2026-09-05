@@ -4,6 +4,8 @@ import com.medcase.common.constant.UserConstants;
 import com.medcase.common.core.domain.entity.SysRole;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
+import com.medcase.mp.mybatis.PageParam;
+import com.medcase.mp.mybatis.PageResult;
 import com.medcase.system.converter.SystemEntityConverter;
 import com.medcase.system.entity.SysRoleEntity;
 import com.medcase.system.entity.SysRoleMenuEntity;
@@ -11,6 +13,7 @@ import com.medcase.system.entity.SysUserRoleEntity;
 import com.medcase.system.mapper.SysRoleMapper;
 import com.medcase.system.mapper.SysRoleMenuMapper;
 import com.medcase.system.mapper.SysUserRoleMapper;
+import com.medcase.web.controller.system.dto.RoleQueryRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,15 +42,10 @@ public class SysRoleService {
 
     /**
      * 根据条件分页查询角色数据
-     * 
-     * @param role 角色信息
      * @return 角色数据集合信息
      */
-    public List<SysRole> selectRoleList(
-            SysRole role, String beginTime, String endTime) {
-
-        List<SysRoleEntity> list = roleMapper.selectRoleList(role, beginTime, endTime);
-        return SystemEntityConverter.copyList(list, SysRole.class);
+    public PageResult<SysRoleEntity> selectPage(PageParam pageParam, RoleQueryRequest request) {
+        return roleMapper.selectPage(pageParam, request);
     }
 
     /**

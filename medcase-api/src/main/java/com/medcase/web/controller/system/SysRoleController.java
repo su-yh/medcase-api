@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.medcase.common.annotation.Log;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
@@ -26,8 +25,10 @@ import com.medcase.framework.web.service.TokenService;
 import com.medcase.mvc.authentication.annotation.CurrLoginUser;
 import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
+import com.medcase.system.entity.SysRoleEntity;
 import com.medcase.system.service.SysRoleService;
 import com.medcase.system.service.SysUserService;
+import com.medcase.web.controller.system.dto.RoleQueryRequest;
 import com.medcase.web.controller.system.dto.RoleUserRequest;
 
 /**
@@ -52,14 +53,11 @@ public class SysRoleController {
 
     @PreAuthorize("@ss.hasPermi('system:role:list')")
     @GetMapping("/list")
-    public PageResult<SysRole> list(
+    public PageResult<SysRoleEntity> list(
             PageParam pageParam,
-            SysRole role,
-            @RequestParam(value = "beginTime", required = false) String beginTime,
-            @RequestParam(value = "endTime", required = false) String endTime) {
+            RoleQueryRequest request) {
 
-        List<SysRole> list = roleService.selectRoleList(role, beginTime, endTime);
-        return new PageResult<>(PageParam.doPageList(pageParam, list), (long) list.size());
+        return roleService.selectPage(pageParam, request);
     }
 
     /**
