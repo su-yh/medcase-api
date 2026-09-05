@@ -68,10 +68,14 @@ public class SysRoleService {
      * @return 角色列表
      */
     public List<SysRoleEntity> selectRolesByUserId(Long userId) {
-        List<SysRole> userRoles = roleMapper.selectRolePermissionByUserId(userId);
-        List<SysRoleEntity> roles = SystemEntityConverter.copyList(selectRoleAll(), SysRoleEntity.class);
+        List<SysRoleEntity> userRoles = selectRoleList(userId);
+        List<SysRoleEntity> roles = selectRoleAll();
+        if (userRoles == null) {
+            return roles;
+        }
+
         for (SysRoleEntity role : roles) {
-            for (SysRole userRole : userRoles) {
+            for (SysRoleEntity userRole : userRoles) {
                 if (role.getRoleId().longValue() == userRole.getRoleId().longValue()) {
                     role.setFlag(true);
                     break;
@@ -88,14 +92,33 @@ public class SysRoleService {
      * @return 权限列表
      */
     public Set<String> selectRolePermissionByUserId(Long userId) {
-        List<SysRole> perms = roleMapper.selectRolePermissionByUserId(userId);
+        List<SysRoleEntity> perms = selectRoleList(userId);
         Set<String> permsSet = new HashSet<>();
-        for (SysRole perm : perms) {
+        if (perms == null) {
+            return permsSet;
+        }
+
+        for (SysRoleEntity perm : perms) {
             if (perm != null) {
                 permsSet.addAll(Arrays.asList(perm.getRoleKey().trim().split(",")));
             }
         }
         return permsSet;
+    }
+
+    private List<SysRoleEntity> selectRoleList(Long userId) {
+        List<SysUserRoleEntity> userRoleEntities = userRoleMapper.selectByUserId(userId);
+        if (userRoleEntities == null || userRoleEntities.isEmpty()) {
+            return null;
+        }
+
+        List<SysRoleEntity> entities = new ArrayList<>();
+        for (SysUserRoleEntity userRoleEntity : userRoleEntities) {
+            SysRoleEntity sysRoleEntity = selectRoleById(userRoleEntity.getRoleId());
+            entities.add(sysRoleEntity);
+        }
+
+        return entities;
     }
 
     /**

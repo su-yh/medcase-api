@@ -1,7 +1,6 @@
 package com.medcase.system.mapper;
 
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.medcase.common.core.domain.entity.SysRole;
 import com.medcase.mp.mybatis.BaseMapperX;
 import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
@@ -10,7 +9,6 @@ import com.medcase.web.controller.system.dto.RoleQueryRequest;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.Arrays;
-import java.util.List;
 
 @Mapper
 public interface SysRoleMapper extends BaseMapperX<SysRoleEntity> {
@@ -24,8 +22,6 @@ public interface SysRoleMapper extends BaseMapperX<SysRoleEntity> {
                 .eq(SysRoleEntity::getDelFlag, "0")
                 .orderByAsc(SysRoleEntity::getRoleSort));
     }
-
-    List<SysRole> selectRolePermissionByUserId(Long userId);
 
     default SysRoleEntity selectRoleByName(String roleName) {
         return selectOne(build()

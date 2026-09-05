@@ -1,11 +1,13 @@
 package com.medcase.system.mapper;
 
 import com.medcase.mp.mybatis.BaseMapperX;
+import com.medcase.mp.mybatis.LambdaQueryWrapperX;
 import com.medcase.system.entity.SysUserRoleEntity;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 @Mapper
 public interface SysUserRoleMapper extends BaseMapperX<SysUserRoleEntity> {
@@ -19,14 +21,6 @@ public interface SysUserRoleMapper extends BaseMapperX<SysUserRoleEntity> {
 
     default int deleteByUserIds(Long[] userIds) {
         return delete(build().in(SysUserRoleEntity::getUserId, Arrays.asList(userIds)));
-    }
-
-    default int deleteByRoleId(Long roleId) {
-        return delete(build().eq(SysUserRoleEntity::getRoleId, roleId));
-    }
-
-    default int deleteByRoleIds(Long[] roleIds) {
-        return delete(build().in(SysUserRoleEntity::getRoleId, Arrays.asList(roleIds)));
     }
 
     default int deleteByUserAndRole(Long userId, Long roleId) {
@@ -43,5 +37,16 @@ public interface SysUserRoleMapper extends BaseMapperX<SysUserRoleEntity> {
 
     default void insertUserRoles(Collection<SysUserRoleEntity> entities) {
         insertBatch(entities);
+    }
+
+    default List<SysUserRoleEntity> selectByUserId(Long userId) {
+        if (userId == null) {
+            return null;
+        }
+
+        LambdaQueryWrapperX<SysUserRoleEntity> queryWrapperX = build();
+        queryWrapperX.eq(SysUserRoleEntity::getUserId, userId);
+
+        return selectList(queryWrapperX);
     }
 }
