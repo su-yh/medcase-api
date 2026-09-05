@@ -1,7 +1,7 @@
 package com.medcase.web.controller.system;
 
 import com.medcase.common.annotation.Log;
-import com.medcase.common.core.domain.entity.SysDept;
+import com.medcase.common.core.domain.TreeSelect;
 import com.medcase.common.core.domain.entity.SysRole;
 import com.medcase.common.core.domain.entity.SysUser;
 import com.medcase.common.core.domain.model.LoginUser;
@@ -17,6 +17,7 @@ import com.medcase.system.service.SysDeptService;
 import com.medcase.system.service.SysPostService;
 import com.medcase.system.service.SysRoleService;
 import com.medcase.system.service.SysUserService;
+import com.medcase.web.controller.system.dto.DeptQueryRequest;
 import com.medcase.web.controller.system.dto.PostResponse;
 import com.medcase.web.controller.system.dto.UserAuthRoleResponse;
 import com.medcase.web.controller.system.dto.UserDetailResponse;
@@ -250,8 +251,8 @@ public class SysUserController {
      */
     @PreAuthorize("@ss.hasPermi('system:user:list')")
     @GetMapping("/deptTree")
-    public List<com.medcase.common.core.domain.TreeSelect> deptTree(SysDept dept) {
+    public List<TreeSelect> deptTree(DeptQueryRequest request) {
 
-        return deptService.selectDeptTreeList(dept);
+        return deptService.selectDeptTreeList(request);
     }
 }

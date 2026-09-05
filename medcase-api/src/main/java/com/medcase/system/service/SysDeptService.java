@@ -69,16 +69,11 @@ public class SysDeptService {
     /**
      * 查询部门树结构信息
      * 
-     * @param dept 部门信息
+     * @param query 部门查询条件
      * @return 部门树信息集合
      */
-    public List<TreeSelect> selectDeptTreeList(SysDept dept) {
+    public List<TreeSelect> selectDeptTreeList(DeptQueryRequest query) {
 
-        DeptQueryRequest query = new DeptQueryRequest();
-        if (dept != null) {
-            query.setDeptNameLike(dept.getDeptName());
-            query.setStatus(dept.getStatus());
-        }
         List<SysDept> depts = selectDeptList(query);
         return buildDeptTreeSelect(depts);
     }

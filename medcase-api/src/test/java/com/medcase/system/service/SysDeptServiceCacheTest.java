@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 import com.medcase.common.core.domain.entity.SysDept;
+import com.medcase.common.core.domain.TreeSelect;
 import com.medcase.common.constant.UserConstants;
 import com.medcase.web.controller.system.dto.DeptQueryRequest;
 import com.medcase.system.entity.SysDeptEntity;
@@ -178,6 +179,21 @@ class SysDeptServiceCacheTest {
         List<SysDept> result = deptService.selectDeptList(new DeptQueryRequest());
 
         assertEquals(List.of(1L), result.stream().map(SysDept::getDeptId).toList());
+    }
+
+    @Test
+    void selectDeptTreeListAcceptsDeptQueryRequest() {
+
+        SysDeptEntity department = department(1L, 0L, "总部", "0");
+        when(deptMapper.selectAllDepartments()).thenReturn(List.of(department));
+
+        DeptQueryRequest query = new DeptQueryRequest();
+        query.setDeptNameLike("总部");
+
+        List<TreeSelect> result = deptService.selectDeptTreeList(query);
+
+        assertEquals(1, result.size());
+        assertEquals(1L, result.get(0).getId());
     }
 
     @Test
