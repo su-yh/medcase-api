@@ -1,9 +1,6 @@
 package com.medcase.system.service;
 
-import com.medcase.common.constant.CacheConstants;
 import com.medcase.common.core.domain.entity.SysDictData;
-import com.medcase.common.core.redis.RedisCache;
-import com.medcase.common.utils.json.JsonUtils;
 import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
 import com.medcase.system.converter.SystemEntityConverter;
@@ -11,8 +8,6 @@ import com.medcase.system.entity.SysDictDataEntity;
 import com.medcase.system.mapper.SysDictDataMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 /**
  * 字典 业务层处理
@@ -25,7 +20,7 @@ public class SysDictDataService {
     private SysDictDataMapper dictDataMapper;
 
     @Autowired
-    private RedisCache redisCache;
+    private SysDictTypeService dictTypeService;
 
     public PageResult<SysDictData> selectPage(PageParam pageParam, SysDictData dictData) {
 
@@ -59,10 +54,7 @@ public class SysDictDataService {
 
             SysDictData data = selectDictDataById(dictCode);
             dictDataMapper.deleteById(dictCode);
-            List<SysDictData> dictDatas = selectDictDataByType(data.getDictType());
-            redisCache.setCacheObject(
-                    CacheConstants.SYS_DICT_KEY + data.getDictType(),
-                    JsonUtils.toJSONString(dictDatas));
+            dictTypeService.clearDictCache(data.getDictType());
         }
     }
 
@@ -79,10 +71,7 @@ public class SysDictDataService {
         data.setDictCode(entity.getDictCode());
         if (row > 0) {
 
-            List<SysDictData> dictDatas = selectDictDataByType(data.getDictType());
-            redisCache.setCacheObject(
-                    CacheConstants.SYS_DICT_KEY + data.getDictType(),
-                    JsonUtils.toJSONString(dictDatas));
+            dictTypeService.clearDictCache(data.getDictType());
         }
         return row;
     }
@@ -95,21 +84,15 @@ public class SysDictDataService {
      */
     public int updateDictData(SysDictData data) {
 
+        SysDictData oldData = selectDictDataById(data.getDictCode());
         int row = dictDataMapper.updateById(SystemEntityConverter.toEntity(data));
         if (row > 0) {
 
-            List<SysDictData> dictDatas = selectDictDataByType(data.getDictType());
-            redisCache.setCacheObject(
-                    CacheConstants.SYS_DICT_KEY + data.getDictType(),
-                    JsonUtils.toJSONString(dictDatas));
+            if (oldData != null) {
+                dictTypeService.clearDictCache(oldData.getDictType());
+            }
+            dictTypeService.clearDictCache(data.getDictType());
         }
         return row;
-    }
-
-    private List<SysDictData> selectDictDataByType(String dictType) {
-
-        return SystemEntityConverter.copyList(
-                dictDataMapper.selectEnabledDictDataByType(dictType),
-                SysDictData.class);
     }
 }

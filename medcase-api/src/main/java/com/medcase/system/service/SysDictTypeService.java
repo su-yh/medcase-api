@@ -1,16 +1,16 @@
 package com.medcase.system.service;
 
-import com.medcase.common.constant.CacheConstants;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import com.medcase.common.constant.UserConstants;
 import com.medcase.common.core.domain.entity.SysDictData;
 import com.medcase.common.core.domain.entity.SysDictType;
-import com.medcase.common.core.redis.RedisCache;
-import com.medcase.common.utils.json.JsonUtils;
 import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
 import com.medcase.system.converter.SystemEntityConverter;
+import com.medcase.system.entity.SysDictDataEntity;
 import com.medcase.system.entity.SysDictTypeEntity;
 import com.medcase.system.mapper.SysDictDataMapper;
 import com.medcase.system.mapper.SysDictTypeMapper;
@@ -18,10 +18,14 @@ import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -31,14 +35,19 @@ import java.util.stream.Collectors;
 @Service
 public class SysDictTypeService {
 
+    private static final long DICT_CACHE_EXPIRE_MINUTES = 30L;
+
+    private final Cache<String, List<SysDictDataEntity>> dictCache = Caffeine.newBuilder()
+            .expireAfterWrite(DICT_CACHE_EXPIRE_MINUTES, TimeUnit.MINUTES)
+            .build();
+
+    private final Object dictCacheLoadLock = new Object();
+
     @Autowired
     private SysDictTypeMapper dictTypeMapper;
 
     @Autowired
     private SysDictDataMapper dictDataMapper;
-
-    @Autowired
-    private RedisCache redisCache;
 
     /**
      * 项目启动时，初始化字典到缓存
@@ -80,23 +89,27 @@ public class SysDictTypeService {
      */
     public List<SysDictData> selectDictDataByType(String dictType) {
 
-        String cacheKey = CacheConstants.SYS_DICT_KEY + dictType;
-        String arrayCache = redisCache.getCacheObject(cacheKey);
-        List<SysDictData> dictDatas = org.springframework.util.StringUtils.hasText(arrayCache)
-                ? JsonUtils.parseArray(arrayCache, SysDictData.class) : null;
-        if (!org.springframework.util.CollectionUtils.isEmpty(dictDatas)) {
-
-            return dictDatas;
+        if (!StringUtils.hasText(dictType)) {
+            return null;
         }
-        dictDatas = SystemEntityConverter.copyList(
-                dictDataMapper.selectEnabledDictDataByType(dictType),
-                SysDictData.class);
-        if (!org.springframework.util.CollectionUtils.isEmpty(dictDatas)) {
 
-            redisCache.setCacheObject(cacheKey, JsonUtils.toJSONString(dictDatas));
-            return dictDatas;
+        List<SysDictDataEntity> dictDatas = dictCache.getIfPresent(dictType);
+        if (dictDatas == null) {
+            synchronized (dictCacheLoadLock) {
+                dictDatas = dictCache.getIfPresent(dictType);
+                if (dictDatas == null) {
+                    dictDatas = dictDataMapper.selectEnabledDictDataByType(dictType);
+                    if (dictDatas == null) {
+                        dictDatas = List.of();
+                    }
+                    dictCache.put(dictType, List.copyOf(dictDatas));
+                }
+            }
         }
-        return null;
+        if (CollectionUtils.isEmpty(dictDatas)) {
+            return null;
+        }
+        return SystemEntityConverter.copyList(new ArrayList<>(dictDatas), SysDictData.class);
     }
 
     /**
@@ -126,7 +139,7 @@ public class SysDictTypeService {
                 throw ExceptionUtil.business(ErrorCodeEnums.DICT_TYPE_ASSIGNED_DELETE, dictType.getDictName());
             }
             dictTypeMapper.deleteById(dictId);
-            redisCache.deleteObject(CacheConstants.SYS_DICT_KEY + dictType.getDictType());
+            clearDictCache(dictType.getDictType());
         }
     }
 
@@ -135,19 +148,21 @@ public class SysDictTypeService {
      */
     public void loadingDictCache() {
 
-        SysDictData dictData = new SysDictData();
-        dictData.setStatus("0");
-        Map<String, List<SysDictData>> dictDataMap = SystemEntityConverter.copyList(
-                dictDataMapper.selectDictDataList(
-                        dictData.getDictType(), dictData.getDictLabel(), dictData.getStatus()),
-                SysDictData.class).stream().collect(Collectors.groupingBy(SysDictData::getDictType));
-        for (Map.Entry<String, List<SysDictData>> entry : dictDataMap.entrySet()) {
-
-            redisCache.setCacheObject(
-                    CacheConstants.SYS_DICT_KEY + entry.getKey(),
-                    JsonUtils.toJSONString(entry.getValue().stream()
-                            .sorted(Comparator.comparing(SysDictData::getDictSort))
-                            .collect(Collectors.toList())));
+        List<SysDictDataEntity> dictDatas = dictDataMapper.selectDictDataList(null, null, "0");
+        if (dictDatas == null) {
+            dictDatas = List.of();
+        }
+        Map<String, List<SysDictDataEntity>> dictDataMap = dictDatas.stream()
+                .filter(dictData -> StringUtils.hasText(dictData.getDictType()))
+                .collect(Collectors.groupingBy(SysDictDataEntity::getDictType));
+        synchronized (dictCacheLoadLock) {
+            dictCache.invalidateAll();
+            for (Map.Entry<String, List<SysDictDataEntity>> entry : dictDataMap.entrySet()) {
+                List<SysDictDataEntity> sortedDictDatas = entry.getValue().stream()
+                        .sorted(Comparator.comparing(SysDictDataEntity::getDictSort))
+                        .collect(Collectors.toList());
+                dictCache.put(entry.getKey(), List.copyOf(sortedDictDatas));
+            }
         }
     }
 
@@ -156,7 +171,19 @@ public class SysDictTypeService {
      */
     public void clearDictCache() {
 
-        redisCache.deleteObject(redisCache.keys(CacheConstants.SYS_DICT_KEY + "*"));
+        dictCache.invalidateAll();
+    }
+
+    /**
+     * 清空指定字典类型缓存数据
+     *
+     * @param dictType 字典类型
+     */
+    public void clearDictCache(String dictType) {
+
+        if (StringUtils.hasText(dictType)) {
+            dictCache.invalidate(dictType);
+        }
     }
 
     /**
@@ -179,12 +206,6 @@ public class SysDictTypeService {
         SysDictTypeEntity entity = SystemEntityConverter.toEntity(dict);
         int row = dictTypeMapper.insert(entity);
         dict.setDictId(entity.getDictId());
-        if (row > 0) {
-
-            redisCache.setCacheObject(
-                    CacheConstants.SYS_DICT_KEY + dict.getDictType(),
-                    JsonUtils.toJSONString(null));
-        }
         return row;
     }
 
@@ -202,10 +223,8 @@ public class SysDictTypeService {
         int row = dictTypeMapper.updateById(SystemEntityConverter.toEntity(dict));
         if (row > 0) {
 
-            List<SysDictData> dictDatas = selectDictDataByType(dict.getDictType());
-            redisCache.setCacheObject(
-                    CacheConstants.SYS_DICT_KEY + dict.getDictType(),
-                    JsonUtils.toJSONString(dictDatas));
+            clearDictCache(oldDict.getDictType());
+            clearDictCache(dict.getDictType());
         }
         return row;
     }
