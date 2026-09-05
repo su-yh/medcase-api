@@ -10,6 +10,7 @@ import static org.mockito.Mockito.when;
 import java.util.List;
 import com.medcase.common.core.domain.entity.SysDept;
 import com.medcase.common.constant.UserConstants;
+import com.medcase.web.controller.system.dto.DeptQueryRequest;
 import com.medcase.system.entity.SysDeptEntity;
 import com.medcase.system.mapper.SysDeptMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -142,8 +143,8 @@ class SysDeptServiceCacheTest {
         department.setStatus(UserConstants.DEPT_NORMAL);
         when(deptMapper.selectAllDepartments()).thenReturn(List.of(department));
 
-        SysDept query = new SysDept();
-        query.setDeptName("研发");
+        DeptQueryRequest query = new DeptQueryRequest();
+        query.setDeptNameLike("研发");
 
         List<SysDept> result = deptService.selectDeptList(query);
 
@@ -161,7 +162,7 @@ class SysDeptServiceCacheTest {
         when(deptMapper.selectAllDepartments())
                 .thenReturn(List.of(currentDepartment, childDepartment, otherDepartment));
 
-        SysDept query = new SysDept();
+        DeptQueryRequest query = new DeptQueryRequest();
 
         List<SysDept> result = deptService.selectDeptList(query);
 
@@ -174,7 +175,7 @@ class SysDeptServiceCacheTest {
         SysDeptEntity department = department(1L, 0L, "总部", "0");
         when(deptMapper.selectAllDepartments()).thenReturn(List.of(department));
 
-        List<SysDept> result = deptService.selectDeptList(new SysDept());
+        List<SysDept> result = deptService.selectDeptList(new DeptQueryRequest());
 
         assertEquals(List.of(1L), result.stream().map(SysDept::getDeptId).toList());
     }

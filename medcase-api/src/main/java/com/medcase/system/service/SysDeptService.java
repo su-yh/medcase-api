@@ -12,6 +12,7 @@ import com.medcase.system.converter.SystemEntityConverter;
 import com.medcase.system.entity.SysDeptEntity;
 import com.medcase.system.mapper.SysDeptMapper;
 import com.medcase.system.mapper.SysUserMapper;
+import com.medcase.web.controller.system.dto.DeptQueryRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,15 +50,15 @@ public class SysDeptService {
     /**
      * 查询部门管理数据
      * 
-     * @param dept 部门信息
+     * @param query 部门查询条件
      * @return 部门信息集合
      */
-    public List<SysDept> selectDeptList(SysDept dept) {
+    public List<SysDept> selectDeptList(DeptQueryRequest query) {
 
         List<SysDeptEntity> departments = all();
         List<SysDept> result = new ArrayList<>();
         for (SysDeptEntity department : departments) {
-            if (!matchesDeptQuery(department, dept)) {
+            if (!matchesDeptQuery(department, query)) {
                 continue;
             }
             result.add(SystemEntityConverter.toDomain(department));
@@ -73,28 +74,23 @@ public class SysDeptService {
      */
     public List<TreeSelect> selectDeptTreeList(SysDept dept) {
 
-        List<SysDept> depts = selectDeptList(dept);
+        DeptQueryRequest query = new DeptQueryRequest();
+        if (dept != null) {
+            query.setDeptNameLike(dept.getDeptName());
+            query.setStatus(dept.getStatus());
+        }
+        List<SysDept> depts = selectDeptList(query);
         return buildDeptTreeSelect(depts);
     }
 
-    private boolean matchesDeptQuery(SysDeptEntity department, SysDept query) {
+    private boolean matchesDeptQuery(SysDeptEntity department, DeptQueryRequest query) {
 
         if (query == null) {
             return true;
         }
-        if (query.getDeptId() != null
-                && !Long.valueOf(0L).equals(query.getDeptId())
-                && !query.getDeptId().equals(department.getDeptId())) {
-            return false;
-        }
-        if (query.getParentId() != null
-                && !Long.valueOf(0L).equals(query.getParentId())
-                && !query.getParentId().equals(department.getParentId())) {
-            return false;
-        }
-        if (org.springframework.util.StringUtils.hasText(query.getDeptName())
+        if (org.springframework.util.StringUtils.hasText(query.getDeptNameLike())
                 && (department.getDeptName() == null
-                || !department.getDeptName().contains(query.getDeptName()))) {
+                || !department.getDeptName().contains(query.getDeptNameLike()))) {
             return false;
         }
         return !org.springframework.util.StringUtils.hasText(query.getStatus())

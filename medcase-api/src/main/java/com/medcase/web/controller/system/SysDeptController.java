@@ -24,6 +24,7 @@ import com.medcase.common.enums.BusinessType;
 import com.medcase.common.enums.UserTypeEnums;
 import com.medcase.system.service.SysDeptService;
 import com.medcase.mvc.authentication.annotation.CurrLoginUser;
+import com.medcase.web.controller.system.dto.DeptQueryRequest;
 
 /**
  * 部门信息
@@ -41,9 +42,9 @@ public class SysDeptController {
      */
     @PreAuthorize("@ss.hasPermi('system:dept:list')")
     @GetMapping("/list")
-    public List<SysDept> list(SysDept dept) {
+    public List<SysDept> list(DeptQueryRequest request) {
 
-        List<SysDept> depts = deptService.selectDeptList(dept);
+        List<SysDept> depts = deptService.selectDeptList(request);
         return depts;
     }
 
@@ -55,7 +56,7 @@ public class SysDeptController {
     public List<SysDept> excludeChild(
             @PathVariable(value = "deptId", required = false) Long deptId) {
 
-        List<SysDept> depts = deptService.selectDeptList(new SysDept());
+        List<SysDept> depts = deptService.selectDeptList(new DeptQueryRequest());
         depts.removeIf(d -> d.getDeptId().intValue() == deptId
                 || ArrayUtils.contains(
                 org.springframework.util.StringUtils.tokenizeToStringArray(d.getAncestors(), ",", false, true),
