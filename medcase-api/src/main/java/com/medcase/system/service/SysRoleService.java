@@ -1,5 +1,7 @@
 package com.medcase.system.service;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import com.medcase.common.constant.UserConstants;
 import com.medcase.common.core.domain.entity.SysRole;
 import com.medcase.mp.mybatis.PageParam;
@@ -23,6 +25,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 角色 业务层处理
@@ -30,6 +33,10 @@ import java.util.Set;
  */
 @Service
 public class SysRoleService {
+
+    private static final String ALL_ROLES_CACHE_KEY = "allRoles";
+
+    private static final long ROLE_CACHE_EXPIRE_MINUTES = 30L;
 
     @Autowired
     private SysRoleMapper roleMapper;
@@ -39,6 +46,12 @@ public class SysRoleService {
 
     @Autowired
     private SysUserRoleMapper userRoleMapper;
+
+    private final Cache<String, List<SysRoleEntity>> roleCache = Caffeine.newBuilder()
+            .expireAfterWrite(ROLE_CACHE_EXPIRE_MINUTES, TimeUnit.MINUTES)
+            .build();
+
+    private final Object roleCacheLoadLock = new Object();
 
     /**
      * 根据条件分页查询角色数据
@@ -56,7 +69,7 @@ public class SysRoleService {
      */
     public List<SysRoleEntity> selectRolesByUserId(Long userId) {
         List<SysRole> userRoles = roleMapper.selectRolePermissionByUserId(userId);
-        List<SysRoleEntity> roles = selectRoleAll();
+        List<SysRoleEntity> roles = SystemEntityConverter.copyList(selectRoleAll(), SysRoleEntity.class);
         for (SysRoleEntity role : roles) {
             for (SysRole userRole : userRoles) {
                 if (role.getRoleId().longValue() == userRole.getRoleId().longValue()) {
@@ -91,7 +104,24 @@ public class SysRoleService {
      * @return 角色列表
      */
     public List<SysRoleEntity> selectRoleAll() {
-        return roleMapper.selectList();
+        List<SysRoleEntity> roles = roleCache.getIfPresent(ALL_ROLES_CACHE_KEY);
+        if (roles != null) {
+            return roles;
+        }
+
+        synchronized (roleCacheLoadLock) {
+            roles = roleCache.getIfPresent(ALL_ROLES_CACHE_KEY);
+            if (roles != null) {
+                return roles;
+            }
+
+            roles = roleMapper.selectList();
+            if (roles == null) {
+                roles = List.of();
+            }
+            roleCache.put(ALL_ROLES_CACHE_KEY, roles);
+        }
+        return roles;
     }
 
     /**
@@ -101,7 +131,13 @@ public class SysRoleService {
      * @return 角色对象信息
      */
     public SysRoleEntity selectRoleById(Long roleId) {
-        return roleMapper.selectById(roleId);
+        if (roleId == null) {
+            return null;
+        }
+        return selectRoleAll().stream()
+                .filter(role -> roleId.equals(role.getRoleId()))
+                .findFirst()
+                .orElse(null);
     }
 
     /**
@@ -155,6 +191,11 @@ public class SysRoleService {
         SysRoleEntity entity = SystemEntityConverter.toEntity(role);
         int row = roleMapper.insert(entity);
         role.setRoleId(entity.getRoleId());
+        if (row > 0) {
+            synchronized (roleCacheLoadLock) {
+                roleCache.invalidate(ALL_ROLES_CACHE_KEY);
+            }
+        }
         return insertRoleMenu(role);
     }
 
@@ -169,6 +210,9 @@ public class SysRoleService {
         roleMapper.updateById(SystemEntityConverter.toEntity(role));
         // 删除角色与菜单关联
         roleMenuMapper.deleteByRoleId(role.getRoleId());
+        synchronized (roleCacheLoadLock) {
+            roleCache.invalidate(ALL_ROLES_CACHE_KEY);
+        }
         return insertRoleMenu(role);
     }
 
@@ -179,7 +223,13 @@ public class SysRoleService {
      * @return 结果
      */
     public int updateRoleStatus(SysRole role) {
-        return roleMapper.updateById(SystemEntityConverter.toEntity(role));
+        int row = roleMapper.updateById(SystemEntityConverter.toEntity(role));
+        if (row > 0) {
+            synchronized (roleCacheLoadLock) {
+                roleCache.invalidate(ALL_ROLES_CACHE_KEY);
+            }
+        }
+        return row;
     }
 
     /**
@@ -214,14 +264,20 @@ public class SysRoleService {
     @Transactional
     public int deleteRoleByIds(Long[] roleIds) {
         for (Long roleId : roleIds) {
-            SysRoleEntity role = selectRoleById(roleId);
+            SysRoleEntity role = roleMapper.selectById(roleId);
             if (countUserRoleByRoleId(roleId) > 0) {
                 throw ExceptionUtil.business(ErrorCodeEnums.ROLE_ASSIGNED_DELETE, role.getRoleName());
             }
         }
         // 删除角色与菜单关联
         roleMenuMapper.deleteByRoleIds(roleIds);
-        return roleMapper.deleteRolesByIds(roleIds);
+        int row = roleMapper.deleteRolesByIds(roleIds);
+        if (row > 0) {
+            synchronized (roleCacheLoadLock) {
+                roleCache.invalidate(ALL_ROLES_CACHE_KEY);
+            }
+        }
+        return row;
     }
 
     /**

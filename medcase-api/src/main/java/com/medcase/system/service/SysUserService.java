@@ -1,7 +1,6 @@
 package com.medcase.system.service;
 
 import com.medcase.common.constant.UserConstants;
-import com.medcase.common.core.domain.entity.SysRole;
 import com.medcase.common.core.domain.entity.SysUser;
 import com.medcase.common.enums.UserTypeEnums;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
@@ -11,12 +10,12 @@ import com.medcase.mp.mybatis.PageResult;
 import com.medcase.system.event.UserAvatarUploadedEvent;
 import com.medcase.system.converter.SystemEntityConverter;
 import com.medcase.system.entity.SysDeptEntity;
+import com.medcase.system.entity.SysRoleEntity;
 import com.medcase.system.entity.SysUserEntity;
 import com.medcase.system.entity.SysUserPostEntity;
 import com.medcase.system.entity.SysUserRoleEntity;
 import com.medcase.system.entity.SysPostEntity;
 import com.medcase.system.mapper.SysPostMapper;
-import com.medcase.system.mapper.SysRoleMapper;
 import com.medcase.system.mapper.SysUserMapper;
 import com.medcase.system.mapper.SysUserPostMapper;
 import com.medcase.system.mapper.SysUserRoleMapper;
@@ -47,7 +46,7 @@ public class SysUserService {
     private SysDeptService deptService;
 
     @Autowired
-    private SysRoleMapper roleMapper;
+    private SysRoleService roleService;
 
     @Autowired
     private SysPostMapper postMapper;
@@ -193,17 +192,19 @@ public class SysUserService {
     /**
      * 查询用户所属角色组
      * 
-     * @param userName 用户名
+     * @param userId 用户ID
      * @return 结果
      */
-    public String selectUserRoleGroup(String userName) {
+    public String selectUserRoleGroup(Long userId) {
 
-        List<SysRole> list = roleMapper.selectRolesByUserName(userName);
+        List<SysRoleEntity> list = roleService.selectRolesByUserId(userId).stream()
+                .filter(SysRoleEntity::isFlag)
+                .toList();
         if (CollectionUtils.isEmpty(list)) {
 
             return "";
         }
-        return list.stream().map(SysRole::getRoleName).collect(Collectors.joining(","));
+        return list.stream().map(SysRoleEntity::getRoleName).collect(Collectors.joining(","));
     }
 
     /**

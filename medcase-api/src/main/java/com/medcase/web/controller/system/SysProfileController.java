@@ -49,7 +49,7 @@ public class SysProfileController {
         SysUser user = loginUser.getUser();
         return new ProfileResponse(
                 user,
-                userService.selectUserRoleGroup(loginUser.getUsername()),
+                userService.selectUserRoleGroup(loginUser.getUserId()),
                 userService.selectUserPostGroup(loginUser.getUsername()));
     }
 

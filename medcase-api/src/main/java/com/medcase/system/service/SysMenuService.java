@@ -14,7 +14,6 @@ import com.medcase.system.domain.vo.RouterVo;
 import com.medcase.system.entity.SysMenuEntity;
 import com.medcase.system.entity.SysRoleEntity;
 import com.medcase.system.mapper.SysMenuMapper;
-import com.medcase.system.mapper.SysRoleMapper;
 import com.medcase.system.mapper.SysRoleMenuMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,7 +46,7 @@ public class SysMenuService {
     private SysMenuMapper menuMapper;
 
     @Autowired
-    private SysRoleMapper roleMapper;
+    private SysRoleService roleService;
 
     @Autowired
     private SysRoleMenuMapper roleMenuMapper;
@@ -145,7 +144,7 @@ public class SysMenuService {
      * @return 选中菜单列表
      */
     public List<Long> selectMenuListByRoleId(Long roleId) {
-        SysRoleEntity sysRoleEntity = roleMapper.selectById(roleId);
+        SysRoleEntity sysRoleEntity = roleService.selectRoleById(roleId);
         return menuMapper.selectMenuListByRoleId(roleId, sysRoleEntity.getMenuCheckStrictly());
     }
 
