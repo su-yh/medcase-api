@@ -1,7 +1,6 @@
 package com.medcase.system.mapper;
 
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.medcase.common.constant.UserConstants;
 import com.medcase.mp.mybatis.BaseMapperX;
 import com.medcase.system.entity.SysDeptEntity;
@@ -19,29 +18,8 @@ public interface SysDeptMapper extends BaseMapperX<SysDeptEntity> {
                 .orderByAsc(SysDeptEntity::getOrderNum));
     }
 
-    default int selectNormalChildrenCount(Long deptId) {
-        return Math.toIntExact(selectCount(build()
-                .eq(SysDeptEntity::getStatus, "0")
-                .eq(SysDeptEntity::getDelFlag, "0")
-                .apply("find_in_set({0}, ancestors)", deptId)));
-    }
-
-    default int selectChildrenCount(Long deptId) {
-        return Math.toIntExact(selectCount(build()
-                .eq(SysDeptEntity::getParentId, deptId)
-                .eq(SysDeptEntity::getDelFlag, "0")));
-    }
-
     default List<SysDeptEntity> selectChildrenByDeptId(Long deptId) {
         return selectList(build().apply("find_in_set({0}, ancestors)", deptId));
-    }
-
-    default SysDeptEntity selectDeptByName(String deptName, Long parentId) {
-        LambdaQueryWrapper<SysDeptEntity> query = build()
-                .eq(SysDeptEntity::getDeptName, deptName)
-                .eq(SysDeptEntity::getParentId, parentId)
-                .eq(SysDeptEntity::getDelFlag, "0");
-        return selectOne(query);
     }
 
     default int updateParentStatusNormal(Collection<Long> deptIds) {

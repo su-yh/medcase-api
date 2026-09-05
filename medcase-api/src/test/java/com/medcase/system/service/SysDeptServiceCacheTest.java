@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
@@ -176,6 +177,50 @@ class SysDeptServiceCacheTest {
         List<SysDept> result = deptService.selectDeptList(new SysDept());
 
         assertEquals(List.of(1L), result.stream().map(SysDept::getDeptId).toList());
+    }
+
+    @Test
+    void selectNormalChildrenDeptByIdUsesCachedDepartments() {
+
+        SysDeptEntity currentDepartment = department(1L, 0L, "总部", "0");
+        SysDeptEntity childDepartment = department(2L, 1L, "子部门", "0,1");
+        SysDeptEntity grandchildDepartment = department(3L, 2L, "孙部门", "0,1,2");
+        SysDeptEntity disabledDepartment = department(4L, 1L, "停用部门", "0,1");
+        disabledDepartment.setStatus(UserConstants.DEPT_DISABLE);
+        when(deptMapper.selectAllDepartments())
+                .thenReturn(List.of(currentDepartment, childDepartment, grandchildDepartment,
+                        disabledDepartment));
+
+        int result = deptService.selectNormalChildrenDeptById(1L);
+
+        assertEquals(2, result);
+    }
+
+    @Test
+    void hasChildByDeptIdUsesCachedDepartments() {
+
+        SysDeptEntity childDepartment = department(2L, 1L, "子部门", "0,1");
+        when(deptMapper.selectAllDepartments()).thenReturn(List.of(childDepartment));
+
+        boolean result = deptService.hasChildByDeptId(1L);
+
+        assertTrue(result);
+    }
+
+    @Test
+    void checkDeptNameUniqueUsesCachedDepartments() {
+
+        SysDeptEntity existingDepartment = department(1L, 10L, "研发部门", "0,10");
+        when(deptMapper.selectAllDepartments()).thenReturn(List.of(existingDepartment));
+
+        SysDept dept = new SysDept();
+        dept.setDeptId(2L);
+        dept.setParentId(10L);
+        dept.setDeptName("研发部门");
+
+        boolean result = deptService.checkDeptNameUnique(dept);
+
+        assertEquals(UserConstants.NOT_UNIQUE, result);
     }
 
     @Test

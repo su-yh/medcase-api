@@ -1,6 +1,7 @@
 package com.medcase.web.controller.system.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import java.util.Date;
@@ -16,6 +17,9 @@ public class NoticeReadUserResponse {
     private String userName;
 
     private String nickName;
+
+    @JsonIgnore
+    private Long deptId;
 
     private String deptName;
 

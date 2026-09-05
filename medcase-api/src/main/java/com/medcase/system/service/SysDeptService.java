@@ -187,7 +187,15 @@ public class SysDeptService {
      */
     public int selectNormalChildrenDeptById(Long deptId) {
 
-        return deptMapper.selectNormalChildrenCount(deptId);
+        if (deptId == null) {
+            return 0;
+        }
+        return Math.toIntExact(all().stream()
+                .filter(dept -> UserConstants.DEPT_NORMAL.equals(dept.getStatus()))
+                .filter(dept -> dept.getAncestors() != null)
+                .filter(dept -> Arrays.asList(dept.getAncestors().split(","))
+                        .contains(String.valueOf(deptId)))
+                .count());
     }
 
     /**
@@ -198,8 +206,11 @@ public class SysDeptService {
      */
     public boolean hasChildByDeptId(Long deptId) {
 
-        int result = deptMapper.selectChildrenCount(deptId);
-        return result > 0;
+        if (deptId == null) {
+            return false;
+        }
+        return all().stream()
+                .anyMatch(dept -> deptId.equals(dept.getParentId()));
     }
 
     /**
@@ -222,14 +233,11 @@ public class SysDeptService {
      */
     public boolean checkDeptNameUnique(SysDept dept) {
 
-        Long deptId = dept.getDeptId() == null ? -1L : dept.getDeptId();
-        SysDept info = SystemEntityConverter.toDomain(
-                deptMapper.selectDeptByName(dept.getDeptName(), dept.getParentId()));
-        if (info != null && info.getDeptId().longValue() != deptId.longValue()) {
-
-            return UserConstants.NOT_UNIQUE;
-        }
-        return UserConstants.UNIQUE;
+        boolean exists = all().stream()
+                .anyMatch(item -> java.util.Objects.equals(item.getDeptName(), dept.getDeptName())
+                        && java.util.Objects.equals(item.getParentId(), dept.getParentId())
+                        && !java.util.Objects.equals(item.getDeptId(), dept.getDeptId()));
+        return exists ? UserConstants.NOT_UNIQUE : UserConstants.UNIQUE;
     }
 
     /**

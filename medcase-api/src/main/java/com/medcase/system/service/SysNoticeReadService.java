@@ -1,5 +1,6 @@
 package com.medcase.system.service;
 
+import com.medcase.common.core.domain.entity.SysDept;
 import com.medcase.system.entity.SysNoticeReadEntity;
 import com.medcase.system.mapper.SysNoticeReadMapper;
 import com.medcase.web.controller.system.dto.NoticeReadUserResponse;
@@ -22,6 +23,8 @@ import java.util.stream.Collectors;
 public class SysNoticeReadService {
 
     private final SysNoticeReadMapper noticeReadMapper;
+
+    private final SysDeptService deptService;
 
     /**
      * 标记已读
@@ -81,7 +84,15 @@ public class SysNoticeReadService {
      * 查询已阅读某公告的用户列表
      */
     public List<NoticeReadUserResponse> selectReadUsersByNoticeId(Long noticeId, String nickNameLike) {
-        return noticeReadMapper.selectReadUsersByNoticeId(noticeId, nickNameLike);
+        List<NoticeReadUserResponse> result =
+                noticeReadMapper.selectReadUsersByNoticeId(noticeId, nickNameLike);
+        for (NoticeReadUserResponse item : result) {
+            SysDept dept = deptService.selectDeptById(item.getDeptId());
+            if (dept != null) {
+                item.setDeptName(dept.getDeptName());
+            }
+        }
+        return result;
     }
 
     /**

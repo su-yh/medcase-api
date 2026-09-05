@@ -22,5 +22,7 @@ class SysNoticeReadMapperContractTest {
         assertFalse(mapperXml.contains("#{searchValue}"));
         assertFalse(mapperXml.contains("u.user_name like"));
         assertTrue(mapperXml.contains("u.nick_name like concat('%', #{nickNameLike}, '%')"));
+        assertTrue(mapperXml.contains("u.dept_id      as deptId"));
+        assertFalse(mapperXml.contains("sys_dept"));
     }
 }

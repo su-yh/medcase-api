@@ -10,6 +10,7 @@ import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
 import com.medcase.system.event.UserAvatarUploadedEvent;
 import com.medcase.system.converter.SystemEntityConverter;
+import com.medcase.system.entity.SysDeptEntity;
 import com.medcase.system.entity.SysUserEntity;
 import com.medcase.system.entity.SysUserPostEntity;
 import com.medcase.system.entity.SysUserRoleEntity;
@@ -27,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -40,6 +42,9 @@ public class SysUserService {
 
     @Autowired
     private SysUserMapper userMapper;
+
+    @Autowired
+    private SysDeptService deptService;
 
     @Autowired
     private SysRoleMapper roleMapper;
@@ -61,7 +66,25 @@ public class SysUserService {
      */
     public PageResult<SysUser> selectPage(SysUser user, PageParam pageParam) {
         useAdminUserTypeIfAbsent(user);
-        return userMapper.selectPage(pageParam, user);
+        List<Long> deptIds = null;
+        if (user != null && user.getDeptId() != null
+                && !Long.valueOf(0L).equals(user.getDeptId())) {
+            deptIds = new ArrayList<>();
+            deptIds.add(user.getDeptId());
+            for (SysDeptEntity department : deptService.all()) {
+                if (department.getDeptId() != null
+                        && department.getAncestors() != null
+                        && Arrays.asList(department.getAncestors().split(","))
+                        .contains(String.valueOf(user.getDeptId()))) {
+                    deptIds.add(department.getDeptId());
+                }
+            }
+        }
+        PageResult<SysUser> result = userMapper.selectPage(pageParam, user, deptIds);
+        for (SysUser item : result.getList()) {
+            item.setDept(deptService.selectDeptById(item.getDeptId()));
+        }
+        return result;
     }
 
     /**
@@ -72,7 +95,25 @@ public class SysUserService {
      */
     public List<SysUser> selectUserList(SysUser user) {
         useAdminUserTypeIfAbsent(user);
-        return userMapper.selectUserList(user);
+        List<Long> deptIds = null;
+        if (user != null && user.getDeptId() != null
+                && !Long.valueOf(0L).equals(user.getDeptId())) {
+            deptIds = new ArrayList<>();
+            deptIds.add(user.getDeptId());
+            for (SysDeptEntity department : deptService.all()) {
+                if (department.getDeptId() != null
+                        && department.getAncestors() != null
+                        && Arrays.asList(department.getAncestors().split(","))
+                        .contains(String.valueOf(user.getDeptId()))) {
+                    deptIds.add(department.getDeptId());
+                }
+            }
+        }
+        List<SysUser> result = userMapper.selectUserList(user, deptIds);
+        for (SysUser item : result) {
+            item.setDept(deptService.selectDeptById(item.getDeptId()));
+        }
+        return result;
     }
 
     /**
@@ -83,7 +124,25 @@ public class SysUserService {
      */
     public List<SysUser> selectAllocatedList(SysUser user) {
         useAdminUserTypeIfAbsent(user);
-        return userMapper.selectAllocatedList(user);
+        List<Long> deptIds = null;
+        if (user != null && user.getDeptId() != null
+                && !Long.valueOf(0L).equals(user.getDeptId())) {
+            deptIds = new ArrayList<>();
+            deptIds.add(user.getDeptId());
+            for (SysDeptEntity department : deptService.all()) {
+                if (department.getDeptId() != null
+                        && department.getAncestors() != null
+                        && Arrays.asList(department.getAncestors().split(","))
+                        .contains(String.valueOf(user.getDeptId()))) {
+                    deptIds.add(department.getDeptId());
+                }
+            }
+        }
+        List<SysUser> result = userMapper.selectAllocatedList(user, deptIds);
+        for (SysUser item : result) {
+            item.setDept(deptService.selectDeptById(item.getDeptId()));
+        }
+        return result;
     }
 
     /**
@@ -94,7 +153,25 @@ public class SysUserService {
      */
     public List<SysUser> selectUnallocatedList(SysUser user) {
         useAdminUserTypeIfAbsent(user);
-        return userMapper.selectUnallocatedList(user);
+        List<Long> deptIds = null;
+        if (user != null && user.getDeptId() != null
+                && !Long.valueOf(0L).equals(user.getDeptId())) {
+            deptIds = new ArrayList<>();
+            deptIds.add(user.getDeptId());
+            for (SysDeptEntity department : deptService.all()) {
+                if (department.getDeptId() != null
+                        && department.getAncestors() != null
+                        && Arrays.asList(department.getAncestors().split(","))
+                        .contains(String.valueOf(user.getDeptId()))) {
+                    deptIds.add(department.getDeptId());
+                }
+            }
+        }
+        List<SysUser> result = userMapper.selectUnallocatedList(user, deptIds);
+        for (SysUser item : result) {
+            item.setDept(deptService.selectDeptById(item.getDeptId()));
+        }
+        return result;
     }
 
     /**
@@ -106,7 +183,25 @@ public class SysUserService {
      */
     public PageResult<SysUser> selectAllocatedPage(SysUser user, PageParam pageParam) {
         useAdminUserTypeIfAbsent(user);
-        return userMapper.selectAllocatedPage(pageParam, user);
+        List<Long> deptIds = null;
+        if (user != null && user.getDeptId() != null
+                && !Long.valueOf(0L).equals(user.getDeptId())) {
+            deptIds = new ArrayList<>();
+            deptIds.add(user.getDeptId());
+            for (SysDeptEntity department : deptService.all()) {
+                if (department.getDeptId() != null
+                        && department.getAncestors() != null
+                        && Arrays.asList(department.getAncestors().split(","))
+                        .contains(String.valueOf(user.getDeptId()))) {
+                    deptIds.add(department.getDeptId());
+                }
+            }
+        }
+        PageResult<SysUser> result = userMapper.selectAllocatedPage(pageParam, user, deptIds);
+        for (SysUser item : result.getList()) {
+            item.setDept(deptService.selectDeptById(item.getDeptId()));
+        }
+        return result;
     }
 
     /**
@@ -118,7 +213,25 @@ public class SysUserService {
      */
     public PageResult<SysUser> selectUnallocatedPage(SysUser user, PageParam pageParam) {
         useAdminUserTypeIfAbsent(user);
-        return userMapper.selectUnallocatedPage(pageParam, user);
+        List<Long> deptIds = null;
+        if (user != null && user.getDeptId() != null
+                && !Long.valueOf(0L).equals(user.getDeptId())) {
+            deptIds = new ArrayList<>();
+            deptIds.add(user.getDeptId());
+            for (SysDeptEntity department : deptService.all()) {
+                if (department.getDeptId() != null
+                        && department.getAncestors() != null
+                        && Arrays.asList(department.getAncestors().split(","))
+                        .contains(String.valueOf(user.getDeptId()))) {
+                    deptIds.add(department.getDeptId());
+                }
+            }
+        }
+        PageResult<SysUser> result = userMapper.selectUnallocatedPage(pageParam, user, deptIds);
+        for (SysUser item : result.getList()) {
+            item.setDept(deptService.selectDeptById(item.getDeptId()));
+        }
+        return result;
     }
 
     private void useAdminUserTypeIfAbsent(SysUser user) {
@@ -135,8 +248,12 @@ public class SysUserService {
      */
     public SysUser selectUserByUserName(String userName, String userType) {
 
-        return SystemEntityConverter.toDomain(
+        SysUser user = SystemEntityConverter.toDomain(
                 userMapper.selectUserByUserName(userName, userType, "0"));
+        if (user != null) {
+            user.setDept(deptService.selectDeptById(user.getDeptId()));
+        }
+        return user;
     }
 
     /**
@@ -147,7 +264,11 @@ public class SysUserService {
      */
     public SysUser selectUserById(Long userId) {
 
-        return SystemEntityConverter.toDomain(userMapper.selectById(userId));
+        SysUser user = SystemEntityConverter.toDomain(userMapper.selectById(userId));
+        if (user != null) {
+            user.setDept(deptService.selectDeptById(user.getDeptId()));
+        }
+        return user;
     }
 
     /**

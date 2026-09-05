@@ -16,40 +16,68 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
 @Mapper
 public interface SysUserMapper extends BaseMapperX<SysUserEntity> {
-    List<SysUser> selectUserList(SysUser user);
+    List<SysUser> selectUserList(
+            @Param("user") SysUser user, @Param("deptIds") Collection<Long> deptIds);
 
-    List<SysUser> selectAllocatedList(SysUser user);
+    List<SysUser> selectAllocatedList(
+            @Param("user") SysUser user, @Param("deptIds") Collection<Long> deptIds);
 
-    List<SysUser> selectUnallocatedList(SysUser user);
+    List<SysUser> selectUnallocatedList(
+            @Param("user") SysUser user, @Param("deptIds") Collection<Long> deptIds);
 
     default PageResult<SysUser> selectPage(PageParam pageParam, SysUser user) {
+        return selectPage(pageParam, user, null);
+    }
+
+    default PageResult<SysUser> selectPage(
+            PageParam pageParam, SysUser user, Collection<Long> deptIds) {
         Page<SysUser> page = MyBatisUtils.buildPage(pageParam);
-        IPage<SysUser> userPage = selectUserPage(page, user);
+        IPage<SysUser> userPage = selectUserPage(page, user, deptIds);
         return new PageResult<>(userPage.getRecords(), userPage.getTotal());
     }
 
-    IPage<SysUser> selectUserPage(Page<SysUser> page, @Param("user") SysUser user);
+    IPage<SysUser> selectUserPage(
+            Page<SysUser> page,
+            @Param("user") SysUser user,
+            @Param("deptIds") Collection<Long> deptIds);
 
     default PageResult<SysUser> selectAllocatedPage(PageParam pageParam, SysUser user) {
+        return selectAllocatedPage(pageParam, user, null);
+    }
+
+    default PageResult<SysUser> selectAllocatedPage(
+            PageParam pageParam, SysUser user, Collection<Long> deptIds) {
         Page<SysUser> page = MyBatisUtils.buildPage(pageParam);
-        IPage<SysUser> userPage = selectAllocatedPage(page, user);
+        IPage<SysUser> userPage = selectAllocatedPage(page, user, deptIds);
         return new PageResult<>(userPage.getRecords(), userPage.getTotal());
     }
 
-    IPage<SysUser> selectAllocatedPage(Page<SysUser> page, @Param("user") SysUser user);
+    IPage<SysUser> selectAllocatedPage(
+            Page<SysUser> page,
+            @Param("user") SysUser user,
+            @Param("deptIds") Collection<Long> deptIds);
 
     default PageResult<SysUser> selectUnallocatedPage(PageParam pageParam, SysUser user) {
+        return selectUnallocatedPage(pageParam, user, null);
+    }
+
+    default PageResult<SysUser> selectUnallocatedPage(
+            PageParam pageParam, SysUser user, Collection<Long> deptIds) {
         Page<SysUser> page = MyBatisUtils.buildPage(pageParam);
-        IPage<SysUser> userPage = selectUnallocatedPage(page, user);
+        IPage<SysUser> userPage = selectUnallocatedPage(page, user, deptIds);
         return new PageResult<>(userPage.getRecords(), userPage.getTotal());
     }
 
-    IPage<SysUser> selectUnallocatedPage(Page<SysUser> page, @Param("user") SysUser user);
+    IPage<SysUser> selectUnallocatedPage(
+            Page<SysUser> page,
+            @Param("user") SysUser user,
+            @Param("deptIds") Collection<Long> deptIds);
 
     default SysUserEntity selectUserByUserName(
             String userName, String userType, String delFlag) {

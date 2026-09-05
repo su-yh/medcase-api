@@ -12,10 +12,12 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.util.Collection;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -25,11 +27,15 @@ class SysUserServiceRolePageTest {
     @Mock
     private SysUserMapper userMapper;
 
+    @Mock
+    private SysDeptService deptService;
+
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
         userService = new SysUserService();
         ReflectionTestUtils.setField(userService, "userMapper", userMapper);
+        ReflectionTestUtils.setField(userService, "deptService", deptService);
     }
 
     @Test
@@ -45,13 +51,15 @@ class SysUserServiceRolePageTest {
         resultUser.setUserName("bound-user");
         resultUser.setUserType(UserTypeEnums.ADMIN);
 
-        when(userMapper.selectAllocatedPage(any(PageParam.class), any(SysUser.class)))
+        when(userMapper.selectAllocatedPage(
+                any(PageParam.class), any(SysUser.class), nullable(Collection.class)))
                 .thenReturn(new PageResult<>(List.of(resultUser), 1L));
 
         PageResult<SysUser> result = userService.selectAllocatedPage(user, pageParam);
 
         ArgumentCaptor<SysUser> userCaptor = ArgumentCaptor.forClass(SysUser.class);
-        verify(userMapper).selectAllocatedPage(any(PageParam.class), userCaptor.capture());
+        verify(userMapper).selectAllocatedPage(
+                any(PageParam.class), userCaptor.capture(), nullable(Collection.class));
         assertEquals(UserTypeEnums.ADMIN, userCaptor.getValue().getUserType());
         assertEquals(1, result.getTotal());
         assertEquals(7L, result.getList().get(0).getUserId());
@@ -70,13 +78,15 @@ class SysUserServiceRolePageTest {
         resultUser.setUserName("free-user");
         resultUser.setUserType(UserTypeEnums.ADMIN);
 
-        when(userMapper.selectUnallocatedPage(any(PageParam.class), any(SysUser.class)))
+        when(userMapper.selectUnallocatedPage(
+                any(PageParam.class), any(SysUser.class), nullable(Collection.class)))
                 .thenReturn(new PageResult<>(List.of(resultUser), 1L));
 
         PageResult<SysUser> result = userService.selectUnallocatedPage(user, pageParam);
 
         ArgumentCaptor<SysUser> userCaptor = ArgumentCaptor.forClass(SysUser.class);
-        verify(userMapper).selectUnallocatedPage(any(PageParam.class), userCaptor.capture());
+        verify(userMapper).selectUnallocatedPage(
+                any(PageParam.class), userCaptor.capture(), nullable(Collection.class));
         assertEquals(UserTypeEnums.ADMIN, userCaptor.getValue().getUserType());
         assertEquals(1, result.getTotal());
         assertEquals(8L, result.getList().get(0).getUserId());

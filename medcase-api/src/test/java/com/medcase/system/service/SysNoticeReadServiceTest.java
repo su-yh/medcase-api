@@ -2,6 +2,8 @@ package com.medcase.system.service;
 
 import com.medcase.system.entity.SysNoticeReadEntity;
 import com.medcase.system.mapper.SysNoticeReadMapper;
+import com.medcase.common.core.domain.entity.SysDept;
+import com.medcase.web.controller.system.dto.NoticeReadUserResponse;
 import com.medcase.web.controller.system.dto.NoticeTopItemResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,10 +27,13 @@ class SysNoticeReadServiceTest {
     @Mock
     private SysNoticeReadMapper noticeReadMapper;
 
+    @Mock
+    private SysDeptService deptService;
+
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        noticeReadService = new SysNoticeReadService(noticeReadMapper);
+        noticeReadService = new SysNoticeReadService(noticeReadMapper, deptService);
     }
 
     @Test
@@ -69,6 +74,24 @@ class SysNoticeReadServiceTest {
         Collection<SysNoticeReadEntity> records = captor.getValue();
         assertEquals(2, records.size());
         assertTrue(records.stream().allMatch(record -> record.getReadTime() != null));
+    }
+
+    @Test
+    void selectReadUsersByNoticeIdFillsDeptNameFromCache() {
+
+        NoticeReadUserResponse response = new NoticeReadUserResponse();
+        response.setDeptId(1L);
+        SysDept dept = new SysDept();
+        dept.setDeptId(1L);
+        dept.setDeptName("管理部");
+        when(noticeReadMapper.selectReadUsersByNoticeId(3L, "张"))
+                .thenReturn(List.of(response));
+        when(deptService.selectDeptById(1L)).thenReturn(dept);
+
+        List<NoticeReadUserResponse> result =
+                noticeReadService.selectReadUsersByNoticeId(3L, "张");
+
+        assertEquals("管理部", result.get(0).getDeptName());
     }
 
     private NoticeTopItemResponse notice(Long noticeId) {
