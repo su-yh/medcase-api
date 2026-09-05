@@ -24,7 +24,6 @@ import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
 import com.medcase.mvc.authentication.annotation.CurrLoginUser;
 import com.medcase.system.service.SysDictDataService;
-import com.medcase.system.service.SysDictTypeService;
 
 /**
  * 数据字典信息
@@ -36,9 +35,6 @@ public class SysDictDataController {
 
     @Autowired
     private SysDictDataService dictDataService;
-
-    @Autowired
-    private SysDictTypeService dictTypeService;
 
     @PreAuthorize("@ss.hasPermi('system:dict:list')")
     @GetMapping("/list")
@@ -63,7 +59,7 @@ public class SysDictDataController {
     @GetMapping(value = "/type/{dictType}")
     public List<SysDictData> dictType(@PathVariable String dictType) {
 
-        List<SysDictData> data = dictTypeService.selectDictDataByType(dictType);
+        List<SysDictData> data = dictDataService.selectDictDataByType(dictType);
         if (data == null) {
 
             data = new ArrayList<SysDictData>();

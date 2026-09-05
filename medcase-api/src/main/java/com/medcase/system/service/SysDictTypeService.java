@@ -3,30 +3,21 @@ package com.medcase.system.service;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.medcase.common.constant.UserConstants;
-import com.medcase.common.core.domain.entity.SysDictData;
 import com.medcase.common.core.domain.entity.SysDictType;
 import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
 import com.medcase.system.converter.SystemEntityConverter;
-import com.medcase.system.entity.SysDictDataEntity;
 import com.medcase.system.entity.SysDictTypeEntity;
 import com.medcase.system.mapper.SysDictDataMapper;
 import com.medcase.system.mapper.SysDictTypeMapper;
-import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 /**
  * 字典 业务层处理
@@ -37,11 +28,11 @@ public class SysDictTypeService {
 
     private static final long DICT_CACHE_EXPIRE_MINUTES = 30L;
 
-    private final Cache<String, List<SysDictDataEntity>> dictCache = Caffeine.newBuilder()
+    private final Cache<Long, SysDictTypeEntity> dictTypeCache = Caffeine.newBuilder()
             .expireAfterWrite(DICT_CACHE_EXPIRE_MINUTES, TimeUnit.MINUTES)
             .build();
 
-    private final Object dictCacheLoadLock = new Object();
+    private final Object dictTypeCacheLoadLock = new Object();
 
     @Autowired
     private SysDictTypeMapper dictTypeMapper;
@@ -49,14 +40,8 @@ public class SysDictTypeService {
     @Autowired
     private SysDictDataMapper dictDataMapper;
 
-    /**
-     * 项目启动时，初始化字典到缓存
-     */
-    @PostConstruct
-    public void init() {
-
-        loadingDictCache();
-    }
+    @Autowired
+    private SysDictDataService dictDataService;
 
     public PageResult<SysDictType> selectPage(PageParam pageParam, SysDictType dictType) {
 
@@ -82,37 +67,6 @@ public class SysDictTypeService {
     }
 
     /**
-     * 根据字典类型查询字典数据
-     * 
-     * @param dictType 字典类型
-     * @return 字典数据集合信息
-     */
-    public List<SysDictData> selectDictDataByType(String dictType) {
-
-        if (!StringUtils.hasText(dictType)) {
-            return null;
-        }
-
-        List<SysDictDataEntity> dictDatas = dictCache.getIfPresent(dictType);
-        if (dictDatas == null) {
-            synchronized (dictCacheLoadLock) {
-                dictDatas = dictCache.getIfPresent(dictType);
-                if (dictDatas == null) {
-                    dictDatas = dictDataMapper.selectEnabledDictDataByType(dictType);
-                    if (dictDatas == null) {
-                        dictDatas = List.of();
-                    }
-                    dictCache.put(dictType, List.copyOf(dictDatas));
-                }
-            }
-        }
-        if (CollectionUtils.isEmpty(dictDatas)) {
-            return null;
-        }
-        return SystemEntityConverter.copyList(new ArrayList<>(dictDatas), SysDictData.class);
-    }
-
-    /**
      * 根据字典类型ID查询信息
      * 
      * @param dictId 字典类型ID
@@ -120,7 +74,22 @@ public class SysDictTypeService {
      */
     public SysDictType selectDictTypeById(Long dictId) {
 
-        return SystemEntityConverter.toDomain(dictTypeMapper.selectById(dictId));
+        if (dictId == null) {
+            return null;
+        }
+        SysDictTypeEntity dictType = dictTypeCache.getIfPresent(dictId);
+        if (dictType == null) {
+            synchronized (dictTypeCacheLoadLock) {
+                dictType = dictTypeCache.getIfPresent(dictId);
+                if (dictType == null) {
+                    dictType = dictTypeMapper.selectById(dictId);
+                    if (dictType != null) {
+                        dictTypeCache.put(dictId, dictType);
+                    }
+                }
+            }
+        }
+        return SystemEntityConverter.toDomain(dictType);
     }
 
 
@@ -133,36 +102,14 @@ public class SysDictTypeService {
 
         for (Long dictId : dictIds) {
 
-            SysDictType dictType = selectDictTypeById(dictId);
+            SysDictType dictType = SystemEntityConverter.toDomain(dictTypeMapper.selectById(dictId));
             if (dictDataMapper.countByDictType(dictType.getDictType()) > 0) {
 
                 throw ExceptionUtil.business(ErrorCodeEnums.DICT_TYPE_ASSIGNED_DELETE, dictType.getDictName());
             }
             dictTypeMapper.deleteById(dictId);
-            clearDictCache(dictType.getDictType());
-        }
-    }
-
-    /**
-     * 加载字典缓存数据
-     */
-    public void loadingDictCache() {
-
-        List<SysDictDataEntity> dictDatas = dictDataMapper.selectDictDataList(null, null, "0");
-        if (dictDatas == null) {
-            dictDatas = List.of();
-        }
-        Map<String, List<SysDictDataEntity>> dictDataMap = dictDatas.stream()
-                .filter(dictData -> StringUtils.hasText(dictData.getDictType()))
-                .collect(Collectors.groupingBy(SysDictDataEntity::getDictType));
-        synchronized (dictCacheLoadLock) {
-            dictCache.invalidateAll();
-            for (Map.Entry<String, List<SysDictDataEntity>> entry : dictDataMap.entrySet()) {
-                List<SysDictDataEntity> sortedDictDatas = entry.getValue().stream()
-                        .sorted(Comparator.comparing(SysDictDataEntity::getDictSort))
-                        .collect(Collectors.toList());
-                dictCache.put(entry.getKey(), List.copyOf(sortedDictDatas));
-            }
+            clearDictTypeCache(dictId);
+            dictDataService.clearDictDataCache(dictType.getDictType());
         }
     }
 
@@ -171,18 +118,19 @@ public class SysDictTypeService {
      */
     public void clearDictCache() {
 
-        dictCache.invalidateAll();
+        dictTypeCache.invalidateAll();
+        dictDataService.clearDictCache();
     }
 
     /**
      * 清空指定字典类型缓存数据
      *
-     * @param dictType 字典类型
+     * @param dictId 字典类型ID
      */
-    public void clearDictCache(String dictType) {
+    public void clearDictTypeCache(Long dictId) {
 
-        if (StringUtils.hasText(dictType)) {
-            dictCache.invalidate(dictType);
+        if (dictId != null) {
+            dictTypeCache.invalidate(dictId);
         }
     }
 
@@ -192,7 +140,6 @@ public class SysDictTypeService {
     public void resetDictCache() {
 
         clearDictCache();
-        loadingDictCache();
     }
 
     /**
@@ -218,13 +165,15 @@ public class SysDictTypeService {
     @Transactional
     public int updateDictType(SysDictType dict) {
 
-        SysDictType oldDict = selectDictTypeById(dict.getDictId());
+        SysDictType oldDict = SystemEntityConverter.toDomain(
+                dictTypeMapper.selectById(dict.getDictId()));
         dictDataMapper.updateDictType(oldDict.getDictType(), dict.getDictType());
         int row = dictTypeMapper.updateById(SystemEntityConverter.toEntity(dict));
         if (row > 0) {
 
-            clearDictCache(oldDict.getDictType());
-            clearDictCache(dict.getDictType());
+            clearDictTypeCache(dict.getDictId());
+            dictDataService.clearDictDataCache(oldDict.getDictType());
+            dictDataService.clearDictDataCache(dict.getDictType());
         }
         return row;
     }

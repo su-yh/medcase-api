@@ -22,16 +22,6 @@ public interface SysDictDataMapper extends BaseMapperX<SysDictDataEntity> {
         return selectPage(pageParam, query);
     }
 
-    default List<SysDictDataEntity> selectDictDataList(
-            String dictType, String dictLabel, String status) {
-        LambdaQueryWrapper<SysDictDataEntity> query = build()
-                .eqIfPresent(SysDictDataEntity::getDictType, dictType)
-                .likeIfPresent(SysDictDataEntity::getDictLabel, dictLabel)
-                .eqIfPresent(SysDictDataEntity::getStatus, status)
-                .orderByAsc(SysDictDataEntity::getDictSort);
-        return selectList(query);
-    }
-
     default List<SysDictDataEntity> selectEnabledDictDataByType(String dictType) {
         return selectList(build()
                 .eq(SysDictDataEntity::getStatus, "0")
