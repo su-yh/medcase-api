@@ -8,22 +8,18 @@ import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.medcase.common.annotation.DataScope;
 import com.medcase.common.constant.UserConstants;
 import com.medcase.common.core.domain.entity.SysRole;
-import com.medcase.common.utils.SecurityUtils;
 import com.medcase.common.utils.spring.SpringUtils;
 import com.medcase.system.converter.SystemEntityConverter;
-import com.medcase.system.entity.SysRoleDeptEntity;
 import com.medcase.system.entity.SysRoleEntity;
 import com.medcase.system.entity.SysRoleMenuEntity;
 import com.medcase.system.entity.SysUserRoleEntity;
-import com.medcase.system.mapper.SysRoleDeptMapper;
 import com.medcase.system.mapper.SysRoleMapper;
 import com.medcase.system.mapper.SysRoleMenuMapper;
 import com.medcase.system.mapper.SysUserRoleMapper;
-import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
+import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 
 /**
  * 角色 业务层处理
@@ -41,16 +37,12 @@ public class SysRoleService {
     @Autowired
     private SysUserRoleMapper userRoleMapper;
 
-    @Autowired
-    private SysRoleDeptMapper roleDeptMapper;
-
     /**
      * 根据条件分页查询角色数据
      * 
      * @param role 角色信息
      * @return 角色数据集合信息
      */
-    @DataScope(deptAlias = "d")
     public List<SysRole> selectRoleList(SysRole role) {
 
         return roleMapper.selectRoleList(role);
@@ -182,28 +174,6 @@ public class SysRoleService {
     }
 
     /**
-     * 校验角色是否有数据权限
-     * 
-     * @param roleIds 角色id
-     */
-    public void checkRoleDataScope(Long... roleIds) {
-
-        if (!SecurityUtils.isAdmin()) {
-
-            for (Long roleId : roleIds) {
-
-                SysRole role = new SysRole();
-                role.setRoleId(roleId);
-                List<SysRole> roles = SpringUtils.getAopProxy(this).selectRoleList(role);
-                if (org.springframework.util.CollectionUtils.isEmpty(roles)) {
-
-                    throw ExceptionUtil.business(ErrorCodeEnums.ROLE_DATA_SCOPE_DENIED);
-                }
-            }
-        }
-    }
-
-    /**
      * 通过角色ID查询角色使用数量
      * 
      * @param roleId 角色ID
@@ -256,22 +226,6 @@ public class SysRoleService {
     }
 
     /**
-     * 修改数据权限信息
-     * 
-     * @param role 角色信息
-     * @return 结果
-     */
-    @Transactional
-    public int authDataScope(SysRole role) {
-
-        roleMapper.updateById(SystemEntityConverter.toEntity(role));
-        // 删除角色与部门关联
-        roleDeptMapper.deleteByRoleId(role.getRoleId());
-        // 新增角色和部门信息（数据权限）
-        return insertRoleDept(role);
-    }
-
-    /**
      * 新增角色菜单信息
      * 
      * @param role 角色对象
@@ -297,31 +251,6 @@ public class SysRoleService {
     }
 
     /**
-     * 新增角色部门信息(数据权限)
-     *
-     * @param role 角色对象
-     */
-    public int insertRoleDept(SysRole role) {
-
-        int rows = 1;
-        // 新增角色与部门（数据权限）管理
-        List<SysRoleDeptEntity> list = new ArrayList<>();
-        for (Long deptId : role.getDeptIds()) {
-
-            SysRoleDeptEntity rd = new SysRoleDeptEntity();
-            rd.setRoleId(role.getRoleId());
-            rd.setDeptId(deptId);
-            list.add(rd);
-        }
-        if (list.size() > 0) {
-
-            roleDeptMapper.insertRoleDepts(list);
-            rows = list.size();
-        }
-        return rows;
-    }
-
-    /**
      * 通过角色ID删除角色
      * 
      * @param roleId 角色ID
@@ -332,8 +261,6 @@ public class SysRoleService {
 
         // 删除角色与菜单关联
         roleMenuMapper.deleteByRoleId(roleId);
-        // 删除角色与部门关联
-        roleDeptMapper.deleteByRoleId(roleId);
         return roleMapper.deleteRoleById(roleId);
     }
 
@@ -349,7 +276,6 @@ public class SysRoleService {
         for (Long roleId : roleIds) {
 
             checkRoleAllowed(new SysRole(roleId));
-            checkRoleDataScope(roleId);
             SysRole role = selectRoleById(roleId);
             if (countUserRoleByRoleId(roleId) > 0) {
 
@@ -358,8 +284,6 @@ public class SysRoleService {
         }
         // 删除角色与菜单关联
         roleMenuMapper.deleteByRoleIds(roleIds);
-        // 删除角色与部门关联
-        roleDeptMapper.deleteByRoleIds(roleIds);
         return roleMapper.deleteRolesByIds(roleIds);
     }
 

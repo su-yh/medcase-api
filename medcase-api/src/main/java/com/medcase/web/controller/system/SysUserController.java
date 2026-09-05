@@ -95,7 +95,6 @@ public class SysUserController {
         List<Long> roleIds = null;
         if (userId != null) {
 
-            userService.checkUserDataScope(userId);
             sysUser = userService.selectUserById(userId);
             postIds = postService.selectPostListByUserId(userId);
             List<SysRole> roles = sysUser.getRoles();
@@ -123,8 +122,6 @@ public class SysUserController {
             @Validated @RequestBody SysUser user,
             @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
 
-        deptService.checkDeptDataScope(user.getDeptId());
-        roleService.checkRoleDataScope(user.getRoleIds());
         if (!userService.checkUserNameUnique(user)) {
             throw ExceptionUtil.business(ErrorCodeEnums.USERNAME_EXISTS, user.getUserName());
         }
@@ -154,9 +151,6 @@ public class SysUserController {
         user.setPassword(null);
 
         userService.checkUserAllowed(user);
-        userService.checkUserDataScope(user.getUserId());
-        deptService.checkDeptDataScope(user.getDeptId());
-        roleService.checkRoleDataScope(user.getRoleIds());
         if (!userService.checkUserNameUnique(user)) {
             throw ExceptionUtil.business(ErrorCodeEnums.USERNAME_EXISTS, user.getUserName());
         }
@@ -201,7 +195,6 @@ public class SysUserController {
             @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
 
         userService.checkUserAllowed(user);
-        userService.checkUserDataScope(user.getUserId());
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setUpdateBy(loginUser.getUsername());
         if (userService.resetPwd(user) <= 0) {
@@ -220,7 +213,6 @@ public class SysUserController {
             @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
 
         userService.checkUserAllowed(user);
-        userService.checkUserDataScope(user.getUserId());
         user.setUpdateBy(loginUser.getUsername());
         if (userService.updateUserStatus(user) <= 0) {
             throw ExceptionUtil.business(ErrorCodeEnums.USER_OPERATION_FAILED);
@@ -250,8 +242,6 @@ public class SysUserController {
     @PutMapping("/authRole")
     public void insertAuthRole(Long userId, Long[] roleIds) {
 
-        userService.checkUserDataScope(userId);
-        roleService.checkRoleDataScope(roleIds);
         userService.insertUserAuth(userId, roleIds);
     }
 

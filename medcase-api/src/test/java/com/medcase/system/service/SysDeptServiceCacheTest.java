@@ -1,6 +1,7 @@
 package com.medcase.system.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -15,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.test.util.ReflectionTestUtils;
+import com.github.benmanes.caffeine.cache.Cache;
 
 class SysDeptServiceCacheTest {
 
@@ -128,4 +130,72 @@ class SysDeptServiceCacheTest {
 
         verify(deptMapper, times(2)).selectAllDepartments();
     }
+
+    @Test
+    void selectDeptListUsesCachedDepartmentsAndAppliesQuery() {
+
+        SysDeptEntity department = new SysDeptEntity();
+        department.setDeptId(1L);
+        department.setParentId(0L);
+        department.setDeptName("研发部门");
+        department.setStatus(UserConstants.DEPT_NORMAL);
+        when(deptMapper.selectAllDepartments()).thenReturn(List.of(department));
+
+        SysDept query = new SysDept();
+        query.setDeptName("研发");
+
+        List<SysDept> result = deptService.selectDeptList(query);
+
+        assertEquals(1, result.size());
+        assertEquals("研发部门", result.get(0).getDeptName());
+        verify(deptMapper, times(1)).selectAllDepartments();
+    }
+
+    @Test
+    void selectDeptListReturnsAllDepartmentsWithoutRoleScopeFiltering() {
+
+        SysDeptEntity currentDepartment = department(1L, 0L, "总部", "0");
+        SysDeptEntity childDepartment = department(2L, 1L, "子部门", "0,1");
+        SysDeptEntity otherDepartment = department(3L, 0L, "其他部门", "0");
+        when(deptMapper.selectAllDepartments())
+                .thenReturn(List.of(currentDepartment, childDepartment, otherDepartment));
+
+        SysDept query = new SysDept();
+
+        List<SysDept> result = deptService.selectDeptList(query);
+
+        assertEquals(List.of(1L, 2L, 3L), result.stream().map(SysDept::getDeptId).toList());
+    }
+
+    @Test
+    void selectDeptListReturnsAllDepartmentsWithoutLoginUser() {
+
+        SysDeptEntity department = department(1L, 0L, "总部", "0");
+        when(deptMapper.selectAllDepartments()).thenReturn(List.of(department));
+
+        List<SysDept> result = deptService.selectDeptList(new SysDept());
+
+        assertEquals(List.of(1L), result.stream().map(SysDept::getDeptId).toList());
+    }
+
+    @Test
+    void departmentCacheHasWriteExpiration() {
+
+        Cache<String, List<SysDeptEntity>> cache =
+                (Cache<String, List<SysDeptEntity>>) ReflectionTestUtils.getField(deptService, "deptCache");
+
+        assertTrue(cache.policy().expireAfterWrite().isPresent());
+    }
+
+    private SysDeptEntity department(Long deptId, Long parentId, String name, String ancestors) {
+
+        SysDeptEntity department = new SysDeptEntity();
+        department.setDeptId(deptId);
+        department.setParentId(parentId);
+        department.setDeptName(name);
+        department.setAncestors(ancestors);
+        department.setStatus(UserConstants.DEPT_NORMAL);
+        return department;
+    }
+
 }

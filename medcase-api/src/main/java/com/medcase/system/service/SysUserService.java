@@ -1,12 +1,9 @@
 package com.medcase.system.service;
 
-import com.medcase.common.annotation.DataScope;
 import com.medcase.common.constant.UserConstants;
 import com.medcase.common.core.domain.entity.SysRole;
 import com.medcase.common.core.domain.entity.SysUser;
 import com.medcase.common.enums.UserTypeEnums;
-import com.medcase.common.utils.SecurityUtils;
-import com.medcase.common.utils.spring.SpringUtils;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
 import com.medcase.mp.mybatis.PageParam;
@@ -56,16 +53,12 @@ public class SysUserService {
     @Autowired
     private SysUserPostMapper userPostMapper;
 
-    @Autowired
-    private SysDeptService deptService;
-
     /**
      * 根据条件分页查询用户列表
      * 
      * @param user 用户信息
      * @return 用户信息集合信息
      */
-    @DataScope(deptAlias = "d", userAlias = "u")
     public PageResult<SysUser> selectPage(SysUser user, PageParam pageParam) {
         useAdminUserTypeIfAbsent(user);
         return userMapper.selectPage(pageParam, user);
@@ -77,7 +70,6 @@ public class SysUserService {
      * @param user 用户信息
      * @return 用户信息集合信息
      */
-    @DataScope(deptAlias = "d", userAlias = "u")
     public List<SysUser> selectUserList(SysUser user) {
         useAdminUserTypeIfAbsent(user);
         return userMapper.selectUserList(user);
@@ -89,7 +81,6 @@ public class SysUserService {
      * @param user 用户信息
      * @return 用户信息集合信息
      */
-    @DataScope(deptAlias = "d", userAlias = "u")
     public List<SysUser> selectAllocatedList(SysUser user) {
         useAdminUserTypeIfAbsent(user);
         return userMapper.selectAllocatedList(user);
@@ -101,7 +92,6 @@ public class SysUserService {
      * @param user 用户信息
      * @return 用户信息集合信息
      */
-    @DataScope(deptAlias = "d", userAlias = "u")
     public List<SysUser> selectUnallocatedList(SysUser user) {
         useAdminUserTypeIfAbsent(user);
         return userMapper.selectUnallocatedList(user);
@@ -114,7 +104,6 @@ public class SysUserService {
      * @param pageParam 分页参数
      * @return 用户信息集合信息
      */
-    @DataScope(deptAlias = "d", userAlias = "u")
     public PageResult<SysUser> selectAllocatedPage(SysUser user, PageParam pageParam) {
         useAdminUserTypeIfAbsent(user);
         return userMapper.selectAllocatedPage(pageParam, user);
@@ -127,7 +116,6 @@ public class SysUserService {
      * @param pageParam 分页参数
      * @return 用户信息集合信息
      */
-    @DataScope(deptAlias = "d", userAlias = "u")
     public PageResult<SysUser> selectUnallocatedPage(SysUser user, PageParam pageParam) {
         useAdminUserTypeIfAbsent(user);
         return userMapper.selectUnallocatedPage(pageParam, user);
@@ -256,25 +244,6 @@ public class SysUserService {
     public void checkUserAllowed(SysUser user) {
         if (user.getUserId() != null && user.isAdmin()) {
             throw ExceptionUtil.business(ErrorCodeEnums.SUPER_ADMIN_USER_OPERATION);
-        }
-    }
-
-    /**
-     * 校验用户是否有数据权限
-     * 
-     * @param userId 用户id
-     */
-    public void checkUserDataScope(Long userId) {
-
-        if (!SecurityUtils.isAdmin()) {
-
-            SysUser user = new SysUser();
-            user.setUserId(userId);
-            List<SysUser> users = SpringUtils.getAopProxy(this).selectUserList(user);
-            if (org.springframework.util.CollectionUtils.isEmpty(users)) {
-
-                throw ExceptionUtil.business(ErrorCodeEnums.USER_DATA_SCOPE_DENIED);
-            }
         }
     }
 
@@ -509,7 +478,6 @@ public class SysUserService {
         for (Long userId : userIds) {
 
             checkUserAllowed(new SysUser(userId));
-            checkUserDataScope(userId);
         }
         // 删除用户与角色关联
         userRoleMapper.deleteByUserIds(userIds);

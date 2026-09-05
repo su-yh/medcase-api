@@ -52,7 +52,8 @@ public class SysDeptController {
      */
     @PreAuthorize("@ss.hasPermi('system:dept:list')")
     @GetMapping("/list/exclude/{deptId}")
-    public List<SysDept> excludeChild(@PathVariable(value = "deptId", required = false) Long deptId) {
+    public List<SysDept> excludeChild(
+            @PathVariable(value = "deptId", required = false) Long deptId) {
 
         List<SysDept> depts = deptService.selectDeptList(new SysDept());
         depts.removeIf(d -> d.getDeptId().intValue() == deptId
@@ -69,7 +70,6 @@ public class SysDeptController {
     @GetMapping(value = "/{deptId}")
     public SysDept getInfo(@PathVariable Long deptId) {
 
-        deptService.checkDeptDataScope(deptId);
         return deptService.selectDeptById(deptId);
     }
 
@@ -103,7 +103,6 @@ public class SysDeptController {
             @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
 
         Long deptId = dept.getDeptId();
-        deptService.checkDeptDataScope(deptId);
         if (!deptService.checkDeptNameUnique(dept)) {
             throw ExceptionUtil.business(ErrorCodeEnums.DEPT_NAME_EXISTS);
         }
@@ -147,7 +146,6 @@ public class SysDeptController {
         if (deptService.checkDeptExistUser(deptId)) {
             throw ExceptionUtil.business(ErrorCodeEnums.DEPT_HAS_USERS);
         }
-        deptService.checkDeptDataScope(deptId);
         if (deptService.deleteDeptById(deptId) <= 0) {
             throw ExceptionUtil.business(ErrorCodeEnums.DEPT_OPERATION_FAILED);
         }

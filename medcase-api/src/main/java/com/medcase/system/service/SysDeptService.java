@@ -2,20 +2,15 @@ package com.medcase.system.service;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
-import com.medcase.common.annotation.DataScope;
 import com.medcase.common.constant.UserConstants;
 import com.medcase.common.core.domain.TreeSelect;
 import com.medcase.common.core.domain.entity.SysDept;
-import com.medcase.common.core.domain.entity.SysRole;
 import com.medcase.common.core.text.Convert;
-import com.medcase.common.utils.SecurityUtils;
-import com.medcase.common.utils.spring.SpringUtils;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
 import com.medcase.system.converter.SystemEntityConverter;
 import com.medcase.system.entity.SysDeptEntity;
 import com.medcase.system.mapper.SysDeptMapper;
-import com.medcase.system.mapper.SysRoleMapper;
 import com.medcase.system.mapper.SysUserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -36,15 +32,16 @@ public class SysDeptService {
 
     private static final String ALL_DEPARTMENTS_CACHE_KEY = "allDepartments";
 
-    private final Cache<String, List<SysDeptEntity>> deptCache = Caffeine.newBuilder().build();
+    private static final long DEPT_CACHE_EXPIRE_MINUTES = 30L;
+
+    private final Cache<String, List<SysDeptEntity>> deptCache = Caffeine.newBuilder()
+            .expireAfterWrite(DEPT_CACHE_EXPIRE_MINUTES, TimeUnit.MINUTES)
+            .build();
 
     private final Object deptCacheLoadLock = new Object();
 
     @Autowired
     private SysDeptMapper deptMapper;
-
-    @Autowired
-    private SysRoleMapper roleMapper;
 
     @Autowired
     private SysUserMapper userMapper;
@@ -55,10 +52,17 @@ public class SysDeptService {
      * @param dept 部门信息
      * @return 部门信息集合
      */
-    @DataScope(deptAlias = "d")
     public List<SysDept> selectDeptList(SysDept dept) {
 
-        return deptMapper.selectDeptList(dept);
+        List<SysDeptEntity> departments = all();
+        List<SysDept> result = new ArrayList<>();
+        for (SysDeptEntity department : departments) {
+            if (!matchesDeptQuery(department, dept)) {
+                continue;
+            }
+            result.add(SystemEntityConverter.toDomain(department));
+        }
+        return result;
     }
 
     /**
@@ -69,8 +73,32 @@ public class SysDeptService {
      */
     public List<TreeSelect> selectDeptTreeList(SysDept dept) {
 
-        List<SysDept> depts = SpringUtils.getAopProxy(this).selectDeptList(dept);
+        List<SysDept> depts = selectDeptList(dept);
         return buildDeptTreeSelect(depts);
+    }
+
+    private boolean matchesDeptQuery(SysDeptEntity department, SysDept query) {
+
+        if (query == null) {
+            return true;
+        }
+        if (query.getDeptId() != null
+                && !Long.valueOf(0L).equals(query.getDeptId())
+                && !query.getDeptId().equals(department.getDeptId())) {
+            return false;
+        }
+        if (query.getParentId() != null
+                && !Long.valueOf(0L).equals(query.getParentId())
+                && !query.getParentId().equals(department.getParentId())) {
+            return false;
+        }
+        if (org.springframework.util.StringUtils.hasText(query.getDeptName())
+                && (department.getDeptName() == null
+                || !department.getDeptName().contains(query.getDeptName()))) {
+            return false;
+        }
+        return !org.springframework.util.StringUtils.hasText(query.getStatus())
+                || query.getStatus().equals(department.getStatus());
     }
 
     /**
@@ -109,18 +137,6 @@ public class SysDeptService {
 
         List<SysDept> deptTrees = buildDeptTree(depts);
         return deptTrees.stream().map(TreeSelect::new).collect(Collectors.toList());
-    }
-
-    /**
-     * 根据角色ID查询部门树信息
-     * 
-     * @param roleId 角色ID
-     * @return 选中部门列表
-     */
-    public List<Long> selectDeptListByRoleId(Long roleId) {
-
-        SysRole role = SystemEntityConverter.toDomain(roleMapper.selectById(roleId));
-        return deptMapper.selectDeptListByRoleId(roleId, role.isDeptCheckStrictly());
     }
 
     /**
@@ -214,25 +230,6 @@ public class SysDeptService {
             return UserConstants.NOT_UNIQUE;
         }
         return UserConstants.UNIQUE;
-    }
-
-    /**
-     * 校验部门是否有数据权限
-     * 
-     * @param deptId 部门id
-     */
-    public void checkDeptDataScope(Long deptId) {
-
-        if (!SecurityUtils.isAdmin() && deptId != null) {
-
-            SysDept dept = new SysDept();
-            dept.setDeptId(deptId);
-            List<SysDept> depts = SpringUtils.getAopProxy(this).selectDeptList(dept);
-            if (org.springframework.util.CollectionUtils.isEmpty(depts)) {
-
-                throw ExceptionUtil.business(ErrorCodeEnums.DEPT_DATA_SCOPE_DENIED);
-            }
-        }
     }
 
     /**

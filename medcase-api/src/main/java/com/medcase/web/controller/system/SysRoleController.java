@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.medcase.common.annotation.Log;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
-import com.medcase.common.core.domain.entity.SysDept;
 import com.medcase.common.core.domain.entity.SysRole;
 import com.medcase.common.core.domain.entity.SysUser;
 import com.medcase.common.enums.BusinessType;
@@ -26,11 +25,9 @@ import com.medcase.framework.web.service.TokenService;
 import com.medcase.mvc.authentication.annotation.CurrLoginUser;
 import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
-import com.medcase.system.service.SysDeptService;
 import com.medcase.system.service.SysRoleService;
 import com.medcase.system.service.SysUserService;
 import com.medcase.web.controller.system.dto.RoleUserRequest;
-import com.medcase.web.controller.system.dto.RoleDeptTreeResponse;
 
 /**
  * 角色信息
@@ -52,9 +49,6 @@ public class SysRoleController {
     @Autowired
     private SysUserService userService;
 
-    @Autowired
-    private SysDeptService deptService;
-
     @PreAuthorize("@ss.hasPermi('system:role:list')")
     @GetMapping("/list")
     public PageResult<SysRole> list(PageParam pageParam, SysRole role) {
@@ -70,7 +64,6 @@ public class SysRoleController {
     @GetMapping(value = "/{roleId}")
     public SysRole getInfo(@PathVariable Long roleId) {
 
-        roleService.checkRoleDataScope(roleId);
         return roleService.selectRoleById(roleId);
     }
 
@@ -108,7 +101,6 @@ public class SysRoleController {
             @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
 
         roleService.checkRoleAllowed(role);
-        roleService.checkRoleDataScope(role.getRoleId());
         if (!roleService.checkRoleNameUnique(role)) {
             throw ExceptionUtil.business(ErrorCodeEnums.ROLE_NAME_EXISTS);
         }
@@ -127,21 +119,6 @@ public class SysRoleController {
     }
 
     /**
-     * 修改保存数据权限
-     */
-    @PreAuthorize("@ss.hasPermi('system:role:edit')")
-    @Log(title = "角色管理", businessType = BusinessType.UPDATE)
-    @PutMapping("/dataScope")
-    public void dataScope(@RequestBody SysRole role) {
-
-        roleService.checkRoleAllowed(role);
-        roleService.checkRoleDataScope(role.getRoleId());
-        if (roleService.authDataScope(role) <= 0) {
-            throw ExceptionUtil.business(ErrorCodeEnums.ROLE_DATA_SCOPE_UPDATE_FAILED);
-        }
-    }
-
-    /**
      * 状态修改
      */
     @PreAuthorize("@ss.hasPermi('system:role:edit')")
@@ -152,7 +129,6 @@ public class SysRoleController {
             @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
 
         roleService.checkRoleAllowed(role);
-        roleService.checkRoleDataScope(role.getRoleId());
         role.setUpdateBy(loginUser.getUsername());
         if (roleService.updateRoleStatus(role) <= 0) {
             throw ExceptionUtil.business(ErrorCodeEnums.ROLE_STATUS_UPDATE_FAILED);
@@ -236,21 +212,9 @@ public class SysRoleController {
     @PutMapping("/authUser/selectAll")
     public void selectAuthUserAll(Long roleId, Long[] userIds) {
 
-        roleService.checkRoleDataScope(roleId);
         if (roleService.insertAuthUsers(roleId, userIds) <= 0) {
             throw ExceptionUtil.business(ErrorCodeEnums.ROLE_AUTH_USER_SELECT_FAILED);
         }
     }
 
-    /**
-     * 获取对应角色部门树列表
-     */
-    @PreAuthorize("@ss.hasPermi('system:role:query')")
-    @GetMapping(value = "/deptTree/{roleId}")
-    public RoleDeptTreeResponse deptTree(@PathVariable("roleId") Long roleId) {
-
-        return new RoleDeptTreeResponse(
-                deptService.selectDeptListByRoleId(roleId),
-                deptService.selectDeptTreeList(new SysDept()));
-    }
 }

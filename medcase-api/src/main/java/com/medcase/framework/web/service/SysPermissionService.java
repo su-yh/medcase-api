@@ -26,7 +26,7 @@ public class SysPermissionService {
     private SysMenuService menuService;
 
     /**
-     * 获取角色数据权限
+     * 获取角色权限
      * @param user 用户信息
      * @return 角色权限信息
      */
@@ -46,7 +46,7 @@ public class SysPermissionService {
     }
 
     /**
-     * 获取菜单数据权限
+     * 获取菜单权限
      * @param user 用户信息
      * @return 菜单权限信息
      */
@@ -63,7 +63,7 @@ public class SysPermissionService {
             List<SysRole> roles = user.getRoles();
             if (!CollectionUtils.isEmpty(roles)) {
 
-                // 多角色设置permissions属性，以便数据权限匹配权限
+                // 多角色设置permissions属性，以便权限匹配
                 for (SysRole role : roles) {
 
                     if (org.apache.commons.lang3.Strings.CS.equals(role.getStatus(), UserConstants.ROLE_NORMAL)

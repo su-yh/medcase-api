@@ -22,11 +22,7 @@ public class SysRoleEntity extends AbstractBaseEntity {
 
     private Integer roleSort;
 
-    private String dataScope;
-
     private Boolean menuCheckStrictly;
-
-    private Boolean deptCheckStrictly;
 
     private String status;
 
