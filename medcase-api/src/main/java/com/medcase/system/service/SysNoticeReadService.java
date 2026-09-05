@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -29,6 +30,7 @@ public class SysNoticeReadService {
         SysNoticeReadEntity record = new SysNoticeReadEntity();
         record.setNoticeId(noticeId);
         record.setUserId(userId);
+        record.setReadTime(new Date());
         noticeReadMapper.insert(record);
     }
 
@@ -64,10 +66,12 @@ public class SysNoticeReadService {
             return;
         }
         List<SysNoticeReadEntity> list = new ArrayList<>(noticeIds.length);
+        Date readTime = new Date();
         for (Long noticeId : noticeIds) {
             SysNoticeReadEntity entity = new SysNoticeReadEntity();
             entity.setNoticeId(noticeId);
             entity.setUserId(userId);
+            entity.setReadTime(readTime);
             list.add(entity);
         }
         noticeReadMapper.insertNoticeReadBatch(list);
