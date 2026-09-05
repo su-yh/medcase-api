@@ -1,13 +1,5 @@
 package com.medcase.system.service;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-import jakarta.annotation.PostConstruct;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import com.medcase.common.constant.CacheConstants;
 import com.medcase.common.constant.UserConstants;
 import com.medcase.common.core.domain.entity.SysDictData;
@@ -16,12 +8,21 @@ import com.medcase.common.core.redis.RedisCache;
 import com.medcase.common.utils.json.JsonUtils;
 import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
+import com.medcase.mvc.constants.enums.ErrorCodeEnums;
+import com.medcase.mvc.exception.ExceptionUtil;
 import com.medcase.system.converter.SystemEntityConverter;
 import com.medcase.system.entity.SysDictTypeEntity;
 import com.medcase.system.mapper.SysDictDataMapper;
 import com.medcase.system.mapper.SysDictTypeMapper;
-import com.medcase.mvc.constants.enums.ErrorCodeEnums;
-import com.medcase.mvc.exception.ExceptionUtil;
+import jakarta.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 字典 业务层处理
@@ -109,16 +110,6 @@ public class SysDictTypeService {
         return SystemEntityConverter.toDomain(dictTypeMapper.selectById(dictId));
     }
 
-    /**
-     * 根据字典类型查询信息
-     * 
-     * @param dictType 字典类型
-     * @return 字典类型
-     */
-    public SysDictType selectDictTypeByType(String dictType) {
-
-        return SystemEntityConverter.toDomain(dictTypeMapper.selectDictTypeByType(dictType));
-    }
 
     /**
      * 批量删除字典类型信息

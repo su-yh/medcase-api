@@ -38,13 +38,6 @@ public class SysNoticeReadService {
     }
 
     /**
-     * 查询某用户未读公告数量
-     */
-    public int selectUnreadCount(Long userId) {
-        return noticeReadMapper.selectUnreadCount(userId);
-    }
-
-    /**
      * 查询公告列表并标记当前用户已读状态
      */
     public List<NoticeTopItemResponse> selectNoticeListWithReadStatus(Long userId, int limit) {

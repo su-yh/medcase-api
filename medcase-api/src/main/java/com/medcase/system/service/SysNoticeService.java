@@ -1,13 +1,13 @@
 package com.medcase.system.service;
 
-import java.util.Arrays;
-import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import com.medcase.system.entity.SysNoticeEntity;
-import com.medcase.system.mapper.SysNoticeMapper;
 import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
+import com.medcase.system.entity.SysNoticeEntity;
+import com.medcase.system.mapper.SysNoticeMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.Arrays;
 
 /**
  * 公告 服务层实现
@@ -62,17 +62,6 @@ public class SysNoticeService {
     public int updateNotice(SysNoticeEntity notice) {
 
         return noticeMapper.updateById(notice);
-    }
-
-    /**
-     * 删除公告对象
-     * 
-     * @param noticeId 公告ID
-     * @return 结果
-     */
-    public int deleteNoticeById(Long noticeId) {
-
-        return noticeMapper.deleteById(noticeId);
     }
 
     /**

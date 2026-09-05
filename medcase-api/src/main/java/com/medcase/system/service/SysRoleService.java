@@ -1,16 +1,10 @@
 package com.medcase.system.service;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import com.medcase.common.constant.UserConstants;
 import com.medcase.common.core.domain.entity.SysRole;
 import com.medcase.common.utils.spring.SpringUtils;
+import com.medcase.mvc.constants.enums.ErrorCodeEnums;
+import com.medcase.mvc.exception.ExceptionUtil;
 import com.medcase.system.converter.SystemEntityConverter;
 import com.medcase.system.entity.SysRoleEntity;
 import com.medcase.system.entity.SysRoleMenuEntity;
@@ -18,8 +12,15 @@ import com.medcase.system.entity.SysUserRoleEntity;
 import com.medcase.system.mapper.SysRoleMapper;
 import com.medcase.system.mapper.SysRoleMenuMapper;
 import com.medcase.system.mapper.SysUserRoleMapper;
-import com.medcase.mvc.exception.ExceptionUtil;
-import com.medcase.mvc.constants.enums.ErrorCodeEnums;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * 角色 业务层处理
@@ -100,17 +101,6 @@ public class SysRoleService {
     public List<SysRole> selectRoleAll() {
 
         return SpringUtils.getAopProxy(this).selectRoleList(new SysRole());
-    }
-
-    /**
-     * 根据用户ID获取角色选择框列表
-     * 
-     * @param userId 用户ID
-     * @return 选中角色ID列表
-     */
-    public List<Long> selectRoleListByUserId(Long userId) {
-
-        return roleMapper.selectRoleListByUserId(userId);
     }
 
     /**
@@ -248,20 +238,6 @@ public class SysRoleService {
             rows = list.size();
         }
         return rows;
-    }
-
-    /**
-     * 通过角色ID删除角色
-     * 
-     * @param roleId 角色ID
-     * @return 结果
-     */
-    @Transactional
-    public int deleteRoleById(Long roleId) {
-
-        // 删除角色与菜单关联
-        roleMenuMapper.deleteByRoleId(roleId);
-        return roleMapper.deleteRoleById(roleId);
     }
 
     /**

@@ -1,18 +1,18 @@
 package com.medcase.system.service;
 
-import java.util.Arrays;
-import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import com.medcase.common.constant.UserConstants;
 import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
-import com.medcase.system.entity.SysPostEntity;
-import com.medcase.system.entity.SysUserPostEntity;
-import com.medcase.system.mapper.SysPostMapper;
-import com.medcase.system.mapper.SysUserPostMapper;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
+import com.medcase.system.entity.SysPostEntity;
+import com.medcase.system.mapper.SysPostMapper;
+import com.medcase.system.mapper.SysUserPostMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * 岗位信息 服务层处理
@@ -114,17 +114,6 @@ public class SysPostService {
     public int countUserPostById(Long postId) {
 
         return Math.toIntExact(userPostMapper.countByPostId(postId));
-    }
-
-    /**
-     * 删除岗位信息
-     * 
-     * @param postId 岗位ID
-     * @return 结果
-     */
-    public int deletePostById(Long postId) {
-
-        return postMapper.deleteById(postId);
     }
 
     /**

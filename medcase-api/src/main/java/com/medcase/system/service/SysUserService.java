@@ -88,93 +88,6 @@ public class SysUserService {
     }
 
     /**
-     * 根据条件查询用户列表
-     *
-     * @param user 用户信息
-     * @return 用户信息集合信息
-     */
-    public List<SysUser> selectUserList(SysUser user) {
-        useAdminUserTypeIfAbsent(user);
-        List<Long> deptIds = null;
-        if (user != null && user.getDeptId() != null
-                && !Long.valueOf(0L).equals(user.getDeptId())) {
-            deptIds = new ArrayList<>();
-            deptIds.add(user.getDeptId());
-            for (SysDeptEntity department : deptService.all()) {
-                if (department.getDeptId() != null
-                        && department.getAncestors() != null
-                        && Arrays.asList(department.getAncestors().split(","))
-                        .contains(String.valueOf(user.getDeptId()))) {
-                    deptIds.add(department.getDeptId());
-                }
-            }
-        }
-        List<SysUser> result = userMapper.selectUserList(user, deptIds);
-        for (SysUser item : result) {
-            item.setDept(deptService.selectDeptById(item.getDeptId()));
-        }
-        return result;
-    }
-
-    /**
-     * 根据条件分页查询已分配用户角色列表
-     * 
-     * @param user 用户信息
-     * @return 用户信息集合信息
-     */
-    public List<SysUser> selectAllocatedList(SysUser user) {
-        useAdminUserTypeIfAbsent(user);
-        List<Long> deptIds = null;
-        if (user != null && user.getDeptId() != null
-                && !Long.valueOf(0L).equals(user.getDeptId())) {
-            deptIds = new ArrayList<>();
-            deptIds.add(user.getDeptId());
-            for (SysDeptEntity department : deptService.all()) {
-                if (department.getDeptId() != null
-                        && department.getAncestors() != null
-                        && Arrays.asList(department.getAncestors().split(","))
-                        .contains(String.valueOf(user.getDeptId()))) {
-                    deptIds.add(department.getDeptId());
-                }
-            }
-        }
-        List<SysUser> result = userMapper.selectAllocatedList(user, deptIds);
-        for (SysUser item : result) {
-            item.setDept(deptService.selectDeptById(item.getDeptId()));
-        }
-        return result;
-    }
-
-    /**
-     * 根据条件分页查询未分配用户角色列表
-     * 
-     * @param user 用户信息
-     * @return 用户信息集合信息
-     */
-    public List<SysUser> selectUnallocatedList(SysUser user) {
-        useAdminUserTypeIfAbsent(user);
-        List<Long> deptIds = null;
-        if (user != null && user.getDeptId() != null
-                && !Long.valueOf(0L).equals(user.getDeptId())) {
-            deptIds = new ArrayList<>();
-            deptIds.add(user.getDeptId());
-            for (SysDeptEntity department : deptService.all()) {
-                if (department.getDeptId() != null
-                        && department.getAncestors() != null
-                        && Arrays.asList(department.getAncestors().split(","))
-                        .contains(String.valueOf(user.getDeptId()))) {
-                    deptIds.add(department.getDeptId());
-                }
-            }
-        }
-        List<SysUser> result = userMapper.selectUnallocatedList(user, deptIds);
-        for (SysUser item : result) {
-            item.setDept(deptService.selectDeptById(item.getDeptId()));
-        }
-        return result;
-    }
-
-    /**
      * 根据条件分页查询已分配用户角色列表
      *
      * @param user 用户信息
@@ -569,22 +482,6 @@ public class SysUserService {
             }
             userRoleMapper.insertUserRoles(list);
         }
-    }
-
-    /**
-     * 通过用户ID删除用户
-     * 
-     * @param userId 用户ID
-     * @return 结果
-     */
-    @Transactional
-    public int deleteUserById(Long userId) {
-
-        // 删除用户与角色关联
-        userRoleMapper.deleteByUserId(userId);
-        // 删除用户与岗位表
-        userPostMapper.deleteByUserId(userId);
-        return userMapper.deleteUserById(userId);
     }
 
     /**
