@@ -196,12 +196,14 @@ public class SysUserService {
      * @return 结果
      */
     public String selectUserRoleGroup(Long userId) {
-
-        List<SysRoleEntity> list = roleService.selectRolesByUserId(userId).stream()
+        List<SysRoleEntity> roles = roleService.selectRolesByUserId(userId);
+        if (CollectionUtils.isEmpty(roles)) {
+            return "";
+        }
+        List<SysRoleEntity> list = roles.stream()
                 .filter(SysRoleEntity::isFlag)
                 .toList();
         if (CollectionUtils.isEmpty(list)) {
-
             return "";
         }
         return list.stream().map(SysRoleEntity::getRoleName).collect(Collectors.joining(","));

@@ -48,6 +48,17 @@ class SysUserServiceRoleCacheTest {
         verify(roleService).selectRolesByUserId(100L);
     }
 
+    @Test
+    void selectUserRoleGroupReturnsEmptyWhenRolesAreNull() {
+
+        when(roleService.selectRolesByUserId(101L)).thenReturn(null);
+
+        String roleGroup = userService.selectUserRoleGroup(101L);
+
+        assertEquals("", roleGroup);
+        verify(roleService).selectRolesByUserId(101L);
+    }
+
     private SysRoleEntity role(Long roleId, String roleName, boolean flag) {
 
         SysRoleEntity role = new SysRoleEntity();
