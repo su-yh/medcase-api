@@ -5,7 +5,7 @@
  |_|  |_| |_____| |____/   \____| /_/   \_\ |____/  |_____|
 
 ╔════════════════════════════════════════╗
-║         MedCase 医疗病例系统           ║
+║         MedCase 医疗病例系统             ║
 ╚════════════════════════════════════════╝
 :: Spring Boot Version : ${spring-boot.version}
 :: Active Profile      : ${spring.profiles.active}
