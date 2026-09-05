@@ -36,5 +36,5 @@ public class SysRoleEntity extends AbstractBaseEntity {
     private String remark;
 
     @TableField(exist = false)
-    private boolean flag;
+    private boolean flag = false;
 }
