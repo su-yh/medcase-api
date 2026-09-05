@@ -7,7 +7,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
-import com.medcase.common.core.domain.entity.SysDictData;
 import com.medcase.system.entity.SysDictDataEntity;
 import com.medcase.system.mapper.SysDictDataMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -46,8 +45,8 @@ class SysDictDataServiceCacheTest {
         dictData.setDictLabel("男");
         when(dictDataMapper.selectEnabledDictDataByType(DICT_TYPE)).thenReturn(List.of(dictData));
 
-        List<SysDictData> firstResult = dictDataService.selectDictDataByType(DICT_TYPE);
-        List<SysDictData> secondResult = dictDataService.selectDictDataByType(DICT_TYPE);
+        List<SysDictDataEntity> firstResult = dictDataService.selectDictDataByType(DICT_TYPE);
+        List<SysDictDataEntity> secondResult = dictDataService.selectDictDataByType(DICT_TYPE);
 
         assertEquals("男", firstResult.get(0).getDictLabel());
         assertEquals("男", secondResult.get(0).getDictLabel());
@@ -89,7 +88,7 @@ class SysDictDataServiceCacheTest {
     @Test
     void insertDictDataClearsTheAffectedDictTypeCache() {
 
-        SysDictData data = new SysDictData();
+        SysDictDataEntity data = new SysDictDataEntity();
         data.setDictType(NEW_DICT_TYPE);
         when(dictDataMapper.insert(any(SysDictDataEntity.class))).thenReturn(1);
         when(dictDataMapper.selectEnabledDictDataByType(NEW_DICT_TYPE)).thenReturn(List.of(), List.of());
@@ -106,7 +105,7 @@ class SysDictDataServiceCacheTest {
 
         SysDictDataEntity oldData = new SysDictDataEntity();
         oldData.setDictType(OLD_DICT_TYPE);
-        SysDictData data = new SysDictData();
+        SysDictDataEntity data = new SysDictDataEntity();
         data.setDictCode(DICT_CODE);
         data.setDictType(NEW_DICT_TYPE);
         when(dictDataMapper.selectById(DICT_CODE)).thenReturn(oldData);

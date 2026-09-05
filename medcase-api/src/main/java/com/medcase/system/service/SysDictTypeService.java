@@ -3,12 +3,10 @@ package com.medcase.system.service;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.medcase.common.constant.UserConstants;
-import com.medcase.common.core.domain.entity.SysDictType;
 import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
-import com.medcase.system.converter.SystemEntityConverter;
 import com.medcase.system.entity.SysDictTypeEntity;
 import com.medcase.system.mapper.SysDictDataMapper;
 import com.medcase.system.mapper.SysDictTypeMapper;
@@ -43,17 +41,13 @@ public class SysDictTypeService {
     @Autowired
     private SysDictDataService dictDataService;
 
-    public PageResult<SysDictType> selectPage(PageParam pageParam, SysDictType dictType) {
+    public PageResult<SysDictTypeEntity> selectPage(
+            PageParam pageParam, String dictName, String status, String dictType,
+            String beginTime, String endTime) {
 
-        Object beginTime = dictType.getParams().get("beginTime");
-        Object endTime = dictType.getParams().get("endTime");
-        PageResult<SysDictTypeEntity> entityPage = dictTypeMapper.selectPage(
-                pageParam, dictType.getDictName(), dictType.getStatus(), dictType.getDictType(),
+        return dictTypeMapper.selectPage(
+                pageParam, dictName, status, dictType,
                 beginTime, endTime);
-        PageResult<SysDictType> result = new PageResult<>();
-        result.setList(SystemEntityConverter.copyList(entityPage.getList(), SysDictType.class));
-        result.setTotal(entityPage.getTotal());
-        return result;
     }
 
     /**
@@ -61,9 +55,9 @@ public class SysDictTypeService {
      * 
      * @return 字典类型集合信息
      */
-    public List<SysDictType> selectDictTypeAll() {
+    public List<SysDictTypeEntity> selectDictTypeAll() {
 
-        return SystemEntityConverter.copyList(dictTypeMapper.selectAllDictTypes(), SysDictType.class);
+        return dictTypeMapper.selectAllDictTypes();
     }
 
     /**
@@ -72,7 +66,7 @@ public class SysDictTypeService {
      * @param dictId 字典类型ID
      * @return 字典类型
      */
-    public SysDictType selectDictTypeById(Long dictId) {
+    public SysDictTypeEntity selectDictTypeById(Long dictId) {
 
         if (dictId == null) {
             return null;
@@ -89,7 +83,7 @@ public class SysDictTypeService {
                 }
             }
         }
-        return SystemEntityConverter.toDomain(dictType);
+        return dictType;
     }
 
 
@@ -102,7 +96,7 @@ public class SysDictTypeService {
 
         for (Long dictId : dictIds) {
 
-            SysDictType dictType = SystemEntityConverter.toDomain(dictTypeMapper.selectById(dictId));
+            SysDictTypeEntity dictType = dictTypeMapper.selectById(dictId);
             if (dictDataMapper.countByDictType(dictType.getDictType()) > 0) {
 
                 throw ExceptionUtil.business(ErrorCodeEnums.DICT_TYPE_ASSIGNED_DELETE, dictType.getDictName());
@@ -148,11 +142,9 @@ public class SysDictTypeService {
      * @param dict 字典类型信息
      * @return 结果
      */
-    public int insertDictType(SysDictType dict) {
+    public int insertDictType(SysDictTypeEntity dict) {
 
-        SysDictTypeEntity entity = SystemEntityConverter.toEntity(dict);
-        int row = dictTypeMapper.insert(entity);
-        dict.setDictId(entity.getDictId());
+        int row = dictTypeMapper.insert(dict);
         return row;
     }
 
@@ -163,12 +155,11 @@ public class SysDictTypeService {
      * @return 结果
      */
     @Transactional
-    public int updateDictType(SysDictType dict) {
+    public int updateDictType(SysDictTypeEntity dict) {
 
-        SysDictType oldDict = SystemEntityConverter.toDomain(
-                dictTypeMapper.selectById(dict.getDictId()));
+        SysDictTypeEntity oldDict = dictTypeMapper.selectById(dict.getDictId());
         dictDataMapper.updateDictType(oldDict.getDictType(), dict.getDictType());
-        int row = dictTypeMapper.updateById(SystemEntityConverter.toEntity(dict));
+        int row = dictTypeMapper.updateById(dict);
         if (row > 0) {
 
             clearDictTypeCache(dict.getDictId());
@@ -184,12 +175,11 @@ public class SysDictTypeService {
      * @param dict 字典类型
      * @return 结果
      */
-    public boolean checkDictTypeUnique(SysDictType dict) {
+    public boolean checkDictTypeUnique(Long dictId, String dictTypeValue) {
 
-        Long dictId = dict.getDictId() == null ? -1L : dict.getDictId();
-        SysDictType dictType = SystemEntityConverter.toDomain(
-                dictTypeMapper.selectDictTypeByType(dict.getDictType()));
-        if (dictType != null && dictType.getDictId().longValue() != dictId.longValue()) {
+        Long currentDictId = dictId == null ? -1L : dictId;
+        SysDictTypeEntity dictType = dictTypeMapper.selectDictTypeByType(dictTypeValue);
+        if (dictType != null && dictType.getDictId().longValue() != currentDictId.longValue()) {
 
             return UserConstants.NOT_UNIQUE;
         }

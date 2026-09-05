@@ -1,11 +1,13 @@
 package com.medcase.web.controller.system;
 
-import com.medcase.common.core.domain.entity.SysDictData;
-import com.medcase.common.core.domain.entity.SysDictType;
 import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
+import com.medcase.system.entity.SysDictDataEntity;
+import com.medcase.system.entity.SysDictTypeEntity;
 import com.medcase.web.controller.system.dto.ConfigQueryRequest;
 import com.medcase.web.controller.system.dto.ConfigResponse;
+import com.medcase.web.controller.system.dto.DictDataQueryRequest;
+import com.medcase.web.controller.system.dto.DictTypeQueryRequest;
 import com.medcase.web.controller.system.dto.NoticeQueryRequest;
 import com.medcase.web.controller.system.dto.NoticeResponse;
 import com.medcase.web.controller.system.dto.PostQueryRequest;
@@ -21,8 +23,8 @@ class SystemSingleTablePageControllerTest {
     @Test
     void simpleSingleTableListsUsePageParam() throws NoSuchMethodException {
         assertListMethod(SysConfigController.class, ConfigResponse.class, ConfigQueryRequest.class);
-        assertListMethod(SysDictDataController.class, SysDictData.class, SysDictData.class);
-        assertListMethod(SysDictTypeController.class, SysDictType.class, SysDictType.class);
+        assertListMethod(SysDictDataController.class, SysDictDataEntity.class, DictDataQueryRequest.class);
+        assertListMethod(SysDictTypeController.class, SysDictTypeEntity.class, DictTypeQueryRequest.class);
         assertListMethod(SysPostController.class, PostResponse.class, PostQueryRequest.class);
         assertListMethod(SysNoticeController.class, NoticeResponse.class, NoticeQueryRequest.class);
     }

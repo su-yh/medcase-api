@@ -1,14 +1,10 @@
 package com.medcase.system.converter;
 
 import com.medcase.common.core.domain.entity.SysDept;
-import com.medcase.common.core.domain.entity.SysDictData;
-import com.medcase.common.core.domain.entity.SysDictType;
 import com.medcase.common.core.domain.entity.SysMenu;
 import com.medcase.common.core.domain.entity.SysRole;
 import com.medcase.common.core.domain.entity.SysUser;
 import com.medcase.system.entity.SysDeptEntity;
-import com.medcase.system.entity.SysDictDataEntity;
-import com.medcase.system.entity.SysDictTypeEntity;
 import com.medcase.system.entity.SysMenuEntity;
 import com.medcase.system.entity.SysNoticeEntity;
 import com.medcase.system.entity.SysPostEntity;
@@ -32,22 +28,6 @@ public final class SystemEntityConverter {
 
     public static SysDept toDomain(SysDeptEntity source) {
         return copy(source, SysDept.class);
-    }
-
-    public static SysDictDataEntity toEntity(SysDictData source) {
-        return copy(source, SysDictDataEntity.class);
-    }
-
-    public static SysDictData toDomain(SysDictDataEntity source) {
-        return copy(source, SysDictData.class);
-    }
-
-    public static SysDictTypeEntity toEntity(SysDictType source) {
-        return copy(source, SysDictTypeEntity.class);
-    }
-
-    public static SysDictType toDomain(SysDictTypeEntity source) {
-        return copy(source, SysDictType.class);
     }
 
     public static SysMenuEntity toEntity(SysMenu source) {

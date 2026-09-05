@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.test.util.ReflectionTestUtils;
-import com.medcase.common.core.domain.entity.SysDictType;
 import com.medcase.system.entity.SysDictTypeEntity;
 import com.medcase.system.mapper.SysDictTypeMapper;
 
@@ -39,8 +38,8 @@ class SysDictTypeServiceDictCacheTest {
         dictType.setDictName("用户性别");
         when(dictTypeMapper.selectById(DICT_ID)).thenReturn(dictType);
 
-        SysDictType firstResult = dictTypeService.selectDictTypeById(DICT_ID);
-        SysDictType secondResult = dictTypeService.selectDictTypeById(DICT_ID);
+        SysDictTypeEntity firstResult = dictTypeService.selectDictTypeById(DICT_ID);
+        SysDictTypeEntity secondResult = dictTypeService.selectDictTypeById(DICT_ID);
 
         assertEquals("用户性别", firstResult.getDictName());
         assertEquals("用户性别", secondResult.getDictName());

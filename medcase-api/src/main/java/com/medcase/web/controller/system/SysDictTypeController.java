@@ -16,13 +16,15 @@ import com.medcase.common.annotation.Log;
 import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
-import com.medcase.common.core.domain.entity.SysDictType;
 import com.medcase.common.enums.BusinessType;
 import com.medcase.common.enums.UserTypeEnums;
 import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
 import com.medcase.mvc.authentication.annotation.CurrLoginUser;
+import com.medcase.system.entity.SysDictTypeEntity;
 import com.medcase.system.service.SysDictTypeService;
+import com.medcase.web.controller.system.dto.DictTypeQueryRequest;
+import com.medcase.web.controller.system.dto.DictTypeSaveRequest;
 
 /**
  * 数据字典信息
@@ -37,9 +39,11 @@ public class SysDictTypeController {
 
     @PreAuthorize("@ss.hasPermi('system:dict:list')")
     @GetMapping("/list")
-    public PageResult<SysDictType> list(PageParam pageParam, SysDictType dictType) {
+    public PageResult<SysDictTypeEntity> list(PageParam pageParam, DictTypeQueryRequest request) {
 
-        return dictTypeService.selectPage(pageParam, dictType);
+        return dictTypeService.selectPage(
+                pageParam, request.getDictName(), request.getStatus(), request.getDictType(),
+                request.getBeginTime(), request.getEndTime());
     }
 
     /**
@@ -47,7 +51,7 @@ public class SysDictTypeController {
      */
     @PreAuthorize("@ss.hasPermi('system:dict:query')")
     @GetMapping(value = "/{dictId}")
-    public SysDictType getInfo(@PathVariable Long dictId) {
+    public SysDictTypeEntity getInfo(@PathVariable Long dictId) {
 
         return dictTypeService.selectDictTypeById(dictId);
     }
@@ -59,12 +63,13 @@ public class SysDictTypeController {
     @Log(title = "字典类型", businessType = BusinessType.INSERT)
     @PostMapping
     public void add(
-            @Validated @RequestBody SysDictType dict,
+            @Validated @RequestBody DictTypeSaveRequest request,
             @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
 
-        if (!dictTypeService.checkDictTypeUnique(dict)) {
+        if (!dictTypeService.checkDictTypeUnique(request.getDictId(), request.getDictType())) {
             throw ExceptionUtil.business(ErrorCodeEnums.DICT_TYPE_EXISTS);
         }
+        SysDictTypeEntity dict = toEntity(request);
         dict.setCreateBy(loginUser.getUsername());
         if (dictTypeService.insertDictType(dict) <= 0) {
             throw ExceptionUtil.business(ErrorCodeEnums.DICT_OPERATION_FAILED);
@@ -78,12 +83,13 @@ public class SysDictTypeController {
     @Log(title = "字典类型", businessType = BusinessType.UPDATE)
     @PutMapping
     public void edit(
-            @Validated @RequestBody SysDictType dict,
+            @Validated @RequestBody DictTypeSaveRequest request,
             @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
 
-        if (!dictTypeService.checkDictTypeUnique(dict)) {
+        if (!dictTypeService.checkDictTypeUnique(request.getDictId(), request.getDictType())) {
             throw ExceptionUtil.business(ErrorCodeEnums.DICT_TYPE_EXISTS);
         }
+        SysDictTypeEntity dict = toEntity(request);
         dict.setUpdateBy(loginUser.getUsername());
         if (dictTypeService.updateDictType(dict) <= 0) {
             throw ExceptionUtil.business(ErrorCodeEnums.DICT_OPERATION_FAILED);
@@ -116,9 +122,20 @@ public class SysDictTypeController {
      * 获取字典选择框列表
      */
     @GetMapping("/optionselect")
-    public List<SysDictType> optionselect() {
+    public List<SysDictTypeEntity> optionselect() {
 
-        List<SysDictType> dictTypes = dictTypeService.selectDictTypeAll();
+        List<SysDictTypeEntity> dictTypes = dictTypeService.selectDictTypeAll();
         return dictTypes;
+    }
+
+    private SysDictTypeEntity toEntity(DictTypeSaveRequest request) {
+
+        SysDictTypeEntity entity = new SysDictTypeEntity();
+        entity.setDictId(request.getDictId());
+        entity.setDictName(request.getDictName());
+        entity.setDictType(request.getDictType());
+        entity.setStatus(request.getStatus());
+        entity.setRemark(request.getRemark());
+        return entity;
     }
 }

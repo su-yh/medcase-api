@@ -2,10 +2,8 @@ package com.medcase.system.service;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
-import com.medcase.common.core.domain.entity.SysDictData;
 import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
-import com.medcase.system.converter.SystemEntityConverter;
 import com.medcase.system.entity.SysDictDataEntity;
 import com.medcase.system.mapper.SysDictDataMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,14 +33,10 @@ public class SysDictDataService {
     @Autowired
     private SysDictDataMapper dictDataMapper;
 
-    public PageResult<SysDictData> selectPage(PageParam pageParam, SysDictData dictData) {
+    public PageResult<SysDictDataEntity> selectPage(
+            PageParam pageParam, String dictType, String dictLabel, String status) {
 
-        PageResult<SysDictDataEntity> entityPage = dictDataMapper.selectPage(
-                pageParam, dictData.getDictType(), dictData.getDictLabel(), dictData.getStatus());
-        PageResult<SysDictData> result = new PageResult<>();
-        result.setList(SystemEntityConverter.copyList(entityPage.getList(), SysDictData.class));
-        result.setTotal(entityPage.getTotal());
-        return result;
+        return dictDataMapper.selectPage(pageParam, dictType, dictLabel, status);
     }
 
     /**
@@ -51,7 +45,7 @@ public class SysDictDataService {
      * @param dictType 字典类型
      * @return 字典数据集合信息
      */
-    public List<SysDictData> selectDictDataByType(String dictType) {
+    public List<SysDictDataEntity> selectDictDataByType(String dictType) {
 
         if (!StringUtils.hasText(dictType)) {
             return null;
@@ -73,7 +67,7 @@ public class SysDictDataService {
         if (CollectionUtils.isEmpty(dictDatas)) {
             return null;
         }
-        return SystemEntityConverter.copyList(new ArrayList<>(dictDatas), SysDictData.class);
+        return new ArrayList<>(dictDatas);
     }
 
     /**
@@ -82,9 +76,9 @@ public class SysDictDataService {
      * @param dictCode 字典数据ID
      * @return 字典数据
      */
-    public SysDictData selectDictDataById(Long dictCode) {
+    public SysDictDataEntity selectDictDataById(Long dictCode) {
 
-        return SystemEntityConverter.toDomain(dictDataMapper.selectById(dictCode));
+        return dictDataMapper.selectById(dictCode);
     }
 
     /**
@@ -116,7 +110,7 @@ public class SysDictDataService {
 
         for (Long dictCode : dictCodes) {
 
-            SysDictData data = selectDictDataById(dictCode);
+            SysDictDataEntity data = selectDictDataById(dictCode);
             dictDataMapper.deleteById(dictCode);
             clearDictDataCache(data.getDictType());
         }
@@ -128,11 +122,9 @@ public class SysDictDataService {
      * @param data 字典数据信息
      * @return 结果
      */
-    public int insertDictData(SysDictData data) {
+    public int insertDictData(SysDictDataEntity data) {
 
-        SysDictDataEntity entity = SystemEntityConverter.toEntity(data);
-        int row = dictDataMapper.insert(entity);
-        data.setDictCode(entity.getDictCode());
+        int row = dictDataMapper.insert(data);
         if (row > 0) {
 
             clearDictDataCache(data.getDictType());
@@ -146,10 +138,10 @@ public class SysDictDataService {
      * @param data 字典数据信息
      * @return 结果
      */
-    public int updateDictData(SysDictData data) {
+    public int updateDictData(SysDictDataEntity data) {
 
-        SysDictData oldData = selectDictDataById(data.getDictCode());
-        int row = dictDataMapper.updateById(SystemEntityConverter.toEntity(data));
+        SysDictDataEntity oldData = selectDictDataById(data.getDictCode());
+        int row = dictDataMapper.updateById(data);
         if (row > 0) {
 
             if (oldData != null) {

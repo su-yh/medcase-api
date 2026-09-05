@@ -1,12 +1,14 @@
 package com.medcase.system.service;
 
-import com.medcase.common.core.domain.entity.SysDictData;
-import com.medcase.common.core.domain.entity.SysDictType;
 import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
 import com.medcase.system.entity.SysConfigEntity;
+import com.medcase.system.entity.SysDictDataEntity;
+import com.medcase.system.entity.SysDictTypeEntity;
 import com.medcase.system.entity.SysNoticeEntity;
 import com.medcase.system.entity.SysPostEntity;
+import com.medcase.web.controller.system.dto.DictDataQueryRequest;
+import com.medcase.web.controller.system.dto.DictTypeQueryRequest;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
@@ -18,8 +20,10 @@ class SystemSingleTablePageServiceTest {
     void simpleSingleTableServicesExposePageMethods() throws NoSuchMethodException {
         assertPageMethod(SysConfigService.class, SysConfigEntity.class,
                 String.class, String.class, String.class, String.class, String.class);
-        assertPageMethod(SysDictDataService.class, SysDictData.class, SysDictData.class);
-        assertPageMethod(SysDictTypeService.class, SysDictType.class, SysDictType.class);
+        assertPageMethod(SysDictDataService.class, SysDictDataEntity.class,
+                String.class, String.class, String.class);
+        assertPageMethod(SysDictTypeService.class, SysDictTypeEntity.class,
+                String.class, String.class, String.class, String.class, String.class);
         assertPageMethod(SysPostService.class, SysPostEntity.class,
                 String.class, String.class, String.class);
         assertPageMethod(SysNoticeService.class, SysNoticeEntity.class,
