@@ -7,7 +7,6 @@ import com.medcase.common.core.domain.entity.SysUser;
 import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.common.enums.BusinessType;
 import com.medcase.common.enums.UserTypeEnums;
-import com.medcase.common.utils.SecurityUtils;
 import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
 import com.medcase.mvc.authentication.annotation.CurrLoginUser;
@@ -108,10 +107,7 @@ public class SysUserController {
                 roleIds = roles.stream().map(SysRole::getRoleId).collect(Collectors.toList());
             }
         }
-        List<SysRole> roles = roleService.selectRoleAll();
-        List<SysRole> availableRoles = SecurityUtils.isAdmin(userId)
-                ? roles
-                : roles.stream().filter(r -> !r.isAdmin()).collect(Collectors.toList());
+        List<SysRole> availableRoles = roleService.selectRoleAll();
         List<PostResponse> posts = postService.selectPostAll().stream()
                 .map(PostResponse::fromEntity)
                 .toList();
@@ -234,9 +230,7 @@ public class SysUserController {
 
         SysUser user = userService.selectUserById(userId);
         List<SysRole> roles = roleService.selectRolesByUserId(userId);
-        List<SysRole> availableRoles = SecurityUtils.isAdmin(userId)
-                ? roles
-                : roles.stream().filter(r -> !r.isAdmin()).collect(Collectors.toList());
+        List<SysRole> availableRoles = roles;
         return new UserAuthRoleResponse(user, availableRoles);
     }
 

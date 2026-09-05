@@ -105,7 +105,6 @@ public class SysRoleController {
             @Validated @RequestBody SysRole role,
             @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
 
-        roleService.checkRoleAllowed(role);
         if (!roleService.checkRoleNameUnique(role)) {
             throw ExceptionUtil.business(ErrorCodeEnums.ROLE_NAME_EXISTS);
         }
@@ -133,7 +132,6 @@ public class SysRoleController {
             @RequestBody SysRole role,
             @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
 
-        roleService.checkRoleAllowed(role);
         role.setUpdateBy(loginUser.getUsername());
         if (roleService.updateRoleStatus(role) <= 0) {
             throw ExceptionUtil.business(ErrorCodeEnums.ROLE_STATUS_UPDATE_FAILED);

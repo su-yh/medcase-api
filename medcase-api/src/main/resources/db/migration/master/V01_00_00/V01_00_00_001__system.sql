@@ -125,9 +125,6 @@ create table sys_role (
 ) engine=innodb auto_increment=100 comment = '角色信息表';
 
 -- ----------------------------
--- 初始化-角色信息表数据
--- ----------------------------
-insert into sys_role values('1', '超级管理员',  'admin',  1, 1, 1, 1, '0', '0', 'admin', sysdate(), '', null, '超级管理员');
 
 
 -- ----------------------------
@@ -244,9 +241,6 @@ create table sys_user_role (
 ) engine=innodb comment = '用户和角色关联表';
 
 -- ----------------------------
--- 初始化-用户和角色关联表数据
--- ----------------------------
-insert into sys_user_role values ('1', '1');
 
 
 -- ----------------------------

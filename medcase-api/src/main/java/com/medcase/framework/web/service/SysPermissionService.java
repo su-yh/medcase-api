@@ -66,8 +66,7 @@ public class SysPermissionService {
                 // 多角色设置permissions属性，以便权限匹配
                 for (SysRole role : roles) {
 
-                    if (org.apache.commons.lang3.Strings.CS.equals(role.getStatus(), UserConstants.ROLE_NORMAL)
-                            && !role.isAdmin()) {
+                    if (org.apache.commons.lang3.Strings.CS.equals(role.getStatus(), UserConstants.ROLE_NORMAL)) {
 
                         Set<String> rolePerms = menuService.selectMenuPermsByRoleId(role.getRoleId());
                         role.setPermissions(rolePerms);

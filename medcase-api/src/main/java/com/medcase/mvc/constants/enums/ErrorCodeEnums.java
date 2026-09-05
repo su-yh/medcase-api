@@ -36,7 +36,6 @@ public enum ErrorCodeEnums implements IErrorCode {
     MENU_SORT_SAVE_FAILED("error.code.menu.sort.save.failed", "保存排序异常，请联系管理员"),
     DEPT_DISABLED("error.code.dept.disabled", "部门停用，不允许新增"),
     DEPT_SORT_SAVE_FAILED("error.code.dept.sort.save.failed", "保存排序异常，请联系管理员"),
-    SUPER_ADMIN_ROLE_OPERATION("error.code.super.admin.role.operation", "不允许操作超级管理员角色"),
     ROLE_ASSIGNED_DELETE("error.code.role.assigned.delete", "{0}已分配,不能删除"),
     POST_ASSIGNED_DELETE("error.code.post.assigned.delete", "{0}已分配,不能删除"),
     DICT_TYPE_ASSIGNED_DELETE("error.code.dict.type.assigned.delete", "{0}已分配,不能删除"),

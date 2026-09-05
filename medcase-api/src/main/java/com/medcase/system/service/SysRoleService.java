@@ -152,19 +152,6 @@ public class SysRoleService {
     }
 
     /**
-     * 校验角色是否允许操作
-     * 
-     * @param role 角色信息
-     */
-    public void checkRoleAllowed(SysRole role) {
-
-        if (role.getRoleId() != null && role.isAdmin()) {
-
-            throw ExceptionUtil.business(ErrorCodeEnums.SUPER_ADMIN_ROLE_OPERATION);
-        }
-    }
-
-    /**
      * 通过角色ID查询角色使用数量
      * 
      * @param roleId 角色ID
@@ -252,7 +239,6 @@ public class SysRoleService {
 
         for (Long roleId : roleIds) {
 
-            checkRoleAllowed(new SysRole(roleId));
             SysRole role = selectRoleById(roleId);
             if (countUserRoleByRoleId(roleId) > 0) {
 
