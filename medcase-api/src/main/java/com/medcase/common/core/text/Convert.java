@@ -1,5 +1,7 @@
 package com.medcase.common.core.text;
 
+import org.springframework.util.StringUtils;
+
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
@@ -7,7 +9,6 @@ import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.text.NumberFormat;
 import java.util.Set;
-import org.springframework.util.StringUtils;
 
 /**
  * 类型转换器
@@ -750,18 +751,6 @@ public class Convert {
     public static BigDecimal toBigDecimal(Object value) {
 
         return toBigDecimal(value, null);
-    }
-
-    /**
-     * 将对象转为字符串<br>
-     * 1、Byte数组和ByteBuffer会被转换为对应字符串的数组 2、对象数组会调用Arrays.toString方法
-     *
-     * @param obj 对象
-     * @return 字符串
-     */
-    public static String utf8Str(Object obj) {
-
-        return str(obj, CharsetKit.CHARSET_UTF_8);
     }
 
     /**
