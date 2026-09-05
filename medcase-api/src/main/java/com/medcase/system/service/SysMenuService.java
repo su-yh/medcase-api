@@ -144,7 +144,6 @@ public class SysMenuService {
      * @return 选中菜单列表
      */
     public List<Long> selectMenuListByRoleId(Long roleId) {
-
         SysRole role = SystemEntityConverter.toDomain(roleMapper.selectById(roleId));
         return menuMapper.selectMenuListByRoleId(roleId, role.isMenuCheckStrictly());
     }
