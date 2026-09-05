@@ -6,13 +6,17 @@ import com.medcase.mp.mybatis.BaseMapperX;
 import com.medcase.mp.mybatis.LambdaQueryWrapperX;
 import com.medcase.system.entity.SysRoleEntity;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.Arrays;
 import java.util.List;
 
 @Mapper
 public interface SysRoleMapper extends BaseMapperX<SysRoleEntity> {
-    List<SysRole> selectRoleList(SysRole role);
+    List<SysRole> selectRoleList(
+            @Param("role") SysRole role,
+            @Param("beginTime") String beginTime,
+            @Param("endTime") String endTime);
 
     List<SysRole> selectRolePermissionByUserId(Long userId);
 

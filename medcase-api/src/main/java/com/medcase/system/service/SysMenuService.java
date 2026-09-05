@@ -76,8 +76,7 @@ public class SysMenuService {
         }
         else {
 
-            menu.getParams().put("userId", userId);
-            menuList = menuMapper.selectMenuListByUserId(menu);
+            menuList = menuMapper.selectMenuListByUserId(menu, userId);
         }
         return menuList;
     }

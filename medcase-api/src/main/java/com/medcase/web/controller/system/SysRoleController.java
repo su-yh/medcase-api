@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.medcase.common.annotation.Log;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
@@ -51,9 +52,13 @@ public class SysRoleController {
 
     @PreAuthorize("@ss.hasPermi('system:role:list')")
     @GetMapping("/list")
-    public PageResult<SysRole> list(PageParam pageParam, SysRole role) {
+    public PageResult<SysRole> list(
+            PageParam pageParam,
+            SysRole role,
+            @RequestParam(value = "beginTime", required = false) String beginTime,
+            @RequestParam(value = "endTime", required = false) String endTime) {
 
-        List<SysRole> list = roleService.selectRoleList(role);
+        List<SysRole> list = roleService.selectRoleList(role, beginTime, endTime);
         return new PageResult<>(PageParam.doPageList(pageParam, list), (long) list.size());
     }
 

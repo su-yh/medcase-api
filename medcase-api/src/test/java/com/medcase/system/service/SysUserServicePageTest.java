@@ -19,6 +19,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -60,7 +61,8 @@ class SysUserServicePageTest {
         when(deptService.all()).thenReturn(List.of());
         when(deptService.selectDeptById(2L)).thenReturn(resultDept);
         when(userMapper.selectPage(
-                any(PageParam.class), any(SysUser.class), any(Collection.class)))
+                any(PageParam.class), any(SysUser.class), any(Collection.class),
+                nullable(String.class), nullable(String.class)))
                 .thenReturn(new PageResult<>(List.of(resultUser), 1L));
 
         PageResult<SysUser> result = userService.selectPage(user, pageParam);
@@ -68,7 +70,8 @@ class SysUserServicePageTest {
         ArgumentCaptor<SysUser> userCaptor = ArgumentCaptor.forClass(SysUser.class);
         ArgumentCaptor<Collection> deptIdsCaptor = ArgumentCaptor.forClass(Collection.class);
         verify(userMapper).selectPage(
-                any(PageParam.class), userCaptor.capture(), deptIdsCaptor.capture());
+                any(PageParam.class), userCaptor.capture(), deptIdsCaptor.capture(),
+                nullable(String.class), nullable(String.class));
         assertEquals(1, result.getTotal());
         assertEquals(1L, result.getList().get(0).getUserId());
         assertEquals(UserTypeEnums.ADMIN, userCaptor.getValue().getUserType());

@@ -23,7 +23,10 @@ import java.util.List;
 @Mapper
 public interface SysUserMapper extends BaseMapperX<SysUserEntity> {
     List<SysUser> selectUserList(
-            @Param("user") SysUser user, @Param("deptIds") Collection<Long> deptIds);
+            @Param("user") SysUser user,
+            @Param("deptIds") Collection<Long> deptIds,
+            @Param("beginTime") String beginTime,
+            @Param("endTime") String endTime);
 
     List<SysUser> selectAllocatedList(
             @Param("user") SysUser user, @Param("deptIds") Collection<Long> deptIds);
@@ -37,15 +40,24 @@ public interface SysUserMapper extends BaseMapperX<SysUserEntity> {
 
     default PageResult<SysUser> selectPage(
             PageParam pageParam, SysUser user, Collection<Long> deptIds) {
+        return selectPage(pageParam, user, deptIds, null, null);
+    }
+
+    default PageResult<SysUser> selectPage(
+            PageParam pageParam, SysUser user, Collection<Long> deptIds,
+            String beginTime, String endTime) {
         Page<SysUser> page = MyBatisUtils.buildPage(pageParam);
-        IPage<SysUser> userPage = selectUserPage(page, user, deptIds);
+        IPage<SysUser> userPage = selectUserPage(
+                page, user, deptIds, beginTime, endTime);
         return new PageResult<>(userPage.getRecords(), userPage.getTotal());
     }
 
     IPage<SysUser> selectUserPage(
             Page<SysUser> page,
             @Param("user") SysUser user,
-            @Param("deptIds") Collection<Long> deptIds);
+            @Param("deptIds") Collection<Long> deptIds,
+            @Param("beginTime") String beginTime,
+            @Param("endTime") String endTime);
 
     default PageResult<SysUser> selectAllocatedPage(PageParam pageParam, SysUser user) {
         return selectAllocatedPage(pageParam, user, null);

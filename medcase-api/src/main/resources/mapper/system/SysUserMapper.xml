@@ -66,11 +66,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		<if test="user.phonenumber != null and user.phonenumber != ''">
 			AND u.phonenumber like concat('%', #{user.phonenumber}, '%')
 		</if>
-		<if test="user.params.beginTime != null and user.params.beginTime != ''"><!-- 开始时间检索 -->
-			AND date_format(u.create_time,'%Y%m%d') &gt;= date_format(#{user.params.beginTime},'%Y%m%d')
+		<if test="beginTime != null and beginTime != ''"><!-- 开始时间检索 -->
+			AND date_format(u.create_time,'%Y%m%d') &gt;= date_format(#{beginTime},'%Y%m%d')
 		</if>
-		<if test="user.params.endTime != null and user.params.endTime != ''"><!-- 结束时间检索 -->
-			AND date_format(u.create_time,'%Y%m%d') &lt;= date_format(#{user.params.endTime},'%Y%m%d')
+		<if test="endTime != null and endTime != ''"><!-- 结束时间检索 -->
+			AND date_format(u.create_time,'%Y%m%d') &lt;= date_format(#{endTime},'%Y%m%d')
 		</if>
 		<if test="deptIds != null and deptIds.size() > 0">
 			AND u.dept_id IN
@@ -101,11 +101,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		<if test="user.phonenumber != null and user.phonenumber != ''">
 			AND u.phonenumber like concat('%', #{user.phonenumber}, '%')
 		</if>
-		<if test="user.params.beginTime != null and user.params.beginTime != ''"><!-- 开始时间检索 -->
-			AND date_format(u.create_time,'%Y%m%d') &gt;= date_format(#{user.params.beginTime},'%Y%m%d')
+		<if test="beginTime != null and beginTime != ''"><!-- 开始时间检索 -->
+			AND date_format(u.create_time,'%Y%m%d') &gt;= date_format(#{beginTime},'%Y%m%d')
 		</if>
-		<if test="user.params.endTime != null and user.params.endTime != ''"><!-- 结束时间检索 -->
-			AND date_format(u.create_time,'%Y%m%d') &lt;= date_format(#{user.params.endTime},'%Y%m%d')
+		<if test="endTime != null and endTime != ''"><!-- 结束时间检索 -->
+			AND date_format(u.create_time,'%Y%m%d') &lt;= date_format(#{endTime},'%Y%m%d')
 		</if>
 		<if test="deptIds != null and deptIds.size() > 0">
 			AND u.dept_id IN

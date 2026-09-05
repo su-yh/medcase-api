@@ -65,6 +65,11 @@ public class SysUserService {
      * @return 用户信息集合信息
      */
     public PageResult<SysUser> selectPage(SysUser user, PageParam pageParam) {
+        return selectPage(user, pageParam, null, null);
+    }
+
+    public PageResult<SysUser> selectPage(
+            SysUser user, PageParam pageParam, String beginTime, String endTime) {
         useAdminUserTypeIfAbsent(user);
         List<Long> deptIds = null;
         if (user != null && user.getDeptId() != null
@@ -80,7 +85,8 @@ public class SysUserService {
                 }
             }
         }
-        PageResult<SysUser> result = userMapper.selectPage(pageParam, user, deptIds);
+        PageResult<SysUser> result = userMapper.selectPage(
+                pageParam, user, deptIds, beginTime, endTime);
         for (SysUser item : result.getList()) {
             item.setDept(deptService.selectDeptById(item.getDeptId()));
         }

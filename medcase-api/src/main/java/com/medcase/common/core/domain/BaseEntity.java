@@ -1,12 +1,9 @@
 package com.medcase.common.core.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Entity基类
@@ -33,11 +30,6 @@ public class BaseEntity implements Serializable {
 
     /** 备注 */
     private String remark;
-
-    /** 请求参数 */
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
-    @Deprecated
-    private Map<String, Object> params;
 
     public String getCreateBy() {
 
@@ -87,21 +79,5 @@ public class BaseEntity implements Serializable {
     public void setRemark(String remark) {
 
         this.remark = remark;
-    }
-
-    @Deprecated
-    public Map<String, Object> getParams() {
-
-        if (params == null) {
-
-            params = new HashMap<>();
-        }
-        return params;
-    }
-
-    @Deprecated
-    public void setParams(Map<String, Object> params) {
-
-        this.params = params;
     }
 }

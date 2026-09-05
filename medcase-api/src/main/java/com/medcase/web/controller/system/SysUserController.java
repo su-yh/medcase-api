@@ -34,6 +34,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -67,9 +68,13 @@ public class SysUserController {
      */
     @PreAuthorize("@ss.hasPermi('system:user:list')")
     @GetMapping("/list")
-    public PageResult<SysUser> list(PageParam pageParam, SysUser user) {
+    public PageResult<SysUser> list(
+            PageParam pageParam,
+            SysUser user,
+            @RequestParam(value = "beginTime", required = false) String beginTime,
+            @RequestParam(value = "endTime", required = false) String endTime) {
 
-        return userService.selectPage(user, pageParam);
+        return userService.selectPage(user, pageParam, beginTime, endTime);
     }
 
     /**

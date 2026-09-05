@@ -44,9 +44,10 @@ public class SysRoleService {
      * @param role 角色信息
      * @return 角色数据集合信息
      */
-    public List<SysRole> selectRoleList(SysRole role) {
+    public List<SysRole> selectRoleList(
+            SysRole role, String beginTime, String endTime) {
 
-        return roleMapper.selectRoleList(role);
+        return roleMapper.selectRoleList(role, beginTime, endTime);
     }
 
     /**
@@ -100,7 +101,7 @@ public class SysRoleService {
      */
     public List<SysRole> selectRoleAll() {
 
-        return SpringUtils.getAopProxy(this).selectRoleList(new SysRole());
+        return SpringUtils.getAopProxy(this).selectRoleList(new SysRole(), null, null);
     }
 
     /**

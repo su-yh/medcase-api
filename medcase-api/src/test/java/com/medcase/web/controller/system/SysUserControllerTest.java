@@ -47,7 +47,8 @@ class SysUserControllerTest {
 
     @Test
     void userListUsesUnifiedPageParameter() throws NoSuchMethodException {
-        Method method = SysUserController.class.getMethod("list", PageParam.class, SysUser.class);
+        Method method = SysUserController.class.getMethod(
+                "list", PageParam.class, SysUser.class, String.class, String.class);
         assertEquals(PageResult.class, method.getReturnType());
         ParameterizedType pageResultType = (ParameterizedType) method.getGenericReturnType();
         assertEquals(SysUser.class.getTypeName(), pageResultType.getActualTypeArguments()[0].getTypeName());

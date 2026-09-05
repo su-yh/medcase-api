@@ -35,7 +35,8 @@ class SysUserMapperPageTest {
         user.setUserName("admin");
 
         when(mapper.selectUserPage(
-                any(Page.class), any(SysUser.class), nullable(Collection.class))).thenAnswer(invocation -> {
+                any(Page.class), any(SysUser.class), nullable(Collection.class),
+                nullable(String.class), nullable(String.class))).thenAnswer(invocation -> {
             Page<SysUser> page = invocation.getArgument(0);
             SysUser query = invocation.getArgument(1);
             page.setTotal(5);
@@ -43,11 +44,13 @@ class SysUserMapperPageTest {
             return page;
         });
 
-        PageResult<SysUser> result = mapper.selectPage(pageParam, user);
+        PageResult<SysUser> result = mapper.selectPage(
+                pageParam, user, null, "2026-09-01", "2026-09-05");
 
         ArgumentCaptor<Page> pageCaptor = ArgumentCaptor.forClass(Page.class);
         verify(mapper).selectUserPage(
-                pageCaptor.capture(), any(SysUser.class), nullable(Collection.class));
+                pageCaptor.capture(), any(SysUser.class), nullable(Collection.class),
+                nullable(String.class), nullable(String.class));
         assertEquals(3L, pageCaptor.getValue().getCurrent());
         assertEquals(20L, pageCaptor.getValue().getSize());
         assertEquals(5, result.getTotal());
@@ -67,5 +70,6 @@ class SysUserMapperPageTest {
         assertEquals(-1, mapperXml.indexOf("sys_dept"));
         assertEquals(-1, mapperXml.indexOf("find_in_set"));
         assertTrue(mapperXml.contains("collection=\"deptIds\""));
+        assertEquals(-1, mapperXml.indexOf("user.params."));
     }
 }
