@@ -1,13 +1,7 @@
 package com.medcase.system.service;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.stream.Collectors;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import com.medcase.common.annotation.DataScope;
 import com.medcase.common.constant.UserConstants;
 import com.medcase.common.core.domain.TreeSelect;
@@ -16,13 +10,22 @@ import com.medcase.common.core.domain.entity.SysRole;
 import com.medcase.common.core.text.Convert;
 import com.medcase.common.utils.SecurityUtils;
 import com.medcase.common.utils.spring.SpringUtils;
+import com.medcase.mvc.constants.enums.ErrorCodeEnums;
+import com.medcase.mvc.exception.ExceptionUtil;
 import com.medcase.system.converter.SystemEntityConverter;
 import com.medcase.system.entity.SysDeptEntity;
 import com.medcase.system.mapper.SysDeptMapper;
 import com.medcase.system.mapper.SysRoleMapper;
 import com.medcase.system.mapper.SysUserMapper;
-import com.medcase.mvc.constants.enums.ErrorCodeEnums;
-import com.medcase.mvc.exception.ExceptionUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 部门管理 服务实现
@@ -30,6 +33,12 @@ import com.medcase.mvc.exception.ExceptionUtil;
  */
 @Service
 public class SysDeptService {
+
+    private static final String ALL_DEPARTMENTS_CACHE_KEY = "allDepartments";
+
+    private final Cache<String, List<SysDeptEntity>> deptCache = Caffeine.newBuilder().build();
+
+    private final Object deptCacheLoadLock = new Object();
 
     @Autowired
     private SysDeptMapper deptMapper;
@@ -121,8 +130,37 @@ public class SysDeptService {
      * @return 部门信息
      */
     public SysDept selectDeptById(Long deptId) {
+        if (deptId == null) {
+            return null;
+        }
 
-        return SystemEntityConverter.toDomain(deptMapper.selectById(deptId));
+        return all().stream()
+                .filter(dept -> deptId.equals(dept.getDeptId()))
+                .findFirst()
+                .map(SystemEntityConverter::toDomain)
+                .orElse(null);
+    }
+
+    public List<SysDeptEntity> all() {
+        List<SysDeptEntity> departments = deptCache.getIfPresent(ALL_DEPARTMENTS_CACHE_KEY);
+        if (departments != null) {
+            return departments;
+        }
+
+        synchronized (deptCacheLoadLock) {
+            departments = deptCache.getIfPresent(ALL_DEPARTMENTS_CACHE_KEY);
+            if (departments != null) {
+                return departments;
+            }
+
+            departments = deptMapper.selectAllDepartments();
+            if (departments == null) {
+                departments = List.of();
+            }
+            deptCache.put(ALL_DEPARTMENTS_CACHE_KEY, departments);
+        }
+
+        return departments;
     }
 
     /**
@@ -215,6 +253,13 @@ public class SysDeptService {
         SysDeptEntity entity = SystemEntityConverter.toEntity(dept);
         int row = deptMapper.insert(entity);
         dept.setDeptId(entity.getDeptId());
+        if (row > 0) {
+
+            synchronized (deptCacheLoadLock) {
+
+                deptCache.invalidate(ALL_DEPARTMENTS_CACHE_KEY);
+            }
+        }
         return row;
     }
 
@@ -244,6 +289,13 @@ public class SysDeptService {
 
             // 如果该部门是启用状态，则启用该部门的所有上级部门
             updateParentDeptStatusNormal(dept);
+        }
+        if (result > 0) {
+
+            synchronized (deptCacheLoadLock) {
+
+                deptCache.invalidate(ALL_DEPARTMENTS_CACHE_KEY);
+            }
         }
         return result;
     }
@@ -301,6 +353,10 @@ public class SysDeptService {
                 deptMapper.updateDeptSort(
                         Convert.toLong(deptIds[i]), Convert.toInt(orderNums[i]));
             }
+            synchronized (deptCacheLoadLock) {
+
+                deptCache.invalidate(ALL_DEPARTMENTS_CACHE_KEY);
+            }
         }
         catch (Exception e) {
 
@@ -316,7 +372,15 @@ public class SysDeptService {
      */
     public int deleteDeptById(Long deptId) {
 
-        return deptMapper.deleteDeptById(deptId);
+        int result = deptMapper.deleteDeptById(deptId);
+        if (result > 0) {
+
+            synchronized (deptCacheLoadLock) {
+
+                deptCache.invalidate(ALL_DEPARTMENTS_CACHE_KEY);
+            }
+        }
+        return result;
     }
 
     /**
