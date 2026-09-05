@@ -1,11 +1,12 @@
 package com.medcase.common.core.domain.entity;
 
-import java.util.Set;
+import com.medcase.common.core.domain.BaseEntity;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import com.medcase.common.core.domain.BaseEntity;
 import lombok.Data;
+
+import java.util.Set;
 
 /**
  * 角色表 sys_role
