@@ -2,7 +2,6 @@ package com.medcase.system.service;
 
 import com.medcase.common.constant.UserConstants;
 import com.medcase.common.core.domain.entity.SysRole;
-import com.medcase.common.utils.spring.SpringUtils;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
 import com.medcase.system.converter.SystemEntityConverter;
@@ -47,7 +46,8 @@ public class SysRoleService {
     public List<SysRole> selectRoleList(
             SysRole role, String beginTime, String endTime) {
 
-        return roleMapper.selectRoleList(role, beginTime, endTime);
+        List<SysRoleEntity> list = roleMapper.selectRoleList(role, beginTime, endTime);
+        return SystemEntityConverter.copyList(list, SysRole.class);
     }
 
     /**
@@ -100,8 +100,8 @@ public class SysRoleService {
      * @return 角色列表
      */
     public List<SysRole> selectRoleAll() {
-
-        return SpringUtils.getAopProxy(this).selectRoleList(new SysRole(), null, null);
+        List<SysRoleEntity> list = roleMapper.selectList();
+        return SystemEntityConverter.copyList(list, SysRole.class);
     }
 
     /**
