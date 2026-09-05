@@ -12,6 +12,7 @@ import java.util.Map;
  * Entity基类
  * 
  */
+@Deprecated
 public class BaseEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
