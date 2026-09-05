@@ -43,12 +43,6 @@ public interface SysRoleMapper extends BaseMapperX<SysRoleEntity> {
                 .eq(SysRoleEntity::getDelFlag, "0"));
     }
 
-    default int deleteRoleById(Long roleId) {
-        return update(null, new LambdaUpdateWrapper<SysRoleEntity>()
-                .set(SysRoleEntity::getDelFlag, "2")
-                .eq(SysRoleEntity::getRoleId, roleId));
-    }
-
     default int deleteRolesByIds(Long[] roleIds) {
         return update(null, new LambdaUpdateWrapper<SysRoleEntity>()
                 .set(SysRoleEntity::getDelFlag, "2")

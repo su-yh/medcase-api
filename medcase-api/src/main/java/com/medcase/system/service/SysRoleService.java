@@ -55,15 +55,11 @@ public class SysRoleService {
      * @return 角色列表
      */
     public List<SysRoleEntity> selectRolesByUserId(Long userId) {
-
         List<SysRole> userRoles = roleMapper.selectRolePermissionByUserId(userId);
         List<SysRoleEntity> roles = selectRoleAll();
         for (SysRoleEntity role : roles) {
-
             for (SysRole userRole : userRoles) {
-
                 if (role.getRoleId().longValue() == userRole.getRoleId().longValue()) {
-
                     role.setFlag(true);
                     break;
                 }
@@ -79,13 +75,10 @@ public class SysRoleService {
      * @return 权限列表
      */
     public Set<String> selectRolePermissionByUserId(Long userId) {
-
         List<SysRole> perms = roleMapper.selectRolePermissionByUserId(userId);
         Set<String> permsSet = new HashSet<>();
         for (SysRole perm : perms) {
-
             if (perm != null) {
-
                 permsSet.addAll(Arrays.asList(perm.getRoleKey().trim().split(",")));
             }
         }
@@ -108,7 +101,6 @@ public class SysRoleService {
      * @return 角色对象信息
      */
     public SysRoleEntity selectRoleById(Long roleId) {
-
         return roleMapper.selectById(roleId);
     }
 
@@ -119,12 +111,9 @@ public class SysRoleService {
      * @return 结果
      */
     public boolean checkRoleNameUnique(SysRole role) {
-
-        Long roleId = role.getRoleId() == null ? -1L : role.getRoleId();
-        SysRole info = SystemEntityConverter.toDomain(
-                roleMapper.selectRoleByName(role.getRoleName()));
-        if (info != null && info.getRoleId().longValue() != roleId.longValue()) {
-
+        long roleId = role.getRoleId() == null ? -1L : role.getRoleId();
+        SysRoleEntity sysRoleEntity = roleMapper.selectRoleByName(role.getRoleName());
+        if (sysRoleEntity != null && sysRoleEntity.getRoleId() != roleId) {
             return UserConstants.NOT_UNIQUE;
         }
         return UserConstants.UNIQUE;
@@ -137,12 +126,9 @@ public class SysRoleService {
      * @return 结果
      */
     public boolean checkRoleKeyUnique(SysRole role) {
-
-        Long roleId = role.getRoleId() == null ? -1L : role.getRoleId();
-        SysRole info = SystemEntityConverter.toDomain(
-                roleMapper.selectRoleByKey(role.getRoleKey()));
-        if (info != null && info.getRoleId().longValue() != roleId.longValue()) {
-
+        long roleId = role.getRoleId() == null ? -1L : role.getRoleId();
+        SysRoleEntity info = roleMapper.selectRoleByKey(role.getRoleKey());
+        if (info != null && info.getRoleId() != roleId) {
             return UserConstants.NOT_UNIQUE;
         }
         return UserConstants.UNIQUE;
@@ -155,7 +141,6 @@ public class SysRoleService {
      * @return 结果
      */
     public int countUserRoleByRoleId(Long roleId) {
-
         return Math.toIntExact(userRoleMapper.countByRoleId(roleId));
     }
 
@@ -167,7 +152,6 @@ public class SysRoleService {
      */
     @Transactional
     public int insertRole(SysRole role) {
-
         SysRoleEntity entity = SystemEntityConverter.toEntity(role);
         int row = roleMapper.insert(entity);
         role.setRoleId(entity.getRoleId());
@@ -182,7 +166,6 @@ public class SysRoleService {
      */
     @Transactional
     public int updateRole(SysRole role) {
-
         roleMapper.updateById(SystemEntityConverter.toEntity(role));
         // 删除角色与菜单关联
         roleMenuMapper.deleteByRoleId(role.getRoleId());
@@ -196,7 +179,6 @@ public class SysRoleService {
      * @return 结果
      */
     public int updateRoleStatus(SysRole role) {
-
         return roleMapper.updateById(SystemEntityConverter.toEntity(role));
     }
 
@@ -206,7 +188,6 @@ public class SysRoleService {
      * @param role 角色对象
      */
     public int insertRoleMenu(SysRole role) {
-
         int rows = 1;
         // 新增用户与角色管理
         List<SysRoleMenuEntity> list = new ArrayList<>();
@@ -217,8 +198,7 @@ public class SysRoleService {
             rm.setMenuId(menuId);
             list.add(rm);
         }
-        if (list.size() > 0) {
-
+        if (!list.isEmpty()) {
             roleMenuMapper.insertRoleMenus(list);
             rows = list.size();
         }
@@ -233,12 +213,9 @@ public class SysRoleService {
      */
     @Transactional
     public int deleteRoleByIds(Long[] roleIds) {
-
         for (Long roleId : roleIds) {
-
             SysRoleEntity role = selectRoleById(roleId);
             if (countUserRoleByRoleId(roleId) > 0) {
-
                 throw ExceptionUtil.business(ErrorCodeEnums.ROLE_ASSIGNED_DELETE, role.getRoleName());
             }
         }
@@ -254,7 +231,6 @@ public class SysRoleService {
      * @return 结果
      */
     public int deleteAuthUser(Long userId, Long roleId) {
-
         return userRoleMapper.deleteByUserAndRole(userId, roleId);
     }
 
@@ -266,7 +242,6 @@ public class SysRoleService {
      * @return 结果
      */
     public int deleteAuthUsers(Long roleId, Long[] userIds) {
-
         return userRoleMapper.deleteByRoleAndUsers(roleId, userIds);
     }
 
@@ -278,11 +253,9 @@ public class SysRoleService {
      * @return 结果
      */
     public int insertAuthUsers(Long roleId, Long[] userIds) {
-
         // 新增用户与角色管理
         List<SysUserRoleEntity> list = new ArrayList<>();
         for (Long userId : userIds) {
-
             SysUserRoleEntity ur = new SysUserRoleEntity();
             ur.setUserId(userId);
             ur.setRoleId(roleId);
