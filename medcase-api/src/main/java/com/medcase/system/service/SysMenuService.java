@@ -1,5 +1,27 @@
 package com.medcase.system.service;
 
+import com.medcase.common.constant.Constants;
+import com.medcase.common.constant.UserConstants;
+import com.medcase.common.core.domain.TreeSelect;
+import com.medcase.common.core.domain.entity.SysMenu;
+import com.medcase.common.core.text.Convert;
+import com.medcase.common.utils.SecurityUtils;
+import com.medcase.mvc.constants.enums.ErrorCodeEnums;
+import com.medcase.mvc.exception.ExceptionUtil;
+import com.medcase.system.converter.SystemEntityConverter;
+import com.medcase.system.domain.vo.MetaVo;
+import com.medcase.system.domain.vo.RouterVo;
+import com.medcase.system.entity.SysMenuEntity;
+import com.medcase.system.entity.SysRoleEntity;
+import com.medcase.system.mapper.SysMenuMapper;
+import com.medcase.system.mapper.SysRoleMapper;
+import com.medcase.system.mapper.SysRoleMenuMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -8,27 +30,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import com.medcase.common.constant.Constants;
-import com.medcase.common.constant.UserConstants;
-import com.medcase.common.core.domain.TreeSelect;
-import com.medcase.common.core.domain.entity.SysMenu;
-import com.medcase.common.core.domain.entity.SysRole;
-import com.medcase.common.core.text.Convert;
-import com.medcase.common.utils.SecurityUtils;
-import com.medcase.system.domain.vo.MetaVo;
-import com.medcase.system.domain.vo.RouterVo;
-import com.medcase.system.converter.SystemEntityConverter;
-import com.medcase.system.entity.SysMenuEntity;
-import com.medcase.system.mapper.SysMenuMapper;
-import com.medcase.system.mapper.SysRoleMenuMapper;
-import com.medcase.system.mapper.SysRoleMapper;
-import com.medcase.mvc.constants.enums.ErrorCodeEnums;
-import com.medcase.mvc.exception.ExceptionUtil;
 
 /**
  * 菜单 业务层处理
@@ -144,8 +145,8 @@ public class SysMenuService {
      * @return 选中菜单列表
      */
     public List<Long> selectMenuListByRoleId(Long roleId) {
-        SysRole role = SystemEntityConverter.toDomain(roleMapper.selectById(roleId));
-        return menuMapper.selectMenuListByRoleId(roleId, role.isMenuCheckStrictly());
+        SysRoleEntity sysRoleEntity = roleMapper.selectById(roleId);
+        return menuMapper.selectMenuListByRoleId(roleId, sysRoleEntity.getMenuCheckStrictly());
     }
 
     /**
