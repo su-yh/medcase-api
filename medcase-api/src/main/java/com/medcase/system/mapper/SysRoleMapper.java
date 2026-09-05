@@ -27,10 +27,6 @@ public interface SysRoleMapper extends BaseMapperX<SysRoleEntity> {
 
     List<SysRole> selectRolePermissionByUserId(Long userId);
 
-    List<Long> selectRoleListByUserId(Long userId);
-
-    List<SysRole> selectRolesByUserName(String userName);
-
     default SysRoleEntity selectRoleByName(String roleName) {
         return selectOne(build()
                 .eq(SysRoleEntity::getRoleName, roleName)
