@@ -1,7 +1,7 @@
 package com.medcase.system;
 
-import com.medcase.common.core.domain.entity.SysRole;
 import com.medcase.common.core.domain.entity.SysUser;
+import com.medcase.system.entity.SysRoleEntity;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -70,7 +70,7 @@ class RoleDepartmentDataPermissionRemovalTest {
 
     private Field findField(String fieldName) {
         try {
-            return SysRole.class.getDeclaredField(fieldName);
+            return SysRoleEntity.class.getDeclaredField(fieldName);
         }
         catch (NoSuchFieldException e) {
             return null;

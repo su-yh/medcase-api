@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.medcase.common.annotation.Log;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
-import com.medcase.common.core.domain.entity.SysRole;
 import com.medcase.common.core.domain.entity.SysUser;
 import com.medcase.common.enums.BusinessType;
 import com.medcase.common.enums.UserTypeEnums;
@@ -28,7 +27,10 @@ import com.medcase.mp.mybatis.PageResult;
 import com.medcase.system.entity.SysRoleEntity;
 import com.medcase.system.service.SysRoleService;
 import com.medcase.system.service.SysUserService;
+import com.medcase.web.controller.system.dto.RoleAddRequest;
+import com.medcase.web.controller.system.dto.RoleEditRequest;
 import com.medcase.web.controller.system.dto.RoleQueryRequest;
+import com.medcase.web.controller.system.dto.RoleStatusRequest;
 import com.medcase.web.controller.system.dto.RoleUserRequest;
 
 /**
@@ -77,17 +79,10 @@ public class SysRoleController {
     @Log(title = "角色管理", businessType = BusinessType.INSERT)
     @PostMapping
     public void add(
-            @Validated @RequestBody SysRole role,
+            @Validated @RequestBody RoleAddRequest request,
             @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
 
-        if (!roleService.checkRoleNameUnique(role)) {
-            throw ExceptionUtil.business(ErrorCodeEnums.ROLE_NAME_EXISTS);
-        }
-        else if (!roleService.checkRoleKeyUnique(role)) {
-            throw ExceptionUtil.business(ErrorCodeEnums.ROLE_KEY_EXISTS);
-        }
-        role.setCreateBy(loginUser.getUsername());
-        if (roleService.insertRole(role) <= 0) {
+        if (roleService.insertRole(request, loginUser.getUsername()) <= 0) {
             throw ExceptionUtil.business(ErrorCodeEnums.OPERATION_FAILED);
         }
 
@@ -100,21 +95,13 @@ public class SysRoleController {
     @Log(title = "角色管理", businessType = BusinessType.UPDATE)
     @PutMapping
     public void edit(
-            @Validated @RequestBody SysRole role,
+            @Validated @RequestBody RoleEditRequest request,
             @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
 
-        if (!roleService.checkRoleNameUnique(role)) {
-            throw ExceptionUtil.business(ErrorCodeEnums.ROLE_NAME_EXISTS);
-        }
-        else if (!roleService.checkRoleKeyUnique(role)) {
-            throw ExceptionUtil.business(ErrorCodeEnums.ROLE_KEY_EXISTS);
-        }
-        role.setUpdateBy(loginUser.getUsername());
-        
-        if (roleService.updateRole(role) > 0) {
+        if (roleService.updateRole(request, loginUser.getUsername()) > 0) {
 
             // 刷新所有持有该角色的在线用户权限
-            tokenService.refreshPermissionByRoleId(role.getRoleId(), permissionService);
+            tokenService.refreshPermissionByRoleId(request.getRoleId(), permissionService);
             return;
         }
         throw ExceptionUtil.business(ErrorCodeEnums.ROLE_UPDATE_FAILED);
@@ -127,11 +114,10 @@ public class SysRoleController {
     @Log(title = "角色管理", businessType = BusinessType.UPDATE)
     @PutMapping("/changeStatus")
     public void changeStatus(
-            @RequestBody SysRole role,
+            @Validated @RequestBody RoleStatusRequest request,
             @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
 
-        role.setUpdateBy(loginUser.getUsername());
-        if (roleService.updateRoleStatus(role) <= 0) {
+        if (roleService.updateRoleStatus(request, loginUser.getUsername()) <= 0) {
             throw ExceptionUtil.business(ErrorCodeEnums.ROLE_STATUS_UPDATE_FAILED);
         }
     }

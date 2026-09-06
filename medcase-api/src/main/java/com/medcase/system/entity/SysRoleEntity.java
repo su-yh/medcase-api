@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.medcase.mp.entity.AbstractBaseEntity;
 import lombok.Data;
+import java.util.Set;
 
 /**
  * 角色表实体。
@@ -37,4 +38,7 @@ public class SysRoleEntity extends AbstractBaseEntity {
 
     @TableField(exist = false)
     private boolean flag = false;
+
+    @TableField(exist = false)
+    private Set<String> permissions;
 }

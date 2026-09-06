@@ -2,7 +2,6 @@ package com.medcase.web.controller.system;
 
 import com.medcase.common.annotation.Log;
 import com.medcase.common.core.domain.TreeSelect;
-import com.medcase.common.core.domain.entity.SysRole;
 import com.medcase.common.core.domain.entity.SysUser;
 import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.common.enums.BusinessType;
@@ -103,9 +102,9 @@ public class SysUserController {
 
             sysUser = userService.selectUserById(userId);
             postIds = postService.selectPostListByUserId(userId);
-            List<SysRole> roles = sysUser.getRoles();
+            List<SysRoleEntity> roles = sysUser.getRoles();
             if (roles != null) {
-                roleIds = roles.stream().map(SysRole::getRoleId).collect(Collectors.toList());
+                roleIds = roles.stream().map(SysRoleEntity::getRoleId).collect(Collectors.toList());
             }
         }
         List<SysRoleEntity> availableRoles = roleService.selectRoleAll();

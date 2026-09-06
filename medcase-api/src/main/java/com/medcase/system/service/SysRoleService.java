@@ -3,19 +3,20 @@ package com.medcase.system.service;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.medcase.common.constant.UserConstants;
-import com.medcase.common.core.domain.entity.SysRole;
 import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
-import com.medcase.system.converter.SystemEntityConverter;
 import com.medcase.system.entity.SysRoleEntity;
 import com.medcase.system.entity.SysRoleMenuEntity;
 import com.medcase.system.entity.SysUserRoleEntity;
 import com.medcase.system.mapper.SysRoleMapper;
 import com.medcase.system.mapper.SysRoleMenuMapper;
 import com.medcase.system.mapper.SysUserRoleMapper;
+import com.medcase.web.controller.system.dto.RoleAddRequest;
+import com.medcase.web.controller.system.dto.RoleEditRequest;
 import com.medcase.web.controller.system.dto.RoleQueryRequest;
+import com.medcase.web.controller.system.dto.RoleStatusRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -169,7 +170,7 @@ public class SysRoleService {
      * @param role 角色信息
      * @return 结果
      */
-    public boolean checkRoleNameUnique(SysRole role) {
+    private boolean checkRoleNameUnique(SysRoleEntity role) {
         long roleId = role.getRoleId() == null ? -1L : role.getRoleId();
         SysRoleEntity sysRoleEntity = roleMapper.selectRoleByName(role.getRoleName());
         if (sysRoleEntity != null && sysRoleEntity.getRoleId() != roleId) {
@@ -184,7 +185,7 @@ public class SysRoleService {
      * @param role 角色信息
      * @return 结果
      */
-    public boolean checkRoleKeyUnique(SysRole role) {
+    private boolean checkRoleKeyUnique(SysRoleEntity role) {
         long roleId = role.getRoleId() == null ? -1L : role.getRoleId();
         SysRoleEntity info = roleMapper.selectRoleByKey(role.getRoleKey());
         if (info != null && info.getRoleId() != roleId) {
@@ -206,47 +207,86 @@ public class SysRoleService {
     /**
      * 新增保存角色信息
      * 
-     * @param role 角色信息
+     * @param request 角色新增请求
+     * @param createBy 创建人
      * @return 结果
      */
     @Transactional
-    public int insertRole(SysRole role) {
-        SysRoleEntity entity = SystemEntityConverter.toEntity(role);
-        int row = roleMapper.insert(entity);
-        role.setRoleId(entity.getRoleId());
+    public int insertRole(RoleAddRequest request, String createBy) {
+        SysRoleEntity role = new SysRoleEntity();
+        role.setRoleName(request.getRoleName());
+        role.setRoleKey(request.getRoleKey());
+        role.setRoleSort(request.getRoleSort());
+        role.setMenuCheckStrictly(request.isMenuCheckStrictly());
+        role.setStatus(request.getStatus());
+        role.setRemark(request.getRemark());
+        role.setCreateBy(createBy);
+
+        if (!checkRoleNameUnique(role)) {
+            throw ExceptionUtil.business(ErrorCodeEnums.ROLE_NAME_EXISTS);
+        }
+        if (!checkRoleKeyUnique(role)) {
+            throw ExceptionUtil.business(ErrorCodeEnums.ROLE_KEY_EXISTS);
+        }
+
+        int row = roleMapper.insert(role);
         if (row > 0) {
             synchronized (roleCacheLoadLock) {
                 roleCache.invalidate(ALL_ROLES_CACHE_KEY);
             }
         }
-        return insertRoleMenu(role);
+        return insertRoleMenu(role.getRoleId(), request.getMenuIds());
     }
 
     /**
      * 修改保存角色信息
      * 
-     * @param role 角色信息
+     * @param request 角色修改请求
+     * @param updateBy 更新人
      * @return 结果
      */
     @Transactional
-    public int updateRole(SysRole role) {
-        roleMapper.updateById(SystemEntityConverter.toEntity(role));
+    public int updateRole(RoleEditRequest request, String updateBy) {
+        SysRoleEntity role = new SysRoleEntity();
+        role.setRoleId(request.getRoleId());
+        role.setRoleName(request.getRoleName());
+        role.setRoleKey(request.getRoleKey());
+        role.setRoleSort(request.getRoleSort());
+        role.setMenuCheckStrictly(request.isMenuCheckStrictly());
+        role.setStatus(request.getStatus());
+        role.setRemark(request.getRemark());
+        role.setUpdateBy(updateBy);
+
+        if (!checkRoleNameUnique(role)) {
+            throw ExceptionUtil.business(ErrorCodeEnums.ROLE_NAME_EXISTS);
+        }
+        if (!checkRoleKeyUnique(role)) {
+            throw ExceptionUtil.business(ErrorCodeEnums.ROLE_KEY_EXISTS);
+        }
+
+        roleMapper.updateById(role);
         // 删除角色与菜单关联
         roleMenuMapper.deleteByRoleId(role.getRoleId());
         synchronized (roleCacheLoadLock) {
             roleCache.invalidate(ALL_ROLES_CACHE_KEY);
         }
-        return insertRoleMenu(role);
+        return insertRoleMenu(role.getRoleId(), request.getMenuIds());
     }
 
     /**
      * 修改角色状态
      * 
-     * @param role 角色信息
+     * @param request 角色状态修改请求
+     * @param updateBy 更新人
      * @return 结果
      */
-    public int updateRoleStatus(SysRole role) {
-        int row = roleMapper.updateById(SystemEntityConverter.toEntity(role));
+    public int updateRoleStatus(RoleStatusRequest request, String updateBy) {
+        SysRoleEntity role = new SysRoleEntity();
+        role.setRoleId(request.getRoleId());
+        role.setStatus(request.getStatus());
+        role.setUpdateBy(updateBy);
+
+        int row = roleMapper.updateById(role);
         if (row > 0) {
             synchronized (roleCacheLoadLock) {
                 roleCache.invalidate(ALL_ROLES_CACHE_KEY);
@@ -258,16 +298,19 @@ public class SysRoleService {
     /**
      * 新增角色菜单信息
      * 
-     * @param role 角色对象
+     * @param roleId 角色ID
      */
-    public int insertRoleMenu(SysRole role) {
+    public int insertRoleMenu(Long roleId, Long[] menuIds) {
         int rows = 1;
         // 新增用户与角色管理
         List<SysRoleMenuEntity> list = new ArrayList<>();
-        for (Long menuId : role.getMenuIds()) {
+        if (menuIds == null) {
+            return rows;
+        }
+        for (Long menuId : menuIds) {
 
             SysRoleMenuEntity rm = new SysRoleMenuEntity();
-            rm.setRoleId(role.getRoleId());
+            rm.setRoleId(roleId);
             rm.setMenuId(menuId);
             list.add(rm);
         }

@@ -10,6 +10,7 @@ import com.medcase.common.enums.UserTypeEnums;
 import com.medcase.common.utils.SecurityUtils;
 import com.medcase.common.xss.Xss;
 import com.medcase.storage.pojo.FileAttachment;
+import com.medcase.system.entity.SysRoleEntity;
 import lombok.Data;
 
 /**
@@ -79,7 +80,7 @@ public class SysUser extends BaseEntity {
     private SysDept dept;
 
     /** 角色对象 */
-    private List<SysRole> roles;
+    private List<SysRoleEntity> roles;
 
     /** 角色组 */
     private Long[] roleIds;

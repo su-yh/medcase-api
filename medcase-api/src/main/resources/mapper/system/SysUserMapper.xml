@@ -29,7 +29,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <collection  property="roles"    javaType="java.util.List"  resultMap="RoleResult" />
     </resultMap>
 
-    <resultMap id="RoleResult" type="com.medcase.common.core.domain.entity.SysRole">
+    <resultMap id="RoleResult" type="com.medcase.system.entity.SysRoleEntity">
         <id     property="roleId"       column="role_id"        />
         <result property="roleName"     column="role_name"      />
         <result property="roleKey"      column="role_key"       />

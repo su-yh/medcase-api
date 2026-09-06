@@ -8,8 +8,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import com.medcase.common.constant.Constants;
 import com.medcase.common.constant.UserConstants;
-import com.medcase.common.core.domain.entity.SysRole;
 import com.medcase.common.core.domain.entity.SysUser;
+import com.medcase.system.entity.SysRoleEntity;
 import com.medcase.system.service.SysMenuService;
 import com.medcase.system.service.SysRoleService;
 
@@ -60,11 +60,11 @@ public class SysPermissionService {
         }
         else {
 
-            List<SysRole> roles = user.getRoles();
+            List<SysRoleEntity> roles = user.getRoles();
             if (!CollectionUtils.isEmpty(roles)) {
 
                 // 多角色设置permissions属性，以便权限匹配
-                for (SysRole role : roles) {
+                for (SysRoleEntity role : roles) {
 
                     if (org.apache.commons.lang3.Strings.CS.equals(role.getStatus(), UserConstants.ROLE_NORMAL)) {
 

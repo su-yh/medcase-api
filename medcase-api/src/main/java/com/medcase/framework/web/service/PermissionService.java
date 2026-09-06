@@ -1,10 +1,10 @@
 package com.medcase.framework.web.service;
 
 import com.medcase.common.constant.Constants;
-import com.medcase.common.core.domain.entity.SysRole;
 import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.common.utils.SecurityUtils;
 import com.medcase.framework.security.context.PermissionContextHolder;
+import com.medcase.system.entity.SysRoleEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -89,7 +89,7 @@ public class PermissionService {
 
             return false;
         }
-        for (SysRole sysRole : loginUser.getUser().getRoles()) {
+        for (SysRoleEntity sysRole : loginUser.getUser().getRoles()) {
 
             String roleKey = sysRole.getRoleKey();
             if (Constants.SUPER_ADMIN.equals(roleKey)

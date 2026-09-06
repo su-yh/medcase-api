@@ -1,11 +1,13 @@
 package com.medcase.system.service;
 
 import com.github.benmanes.caffeine.cache.Cache;
-import com.medcase.common.core.domain.entity.SysRole;
 import com.medcase.system.entity.SysRoleEntity;
 import com.medcase.system.mapper.SysRoleMapper;
 import com.medcase.system.mapper.SysRoleMenuMapper;
 import com.medcase.system.mapper.SysUserRoleMapper;
+import com.medcase.web.controller.system.dto.RoleAddRequest;
+import com.medcase.web.controller.system.dto.RoleEditRequest;
+import com.medcase.web.controller.system.dto.RoleStatusRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -17,6 +19,7 @@ import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -83,12 +86,40 @@ class SysRoleServiceCacheTest {
         when(roleMapper.insert(any(SysRoleEntity.class))).thenReturn(1);
 
         roleService.selectRoleAll();
-        SysRole addRole = new SysRole();
-        addRole.setMenuIds(new Long[0]);
-        roleService.insertRole(addRole);
+        RoleAddRequest addRole = new RoleAddRequest();
+        roleService.insertRole(addRole, "admin");
         roleService.selectRoleAll();
 
         verify(roleMapper, times(2)).selectList();
+    }
+
+    @Test
+    void insertRoleBuildsEntityFromRequestInService() {
+
+        when(roleMapper.selectRoleByName("审核员")).thenReturn(null);
+        when(roleMapper.selectRoleByKey("reviewer")).thenReturn(null);
+        when(roleMapper.insert(any(SysRoleEntity.class))).thenReturn(1);
+
+        RoleAddRequest request = new RoleAddRequest();
+        request.setRoleName("审核员");
+        request.setRoleKey("reviewer");
+        request.setRoleSort(1);
+        request.setMenuCheckStrictly(true);
+        request.setStatus("0");
+        request.setRemark("病例审核角色");
+
+        roleService.insertRole(request, "admin");
+
+        org.mockito.ArgumentCaptor<SysRoleEntity> captor = forClass(SysRoleEntity.class);
+        verify(roleMapper).insert(captor.capture());
+        SysRoleEntity role = captor.getValue();
+        assertEquals("审核员", role.getRoleName());
+        assertEquals("reviewer", role.getRoleKey());
+        assertEquals(1, role.getRoleSort());
+        assertEquals(Boolean.TRUE, role.getMenuCheckStrictly());
+        assertEquals("0", role.getStatus());
+        assertEquals("病例审核角色", role.getRemark());
+        assertEquals("admin", role.getCreateBy());
     }
 
     @Test
@@ -100,10 +131,9 @@ class SysRoleServiceCacheTest {
         when(roleMenuMapper.deleteByRoleId(1L)).thenReturn(0);
 
         roleService.selectRoleAll();
-        SysRole updateRole = new SysRole();
+        RoleEditRequest updateRole = new RoleEditRequest();
         updateRole.setRoleId(1L);
-        updateRole.setMenuIds(new Long[0]);
-        roleService.updateRole(updateRole);
+        roleService.updateRole(updateRole, "admin");
         roleService.selectRoleAll();
 
         verify(roleMapper, times(2)).selectList();
@@ -117,9 +147,9 @@ class SysRoleServiceCacheTest {
         when(roleMapper.updateById(any(SysRoleEntity.class))).thenReturn(1);
 
         roleService.selectRoleAll();
-        SysRole updateRole = new SysRole();
+        RoleStatusRequest updateRole = new RoleStatusRequest();
         updateRole.setRoleId(1L);
-        roleService.updateRoleStatus(updateRole);
+        roleService.updateRoleStatus(updateRole, "admin");
         roleService.selectRoleAll();
 
         verify(roleMapper, times(2)).selectList();

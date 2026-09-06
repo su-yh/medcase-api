@@ -2,11 +2,9 @@ package com.medcase.system.converter;
 
 import com.medcase.common.core.domain.entity.SysDept;
 import com.medcase.common.core.domain.entity.SysMenu;
-import com.medcase.common.core.domain.entity.SysRole;
 import com.medcase.common.core.domain.entity.SysUser;
 import com.medcase.system.entity.SysDeptEntity;
 import com.medcase.system.entity.SysMenuEntity;
-import com.medcase.system.entity.SysRoleEntity;
 import com.medcase.system.entity.SysUserEntity;
 import org.springframework.beans.BeanUtils;
 
@@ -34,10 +32,6 @@ public final class SystemEntityConverter {
 
     public static SysMenu toDomain(SysMenuEntity source) {
         return copy(source, SysMenu.class);
-    }
-
-    public static SysRoleEntity toEntity(SysRole source) {
-        return copy(source, SysRoleEntity.class);
     }
 
     public static SysUserEntity toEntity(SysUser source) {

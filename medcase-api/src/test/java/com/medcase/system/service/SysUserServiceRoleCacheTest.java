@@ -1,6 +1,5 @@
 package com.medcase.system.service;
 
-import com.medcase.common.core.domain.entity.SysRole;
 import com.medcase.system.entity.SysRoleEntity;
 import com.medcase.system.mapper.SysUserMapper;
 import org.junit.jupiter.api.BeforeEach;
