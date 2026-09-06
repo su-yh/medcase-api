@@ -2,6 +2,7 @@ package com.medcase.mvc.audit;
 
 import com.medcase.common.utils.json.JsonUtils;
 import com.medcase.mvc.user.AbstractLoginUser;
+import com.medcase.system.mapper.AuditLogMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -25,14 +26,14 @@ public class AuditComponent extends AbstractAuditComponent {
 
     @Override
     protected void doAuditRecord(
-            IAudit auditOperation,
+            AuditEnums auditOperation,
             Object spelReturnValue,
             HttpServletRequest request,
             AbstractLoginUser loginUser,
             Object... reqArgs) {
         AuditLogEntity recordEntity = new AuditLogEntity();
         recordEntity.setUserId(loginUser.getId()).setUserNickname(loginUser.getNickname())
-                .setOperation(auditOperation.getOperation())
+                .setOperation(auditOperation)
                 .setReqArgument(JsonUtils.toJSONString(reqArgs))
                 .setResult(JsonUtils.toJSONString(spelReturnValue))
                 .setReqPath(request.getServletPath()).setReqMethod(request.getMethod())

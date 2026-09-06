@@ -29,7 +29,7 @@ public class AuditLogEntity {
     private String userNickname;
 
     @TableField("operation")
-    private String operation;
+    private AuditEnums operation;
 
     @TableField("req_argument")
     private String reqArgument;

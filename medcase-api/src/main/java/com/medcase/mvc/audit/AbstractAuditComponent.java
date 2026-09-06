@@ -15,7 +15,7 @@ import jakarta.servlet.http.HttpServletRequest;
 public abstract class AbstractAuditComponent {
     // 审计日志记录
     public boolean auditRecord(
-            IAudit auditOperation,
+            AuditEnums auditOperation,
             Object spelReturnValue,
             HttpServletRequest request,
             AbstractLoginUser loginUser,
@@ -31,7 +31,7 @@ public abstract class AbstractAuditComponent {
     }
 
     protected abstract void doAuditRecord(
-            IAudit auditOperation,
+            AuditEnums auditOperation,
             Object spelReturnValue,
             HttpServletRequest request,
             AbstractLoginUser loginUser,
