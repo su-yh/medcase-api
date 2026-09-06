@@ -1,6 +1,6 @@
 package com.medcase.web.controller.file;
 
-import com.medcase.common.core.domain.entity.SysUser;
+import com.medcase.system.entity.SysUserEntity;
 import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.common.enums.UserTypeEnums;
 import com.medcase.storage.enums.FileBusinessEnums;
@@ -139,7 +139,7 @@ class FileStorageControllerTest {
     }
 
     private LoginUser doctorLoginUser() {
-        SysUser user = new SysUser();
+        SysUserEntity user = new SysUserEntity();
         user.setUserId(12L);
         user.setUserType(UserTypeEnums.DOCTOR);
 
@@ -149,7 +149,7 @@ class FileStorageControllerTest {
     }
 
     private LoginUser adminLoginUser() {
-        SysUser user = new SysUser();
+        SysUserEntity user = new SysUserEntity();
         user.setUserId(12L);
         user.setUserType(UserTypeEnums.ADMIN);
 

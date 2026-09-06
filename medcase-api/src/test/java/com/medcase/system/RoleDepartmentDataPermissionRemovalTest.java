@@ -1,6 +1,6 @@
 package com.medcase.system;
 
-import com.medcase.common.core.domain.entity.SysUser;
+import com.medcase.system.entity.SysUserEntity;
 import com.medcase.system.entity.SysRoleEntity;
 import org.junit.jupiter.api.Test;
 
@@ -54,7 +54,7 @@ class RoleDepartmentDataPermissionRemovalTest {
 
     @Test
     void departmentSelectionAndUserDepartmentRemainAvailable() throws IOException {
-        assertThat(SysUser.class.getDeclaredFields()).extracting(Field::getName).contains("deptId");
+        assertThat(SysUserEntity.class.getDeclaredFields()).extracting(Field::getName).contains("deptId");
         String deptController = Files.readString(Path.of(
                 "src/main/java/com/medcase/web/controller/system/SysDeptController.java"));
         String userController = Files.readString(Path.of(

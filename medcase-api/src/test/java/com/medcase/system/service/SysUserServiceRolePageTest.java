@@ -1,10 +1,11 @@
 package com.medcase.system.service;
 
-import com.medcase.common.core.domain.entity.SysUser;
+import com.medcase.system.entity.SysUserEntity;
 import com.medcase.common.enums.UserTypeEnums;
 import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
 import com.medcase.system.mapper.SysUserMapper;
+import com.medcase.web.controller.system.dto.UserQueryRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -43,21 +44,21 @@ class SysUserServiceRolePageTest {
         PageParam pageParam = new PageParam();
         pageParam.setPageNo(1);
         pageParam.setPageSize(10);
-        SysUser user = new SysUser();
+        UserQueryRequest user = new UserQueryRequest();
         user.setRoleId(99L);
 
-        SysUser resultUser = new SysUser();
+        SysUserEntity resultUser = new SysUserEntity();
         resultUser.setUserId(7L);
         resultUser.setUserName("bound-user");
         resultUser.setUserType(UserTypeEnums.ADMIN);
 
         when(userMapper.selectAllocatedPage(
-                any(PageParam.class), any(SysUser.class), nullable(Collection.class)))
+                any(PageParam.class), any(UserQueryRequest.class), nullable(Collection.class)))
                 .thenReturn(new PageResult<>(List.of(resultUser), 1L));
 
-        PageResult<SysUser> result = userService.selectAllocatedPage(user, pageParam);
+        PageResult<SysUserEntity> result = userService.selectAllocatedPage(user, pageParam);
 
-        ArgumentCaptor<SysUser> userCaptor = ArgumentCaptor.forClass(SysUser.class);
+        ArgumentCaptor<UserQueryRequest> userCaptor = ArgumentCaptor.forClass(UserQueryRequest.class);
         verify(userMapper).selectAllocatedPage(
                 any(PageParam.class), userCaptor.capture(), nullable(Collection.class));
         assertEquals(UserTypeEnums.ADMIN, userCaptor.getValue().getUserType());
@@ -70,21 +71,21 @@ class SysUserServiceRolePageTest {
         PageParam pageParam = new PageParam();
         pageParam.setPageNo(1);
         pageParam.setPageSize(10);
-        SysUser user = new SysUser();
+        UserQueryRequest user = new UserQueryRequest();
         user.setRoleId(99L);
 
-        SysUser resultUser = new SysUser();
+        SysUserEntity resultUser = new SysUserEntity();
         resultUser.setUserId(8L);
         resultUser.setUserName("free-user");
         resultUser.setUserType(UserTypeEnums.ADMIN);
 
         when(userMapper.selectUnallocatedPage(
-                any(PageParam.class), any(SysUser.class), nullable(Collection.class)))
+                any(PageParam.class), any(UserQueryRequest.class), nullable(Collection.class)))
                 .thenReturn(new PageResult<>(List.of(resultUser), 1L));
 
-        PageResult<SysUser> result = userService.selectUnallocatedPage(user, pageParam);
+        PageResult<SysUserEntity> result = userService.selectUnallocatedPage(user, pageParam);
 
-        ArgumentCaptor<SysUser> userCaptor = ArgumentCaptor.forClass(SysUser.class);
+        ArgumentCaptor<UserQueryRequest> userCaptor = ArgumentCaptor.forClass(UserQueryRequest.class);
         verify(userMapper).selectUnallocatedPage(
                 any(PageParam.class), userCaptor.capture(), nullable(Collection.class));
         assertEquals(UserTypeEnums.ADMIN, userCaptor.getValue().getUserType());

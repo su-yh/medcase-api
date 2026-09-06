@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 import com.medcase.common.enums.UserTypeEnums;
+import com.medcase.system.entity.SysUserEntity;
 import org.junit.jupiter.api.Test;
 
 class SysUserUserTypeTest {
@@ -11,7 +12,7 @@ class SysUserUserTypeTest {
     @Test
     void newUserShouldNotHideMissingUserType() {
 
-        SysUser user = new SysUser();
+        SysUserEntity user = new SysUserEntity();
 
         assertNull(user.getUserType());
     }
@@ -19,7 +20,7 @@ class SysUserUserTypeTest {
     @Test
     void userTypeShouldBeWritableForFutureUserTypes() {
 
-        SysUser user = new SysUser();
+        SysUserEntity user = new SysUserEntity();
 
         user.setUserType(UserTypeEnums.DOCTOR);
 

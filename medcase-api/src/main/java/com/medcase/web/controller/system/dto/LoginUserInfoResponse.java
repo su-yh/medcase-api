@@ -1,6 +1,6 @@
 package com.medcase.web.controller.system.dto;
 
-import com.medcase.common.core.domain.entity.SysUser;
+import com.medcase.system.entity.SysUserEntity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -14,7 +14,7 @@ import java.util.Set;
 @Getter
 @AllArgsConstructor
 public class LoginUserInfoResponse {
-    private SysUser user;
+    private SysUserEntity user;
 
     private Set<String> roles;
 

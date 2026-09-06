@@ -1,7 +1,7 @@
 package com.medcase.framework.web.service;
 
-import com.medcase.common.core.domain.entity.SysDept;
-import com.medcase.common.core.domain.entity.SysUser;
+import com.medcase.system.entity.SysDeptEntity;
+import com.medcase.system.entity.SysUserEntity;
 import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.common.enums.UserTypeEnums;
 import com.medcase.system.service.SysUserService;
@@ -35,12 +35,12 @@ class UserDetailsServiceImplTest {
         assertSame(UserTypeEnums.ADMIN, ((LoginUser) userDetails).getUser().getUserType());
     }
 
-    private static SysUser adminUser() {
-        SysDept dept = new SysDept();
+    private static SysUserEntity adminUser() {
+        SysDeptEntity dept = new SysDeptEntity();
         dept.setDeptId(1L);
         dept.setDeptName("管理部");
 
-        SysUser user = new SysUser();
+        SysUserEntity user = new SysUserEntity();
         user.setUserId(1L);
         user.setUserName("suyunhong");
         user.setUserType(UserTypeEnums.ADMIN);

@@ -1,12 +1,12 @@
 package com.medcase.framework.web.service;
 
-import com.medcase.common.core.domain.entity.SysUser;
 import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.common.enums.UserTypeEnums;
 import com.medcase.common.enums.UserStatusEnums;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
 import com.medcase.system.service.SysUserService;
+import com.medcase.system.entity.SysUserEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,13 +33,13 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
-        SysUser user = userService.selectUserByUserName(username, UserTypeEnums.ADMIN.getCode());
+        SysUserEntity user = userService.selectUserByUserName(username, UserTypeEnums.ADMIN.getCode());
         if (user == null) {
 
             log.info("登录用户：{} 不存在.", username);
             throw ExceptionUtil.business(ErrorCodeEnums.ADMIN_LOGIN_FAILED);
         }
-        else if (Boolean.TRUE.equals(user.getDelFlag())) {
+        else if ("2".equals(user.getDelFlag())) {
 
             log.info("登录用户：{} 已被删除.", username);
             throw ExceptionUtil.business(ErrorCodeEnums.USER_DELETED);
@@ -53,7 +53,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         return createLoginUser(user);
     }
 
-    public UserDetails createLoginUser(SysUser user) {
+    public UserDetails createLoginUser(SysUserEntity user) {
 
         return new LoginUser(user.getUserId(), user.getDeptId(), user, permissionService.getMenuPermission(user));
     }

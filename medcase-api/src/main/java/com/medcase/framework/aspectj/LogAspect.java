@@ -1,7 +1,6 @@
 package com.medcase.framework.aspectj;
 
 import com.medcase.common.annotation.Log;
-import com.medcase.common.core.domain.entity.SysUser;
 import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.common.core.text.Convert;
 import com.medcase.common.enums.BusinessStatus;
@@ -14,6 +13,7 @@ import com.medcase.common.utils.json.JsonUtils;
 import com.medcase.framework.manager.AsyncManager;
 import com.medcase.framework.manager.factory.AsyncFactory;
 import com.medcase.system.entity.SysOperLogEntity;
+import com.medcase.system.entity.SysUserEntity;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.ArrayUtils;
@@ -102,7 +102,7 @@ public class LogAspect {
             if (loginUser != null) {
 
                 operLog.setOperName(loginUser.getUsername());
-                SysUser currentUser = loginUser.getUser();
+                SysUserEntity currentUser = loginUser.getUser();
                 if (currentUser != null && currentUser.getDept() != null) {
 
                     operLog.setDeptName(currentUser.getDept().getDeptName());

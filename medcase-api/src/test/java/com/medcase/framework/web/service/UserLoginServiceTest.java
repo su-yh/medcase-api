@@ -2,7 +2,7 @@ package com.medcase.framework.web.service;
 
 import com.medcase.biz.domain.UserEntity;
 import com.medcase.biz.mapper.UserMapper;
-import com.medcase.common.core.domain.entity.SysUser;
+import com.medcase.system.entity.SysUserEntity;
 import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.common.enums.UserStatusEnums;
 import com.medcase.common.enums.UserTypeEnums;
@@ -95,7 +95,7 @@ class UserLoginServiceTest {
         user.setUserType(UserTypeEnums.DOCTOR);
         when(userMapper.selectUserByUsername("doctor01", UserTypeEnums.DOCTOR)).thenReturn(user);
         when(passwordEncoder.matches("secret123", "encoded-password")).thenReturn(true);
-        when(permissionService.getMenuPermission(any(SysUser.class))).thenReturn(Set.of("case:read"));
+        when(permissionService.getMenuPermission(any(SysUserEntity.class))).thenReturn(Set.of("case:read"));
         when(tokenService.createToken(any(LoginUser.class))).thenReturn("doctor-token");
 
         String token = service.login("doctor01", "secret123", null, null, UserTypeEnums.DOCTOR);

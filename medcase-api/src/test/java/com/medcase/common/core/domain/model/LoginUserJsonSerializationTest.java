@@ -1,6 +1,6 @@
 package com.medcase.common.core.domain.model;
 
-import com.medcase.common.core.domain.entity.SysUser;
+import com.medcase.system.entity.SysUserEntity;
 import com.medcase.storage.pojo.FileAttachment;
 import org.junit.jupiter.api.Test;
 import tools.jackson.databind.ObjectMapper;
@@ -15,7 +15,7 @@ class LoginUserJsonSerializationTest {
     @Test
     void jacksonSerializationShouldIgnoreSecurityAndPasswordFields() throws Exception {
 
-        SysUser user = new SysUser();
+        SysUserEntity user = new SysUserEntity();
         user.setUserName("doctor");
         user.setPassword("secret");
         FileAttachment avatar = new FileAttachment();

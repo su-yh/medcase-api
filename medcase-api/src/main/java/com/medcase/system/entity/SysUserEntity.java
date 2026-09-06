@@ -5,12 +5,15 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.medcase.common.enums.UserTypeEnums;
 import com.medcase.mp.entity.AbstractBaseEntity;
 import com.medcase.storage.pojo.FileAttachment;
 import lombok.Data;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * 用户信息表实体。
@@ -56,6 +59,7 @@ public class SysUserEntity extends AbstractBaseEntity {
     @TableField(typeHandler = JacksonTypeHandler.class)
     private FileAttachment avatar;
 
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
     private String status;
@@ -69,4 +73,28 @@ public class SysUserEntity extends AbstractBaseEntity {
     private Date pwdUpdateDate;
 
     private String remark;
+
+    @TableField(exist = false)
+    private SysDeptEntity dept;
+
+    @TableField(exist = false)
+    private List<SysRoleEntity> roles;
+
+    @TableField(exist = false)
+    private Long[] roleIds;
+
+    @TableField(exist = false)
+    private Long[] postIds;
+
+    @TableField(exist = false)
+    private Long roleId;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    public Date getLoginDate() {
+        return loginDate;
+    }
+
+    public boolean isAdmin() {
+        return userId != null && userId == 1L;
+    }
 }

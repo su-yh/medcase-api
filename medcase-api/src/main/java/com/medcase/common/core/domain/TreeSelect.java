@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.medcase.common.constant.UserConstants;
-import com.medcase.common.core.domain.entity.SysDept;
-import com.medcase.common.core.domain.entity.SysMenu;
+import com.medcase.system.entity.SysDeptEntity;
+import com.medcase.system.entity.SysMenuEntity;
 import lombok.Data;
 
 /**
@@ -36,7 +36,7 @@ public class TreeSelect implements Serializable {
 
     }
 
-    public TreeSelect(SysDept dept) {
+    public TreeSelect(SysDeptEntity dept) {
 
         this.id = dept.getDeptId();
         this.label = dept.getDeptName();
@@ -44,7 +44,7 @@ public class TreeSelect implements Serializable {
         this.children = dept.getChildren().stream().map(TreeSelect::new).collect(Collectors.toList());
     }
 
-    public TreeSelect(SysMenu menu) {
+    public TreeSelect(SysMenuEntity menu) {
 
         this.id = menu.getMenuId();
         this.label = menu.getMenuName();

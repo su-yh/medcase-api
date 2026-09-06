@@ -3,7 +3,7 @@ package com.medcase.mvc.authentication;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import com.medcase.common.core.domain.entity.SysUser;
+import com.medcase.system.entity.SysUserEntity;
 import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.common.enums.UserStatusEnums;
 import com.medcase.common.enums.UserTypeEnums;
@@ -61,7 +61,7 @@ class LoginUserArgumentResolverTest {
     }
 
     private void loginAs(UserStatusEnums status) {
-        SysUser user = new SysUser();
+        SysUserEntity user = new SysUserEntity();
         user.setUserId(1L);
         user.setUserType(UserTypeEnums.DOCTOR);
         user.setStatus(status.getCode());

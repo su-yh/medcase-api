@@ -2,7 +2,6 @@ package com.medcase.web.controller.system;
 
 import com.medcase.common.annotation.Log;
 import com.medcase.common.core.domain.TreeSelect;
-import com.medcase.common.core.domain.entity.SysUser;
 import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.common.enums.BusinessType;
 import com.medcase.mp.mybatis.PageParam;
@@ -15,10 +14,16 @@ import com.medcase.system.service.SysPostService;
 import com.medcase.system.service.SysRoleService;
 import com.medcase.system.service.SysUserService;
 import com.medcase.system.entity.SysRoleEntity;
+import com.medcase.system.entity.SysUserEntity;
 import com.medcase.web.controller.system.dto.DeptQueryRequest;
 import com.medcase.web.controller.system.dto.PostResponse;
 import com.medcase.web.controller.system.dto.UserAuthRoleResponse;
 import com.medcase.web.controller.system.dto.UserDetailResponse;
+import com.medcase.web.controller.system.dto.UserProfileUpdateRequest;
+import com.medcase.web.controller.system.dto.UserQueryRequest;
+import com.medcase.web.controller.system.dto.UserResetPasswordRequest;
+import com.medcase.web.controller.system.dto.UserSaveRequest;
+import com.medcase.web.controller.system.dto.UserStatusRequest;
 import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -66,9 +71,9 @@ public class SysUserController {
      */
     @PreAuthorize("@ss.hasPermi('system:user:list')")
     @GetMapping("/list")
-    public PageResult<SysUser> list(
+    public PageResult<SysUserEntity> list(
             PageParam pageParam,
-            SysUser user,
+            UserQueryRequest user,
             @RequestParam(value = "beginTime", required = false) String beginTime,
             @RequestParam(value = "endTime", required = false) String endTime) {
 
@@ -94,7 +99,7 @@ public class SysUserController {
     }
 
     private UserDetailResponse buildUserDetailResponse(Long userId) {
-        SysUser sysUser = null;
+        SysUserEntity sysUser = null;
         List<Long> postIds = null;
         List<Long> roleIds = null;
         if (userId != null) {
@@ -119,7 +124,7 @@ public class SysUserController {
     @PreAuthorize("@ss.hasPermi('system:user:add')")
     @Log(title = "用户管理", businessType = BusinessType.INSERT)
     @PostMapping
-    public void add(@Validated @RequestBody SysUser user) {
+    public void add(@Validated @RequestBody UserSaveRequest user) {
 
         if (!userService.checkUserNameUnique(user)) {
             throw ExceptionUtil.business(ErrorCodeEnums.USERNAME_EXISTS, user.getUserName());
@@ -142,11 +147,11 @@ public class SysUserController {
     @PreAuthorize("@ss.hasPermi('system:user:edit')")
     @Log(title = "用户管理", businessType = BusinessType.UPDATE)
     @PutMapping
-    public void edit(@Validated @RequestBody SysUser user) {
+    public void edit(@Validated @RequestBody UserSaveRequest user) {
 
         user.setPassword(null);
 
-        userService.checkUserAllowed(user);
+        userService.checkUserAllowed(user.getUserId());
         if (!userService.checkUserNameUnique(user)) {
             throw ExceptionUtil.business(ErrorCodeEnums.USERNAME_EXISTS, user.getUserName());
         }
@@ -188,10 +193,10 @@ public class SysUserController {
     @Log(title = "用户管理", businessType = BusinessType.UPDATE)
     @PutMapping("/resetPwd")
     public void resetPwd(
-            @RequestBody SysUser user,
+            @Validated @RequestBody UserResetPasswordRequest user,
             @CurrLoginUser LoginUser loginUser) {
 
-        userService.checkUserAllowed(user);
+        userService.checkUserAllowed(user.getUserId());
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         if (userService.resetPwd(user) <= 0) {
             throw ExceptionUtil.business(ErrorCodeEnums.USER_OPERATION_FAILED);
@@ -206,10 +211,10 @@ public class SysUserController {
     @Log(title = "用户管理", businessType = BusinessType.UPDATE)
     @PutMapping("/changeStatus")
     public void changeStatus(
-            @RequestBody SysUser user,
+            @Validated @RequestBody UserStatusRequest user,
             @CurrLoginUser LoginUser loginUser) {
 
-        userService.checkUserAllowed(user);
+        userService.checkUserAllowed(user.getUserId());
         if (userService.updateUserStatus(user) <= 0) {
             throw ExceptionUtil.business(ErrorCodeEnums.USER_OPERATION_FAILED);
         }
@@ -222,7 +227,7 @@ public class SysUserController {
     @GetMapping("/authRole/{userId}")
     public UserAuthRoleResponse authRole(@PathVariable("userId") Long userId) {
 
-        SysUser user = userService.selectUserById(userId);
+        SysUserEntity user = userService.selectUserById(userId);
         List<SysRoleEntity> roles = roleService.selectRolesByUserId(userId);
         return new UserAuthRoleResponse(user, roles);
     }

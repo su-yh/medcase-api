@@ -4,7 +4,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.medcase.system.mapper.SysMenuMapper">
 
-	<resultMap type="com.medcase.common.core.domain.entity.SysMenu" id="SysMenuResult">
+	<resultMap type="com.medcase.system.entity.SysMenuEntity" id="SysMenuResult">
 		<id     property="menuId"         column="menu_id"        />
 		<result property="menuName"       column="menu_name"      />
 		<result property="parentName"     column="parent_name"    />
@@ -33,17 +33,17 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		from sys_menu
     </sql>
 
-    <select id="selectMenuList" parameterType="com.medcase.common.core.domain.entity.SysMenu" resultMap="SysMenuResult">
+    <select id="selectMenuList" resultMap="SysMenuResult">
 		<include refid="selectMenuVo"/>
 		<where>
-			<if test="menuName != null and menuName != ''">
-				AND menu_name like concat('%', #{menuName}, '%')
+			<if test="menu.menuName != null and menu.menuName != ''">
+				AND menu_name like concat('%', #{menu.menuName}, '%')
 			</if>
-			<if test="visible != null and visible != ''">
-				AND visible = #{visible}
+			<if test="menu.visible != null and menu.visible != ''">
+				AND visible = #{menu.visible}
 			</if>
-			<if test="status != null and status != ''">
-				AND status = #{status}
+			<if test="menu.status != null and menu.status != ''">
+				AND status = #{menu.status}
 			</if>
 		</where>
 		order by parent_id, order_num
@@ -108,7 +108,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		where m.status = '0' and rm.role_id = #{roleId}
 	</select>
 
-	<select id="selectMenusByPathOrRouteName" parameterType="com.medcase.common.core.domain.entity.SysMenu" resultMap="SysMenuResult">
+	<select id="selectMenusByPathOrRouteName" resultMap="SysMenuResult">
 		<include refid="selectMenuVo"/>
 		where menu_type in ('M', 'C') and (path = #{path} or path = #{routeName} or route_name = #{path} or route_name = #{routeName})
 	</select>

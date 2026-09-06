@@ -1,12 +1,12 @@
 package com.medcase.system.service;
 
-import com.medcase.common.core.domain.entity.SysUser;
-import com.medcase.common.core.domain.entity.SysDept;
+import com.medcase.system.entity.SysUserEntity;
+import com.medcase.system.entity.SysDeptEntity;
 import com.medcase.common.enums.UserTypeEnums;
 import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
 import com.medcase.system.mapper.SysUserMapper;
-import com.medcase.system.entity.SysUserEntity;
+import com.medcase.web.controller.system.dto.UserQueryRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -32,12 +32,17 @@ class SysUserServicePageTest {
     @Mock
     private SysDeptService deptService;
 
+    @Mock
+    private SysRoleService roleService;
+
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
         userService = new SysUserService();
         ReflectionTestUtils.setField(userService, "userMapper", userMapper);
         ReflectionTestUtils.setField(userService, "deptService", deptService);
+        ReflectionTestUtils.setField(userService, "roleService", roleService);
+        when(roleService.selectRolesByUserId(any())).thenReturn(List.of());
     }
 
     @Test
@@ -45,29 +50,29 @@ class SysUserServicePageTest {
         PageParam pageParam = new PageParam();
         pageParam.setPageNo(2);
         pageParam.setPageSize(10);
-        SysUser user = new SysUser();
+        UserQueryRequest user = new UserQueryRequest();
         user.setUserName("admin");
         user.setDeptId(1L);
 
-        SysUser resultUser = new SysUser();
+        SysUserEntity resultUser = new SysUserEntity();
         resultUser.setUserId(1L);
         resultUser.setUserName("admin");
         resultUser.setUserType(UserTypeEnums.ADMIN);
         resultUser.setDeptId(2L);
 
-        SysDept resultDept = new SysDept();
+        SysDeptEntity resultDept = new SysDeptEntity();
         resultDept.setDeptId(2L);
         resultDept.setDeptName("子部门");
         when(deptService.all()).thenReturn(List.of());
         when(deptService.selectDeptById(2L)).thenReturn(resultDept);
         when(userMapper.selectPage(
-                any(PageParam.class), any(SysUser.class), any(Collection.class),
+                any(PageParam.class), any(UserQueryRequest.class), any(Collection.class),
                 nullable(String.class), nullable(String.class)))
                 .thenReturn(new PageResult<>(List.of(resultUser), 1L));
 
-        PageResult<SysUser> result = userService.selectPage(user, pageParam);
+        PageResult<SysUserEntity> result = userService.selectPage(user, pageParam);
 
-        ArgumentCaptor<SysUser> userCaptor = ArgumentCaptor.forClass(SysUser.class);
+        ArgumentCaptor<UserQueryRequest> userCaptor = ArgumentCaptor.forClass(UserQueryRequest.class);
         ArgumentCaptor<Collection> deptIdsCaptor = ArgumentCaptor.forClass(Collection.class);
         verify(userMapper).selectPage(
                 any(PageParam.class), userCaptor.capture(), deptIdsCaptor.capture(),
@@ -87,12 +92,12 @@ class SysUserServicePageTest {
         entity.setDeptId(2L);
         when(userMapper.selectById(7L)).thenReturn(entity);
 
-        SysDept dept = new SysDept();
+        SysDeptEntity dept = new SysDeptEntity();
         dept.setDeptId(2L);
         dept.setDeptName("子部门");
         when(deptService.selectDeptById(2L)).thenReturn(dept);
 
-        SysUser result = userService.selectUserById(7L);
+        SysUserEntity result = userService.selectUserById(7L);
 
         assertEquals("子部门", result.getDept().getDeptName());
     }
@@ -107,12 +112,12 @@ class SysUserServicePageTest {
         when(userMapper.selectUserByUserName("admin", UserTypeEnums.ADMIN.getCode(), "0"))
                 .thenReturn(entity);
 
-        SysDept dept = new SysDept();
+        SysDeptEntity dept = new SysDeptEntity();
         dept.setDeptId(2L);
         dept.setDeptName("子部门");
         when(deptService.selectDeptById(2L)).thenReturn(dept);
 
-        SysUser result = userService.selectUserByUserName("admin", UserTypeEnums.ADMIN.getCode());
+        SysUserEntity result = userService.selectUserByUserName("admin", UserTypeEnums.ADMIN.getCode());
 
         assertEquals("子部门", result.getDept().getDeptName());
     }

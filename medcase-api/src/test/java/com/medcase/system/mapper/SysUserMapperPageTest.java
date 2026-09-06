@@ -1,9 +1,10 @@
 package com.medcase.system.mapper;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.medcase.common.core.domain.entity.SysUser;
+import com.medcase.system.entity.SysUserEntity;
 import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
+import com.medcase.web.controller.system.dto.UserQueryRequest;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
@@ -31,25 +32,27 @@ class SysUserMapperPageTest {
         pageParam.setPageNo(3);
         pageParam.setPageSize(20);
 
-        SysUser user = new SysUser();
+        UserQueryRequest user = new UserQueryRequest();
         user.setUserName("admin");
 
         when(mapper.selectUserPage(
-                any(Page.class), any(SysUser.class), nullable(Collection.class),
+                any(Page.class), any(UserQueryRequest.class), nullable(Collection.class),
                 nullable(String.class), nullable(String.class))).thenAnswer(invocation -> {
-            Page<SysUser> page = invocation.getArgument(0);
-            SysUser query = invocation.getArgument(1);
+            Page<SysUserEntity> page = invocation.getArgument(0);
+            UserQueryRequest query = invocation.getArgument(1);
+            SysUserEntity resultUser = new SysUserEntity();
+            resultUser.setUserName(query.getUserName());
             page.setTotal(5);
-            page.setRecords(List.of(query));
+            page.setRecords(List.of(resultUser));
             return page;
         });
 
-        PageResult<SysUser> result = mapper.selectPage(
+        PageResult<SysUserEntity> result = mapper.selectPage(
                 pageParam, user, null, "2026-09-01", "2026-09-05");
 
         ArgumentCaptor<Page> pageCaptor = ArgumentCaptor.forClass(Page.class);
         verify(mapper).selectUserPage(
-                pageCaptor.capture(), any(SysUser.class), nullable(Collection.class),
+                pageCaptor.capture(), any(UserQueryRequest.class), nullable(Collection.class),
                 nullable(String.class), nullable(String.class));
         assertEquals(3L, pageCaptor.getValue().getCurrent());
         assertEquals(20L, pageCaptor.getValue().getSize());

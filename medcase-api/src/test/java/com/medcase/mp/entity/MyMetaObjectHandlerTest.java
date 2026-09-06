@@ -2,7 +2,7 @@ package com.medcase.mp.entity;
 
 import com.baomidou.mybatisplus.core.MybatisConfiguration;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
-import com.medcase.common.core.domain.entity.SysUser;
+import com.medcase.system.entity.SysUserEntity;
 import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.system.entity.SysRoleEntity;
 import org.apache.ibatis.builder.MapperBuilderAssistant;
@@ -35,7 +35,7 @@ class MyMetaObjectHandlerTest {
 
     @Test
     void fillsCurrentUserIdAndNicknameWhenLoginUserExists() {
-        SysUser user = new SysUser();
+        SysUserEntity user = new SysUserEntity();
         user.setNickName("审核管理员");
         LoginUser loginUser = new LoginUser();
         loginUser.setUserId(8L);

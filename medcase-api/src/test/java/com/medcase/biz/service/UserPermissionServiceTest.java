@@ -3,7 +3,7 @@ package com.medcase.biz.service;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.medcase.common.core.domain.entity.SysUser;
+import com.medcase.system.entity.SysUserEntity;
 import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.common.enums.UserStatusEnums;
 import com.medcase.common.enums.UserTypeEnums;
@@ -63,7 +63,7 @@ class UserPermissionServiceTest {
     }
 
     private LoginUser loginUser(UserTypeEnums userType, UserStatusEnums status) {
-        SysUser user = new SysUser();
+        SysUserEntity user = new SysUserEntity();
         user.setUserType(userType);
         user.setStatus(status.getCode());
 

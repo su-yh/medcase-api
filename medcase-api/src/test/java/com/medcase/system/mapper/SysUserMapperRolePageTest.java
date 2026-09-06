@@ -1,9 +1,10 @@
 package com.medcase.system.mapper;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.medcase.common.core.domain.entity.SysUser;
+import com.medcase.system.entity.SysUserEntity;
 import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
+import com.medcase.web.controller.system.dto.UserQueryRequest;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
@@ -27,23 +28,24 @@ class SysUserMapperRolePageTest {
         pageParam.setPageNo(2);
         pageParam.setPageSize(15);
 
-        SysUser user = new SysUser();
+        UserQueryRequest user = new UserQueryRequest();
         user.setRoleId(99L);
 
         when(mapper.selectAllocatedPage(
-                any(Page.class), any(SysUser.class), nullable(Collection.class))).thenAnswer(invocation -> {
-            Page<SysUser> page = invocation.getArgument(0);
-            SysUser query = invocation.getArgument(1);
+                any(Page.class), any(UserQueryRequest.class), nullable(Collection.class))).thenAnswer(invocation -> {
+            Page<SysUserEntity> page = invocation.getArgument(0);
             page.setTotal(9);
-            page.setRecords(List.of(query));
+            SysUserEntity resultUser = new SysUserEntity();
+            resultUser.setRoleId(user.getRoleId());
+            page.setRecords(List.of(resultUser));
             return page;
         });
 
-        PageResult<SysUser> result = mapper.selectAllocatedPage(pageParam, user);
+        PageResult<SysUserEntity> result = mapper.selectAllocatedPage(pageParam, user);
 
         ArgumentCaptor<Page> pageCaptor = ArgumentCaptor.forClass(Page.class);
         verify(mapper).selectAllocatedPage(
-                pageCaptor.capture(), any(SysUser.class), nullable(Collection.class));
+                pageCaptor.capture(), any(UserQueryRequest.class), nullable(Collection.class));
         assertEquals(2L, pageCaptor.getValue().getCurrent());
         assertEquals(15L, pageCaptor.getValue().getSize());
         assertEquals(9, result.getTotal());
@@ -57,23 +59,24 @@ class SysUserMapperRolePageTest {
         pageParam.setPageNo(4);
         pageParam.setPageSize(8);
 
-        SysUser user = new SysUser();
+        UserQueryRequest user = new UserQueryRequest();
         user.setRoleId(100L);
 
         when(mapper.selectUnallocatedPage(
-                any(Page.class), any(SysUser.class), nullable(Collection.class))).thenAnswer(invocation -> {
-            Page<SysUser> page = invocation.getArgument(0);
-            SysUser query = invocation.getArgument(1);
+                any(Page.class), any(UserQueryRequest.class), nullable(Collection.class))).thenAnswer(invocation -> {
+            Page<SysUserEntity> page = invocation.getArgument(0);
             page.setTotal(11);
-            page.setRecords(List.of(query));
+            SysUserEntity resultUser = new SysUserEntity();
+            resultUser.setRoleId(user.getRoleId());
+            page.setRecords(List.of(resultUser));
             return page;
         });
 
-        PageResult<SysUser> result = mapper.selectUnallocatedPage(pageParam, user);
+        PageResult<SysUserEntity> result = mapper.selectUnallocatedPage(pageParam, user);
 
         ArgumentCaptor<Page> pageCaptor = ArgumentCaptor.forClass(Page.class);
         verify(mapper).selectUnallocatedPage(
-                pageCaptor.capture(), any(SysUser.class), nullable(Collection.class));
+                pageCaptor.capture(), any(UserQueryRequest.class), nullable(Collection.class));
         assertEquals(4L, pageCaptor.getValue().getCurrent());
         assertEquals(8L, pageCaptor.getValue().getSize());
         assertEquals(11, result.getTotal());

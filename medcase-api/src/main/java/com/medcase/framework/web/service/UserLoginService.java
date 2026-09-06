@@ -5,7 +5,6 @@ import com.medcase.biz.mapper.UserMapper;
 import com.medcase.common.constant.CacheConstants;
 import com.medcase.common.constant.Constants;
 import com.medcase.common.constant.UserConstants;
-import com.medcase.common.core.domain.entity.SysUser;
 import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.common.core.redis.RedisCache;
 import com.medcase.common.enums.UserStatusEnums;
@@ -19,6 +18,7 @@ import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
 import com.medcase.system.service.SysConfigService;
 import com.medcase.system.service.SysUserService;
+import com.medcase.system.entity.SysUserEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -154,7 +154,7 @@ public class UserLoginService {
             throw ExceptionUtil.business(ErrorCodeEnums.USER_LOGIN_FAILED);
         }
 
-        SysUser sysUser = toSysUser(user);
+        SysUserEntity sysUser = toSysUser(user);
         return new LoginUser(
                 sysUser.getUserId(), null, sysUser, permissionService.getMenuPermission(sysUser));
     }
@@ -172,16 +172,24 @@ public class UserLoginService {
         userMapper.updateById(updateUser);
     }
 
-    private SysUser toSysUser(UserEntity user) {
-        SysUser sysUser = new SysUser();
+    private SysUserEntity toSysUser(UserEntity user) {
+        SysUserEntity sysUser = new SysUserEntity();
         sysUser.setUserId(user.getUserId());
         sysUser.setUserName(user.getUserName());
         sysUser.setNickName(user.getNickName());
+        sysUser.setSupplierId(user.getSupplierId());
         sysUser.setSex(user.getSex());
+        sysUser.setIdCardNumber(user.getIdCardNumber());
+        sysUser.setTitle(user.getTitle());
+        sysUser.setIdCardFront(user.getIdCardFront());
+        sysUser.setIdCardBack(user.getIdCardBack());
+        sysUser.setQualificationCertificate(user.getQualificationCertificate());
         sysUser.setUserType(user.getUserType());
+        sysUser.setPhonenumber(user.getPhonenumber());
         sysUser.setPassword(user.getPassword());
         sysUser.setStatus(user.getStatus().getCode());
-        sysUser.setDelFlag(user.getDelFlag());
+        sysUser.setReviewReason(user.getReviewReason());
+        sysUser.setDelFlag(Boolean.TRUE.equals(user.getDelFlag()) ? "2" : "0");
         sysUser.setLoginIp(user.getLoginIp());
         sysUser.setLoginDate(user.getLoginDate());
         sysUser.setPwdUpdateDate(user.getPwdUpdateDate());

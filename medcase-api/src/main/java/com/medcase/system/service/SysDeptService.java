@@ -4,15 +4,14 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.medcase.common.constant.UserConstants;
 import com.medcase.common.core.domain.TreeSelect;
-import com.medcase.common.core.domain.entity.SysDept;
 import com.medcase.common.core.text.Convert;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
-import com.medcase.system.converter.SystemEntityConverter;
 import com.medcase.system.entity.SysDeptEntity;
 import com.medcase.system.mapper.SysDeptMapper;
 import com.medcase.system.mapper.SysUserMapper;
 import com.medcase.web.controller.system.dto.DeptQueryRequest;
+import com.medcase.web.controller.system.dto.DeptSaveRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -53,15 +52,15 @@ public class SysDeptService {
      * @param query 部门查询条件
      * @return 部门信息集合
      */
-    public List<SysDept> selectDeptList(DeptQueryRequest query) {
+    public List<SysDeptEntity> selectDeptList(DeptQueryRequest query) {
 
         List<SysDeptEntity> departments = all();
-        List<SysDept> result = new ArrayList<>();
+        List<SysDeptEntity> result = new ArrayList<>();
         for (SysDeptEntity department : departments) {
             if (!matchesDeptQuery(department, query)) {
                 continue;
             }
-            result.add(SystemEntityConverter.toDomain(department));
+            result.add(department);
         }
         return result;
     }
@@ -74,7 +73,7 @@ public class SysDeptService {
      */
     public List<TreeSelect> selectDeptTreeList(DeptQueryRequest query) {
 
-        List<SysDept> depts = selectDeptList(query);
+        List<SysDeptEntity> depts = selectDeptList(query);
         return buildDeptTreeSelect(depts);
     }
 
@@ -98,11 +97,11 @@ public class SysDeptService {
      * @param depts 部门列表
      * @return 树结构列表
      */
-    public List<SysDept> buildDeptTree(List<SysDept> depts) {
+    public List<SysDeptEntity> buildDeptTree(List<SysDeptEntity> depts) {
 
-        List<SysDept> returnList = new ArrayList<SysDept>();
-        List<Long> tempList = depts.stream().map(SysDept::getDeptId).collect(Collectors.toList());
-        for (SysDept dept : depts) {
+        List<SysDeptEntity> returnList = new ArrayList<SysDeptEntity>();
+        List<Long> tempList = depts.stream().map(SysDeptEntity::getDeptId).collect(Collectors.toList());
+        for (SysDeptEntity dept : depts) {
 
             // 如果是顶级节点, 遍历该父节点的所有子节点
             if (!tempList.contains(dept.getParentId())) {
@@ -124,9 +123,9 @@ public class SysDeptService {
      * @param depts 部门列表
      * @return 下拉树结构列表
      */
-    public List<TreeSelect> buildDeptTreeSelect(List<SysDept> depts) {
+    public List<TreeSelect> buildDeptTreeSelect(List<SysDeptEntity> depts) {
 
-        List<SysDept> deptTrees = buildDeptTree(depts);
+        List<SysDeptEntity> deptTrees = buildDeptTree(depts);
         return deptTrees.stream().map(TreeSelect::new).collect(Collectors.toList());
     }
 
@@ -136,7 +135,7 @@ public class SysDeptService {
      * @param deptId 部门ID
      * @return 部门信息
      */
-    public SysDept selectDeptById(Long deptId) {
+    public SysDeptEntity selectDeptById(Long deptId) {
         if (deptId == null) {
             return null;
         }
@@ -144,7 +143,6 @@ public class SysDeptService {
         return all().stream()
                 .filter(dept -> deptId.equals(dept.getDeptId()))
                 .findFirst()
-                .map(SystemEntityConverter::toDomain)
                 .orElse(null);
     }
 
@@ -222,7 +220,7 @@ public class SysDeptService {
      * @param dept 部门信息
      * @return 结果
      */
-    public boolean checkDeptNameUnique(SysDept dept) {
+    public boolean checkDeptNameUnique(DeptSaveRequest dept) {
 
         boolean exists = all().stream()
                 .anyMatch(item -> java.util.Objects.equals(item.getDeptName(), dept.getDeptName())
@@ -237,18 +235,16 @@ public class SysDeptService {
      * @param dept 部门信息
      * @return 结果
      */
-    public int insertDept(SysDept dept) {
+    public int insertDept(DeptSaveRequest dept) {
 
-        SysDept info = SystemEntityConverter.toDomain(deptMapper.selectById(dept.getParentId()));
+        SysDeptEntity info = deptMapper.selectById(dept.getParentId());
         // 如果父节点不为正常状态,则不允许新增子节点
-        if (!UserConstants.DEPT_NORMAL.equals(info.getStatus())) {
-
+        if (info == null || !UserConstants.DEPT_NORMAL.equals(info.getStatus())) {
             throw ExceptionUtil.business(ErrorCodeEnums.DEPT_DISABLED);
         }
-        dept.setAncestors(info.getAncestors() + "," + dept.getParentId());
-        SysDeptEntity entity = SystemEntityConverter.toEntity(dept);
+        SysDeptEntity entity = toEntity(dept);
+        entity.setAncestors(info.getAncestors() + "," + dept.getParentId());
         int row = deptMapper.insert(entity);
-        dept.setDeptId(entity.getDeptId());
         if (row > 0) {
 
             synchronized (deptCacheLoadLock) {
@@ -265,26 +261,27 @@ public class SysDeptService {
      * @param dept 部门信息
      * @return 结果
      */
-    public int updateDept(SysDept dept) {
+    public int updateDept(DeptSaveRequest dept) {
 
-        SysDept newParentDept = SystemEntityConverter.toDomain(
-                deptMapper.selectById(dept.getParentId()));
-        SysDept oldDept = SystemEntityConverter.toDomain(
-                deptMapper.selectById(dept.getDeptId()));
+        SysDeptEntity newParentDept = deptMapper.selectById(dept.getParentId());
+        SysDeptEntity oldDept = deptMapper.selectById(dept.getDeptId());
         if (newParentDept != null && oldDept != null) {
 
             String newAncestors = newParentDept.getAncestors() + "," + newParentDept.getDeptId();
             String oldAncestors = oldDept.getAncestors();
-            dept.setAncestors(newAncestors);
             updateDeptChildren(dept.getDeptId(), newAncestors, oldAncestors);
         }
-        int result = deptMapper.updateById(SystemEntityConverter.toEntity(dept));
+        SysDeptEntity entity = toEntity(dept);
+        if (newParentDept != null && oldDept != null) {
+            entity.setAncestors(newParentDept.getAncestors() + "," + newParentDept.getDeptId());
+        }
+        int result = deptMapper.updateById(entity);
         if (UserConstants.DEPT_NORMAL.equals(dept.getStatus())
-                && org.springframework.util.StringUtils.hasText(dept.getAncestors())
-                && !"0".equals(dept.getAncestors())) {
+                && org.springframework.util.StringUtils.hasText(entity.getAncestors())
+                && !UserConstants.NORMAL.equals(entity.getAncestors())) {
 
             // 如果该部门是启用状态，则启用该部门的所有上级部门
-            updateParentDeptStatusNormal(dept);
+            updateParentDeptStatusNormal(entity);
         }
         if (result > 0) {
 
@@ -301,7 +298,7 @@ public class SysDeptService {
      * 
      * @param dept 当前部门
      */
-    private void updateParentDeptStatusNormal(SysDept dept) {
+    private void updateParentDeptStatusNormal(SysDeptEntity dept) {
 
         String ancestors = dept.getAncestors();
         Long[] deptIds = Convert.toLongArray(ancestors);
@@ -317,16 +314,14 @@ public class SysDeptService {
      */
     public void updateDeptChildren(Long deptId, String newAncestors, String oldAncestors) {
 
-        List<SysDept> children = SystemEntityConverter.copyList(
-                deptMapper.selectChildrenByDeptId(deptId),
-                SysDept.class);
-        for (SysDept child : children) {
+        List<SysDeptEntity> children = deptMapper.selectChildrenByDeptId(deptId);
+        for (SysDeptEntity child : children) {
 
             child.setAncestors(child.getAncestors().replaceFirst(oldAncestors, newAncestors));
         }
-        if (children.size() > 0) {
+        if (!children.isEmpty()) {
 
-            for (SysDept child : children) {
+            for (SysDeptEntity child : children) {
 
                 deptMapper.updateDeptAncestors(child.getDeptId(), child.getAncestors());
             }
@@ -382,12 +377,12 @@ public class SysDeptService {
     /**
      * 递归列表
      */
-    private void recursionFn(List<SysDept> list, SysDept t) {
+    private void recursionFn(List<SysDeptEntity> list, SysDeptEntity t) {
 
         // 得到子节点列表
-        List<SysDept> childList = getChildList(list, t);
+        List<SysDeptEntity> childList = getChildList(list, t);
         t.setChildren(childList);
-        for (SysDept tChild : childList) {
+        for (SysDeptEntity tChild : childList) {
 
             if (hasChild(list, tChild)) {
 
@@ -399,13 +394,13 @@ public class SysDeptService {
     /**
      * 得到子节点列表
      */
-    private List<SysDept> getChildList(List<SysDept> list, SysDept t) {
+    private List<SysDeptEntity> getChildList(List<SysDeptEntity> list, SysDeptEntity t) {
 
-        List<SysDept> tlist = new ArrayList<SysDept>();
-        Iterator<SysDept> it = list.iterator();
+        List<SysDeptEntity> tlist = new ArrayList<SysDeptEntity>();
+        Iterator<SysDeptEntity> it = list.iterator();
         while (it.hasNext()) {
 
-            SysDept n = (SysDept) it.next();
+            SysDeptEntity n = it.next();
             if (n.getParentId() != null && n.getParentId().longValue() == t.getDeptId().longValue()) {
 
                 tlist.add(n);
@@ -417,8 +412,21 @@ public class SysDeptService {
     /**
      * 判断是否有子节点
      */
-    private boolean hasChild(List<SysDept> list, SysDept t) {
+    private boolean hasChild(List<SysDeptEntity> list, SysDeptEntity t) {
 
         return getChildList(list, t).size() > 0;
+    }
+
+    private SysDeptEntity toEntity(DeptSaveRequest request) {
+        SysDeptEntity entity = new SysDeptEntity();
+        entity.setDeptId(request.getDeptId());
+        entity.setParentId(request.getParentId());
+        entity.setDeptName(request.getDeptName());
+        entity.setOrderNum(request.getOrderNum());
+        entity.setLeader(request.getLeader());
+        entity.setPhone(request.getPhone());
+        entity.setEmail(request.getEmail());
+        entity.setStatus(request.getStatus());
+        return entity;
     }
 }

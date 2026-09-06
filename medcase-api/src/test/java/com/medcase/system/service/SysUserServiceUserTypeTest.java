@@ -5,9 +5,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.medcase.common.core.domain.entity.SysUser;
+import com.medcase.system.entity.SysUserEntity;
 import com.medcase.common.enums.UserTypeEnums;
 import com.medcase.system.mapper.SysUserMapper;
+import com.medcase.web.controller.system.dto.UserSaveRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -33,7 +34,7 @@ class SysUserServiceUserTypeTest {
     void checkUserNameUniqueDefaultsToAdminUserType() {
 
         when(userMapper.selectUserByUserNameAndType(any(), any(), any())).thenReturn(null);
-        SysUser user = new SysUser();
+        UserSaveRequest user = new UserSaveRequest();
         user.setUserName("same-name");
 
         userService.checkUserNameUnique(user);
@@ -46,7 +47,7 @@ class SysUserServiceUserTypeTest {
     void checkPhoneUniquePreservesExplicitUserType() {
 
         when(userMapper.selectUserByPhoneAndType(any(), any(), any())).thenReturn(null);
-        SysUser user = new SysUser();
+        UserSaveRequest user = new UserSaveRequest();
         user.setPhonenumber("15888888888");
         user.setUserType(UserTypeEnums.DOCTOR);
 
@@ -60,7 +61,7 @@ class SysUserServiceUserTypeTest {
     void checkEmailUniqueDefaultsToAdminUserType() {
 
         when(userMapper.selectUserByEmailAndType(any(), any(), any())).thenReturn(null);
-        SysUser user = new SysUser();
+        UserSaveRequest user = new UserSaveRequest();
         user.setEmail("same@example.com");
 
         userService.checkEmailUnique(user);

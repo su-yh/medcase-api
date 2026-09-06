@@ -1,8 +1,6 @@
 package com.medcase.web.controller.system;
 
 import com.medcase.common.annotation.Anonymous;
-import com.medcase.common.core.domain.entity.SysMenu;
-import com.medcase.common.core.domain.entity.SysUser;
 import com.medcase.common.core.domain.model.LoginBody;
 import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.common.core.text.Convert;
@@ -13,6 +11,8 @@ import com.medcase.framework.web.service.TokenService;
 import com.medcase.framework.web.service.UserLoginService;
 import com.medcase.mvc.authentication.annotation.CurrLoginUser;
 import com.medcase.system.domain.vo.RouterVo;
+import com.medcase.system.entity.SysMenuEntity;
+import com.medcase.system.entity.SysUserEntity;
 import com.medcase.system.service.SysConfigService;
 import com.medcase.system.service.SysMenuService;
 import com.medcase.web.controller.system.dto.LoginResponse;
@@ -79,7 +79,7 @@ public class SysLoginController {
     public LoginUserInfoResponse getInfo(
             @CurrLoginUser LoginUser loginUser) {
 
-        SysUser user = loginUser.getUser();
+        SysUserEntity user = loginUser.getUser();
         // 角色集合
         Set<String> roles = permissionService.getRolePermission(user);
         // 权限集合
@@ -109,7 +109,7 @@ public class SysLoginController {
     public List<RouterVo> getRouters(
             @CurrLoginUser LoginUser loginUser) {
 
-        List<SysMenu> menus = menuService.selectMenuTreeByUserId(loginUser.getUserId());
+        List<SysMenuEntity> menus = menuService.selectMenuTreeByUserId(loginUser.getUserId());
         return menuService.buildMenus(menus);
     }
 

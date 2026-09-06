@@ -19,11 +19,14 @@ import com.medcase.common.constant.UserConstants;
 import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
-import com.medcase.common.core.domain.entity.SysMenu;
 import com.medcase.common.core.domain.TreeSelect;
 import com.medcase.common.enums.BusinessType;
 import com.medcase.mvc.authentication.annotation.CurrLoginUser;
+import com.medcase.system.entity.SysMenuEntity;
 import com.medcase.system.service.SysMenuService;
+import com.medcase.web.controller.system.dto.MenuQueryRequest;
+import com.medcase.web.controller.system.dto.MenuSaveRequest;
+import com.medcase.web.controller.system.dto.MenuSortRequest;
 
 /**
  * 菜单信息
@@ -41,11 +44,11 @@ public class SysMenuController {
     @PreAuthorize("@dp.hasAnyUserType(#loginUser, T(com.medcase.common.enums.UserTypeEnums).ADMIN) " +
             "&& @ss.hasPermi('system:menu:list')")
     @GetMapping("/list")
-    public List<SysMenu> list(
-            SysMenu menu,
+    public List<SysMenuEntity> list(
+            MenuQueryRequest menu,
             @CurrLoginUser LoginUser loginUser) {
 
-        List<SysMenu> menus = menuService.selectMenuList(menu, loginUser.getUserId());
+        List<SysMenuEntity> menus = menuService.selectMenuList(menu, loginUser.getUserId());
         return menus;
     }
 
@@ -54,7 +57,7 @@ public class SysMenuController {
      */
     @PreAuthorize("@ss.hasPermi('system:menu:query')")
     @GetMapping(value = "/{menuId}")
-    public SysMenu getInfo(@PathVariable Long menuId) {
+    public SysMenuEntity getInfo(@PathVariable Long menuId) {
 
         return menuService.selectMenuById(menuId);
     }
@@ -65,10 +68,10 @@ public class SysMenuController {
     @PreAuthorize("@dp.hasAnyUserType(#loginUser, T(com.medcase.common.enums.UserTypeEnums).ADMIN)")
     @GetMapping("/treeselect")
     public List<TreeSelect> treeselect(
-            SysMenu menu,
+            MenuQueryRequest menu,
             @CurrLoginUser LoginUser loginUser) {
 
-        List<SysMenu> menus = menuService.selectMenuList(menu, loginUser.getUserId());
+        List<SysMenuEntity> menus = menuService.selectMenuList(menu, loginUser.getUserId());
         return menuService.buildMenuTreeSelect(menus);
     }
 
@@ -78,7 +81,7 @@ public class SysMenuController {
     @PreAuthorize("@ss.hasPermi('system:menu:add')")
     @Log(title = "菜单管理", businessType = BusinessType.INSERT)
     @PostMapping
-    public void add(@Validated @RequestBody SysMenu menu) {
+    public void add(@Validated @RequestBody MenuSaveRequest menu) {
 
         if (!menuService.checkMenuNameUnique(menu)) {
             throw ExceptionUtil.business(ErrorCodeEnums.MENU_NAME_EXISTS);
@@ -102,7 +105,7 @@ public class SysMenuController {
     @PreAuthorize("@ss.hasPermi('system:menu:edit')")
     @Log(title = "菜单管理", businessType = BusinessType.UPDATE)
     @PutMapping
-    public void edit(@Validated @RequestBody SysMenu menu) {
+    public void edit(@Validated @RequestBody MenuSaveRequest menu) {
 
         if (!menuService.checkMenuNameUnique(menu)) {
             throw ExceptionUtil.business(ErrorCodeEnums.MENU_NAME_EXISTS);
@@ -129,10 +132,10 @@ public class SysMenuController {
     @PreAuthorize("@ss.hasPermi('system:menu:edit')")
     @Log(title = "保存菜单排序", businessType = BusinessType.UPDATE)
     @PutMapping("/updateSort")
-    public void updateSort(@RequestBody Map<String, String> params) {
+    public void updateSort(@Validated @RequestBody MenuSortRequest request) {
 
-        String[] menuIds = params.get("menuIds").split(",");
-        String[] orderNums = params.get("orderNums").split(",");
+        String[] menuIds = request.getMenuIds().split(",");
+        String[] orderNums = request.getOrderNums().split(",");
         menuService.updateMenuSort(menuIds, orderNums);
     }
 

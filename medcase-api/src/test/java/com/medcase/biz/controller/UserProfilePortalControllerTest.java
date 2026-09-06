@@ -10,7 +10,7 @@ import com.medcase.biz.request.UserProfilePhoneRequest;
 import com.medcase.biz.request.UserProfileSubmitRequest;
 import com.medcase.biz.response.UserProfileVO;
 import com.medcase.biz.service.UserProfileService;
-import com.medcase.common.core.domain.entity.SysUser;
+import com.medcase.system.entity.SysUserEntity;
 import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.common.enums.UserTypeEnums;
 import org.junit.jupiter.api.BeforeEach;
@@ -81,7 +81,7 @@ class UserProfilePortalControllerTest {
     }
 
     private LoginUser userLoginUser() {
-        SysUser sysUser = new SysUser();
+        SysUserEntity sysUser = new SysUserEntity();
         sysUser.setUserId(12L);
         sysUser.setUserType(UserTypeEnums.DOCTOR);
         LoginUser loginUser = new LoginUser();

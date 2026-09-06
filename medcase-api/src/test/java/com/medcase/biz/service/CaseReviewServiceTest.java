@@ -9,7 +9,7 @@ import static org.mockito.Mockito.when;
 
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.AbstractBusinessException;
-import com.medcase.common.core.domain.entity.SysUser;
+import com.medcase.system.entity.SysUserEntity;
 import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
@@ -187,7 +187,7 @@ class CaseReviewServiceTest {
     }
 
     private LoginUser loginUser(Long userId, String nickname) {
-        SysUser user = new SysUser();
+        SysUserEntity user = new SysUserEntity();
         user.setUserId(userId);
         user.setNickName(nickname);
         LoginUser loginUser = new LoginUser();

@@ -13,7 +13,7 @@ import com.medcase.biz.enums.CaseStatusEnums;
 import com.medcase.biz.mapper.CaseMapper;
 import com.medcase.biz.request.CaseSubmitRequest;
 import com.medcase.biz.response.CaseVO;
-import com.medcase.common.core.domain.entity.SysUser;
+import com.medcase.system.entity.SysUserEntity;
 import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.common.validation.groups.ValidationGroups;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
@@ -187,7 +187,7 @@ class CaseServiceTest {
     }
 
     private LoginUser loginUser(Long userId) {
-        SysUser user = new SysUser();
+        SysUserEntity user = new SysUserEntity();
         user.setUserId(userId);
         user.setNickName("doctor" + userId);
         user.setUserType(UserTypeEnums.DOCTOR);

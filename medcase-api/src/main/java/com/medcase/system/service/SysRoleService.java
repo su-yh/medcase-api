@@ -3,13 +3,13 @@ package com.medcase.system.service;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.medcase.common.constant.UserConstants;
-import com.medcase.common.core.domain.entity.SysMenu;
 import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
 import com.medcase.system.entity.SysRoleEntity;
 import com.medcase.system.entity.SysRoleMenuEntity;
+import com.medcase.system.entity.SysMenuEntity;
 import com.medcase.system.entity.SysUserRoleEntity;
 import com.medcase.system.mapper.SysRoleMapper;
 import com.medcase.system.mapper.SysRoleMenuMapper;
@@ -357,11 +357,11 @@ public class SysRoleService {
             Long createUserId, boolean admin, Long userId) {
         selectRoleById(roleId, createUserId, admin);
         if (!admin) {
-            List<SysMenu> menus = menuService.selectMenuList(userId);
+            List<SysMenuEntity> menus = menuService.selectMenuList(userId);
             Set<Long> menuIds = new HashSet<>();
             Long[] requestedMenuIds = request.getMenuIds();
             if (menus != null) {
-                for (SysMenu menu : menus) {
+                for (SysMenuEntity menu : menus) {
                     if (menu != null && menu.getMenuId() != null) {
                         menuIds.add(menu.getMenuId());
                     }

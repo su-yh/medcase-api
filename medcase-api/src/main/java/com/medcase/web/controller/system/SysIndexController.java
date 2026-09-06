@@ -9,11 +9,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
-import com.medcase.common.core.domain.entity.SysUser;
 import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.common.enums.UserTypeEnums;
 import com.medcase.mvc.authentication.annotation.CurrLoginUser;
 import com.medcase.system.service.SysUserService;
+import com.medcase.system.entity.SysUserEntity;
 import org.springframework.util.StringUtils;
 
 /**
@@ -42,7 +42,7 @@ public class SysIndexController {
         if (!StringUtils.hasText(password)) {
             throw ExceptionUtil.business(ErrorCodeEnums.SCREEN_UNLOCK_PASSWORD_EMPTY);
         }
-        SysUser user = userService.selectUserByUserName(
+        SysUserEntity user = userService.selectUserByUserName(
                 loginUser.getUsername(), UserTypeEnums.ADMIN.getCode());
         if (user == null) {
             throw ExceptionUtil.business(ErrorCodeEnums.SCREEN_UNLOCK_USER_NOT_FOUND);

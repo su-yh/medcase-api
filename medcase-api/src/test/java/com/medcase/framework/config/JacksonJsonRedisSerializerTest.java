@@ -1,6 +1,6 @@
 package com.medcase.framework.config;
 
-import com.medcase.common.core.domain.entity.SysUser;
+import com.medcase.system.entity.SysUserEntity;
 import com.medcase.common.core.domain.model.LoginUser;
 import org.junit.jupiter.api.Test;
 
@@ -14,7 +14,7 @@ class JacksonJsonRedisSerializerTest {
 
         JacksonJsonRedisSerializer<Object> serializer = new JacksonJsonRedisSerializer<>(Object.class);
 
-        SysUser user = new SysUser();
+        SysUserEntity user = new SysUserEntity();
         user.setUserName("doctor");
         user.setPassword("secret");
         LoginUser loginUser = new LoginUser(user, null);

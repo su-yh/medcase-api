@@ -1,6 +1,6 @@
 package com.medcase.web.controller.system.dto;
 
-import com.medcase.common.core.domain.entity.SysUser;
+import com.medcase.system.entity.SysUserEntity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -11,7 +11,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public class ProfileResponse {
 
-    private SysUser data;
+    private SysUserEntity data;
     private String roleGroup;
     private String postGroup;
 }

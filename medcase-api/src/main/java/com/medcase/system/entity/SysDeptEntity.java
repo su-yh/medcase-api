@@ -1,10 +1,14 @@
 package com.medcase.system.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.medcase.mp.entity.AbstractBaseEntity;
 import lombok.Data;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 部门表实体。
@@ -33,4 +37,10 @@ public class SysDeptEntity extends AbstractBaseEntity {
     private String status;
 
     private String delFlag;
+
+    @TableField(exist = false)
+    private String parentName;
+
+    @TableField(exist = false)
+    private List<SysDeptEntity> children = new ArrayList<>();
 }

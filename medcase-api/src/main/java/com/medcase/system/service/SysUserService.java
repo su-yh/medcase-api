@@ -1,14 +1,12 @@
 package com.medcase.system.service;
 
 import com.medcase.common.constant.UserConstants;
-import com.medcase.common.core.domain.entity.SysUser;
 import com.medcase.common.enums.UserTypeEnums;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
 import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
 import com.medcase.system.event.UserAvatarUploadedEvent;
-import com.medcase.system.converter.SystemEntityConverter;
 import com.medcase.system.entity.SysDeptEntity;
 import com.medcase.system.entity.SysRoleEntity;
 import com.medcase.system.entity.SysUserEntity;
@@ -20,6 +18,11 @@ import com.medcase.system.mapper.SysUserMapper;
 import com.medcase.system.mapper.SysUserPostMapper;
 import com.medcase.system.mapper.SysUserRoleMapper;
 import com.medcase.storage.pojo.FileAttachment;
+import com.medcase.web.controller.system.dto.UserProfileUpdateRequest;
+import com.medcase.web.controller.system.dto.UserQueryRequest;
+import com.medcase.web.controller.system.dto.UserResetPasswordRequest;
+import com.medcase.web.controller.system.dto.UserSaveRequest;
+import com.medcase.web.controller.system.dto.UserStatusRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
@@ -63,12 +66,12 @@ public class SysUserService {
      * @param user 用户信息
      * @return 用户信息集合信息
      */
-    public PageResult<SysUser> selectPage(SysUser user, PageParam pageParam) {
+    public PageResult<SysUserEntity> selectPage(UserQueryRequest user, PageParam pageParam) {
         return selectPage(user, pageParam, null, null);
     }
 
-    public PageResult<SysUser> selectPage(
-            SysUser user, PageParam pageParam, String beginTime, String endTime) {
+    public PageResult<SysUserEntity> selectPage(
+            UserQueryRequest user, PageParam pageParam, String beginTime, String endTime) {
         useAdminUserTypeIfAbsent(user);
         List<Long> deptIds = null;
         if (user != null && user.getDeptId() != null
@@ -84,9 +87,9 @@ public class SysUserService {
                 }
             }
         }
-        PageResult<SysUser> result = userMapper.selectPage(
+        PageResult<SysUserEntity> result = userMapper.selectPage(
                 pageParam, user, deptIds, beginTime, endTime);
-        for (SysUser item : result.getList()) {
+        for (SysUserEntity item : result.getList()) {
             item.setDept(deptService.selectDeptById(item.getDeptId()));
         }
         return result;
@@ -99,7 +102,8 @@ public class SysUserService {
      * @param pageParam 分页参数
      * @return 用户信息集合信息
      */
-    public PageResult<SysUser> selectAllocatedPage(SysUser user, PageParam pageParam) {
+    public PageResult<SysUserEntity> selectAllocatedPage(
+            UserQueryRequest user, PageParam pageParam) {
         useAdminUserTypeIfAbsent(user);
         List<Long> deptIds = null;
         if (user != null && user.getDeptId() != null
@@ -115,8 +119,8 @@ public class SysUserService {
                 }
             }
         }
-        PageResult<SysUser> result = userMapper.selectAllocatedPage(pageParam, user, deptIds);
-        for (SysUser item : result.getList()) {
+        PageResult<SysUserEntity> result = userMapper.selectAllocatedPage(pageParam, user, deptIds);
+        for (SysUserEntity item : result.getList()) {
             item.setDept(deptService.selectDeptById(item.getDeptId()));
         }
         return result;
@@ -129,7 +133,8 @@ public class SysUserService {
      * @param pageParam 分页参数
      * @return 用户信息集合信息
      */
-    public PageResult<SysUser> selectUnallocatedPage(SysUser user, PageParam pageParam) {
+    public PageResult<SysUserEntity> selectUnallocatedPage(
+            UserQueryRequest user, PageParam pageParam) {
         useAdminUserTypeIfAbsent(user);
         List<Long> deptIds = null;
         if (user != null && user.getDeptId() != null
@@ -145,14 +150,20 @@ public class SysUserService {
                 }
             }
         }
-        PageResult<SysUser> result = userMapper.selectUnallocatedPage(pageParam, user, deptIds);
-        for (SysUser item : result.getList()) {
+        PageResult<SysUserEntity> result = userMapper.selectUnallocatedPage(pageParam, user, deptIds);
+        for (SysUserEntity item : result.getList()) {
             item.setDept(deptService.selectDeptById(item.getDeptId()));
         }
         return result;
     }
 
-    private void useAdminUserTypeIfAbsent(SysUser user) {
+    private void useAdminUserTypeIfAbsent(UserQueryRequest user) {
+        if (user != null && user.getUserType() == null) {
+            user.setUserType(UserTypeEnums.ADMIN);
+        }
+    }
+
+    private void useAdminUserTypeIfAbsent(UserSaveRequest user) {
         if (user != null && user.getUserType() == null) {
             user.setUserType(UserTypeEnums.ADMIN);
         }
@@ -164,12 +175,12 @@ public class SysUserService {
      * @param userName 用户名
      * @return 用户对象信息
      */
-    public SysUser selectUserByUserName(String userName, String userType) {
+    public SysUserEntity selectUserByUserName(String userName, String userType) {
 
-        SysUser user = SystemEntityConverter.toDomain(
-                userMapper.selectUserByUserName(userName, userType, "0"));
+        SysUserEntity user = userMapper.selectUserByUserName(userName, userType, "0");
         if (user != null) {
             user.setDept(deptService.selectDeptById(user.getDeptId()));
+            user.setRoles(roleService.selectRolesByUserId(user.getUserId()));
         }
         return user;
     }
@@ -180,11 +191,12 @@ public class SysUserService {
      * @param userId 用户ID
      * @return 用户对象信息
      */
-    public SysUser selectUserById(Long userId) {
+    public SysUserEntity selectUserById(Long userId) {
 
-        SysUser user = SystemEntityConverter.toDomain(userMapper.selectById(userId));
+        SysUserEntity user = userMapper.selectById(userId);
         if (user != null) {
             user.setDept(deptService.selectDeptById(user.getDeptId()));
+            user.setRoles(roleService.selectRolesByUserId(user.getUserId()));
         }
         return user;
     }
@@ -231,13 +243,12 @@ public class SysUserService {
      * @param user 用户信息
      * @return 结果
      */
-    public boolean checkUserNameUnique(SysUser user) {
+    public boolean checkUserNameUnique(UserSaveRequest user) {
         Long userId = user.getUserId() == null ? -1L : user.getUserId();
         useAdminUserTypeIfAbsent(user);
-        SysUser info = SystemEntityConverter.toDomain(
-                userMapper.selectUserByUserNameAndType(
-                        user.getUserName(), user.getUserType(), "0"));
-        if (info != null && info.getUserId().longValue() != userId.longValue()) {
+        SysUserEntity info = userMapper.selectUserByUserNameAndType(
+                user.getUserName(), user.getUserType(), "0");
+        if (info != null && !info.getUserId().equals(userId)) {
             return UserConstants.NOT_UNIQUE;
         }
         return UserConstants.UNIQUE;
@@ -249,13 +260,12 @@ public class SysUserService {
      * @param user 用户信息
      * @return
      */
-    public boolean checkPhoneUnique(SysUser user) {
+    public boolean checkPhoneUnique(UserSaveRequest user) {
         Long userId = user.getUserId() == null ? -1L : user.getUserId();
         useAdminUserTypeIfAbsent(user);
-        SysUser info = SystemEntityConverter.toDomain(
-                userMapper.selectUserByPhoneAndType(
-                        user.getPhonenumber(), user.getUserType(), "0"));
-        if (info != null && info.getUserId().longValue() != userId.longValue()) {
+        SysUserEntity info = userMapper.selectUserByPhoneAndType(
+                user.getPhonenumber(), user.getUserType(), "0");
+        if (info != null && !info.getUserId().equals(userId)) {
             return UserConstants.NOT_UNIQUE;
         }
         return UserConstants.UNIQUE;
@@ -267,13 +277,12 @@ public class SysUserService {
      * @param user 用户信息
      * @return
      */
-    public boolean checkEmailUnique(SysUser user) {
+    public boolean checkEmailUnique(UserSaveRequest user) {
         Long userId = user.getUserId() == null ? -1L : user.getUserId();
         useAdminUserTypeIfAbsent(user);
-        SysUser info = SystemEntityConverter.toDomain(
-                userMapper.selectUserByEmailAndType(
-                        user.getEmail(), user.getUserType(), "0"));
-        if (info != null && info.getUserId().longValue() != userId.longValue()) {
+        SysUserEntity info = userMapper.selectUserByEmailAndType(
+                user.getEmail(), user.getUserType(), "0");
+        if (info != null && !info.getUserId().equals(userId)) {
             return UserConstants.NOT_UNIQUE;
         }
         return UserConstants.UNIQUE;
@@ -284,8 +293,8 @@ public class SysUserService {
      * 
      * @param user 用户信息
      */
-    public void checkUserAllowed(SysUser user) {
-        if (user.getUserId() != null && user.isAdmin()) {
+    public void checkUserAllowed(Long userId) {
+        if (userId != null && org.springframework.util.ObjectUtils.nullSafeEquals(userId, 1L)) {
             throw ExceptionUtil.business(ErrorCodeEnums.SUPER_ADMIN_USER_OPERATION);
         }
     }
@@ -297,10 +306,10 @@ public class SysUserService {
      * @return 结果
      */
     @Transactional
-    public int insertUser(SysUser user) {
+    public int insertUser(UserSaveRequest user) {
 
         user.setUserType(UserTypeEnums.ADMIN);
-        SysUserEntity entity = SystemEntityConverter.toEntity(user);
+        SysUserEntity entity = toEntity(user);
         int rows = userMapper.insert(entity);
         user.setUserId(entity.getUserId());
         // 新增用户岗位关联
@@ -316,10 +325,10 @@ public class SysUserService {
      * @param user 用户信息
      * @return 结果
      */
-    public boolean registerUser(SysUser user) {
+    public boolean registerUser(SysUserEntity user) {
 
         user.setUserType(UserTypeEnums.ADMIN);
-        return userMapper.insert(SystemEntityConverter.toEntity(user)) > 0;
+        return userMapper.insert(user) > 0;
     }
 
     /**
@@ -329,7 +338,7 @@ public class SysUserService {
      * @return 结果
      */
     @Transactional
-    public int updateUser(SysUser user) {
+    public int updateUser(UserSaveRequest user) {
 
         Long userId = user.getUserId();
         // 删除用户与角色关联
@@ -340,7 +349,7 @@ public class SysUserService {
         userPostMapper.deleteByUserId(userId);
         // 新增用户与岗位管理
         insertUserPost(user);
-        return userMapper.updateById(SystemEntityConverter.toEntity(user));
+        return userMapper.updateById(toEntity(user));
     }
 
     /**
@@ -362,7 +371,7 @@ public class SysUserService {
      * @param user 用户信息
      * @return 结果
      */
-    public int updateUserStatus(SysUser user) {
+    public int updateUserStatus(UserStatusRequest user) {
 
         return userMapper.updateUserStatus(user.getUserId(), user.getStatus());
     }
@@ -373,9 +382,15 @@ public class SysUserService {
      * @param user 用户信息
      * @return 结果
      */
-    public int updateUserProfile(SysUser user) {
+    public int updateUserProfile(Long userId, UserProfileUpdateRequest request) {
 
-        return userMapper.updateById(SystemEntityConverter.toEntity(user));
+        SysUserEntity user = new SysUserEntity();
+        user.setUserId(userId);
+        user.setNickName(request.getNickName());
+        user.setEmail(request.getEmail());
+        user.setPhonenumber(request.getPhonenumber());
+        user.setSex(request.getSex());
+        return userMapper.updateById(user);
     }
 
     /**
@@ -419,7 +434,7 @@ public class SysUserService {
      * @param user 用户信息
      * @return 结果
      */
-    public int resetPwd(SysUser user) {
+    public int resetPwd(UserResetPasswordRequest user) {
 
         return userMapper.resetUserPassword(
                 user.getUserId(), user.getPassword(), new Date());
@@ -442,7 +457,7 @@ public class SysUserService {
      * 
      * @param user 用户对象
      */
-    public void insertUserRole(SysUser user) {
+    public void insertUserRole(UserSaveRequest user) {
 
         this.insertUserRole(user.getUserId(), user.getRoleIds());
     }
@@ -452,7 +467,7 @@ public class SysUserService {
      * 
      * @param user 用户对象
      */
-    public void insertUserPost(SysUser user) {
+    public void insertUserPost(UserSaveRequest user) {
 
         Long[] posts = user.getPostIds();
         if (!org.springframework.util.ObjectUtils.isEmpty(posts)) {
@@ -504,13 +519,29 @@ public class SysUserService {
 
         for (Long userId : userIds) {
 
-            checkUserAllowed(new SysUser(userId));
+            checkUserAllowed(userId);
         }
         // 删除用户与角色关联
         userRoleMapper.deleteByUserIds(userIds);
         // 删除用户与岗位关联
         userPostMapper.deleteByUserIds(userIds);
         return userMapper.deleteUsersByIds(userIds);
+    }
+
+    private SysUserEntity toEntity(UserSaveRequest user) {
+        SysUserEntity entity = new SysUserEntity();
+        entity.setUserId(user.getUserId());
+        entity.setDeptId(user.getDeptId());
+        entity.setUserName(user.getUserName());
+        entity.setNickName(user.getNickName());
+        entity.setUserType(user.getUserType());
+        entity.setEmail(user.getEmail());
+        entity.setPhonenumber(user.getPhonenumber());
+        entity.setSex(user.getSex());
+        entity.setPassword(user.getPassword());
+        entity.setStatus(user.getStatus());
+        entity.setRemark(user.getRemark());
+        return entity;
     }
 
 }

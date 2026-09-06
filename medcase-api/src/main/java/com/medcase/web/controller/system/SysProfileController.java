@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.medcase.common.annotation.Log;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
-import com.medcase.common.core.domain.entity.SysUser;
 import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.common.enums.BusinessType;
 import com.medcase.common.utils.DateUtils;
@@ -20,6 +19,9 @@ import com.medcase.framework.web.service.TokenService;
 import com.medcase.mvc.authentication.annotation.CurrLoginUser;
 import com.medcase.system.service.SysUserService;
 import com.medcase.web.controller.system.dto.ProfileResponse;
+import com.medcase.web.controller.system.dto.UserProfileUpdateRequest;
+import com.medcase.web.controller.system.dto.UserSaveRequest;
+import com.medcase.system.entity.SysUserEntity;
 import org.springframework.util.StringUtils;
 
 /**
@@ -47,7 +49,7 @@ public class SysProfileController {
     public ProfileResponse profile(
             @CurrLoginUser LoginUser loginUser) {
 
-        SysUser user = loginUser.getUser();
+        SysUserEntity user = loginUser.getUser();
         return new ProfileResponse(
                 user,
                 userService.selectUserRoleGroup(loginUser.getUserId()),
@@ -61,21 +63,22 @@ public class SysProfileController {
     @PreAuthorize("@dp.hasAnyUserType(#loginUser, T(com.medcase.common.enums.UserTypeEnums).ADMIN)")
     @PutMapping
     public void updateProfile(
-            @RequestBody SysUser user,
+            @RequestBody UserProfileUpdateRequest user,
             @CurrLoginUser LoginUser loginUser) {
 
-        SysUser currentUser = loginUser.getUser();
-        currentUser.setNickName(user.getNickName());
-        currentUser.setEmail(user.getEmail());
+        UserSaveRequest currentUser = new UserSaveRequest();
+        currentUser.setUserId(loginUser.getUserId());
+        currentUser.setUserName(loginUser.getUsername());
+        currentUser.setUserType(loginUser.getUser().getUserType());
         currentUser.setPhonenumber(user.getPhonenumber());
-        currentUser.setSex(user.getSex());
+        currentUser.setEmail(user.getEmail());
         if (StringUtils.hasText(user.getPhonenumber()) && !userService.checkPhoneUnique(currentUser)) {
             throw ExceptionUtil.business(ErrorCodeEnums.PROFILE_PHONE_EXISTS, loginUser.getUsername());
         }
         if (StringUtils.hasText(user.getEmail()) && !userService.checkEmailUnique(currentUser)) {
             throw ExceptionUtil.business(ErrorCodeEnums.PROFILE_EMAIL_EXISTS, loginUser.getUsername());
         }
-        if (userService.updateUserProfile(currentUser) > 0) {
+        if (userService.updateUserProfile(loginUser.getUserId(), user) > 0) {
 
             // 更新缓存用户信息
             tokenService.setLoginUser(loginUser);
@@ -97,7 +100,7 @@ public class SysProfileController {
         String oldPassword = params.get("oldPassword");
         String newPassword = params.get("newPassword");
         Long userId = loginUser.getUserId();
-        SysUser user = userService.selectUserById(userId);
+        SysUserEntity user = userService.selectUserById(userId);
         String password = user.getPassword();
         if (!passwordEncoder.matches(oldPassword, password)) {
             throw ExceptionUtil.business(ErrorCodeEnums.PROFILE_OLD_PASSWORD_INVALID);

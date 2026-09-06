@@ -6,7 +6,6 @@ import org.springframework.stereotype.Component;
 import com.medcase.common.constant.CacheConstants;
 import com.medcase.common.constant.Constants;
 import com.medcase.common.constant.UserConstants;
-import com.medcase.common.core.domain.entity.SysUser;
 import com.medcase.common.core.domain.model.RegisterBody;
 import com.medcase.common.core.redis.RedisCache;
 import com.medcase.common.utils.DateUtils;
@@ -17,6 +16,8 @@ import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
 import com.medcase.system.service.SysConfigService;
 import com.medcase.system.service.SysUserService;
+import com.medcase.system.entity.SysUserEntity;
+import com.medcase.web.controller.system.dto.UserSaveRequest;
 import org.springframework.util.StringUtils;
 
 /**
@@ -45,8 +46,8 @@ public class SysRegisterService {
 
         String username = registerBody.getUsername();
         String password = registerBody.getPassword();
-        SysUser sysUser = new SysUser();
-        sysUser.setUserName(username);
+        UserSaveRequest uniqueUser = new UserSaveRequest();
+        uniqueUser.setUserName(username);
 
         // 验证码开关
         boolean captchaEnabled = configService.selectCaptchaEnabled();
@@ -69,11 +70,13 @@ public class SysRegisterService {
                 || password.length() > UserConstants.PASSWORD_MAX_LENGTH) {
             throw ExceptionUtil.business(ErrorCodeEnums.ADMIN_REGISTER_PASSWORD_LENGTH_INVALID);
         }
-        else if (!userService.checkUserNameUnique(sysUser)) {
+        else if (!userService.checkUserNameUnique(uniqueUser)) {
             throw ExceptionUtil.business(ErrorCodeEnums.ADMIN_REGISTER_USER_EXISTS, username);
         }
         else {
 
+            SysUserEntity sysUser = new SysUserEntity();
+            sysUser.setUserName(username);
             sysUser.setNickName(username);
             sysUser.setPwdUpdateDate(DateUtils.getNowDate());
             sysUser.setPassword(passwordEncoder.encode(password));

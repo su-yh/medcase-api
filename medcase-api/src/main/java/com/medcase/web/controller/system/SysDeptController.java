@@ -1,7 +1,6 @@
 package com.medcase.web.controller.system;
 
 import java.util.List;
-import java.util.Map;
 import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -18,10 +17,12 @@ import com.medcase.common.annotation.Log;
 import com.medcase.common.constant.UserConstants;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
-import com.medcase.common.core.domain.entity.SysDept;
 import com.medcase.common.enums.BusinessType;
+import com.medcase.system.entity.SysDeptEntity;
 import com.medcase.system.service.SysDeptService;
 import com.medcase.web.controller.system.dto.DeptQueryRequest;
+import com.medcase.web.controller.system.dto.DeptSaveRequest;
+import com.medcase.web.controller.system.dto.DeptSortRequest;
 
 /**
  * 部门信息
@@ -39,9 +40,9 @@ public class SysDeptController {
      */
     @PreAuthorize("@ss.hasPermi('system:dept:list')")
     @GetMapping("/list")
-    public List<SysDept> list(DeptQueryRequest request) {
+    public List<SysDeptEntity> list(DeptQueryRequest request) {
 
-        List<SysDept> depts = deptService.selectDeptList(request);
+        List<SysDeptEntity> depts = deptService.selectDeptList(request);
         return depts;
     }
 
@@ -50,10 +51,10 @@ public class SysDeptController {
      */
     @PreAuthorize("@ss.hasPermi('system:dept:list')")
     @GetMapping("/list/exclude/{deptId}")
-    public List<SysDept> excludeChild(
+    public List<SysDeptEntity> excludeChild(
             @PathVariable(value = "deptId", required = false) Long deptId) {
 
-        List<SysDept> depts = deptService.selectDeptList(new DeptQueryRequest());
+        List<SysDeptEntity> depts = deptService.selectDeptList(new DeptQueryRequest());
         depts.removeIf(d -> d.getDeptId().intValue() == deptId
                 || ArrayUtils.contains(
                 org.springframework.util.StringUtils.tokenizeToStringArray(d.getAncestors(), ",", false, true),
@@ -66,7 +67,7 @@ public class SysDeptController {
      */
     @PreAuthorize("@ss.hasPermi('system:dept:query')")
     @GetMapping(value = "/{deptId}")
-    public SysDept getInfo(@PathVariable Long deptId) {
+    public SysDeptEntity getInfo(@PathVariable Long deptId) {
 
         return deptService.selectDeptById(deptId);
     }
@@ -77,7 +78,7 @@ public class SysDeptController {
     @PreAuthorize("@ss.hasPermi('system:dept:add')")
     @Log(title = "部门管理", businessType = BusinessType.INSERT)
     @PostMapping
-    public void add(@Validated @RequestBody SysDept dept) {
+    public void add(@Validated @RequestBody DeptSaveRequest dept) {
 
         if (!deptService.checkDeptNameUnique(dept)) {
             throw ExceptionUtil.business(ErrorCodeEnums.DEPT_NAME_EXISTS);
@@ -93,7 +94,7 @@ public class SysDeptController {
     @PreAuthorize("@ss.hasPermi('system:dept:edit')")
     @Log(title = "部门管理", businessType = BusinessType.UPDATE)
     @PutMapping
-    public void edit(@Validated @RequestBody SysDept dept) {
+    public void edit(@Validated @RequestBody DeptSaveRequest dept) {
 
         Long deptId = dept.getDeptId();
         if (!deptService.checkDeptNameUnique(dept)) {
@@ -117,10 +118,10 @@ public class SysDeptController {
     @PreAuthorize("@ss.hasPermi('system:dept:edit')")
     @Log(title = "保存部门排序", businessType = BusinessType.UPDATE)
     @PutMapping("/updateSort")
-    public void updateSort(@RequestBody Map<String, String> params) {
+    public void updateSort(@Validated @RequestBody DeptSortRequest request) {
 
-        String[] deptIds = params.get("deptIds").split(",");
-        String[] orderNums = params.get("orderNums").split(",");
+        String[] deptIds = request.getDeptIds().split(",");
+        String[] orderNums = request.getOrderNums().split(",");
         deptService.updateDeptSort(deptIds, orderNums);
     }
 

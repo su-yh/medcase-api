@@ -1,6 +1,6 @@
 package com.medcase.system.service;
 
-import com.medcase.common.core.domain.entity.SysMenu;
+import com.medcase.system.entity.SysMenuEntity;
 import com.medcase.mvc.exception.AbstractBusinessException;
 import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
@@ -89,7 +89,7 @@ class SysRoleServiceOwnershipTest {
         SysRoleEntity role = role(1L, 2L, "operator");
         when(roleMapper.selectList()).thenReturn(List.of(role));
 
-        SysMenu ownedMenu = new SysMenu();
+        SysMenuEntity ownedMenu = new SysMenuEntity();
         ownedMenu.setMenuId(10L);
         when(menuService.selectMenuList(2L)).thenReturn(List.of(ownedMenu));
 

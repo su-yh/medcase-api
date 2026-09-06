@@ -1,17 +1,18 @@
 package com.medcase.framework.web.service;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import com.medcase.common.constant.Constants;
+import com.medcase.common.constant.UserConstants;
+import com.medcase.system.entity.SysRoleEntity;
+import com.medcase.system.entity.SysUserEntity;
+import com.medcase.system.service.SysMenuService;
+import com.medcase.system.service.SysRoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
-import com.medcase.common.constant.Constants;
-import com.medcase.common.constant.UserConstants;
-import com.medcase.common.core.domain.entity.SysUser;
-import com.medcase.system.entity.SysRoleEntity;
-import com.medcase.system.service.SysMenuService;
-import com.medcase.system.service.SysRoleService;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * 用户权限处理
@@ -30,16 +31,14 @@ public class SysPermissionService {
      * @param user 用户信息
      * @return 角色权限信息
      */
-    public Set<String> getRolePermission(SysUser user) {
+    public Set<String> getRolePermission(SysUserEntity user) {
 
-        Set<String> roles = new HashSet<String>();
+        Set<String> roles = new HashSet<>();
         // 管理员拥有所有权限
         if (user.isAdmin()) {
-
             roles.add(Constants.SUPER_ADMIN);
         }
         else {
-
             roles.addAll(roleService.selectRolePermissionByUserId(user.getUserId()));
         }
         return roles;
@@ -50,7 +49,7 @@ public class SysPermissionService {
      * @param user 用户信息
      * @return 菜单权限信息
      */
-    public Set<String> getMenuPermission(SysUser user) {
+    public Set<String> getMenuPermission(SysUserEntity user) {
 
         Set<String> perms = new HashSet<String>();
         // 管理员拥有所有权限

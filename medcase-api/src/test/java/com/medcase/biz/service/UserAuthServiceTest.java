@@ -4,7 +4,7 @@ import com.medcase.biz.domain.UserEntity;
 import com.medcase.biz.mapper.UserMapper;
 import com.medcase.biz.request.UserLoginRequest;
 import com.medcase.biz.request.UserRegisterRequest;
-import com.medcase.common.core.domain.entity.SysUser;
+import com.medcase.system.entity.SysUserEntity;
 import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.common.enums.UserStatusEnums;
 import com.medcase.common.enums.UserTypeEnums;
@@ -234,7 +234,7 @@ class UserAuthServiceTest {
 
     @Test
     void logoutDeletesCurrentLoginToken() {
-        SysUser user = new SysUser();
+        SysUserEntity user = new SysUserEntity();
         user.setUserId(12L);
         user.setUserName("doctor01");
         LoginUser loginUser = new LoginUser();
@@ -307,7 +307,7 @@ class UserAuthServiceTest {
     }
 
     private LoginUser doctorLoginUser(Long userId, String token) {
-        SysUser user = new SysUser();
+        SysUserEntity user = new SysUserEntity();
         user.setUserId(userId);
         user.setUserName("doctor01");
         user.setUserType(UserTypeEnums.DOCTOR);

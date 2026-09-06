@@ -8,11 +8,11 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
-import com.medcase.common.core.domain.entity.SysDept;
+import com.medcase.system.entity.SysDeptEntity;
 import com.medcase.common.core.domain.TreeSelect;
 import com.medcase.common.constant.UserConstants;
 import com.medcase.web.controller.system.dto.DeptQueryRequest;
-import com.medcase.system.entity.SysDeptEntity;
+import com.medcase.web.controller.system.dto.DeptSaveRequest;
 import com.medcase.system.mapper.SysDeptMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -44,8 +44,8 @@ class SysDeptServiceCacheTest {
         dept.setDeptName("总部");
         when(deptMapper.selectAllDepartments()).thenReturn(List.of(dept));
 
-        SysDept first = deptService.selectDeptById(1L);
-        SysDept second = deptService.selectDeptById(1L);
+        SysDeptEntity first = deptService.selectDeptById(1L);
+        SysDeptEntity second = deptService.selectDeptById(1L);
 
         assertEquals("总部", first.getDeptName());
         assertEquals("总部", second.getDeptName());
@@ -57,7 +57,7 @@ class SysDeptServiceCacheTest {
 
         when(deptMapper.selectAllDepartments()).thenReturn(null);
 
-        SysDept result = deptService.selectDeptById(1L);
+        SysDeptEntity result = deptService.selectDeptById(1L);
 
         assertEquals(null, result);
         verify(deptMapper, times(1)).selectAllDepartments();
@@ -78,7 +78,7 @@ class SysDeptServiceCacheTest {
         when(deptMapper.selectById(1L)).thenReturn(parentDept);
         when(deptMapper.insert(org.mockito.ArgumentMatchers.any(SysDeptEntity.class))).thenReturn(1);
 
-        SysDept newDept = new SysDept();
+        DeptSaveRequest newDept = new DeptSaveRequest();
         newDept.setParentId(1L);
         deptService.selectDeptById(1L);
         deptService.insertDept(newDept);
@@ -96,8 +96,9 @@ class SysDeptServiceCacheTest {
         when(deptMapper.selectById(1L)).thenReturn(cachedDept);
         when(deptMapper.updateById(org.mockito.ArgumentMatchers.any(SysDeptEntity.class))).thenReturn(1);
 
-        SysDept dept = new SysDept();
+        DeptSaveRequest dept = new DeptSaveRequest();
         dept.setDeptId(1L);
+        dept.setParentId(1L);
         deptService.selectDeptById(1L);
         deptService.updateDept(dept);
         deptService.selectDeptById(1L);
@@ -147,7 +148,7 @@ class SysDeptServiceCacheTest {
         DeptQueryRequest query = new DeptQueryRequest();
         query.setDeptNameLike("研发");
 
-        List<SysDept> result = deptService.selectDeptList(query);
+        List<SysDeptEntity> result = deptService.selectDeptList(query);
 
         assertEquals(1, result.size());
         assertEquals("研发部门", result.get(0).getDeptName());
@@ -165,9 +166,9 @@ class SysDeptServiceCacheTest {
 
         DeptQueryRequest query = new DeptQueryRequest();
 
-        List<SysDept> result = deptService.selectDeptList(query);
+        List<SysDeptEntity> result = deptService.selectDeptList(query);
 
-        assertEquals(List.of(1L, 2L, 3L), result.stream().map(SysDept::getDeptId).toList());
+        assertEquals(List.of(1L, 2L, 3L), result.stream().map(SysDeptEntity::getDeptId).toList());
     }
 
     @Test
@@ -176,9 +177,9 @@ class SysDeptServiceCacheTest {
         SysDeptEntity department = department(1L, 0L, "总部", "0");
         when(deptMapper.selectAllDepartments()).thenReturn(List.of(department));
 
-        List<SysDept> result = deptService.selectDeptList(new DeptQueryRequest());
+        List<SysDeptEntity> result = deptService.selectDeptList(new DeptQueryRequest());
 
-        assertEquals(List.of(1L), result.stream().map(SysDept::getDeptId).toList());
+        assertEquals(List.of(1L), result.stream().map(SysDeptEntity::getDeptId).toList());
     }
 
     @Test
@@ -230,7 +231,7 @@ class SysDeptServiceCacheTest {
         SysDeptEntity existingDepartment = department(1L, 10L, "研发部门", "0,10");
         when(deptMapper.selectAllDepartments()).thenReturn(List.of(existingDepartment));
 
-        SysDept dept = new SysDept();
+        DeptSaveRequest dept = new DeptSaveRequest();
         dept.setDeptId(2L);
         dept.setParentId(10L);
         dept.setDeptName("研发部门");

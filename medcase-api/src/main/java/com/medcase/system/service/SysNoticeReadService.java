@@ -1,6 +1,6 @@
 package com.medcase.system.service;
 
-import com.medcase.common.core.domain.entity.SysDept;
+import com.medcase.system.entity.SysDeptEntity;
 import com.medcase.system.entity.SysNoticeReadEntity;
 import com.medcase.system.mapper.SysNoticeReadMapper;
 import com.medcase.web.controller.system.dto.NoticeReadUserResponse;
@@ -80,7 +80,7 @@ public class SysNoticeReadService {
         List<NoticeReadUserResponse> result =
                 noticeReadMapper.selectReadUsersByNoticeId(noticeId, nickNameLike);
         for (NoticeReadUserResponse item : result) {
-            SysDept dept = deptService.selectDeptById(item.getDeptId());
+            SysDeptEntity dept = deptService.selectDeptById(item.getDeptId());
             if (dept != null) {
                 item.setDeptName(dept.getDeptName());
             }

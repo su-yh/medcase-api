@@ -6,7 +6,7 @@ import com.medcase.biz.request.UserRegisterSmsCodeRequest;
 import com.medcase.biz.service.UserAuthService;
 import com.medcase.biz.service.UserRegisterSmsCodeService;
 import com.medcase.common.annotation.Anonymous;
-import com.medcase.common.core.domain.entity.SysUser;
+import com.medcase.system.entity.SysUserEntity;
 import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.common.enums.UserTypeEnums;
 import org.junit.jupiter.api.BeforeEach;
@@ -125,7 +125,7 @@ class UserAuthPortalControllerTest {
     }
 
     private LoginUser doctorLoginUser() {
-        SysUser sysUser = new SysUser();
+        SysUserEntity sysUser = new SysUserEntity();
         sysUser.setUserId(1L);
         sysUser.setUserName("doctor01");
         sysUser.setUserType(UserTypeEnums.DOCTOR);

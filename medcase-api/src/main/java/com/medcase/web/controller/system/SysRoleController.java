@@ -1,7 +1,6 @@
 package com.medcase.web.controller.system;
 
 import com.medcase.common.annotation.Log;
-import com.medcase.common.core.domain.entity.SysUser;
 import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.common.enums.BusinessType;
 import com.medcase.framework.web.service.SysPermissionService;
@@ -12,6 +11,7 @@ import com.medcase.mvc.authentication.annotation.CurrLoginUser;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
 import com.medcase.system.entity.SysRoleEntity;
+import com.medcase.system.entity.SysUserEntity;
 import com.medcase.system.service.SysRoleService;
 import com.medcase.system.service.SysUserService;
 import com.medcase.web.controller.system.dto.RoleAddRequest;
@@ -20,6 +20,7 @@ import com.medcase.web.controller.system.dto.RoleMenuUpdateRequest;
 import com.medcase.web.controller.system.dto.RoleQueryRequest;
 import com.medcase.web.controller.system.dto.RoleStatusRequest;
 import com.medcase.web.controller.system.dto.RoleUserRequest;
+import com.medcase.web.controller.system.dto.UserQueryRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -200,9 +201,9 @@ public class SysRoleController {
     @PreAuthorize("@dp.hasAnyUserType(#loginUser, T(com.medcase.common.enums.UserTypeEnums).ADMIN) " +
             "&& @ss.hasPermi('system:role:list')")
     @GetMapping("/authUser/allocatedList")
-    public PageResult<SysUser> allocatedList(
+    public PageResult<SysUserEntity> allocatedList(
             PageParam pageParam,
-            SysUser user,
+            UserQueryRequest user,
             @CurrLoginUser LoginUser loginUser) {
 
         roleService.selectRoleById(
@@ -216,9 +217,9 @@ public class SysRoleController {
     @PreAuthorize("@dp.hasAnyUserType(#loginUser, T(com.medcase.common.enums.UserTypeEnums).ADMIN) " +
             "&& @ss.hasPermi('system:role:list')")
     @GetMapping("/authUser/unallocatedList")
-    public PageResult<SysUser> unallocatedList(
+    public PageResult<SysUserEntity> unallocatedList(
             PageParam pageParam,
-            SysUser user,
+            UserQueryRequest user,
             @CurrLoginUser LoginUser loginUser) {
 
         roleService.selectRoleById(

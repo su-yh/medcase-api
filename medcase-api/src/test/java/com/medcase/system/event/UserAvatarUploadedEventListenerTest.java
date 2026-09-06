@@ -1,6 +1,6 @@
 package com.medcase.system.event;
 
-import com.medcase.common.core.domain.entity.SysUser;
+import com.medcase.system.entity.SysUserEntity;
 import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.framework.web.service.TokenService;
 import com.medcase.storage.pojo.FileAttachment;
@@ -45,7 +45,7 @@ class UserAvatarUploadedEventListenerTest {
     }
 
     private UserAvatarUploadedEvent event() {
-        SysUser user = new SysUser();
+        SysUserEntity user = new SysUserEntity();
         user.setUserId(12L);
         LoginUser loginUser = new LoginUser(user, Set.of());
         loginUser.setUserId(12L);

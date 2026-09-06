@@ -2,7 +2,7 @@ package com.medcase.system.service;
 
 import com.medcase.system.entity.SysNoticeReadEntity;
 import com.medcase.system.mapper.SysNoticeReadMapper;
-import com.medcase.common.core.domain.entity.SysDept;
+import com.medcase.system.entity.SysDeptEntity;
 import com.medcase.web.controller.system.dto.NoticeReadUserResponse;
 import com.medcase.web.controller.system.dto.NoticeTopItemResponse;
 import org.junit.jupiter.api.BeforeEach;
@@ -81,7 +81,7 @@ class SysNoticeReadServiceTest {
 
         NoticeReadUserResponse response = new NoticeReadUserResponse();
         response.setDeptId(1L);
-        SysDept dept = new SysDept();
+        SysDeptEntity dept = new SysDeptEntity();
         dept.setDeptId(1L);
         dept.setDeptName("管理部");
         when(noticeReadMapper.selectReadUsersByNoticeId(3L, "张"))

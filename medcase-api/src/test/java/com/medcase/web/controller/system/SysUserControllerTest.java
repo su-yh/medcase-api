@@ -1,8 +1,9 @@
 package com.medcase.web.controller.system;
 
-import com.medcase.common.core.domain.entity.SysUser;
+import com.medcase.system.entity.SysUserEntity;
 import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
+import com.medcase.web.controller.system.dto.UserQueryRequest;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.bind.annotation.GetMapping;
 
@@ -48,9 +49,9 @@ class SysUserControllerTest {
     @Test
     void userListUsesUnifiedPageParameter() throws NoSuchMethodException {
         Method method = SysUserController.class.getMethod(
-                "list", PageParam.class, SysUser.class, String.class, String.class);
+                "list", PageParam.class, UserQueryRequest.class, String.class, String.class);
         assertEquals(PageResult.class, method.getReturnType());
         ParameterizedType pageResultType = (ParameterizedType) method.getGenericReturnType();
-        assertEquals(SysUser.class.getTypeName(), pageResultType.getActualTypeArguments()[0].getTypeName());
+        assertEquals(SysUserEntity.class.getTypeName(), pageResultType.getActualTypeArguments()[0].getTypeName());
     }
 }

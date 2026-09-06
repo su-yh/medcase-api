@@ -9,7 +9,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.medcase.common.core.domain.entity.SysUser;
+import com.medcase.system.entity.SysUserEntity;
 
 /**
  * 登录用户身份权限
@@ -72,19 +72,19 @@ public class LoginUser implements UserDetails {
     /**
      * 用户信息
      */
-    private SysUser user;
+    private SysUserEntity user;
 
     public LoginUser() {
 
     }
 
-    public LoginUser(SysUser user, Set<String> permissions) {
+    public LoginUser(SysUserEntity user, Set<String> permissions) {
 
         this.user = user;
         this.permissions = permissions;
     }
 
-    public LoginUser(Long userId, Long deptId, SysUser user, Set<String> permissions) {
+    public LoginUser(Long userId, Long deptId, SysUserEntity user, Set<String> permissions) {
 
         this.userId = userId;
         this.deptId = deptId;
@@ -251,12 +251,12 @@ public class LoginUser implements UserDetails {
         this.permissions = permissions;
     }
 
-    public SysUser getUser() {
+    public SysUserEntity getUser() {
 
         return user;
     }
 
-    public void setUser(SysUser user) {
+    public void setUser(SysUserEntity user) {
 
         this.user = user;
     }
