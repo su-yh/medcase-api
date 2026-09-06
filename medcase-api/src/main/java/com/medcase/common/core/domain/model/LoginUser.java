@@ -1,21 +1,23 @@
 package com.medcase.common.core.domain.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.medcase.mvc.user.AbstractLoginUser;
+import com.medcase.system.entity.SysUserEntity;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.medcase.system.entity.SysUserEntity;
 
 /**
  * 登录用户身份权限
  * 
  */
-public class LoginUser implements UserDetails {
+public class LoginUser extends AbstractLoginUser implements UserDetails {
 
     private static final long serialVersionUID = 1L;
 
@@ -127,6 +129,16 @@ public class LoginUser implements UserDetails {
     public String getPassword() {
 
         return user.getPassword();
+    }
+
+    @Override
+    public Long getId() {
+        return userId;
+    }
+
+    @Override
+    public String getNickname() {
+        return user.getNickName();
     }
 
     @Override

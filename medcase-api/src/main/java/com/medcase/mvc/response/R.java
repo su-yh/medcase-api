@@ -18,20 +18,20 @@ public class R<T> {
     private final T data;
 
     protected R(String code, String msg, T data) {
-
         this.code = code;
         this.msg = msg;
         this.data = data;
     }
 
     public static <T> R<T> ofSuccess(T data, String message) {
-
         return new R<>(SUCCESS_CODE, message, data);
     }
 
     public static <T> R<T> ofSuccess(T data) {
-
         return new R<>(SUCCESS_CODE, SUCCESS_MSG, data);
     }
 
+    public static Object ofFail(String code, String message) {
+        return new R<>(code, message, null);
+    }
 }
