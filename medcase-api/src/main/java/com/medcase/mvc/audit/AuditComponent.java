@@ -35,7 +35,7 @@ public class AuditComponent extends AbstractAuditComponent {
         recordEntity.setUserId(loginUser.getId()).setUserNickname(loginUser.getNickname())
                 .setOperation(auditOperation)
                 .setReqArgument(JsonUtils.toJSONString(reqArgs))
-                .setResult(JsonUtils.toJSONString(spelReturnValue))
+                .setResultDetail(JsonUtils.toJSONString(spelReturnValue))
                 .setReqPath(request.getServletPath()).setReqMethod(request.getMethod())
                 .setCreated(new Date());
 
