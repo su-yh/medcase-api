@@ -34,7 +34,7 @@ public class AuditLogEntity {
     @TableField("req_argument")
     private String reqArgument;
 
-    @TableField("result")
+    @TableField("result_detail")
     private String result;
 
     @TableField("result_code")
