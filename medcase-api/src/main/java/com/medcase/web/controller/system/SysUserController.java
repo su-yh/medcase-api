@@ -125,7 +125,6 @@ public class SysUserController {
     @AuditOperation("@audit.auditRecord(" +
             "T(com.medcase.mvc.audit.AuditEnums).CREATE_ADMIN_USER, " +
             "#spelReturnValue, #request, #loginUser, #user)")
-    // @AuditOperation()
     @PreAuthorize("@ss.hasPermi('system:user:add')")
     @Log(title = "用户管理", businessType = BusinessType.INSERT)
     @PostMapping
