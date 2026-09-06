@@ -137,7 +137,7 @@ class SysRoleServiceCacheTest {
         roleService.selectRoleAll();
         RoleEditRequest updateRole = new RoleEditRequest();
         updateRole.setRoleId(1L);
-        roleService.updateRole(updateRole, "admin");
+        roleService.updateRole(updateRole, "admin", true);
         roleService.selectRoleAll();
 
         verify(roleMapper, times(2)).selectList();
@@ -146,6 +146,7 @@ class SysRoleServiceCacheTest {
     @Test
     void updateRoleDoesNotChangeRoleMenus() {
 
+        when(roleMapper.selectList()).thenReturn(List.of(role(1L, "管理员")));
         when(roleMapper.updateById(any(SysRoleEntity.class))).thenReturn(1);
 
         RoleEditRequest request = new RoleEditRequest();
@@ -153,7 +154,7 @@ class SysRoleServiceCacheTest {
         request.setRoleName("审核员");
         request.setRoleKey("reviewer");
 
-        roleService.updateRole(request, "admin");
+        roleService.updateRole(request, "admin", true);
 
         verify(roleMenuMapper, never()).deleteByRoleId(1L);
         verify(roleMenuMapper, never()).insertRoleMenus(any());
@@ -162,12 +163,13 @@ class SysRoleServiceCacheTest {
     @Test
     void updateRoleMenusReplacesMenuRelations() {
 
+        when(roleMapper.selectList()).thenReturn(List.of(role(1L, "管理员")));
         when(roleMapper.updateById(any(SysRoleEntity.class))).thenReturn(1);
         RoleMenuUpdateRequest request = new RoleMenuUpdateRequest();
         request.setMenuIds(new Long[] {10L, 20L});
         request.setMenuCheckStrictly(true);
 
-        roleService.updateRoleMenus(1L, request);
+        roleService.updateRoleMenus(1L, request, "admin", true, 1L);
 
         org.mockito.ArgumentCaptor<SysRoleEntity> roleCaptor = forClass(SysRoleEntity.class);
         verify(roleMapper).updateById(roleCaptor.capture());
@@ -184,9 +186,11 @@ class SysRoleServiceCacheTest {
     @Test
     void selectRoleMenuIdsReadsRoleMenuRelations() {
 
+        when(roleMapper.selectList()).thenReturn(List.of(role(1L, "管理员")));
         when(roleMenuMapper.selectMenuIdsByRoleId(1L)).thenReturn(List.of(10L, 20L));
 
-        assertEquals(List.of(10L, 20L), roleService.selectRoleMenuIds(1L));
+        assertEquals(List.of(10L, 20L),
+                roleService.selectRoleMenuIds(1L, "admin", true));
         verify(roleMenuMapper).selectMenuIdsByRoleId(1L);
     }
 
@@ -200,7 +204,7 @@ class SysRoleServiceCacheTest {
         roleService.selectRoleAll();
         RoleStatusRequest updateRole = new RoleStatusRequest();
         updateRole.setRoleId(1L);
-        roleService.updateRoleStatus(updateRole, "admin");
+        roleService.updateRoleStatus(updateRole, "admin", true);
         roleService.selectRoleAll();
 
         verify(roleMapper, times(2)).selectList();
@@ -216,7 +220,7 @@ class SysRoleServiceCacheTest {
         when(roleMapper.deleteRolesByIds(new Long[] {1L})).thenReturn(1);
 
         roleService.selectRoleAll();
-        roleService.deleteRoleByIds(new Long[] {1L});
+        roleService.deleteRoleByIds(new Long[] {1L}, "admin", true);
         roleService.selectRoleAll();
 
         verify(roleMapper, times(2)).selectList();

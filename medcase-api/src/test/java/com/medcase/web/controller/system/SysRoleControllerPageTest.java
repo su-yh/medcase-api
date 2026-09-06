@@ -1,6 +1,7 @@
 package com.medcase.web.controller.system;
 
 import com.medcase.common.core.domain.entity.SysUser;
+import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
 import com.medcase.system.service.SysRoleService;
@@ -26,8 +27,10 @@ class SysRoleControllerPageTest {
 
     @Test
     void allocatedAndUnallocatedUserRoutesUseUnifiedPageParameter() throws NoSuchMethodException {
-        Method allocated = SysRoleController.class.getMethod("allocatedList", PageParam.class, SysUser.class);
-        Method unallocated = SysRoleController.class.getMethod("unallocatedList", PageParam.class, SysUser.class);
+        Method allocated = SysRoleController.class.getMethod(
+                "allocatedList", PageParam.class, SysUser.class, LoginUser.class);
+        Method unallocated = SysRoleController.class.getMethod(
+                "unallocatedList", PageParam.class, SysUser.class, LoginUser.class);
 
         assertEquals(PageResult.class, allocated.getReturnType());
         assertEquals(PageResult.class, unallocated.getReturnType());
@@ -78,8 +81,10 @@ class SysRoleControllerPageTest {
 
     @Test
     void roleMenuEndpointsAreSeparateFromRoleMutation() throws NoSuchMethodException {
-        Method select = SysRoleController.class.getMethod("getRoleMenuIds", Long.class);
-        Method update = SysRoleController.class.getMethod("updateRoleMenus", Long.class, RoleMenuUpdateRequest.class);
+        Method select = SysRoleController.class.getMethod(
+                "getRoleMenuIds", Long.class, LoginUser.class);
+        Method update = SysRoleController.class.getMethod(
+                "updateRoleMenus", Long.class, RoleMenuUpdateRequest.class, LoginUser.class);
 
         assertTrue(Arrays.asList(select.getAnnotation(GetMapping.class).value())
                 .contains("/{roleId}/menuIds"));

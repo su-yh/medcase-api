@@ -12,13 +12,15 @@ import java.util.Arrays;
 
 @Mapper
 public interface SysRoleMapper extends BaseMapperX<SysRoleEntity> {
-    default PageResult<SysRoleEntity> selectPage(PageParam pageParam, RoleQueryRequest request) {
+    default PageResult<SysRoleEntity> selectPage(
+            PageParam pageParam, RoleQueryRequest request, String createBy) {
         return selectPage(pageParam, build()
                 .likeIfPresent(SysRoleEntity::getRoleName, request.getRoleNameLike())
                 .likeIfPresent(SysRoleEntity::getRoleKey, request.getRoleKeyLike())
                 .eqIfPresent(SysRoleEntity::getStatus, request.getStatus())
                 .geIfPresent(SysRoleEntity::getCreateTime, request.getBeginTime())
                 .ltIfPresent(SysRoleEntity::getCreateTime, request.getEndTime())
+                .eqIfPresent(SysRoleEntity::getCreateBy, createBy)
                 .eq(SysRoleEntity::getDelFlag, "0")
                 .orderByAsc(SysRoleEntity::getRoleSort));
     }

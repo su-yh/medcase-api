@@ -3,6 +3,7 @@ package com.medcase.system.service;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.medcase.common.constant.UserConstants;
+import com.medcase.common.core.domain.entity.SysMenu;
 import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
@@ -26,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -49,6 +51,9 @@ public class SysRoleService {
     @Autowired
     private SysUserRoleMapper userRoleMapper;
 
+    @Autowired
+    private SysMenuService menuService;
+
     private final Cache<String, List<SysRoleEntity>> roleCache = Caffeine.newBuilder()
             .expireAfterWrite(ROLE_CACHE_EXPIRE_MINUTES, TimeUnit.MINUTES)
             .build();
@@ -59,8 +64,9 @@ public class SysRoleService {
      * 根据条件分页查询角色数据
      * @return 角色数据集合信息
      */
-    public PageResult<SysRoleEntity> selectPage(PageParam pageParam, RoleQueryRequest request) {
-        return roleMapper.selectPage(pageParam, request);
+    public PageResult<SysRoleEntity> selectPage(
+            PageParam pageParam, RoleQueryRequest request, String createBy, boolean admin) {
+        return roleMapper.selectPage(pageParam, request, admin ? null : createBy);
     }
 
     /**
@@ -166,6 +172,39 @@ public class SysRoleService {
     }
 
     /**
+     * 查询当前管理员允许管理的角色。
+     *
+     * @param roleId 角色ID
+     * @param createBy 当前管理员账号
+     * @param admin 是否为超级管理员
+     * @return 角色对象信息
+     */
+    public SysRoleEntity selectRoleById(Long roleId, String createBy, boolean admin) {
+        SysRoleEntity role = selectRoleById(roleId);
+        if (role == null || (!admin && !Objects.equals(createBy, role.getCreateBy()))) {
+            throw ExceptionUtil.business(ErrorCodeEnums.ACCESS_DENIED);
+        }
+        return role;
+    }
+
+    /**
+     * 查询当前管理员允许分配的角色。
+     *
+     * @param createBy 当前管理员账号
+     * @param admin 是否为超级管理员
+     * @return 角色列表
+     */
+    public List<SysRoleEntity> selectRoleAll(String createBy, boolean admin) {
+        List<SysRoleEntity> roles = selectRoleAll();
+        if (admin) {
+            return roles;
+        }
+        return roles.stream()
+                .filter(role -> Objects.equals(createBy, role.getCreateBy()))
+                .toList();
+    }
+
+    /**
      * 校验角色名称是否唯一
      * 
      * @param role 角色信息
@@ -247,7 +286,8 @@ public class SysRoleService {
      * @return 结果
      */
     @Transactional
-    public int updateRole(RoleEditRequest request, String updateBy) {
+    public int updateRole(RoleEditRequest request, String updateBy, boolean admin) {
+        selectRoleById(request.getRoleId(), updateBy, admin);
         SysRoleEntity role = new SysRoleEntity();
         role.setRoleId(request.getRoleId());
         role.setRoleName(request.getRoleName());
@@ -281,7 +321,8 @@ public class SysRoleService {
      * @param updateBy 更新人
      * @return 结果
      */
-    public int updateRoleStatus(RoleStatusRequest request, String updateBy) {
+    public int updateRoleStatus(RoleStatusRequest request, String updateBy, boolean admin) {
+        selectRoleById(request.getRoleId(), updateBy, admin);
         SysRoleEntity role = new SysRoleEntity();
         role.setRoleId(request.getRoleId());
         role.setStatus(request.getStatus());
@@ -302,7 +343,8 @@ public class SysRoleService {
      * @param roleId 角色ID
      * @return 菜单ID列表
      */
-    public List<Long> selectRoleMenuIds(Long roleId) {
+    public List<Long> selectRoleMenuIds(Long roleId, String createBy, boolean admin) {
+        selectRoleById(roleId, createBy, admin);
         return roleMenuMapper.selectMenuIdsByRoleId(roleId);
     }
 
@@ -314,7 +356,29 @@ public class SysRoleService {
      * @return 结果
      */
     @Transactional
-    public int updateRoleMenus(Long roleId, RoleMenuUpdateRequest request) {
+    public int updateRoleMenus(
+            Long roleId, RoleMenuUpdateRequest request,
+            String createBy, boolean admin, Long userId) {
+        selectRoleById(roleId, createBy, admin);
+        if (!admin) {
+            List<SysMenu> menus = menuService.selectMenuList(userId);
+            Set<Long> menuIds = new HashSet<>();
+            Long[] requestedMenuIds = request.getMenuIds();
+            if (menus != null) {
+                for (SysMenu menu : menus) {
+                    if (menu != null && menu.getMenuId() != null) {
+                        menuIds.add(menu.getMenuId());
+                    }
+                }
+            }
+            if (requestedMenuIds != null) {
+                for (Long menuId : requestedMenuIds) {
+                    if (!menuIds.contains(menuId)) {
+                        throw ExceptionUtil.business(ErrorCodeEnums.ACCESS_DENIED);
+                    }
+                }
+            }
+        }
         SysRoleEntity role = new SysRoleEntity();
         role.setRoleId(roleId);
         role.setMenuCheckStrictly(request.isMenuCheckStrictly());
@@ -340,6 +404,9 @@ public class SysRoleService {
             roleMenuMapper.insertRoleMenus(list);
             row = list.size();
         }
+        synchronized (roleCacheLoadLock) {
+            roleCache.invalidate(ALL_ROLES_CACHE_KEY);
+        }
         return row;
     }
 
@@ -350,9 +417,9 @@ public class SysRoleService {
      * @return 结果
      */
     @Transactional
-    public int deleteRoleByIds(Long[] roleIds) {
+    public int deleteRoleByIds(Long[] roleIds, String createBy, boolean admin) {
         for (Long roleId : roleIds) {
-            SysRoleEntity role = roleMapper.selectById(roleId);
+            SysRoleEntity role = selectRoleById(roleId, createBy, admin);
             if (countUserRoleByRoleId(roleId) > 0) {
                 throw ExceptionUtil.business(ErrorCodeEnums.ROLE_ASSIGNED_DELETE, role.getRoleName());
             }
@@ -374,7 +441,9 @@ public class SysRoleService {
      * @param userRole 用户和角色关联信息
      * @return 结果
      */
-    public int deleteAuthUser(Long userId, Long roleId) {
+    public int deleteAuthUser(
+            Long userId, Long roleId, String createBy, boolean admin) {
+        selectRoleById(roleId, createBy, admin);
         return userRoleMapper.deleteByUserAndRole(userId, roleId);
     }
 
@@ -385,7 +454,9 @@ public class SysRoleService {
      * @param userIds 需要取消授权的用户数据ID
      * @return 结果
      */
-    public int deleteAuthUsers(Long roleId, Long[] userIds) {
+    public int deleteAuthUsers(
+            Long roleId, Long[] userIds, String createBy, boolean admin) {
+        selectRoleById(roleId, createBy, admin);
         return userRoleMapper.deleteByRoleAndUsers(roleId, userIds);
     }
 
@@ -396,7 +467,9 @@ public class SysRoleService {
      * @param userIds 需要授权的用户数据ID
      * @return 结果
      */
-    public int insertAuthUsers(Long roleId, Long[] userIds) {
+    public int insertAuthUsers(
+            Long roleId, Long[] userIds, String createBy, boolean admin) {
+        selectRoleById(roleId, createBy, admin);
         // 新增用户与角色管理
         List<SysUserRoleEntity> list = new ArrayList<>();
         for (Long userId : userIds) {
