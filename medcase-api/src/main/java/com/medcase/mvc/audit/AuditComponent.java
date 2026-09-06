@@ -32,7 +32,7 @@ public class AuditComponent extends AbstractAuditComponent {
             Object... reqArgs) {
         AuditLogEntity recordEntity = new AuditLogEntity();
         recordEntity.setUserId(loginUser.getId()).setUserNickname(loginUser.getNickname())
-                .setPage(auditOperation.getPage()).setOperation(auditOperation.getOperation())
+                .setOperation(auditOperation.getOperation())
                 .setReqArgument(JsonUtils.toJSONString(reqArgs))
                 .setResult(JsonUtils.toJSONString(spelReturnValue))
                 .setReqPath(request.getServletPath()).setReqMethod(request.getMethod())
