@@ -1,18 +1,18 @@
 package com.medcase.mvc.error;
 
+import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.AbstractBusinessException;
 import com.medcase.mvc.exception.ExceptionCategory;
-import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
-import org.springframework.boot.webmvc.autoconfigure.error.ErrorMvcAutoConfiguration;
 import org.springframework.boot.web.error.ErrorAttributeOptions;
+import org.springframework.boot.webmvc.autoconfigure.error.ErrorMvcAutoConfiguration;
 import org.springframework.boot.webmvc.error.DefaultErrorAttributes;
 import org.springframework.context.MessageSource;
-import org.springframework.stereotype.Component;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.WebRequest;
 
 import java.time.LocalDateTime;
@@ -30,10 +30,7 @@ import java.util.Map;
  * 但是如果是自定义的异常最好还是添加一个ControllerAdvice 的全局性的单独处理。
  * <p>
  * <p>
- * 4xx 5xx 都是错误，其他都不被识别为错误。
- * 但是200 的需要判断，最终都是通过 success 的boolean 结果判断成功与失败。
- * 以前的code 现在已经不用了
- * 现在的status 与HttpStatus 一致
+ * 业务响应的code统一使用字符串，HTTP status仍由HTTP响应状态码表示。
  */
 @RequiredArgsConstructor
 @Slf4j

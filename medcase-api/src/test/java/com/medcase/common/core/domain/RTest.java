@@ -14,12 +14,12 @@ class RTest {
 
         R<String> result = R.ofSuccess("token");
 
-        assertEquals(0, result.getCode());
+        assertEquals("OK", result.getCode());
         assertEquals("操作成功", result.getMsg());
         assertEquals("token", result.getData());
 
         JsonNode json = new ObjectMapper().readTree(new ObjectMapper().writeValueAsString(result));
-        assertEquals(0, json.get("code").intValue());
+        assertEquals("OK", json.get("code").textValue());
         assertEquals("操作成功", json.get("msg").textValue());
         assertEquals("token", json.get("data").textValue());
     }
