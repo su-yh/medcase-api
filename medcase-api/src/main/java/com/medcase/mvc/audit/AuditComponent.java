@@ -1,10 +1,12 @@
 package com.medcase.mvc.audit;
 
 import com.medcase.common.utils.json.JsonUtils;
+import com.medcase.filter.TraceFilter;
 import com.medcase.mvc.user.AbstractLoginUser;
 import com.medcase.system.mapper.AuditLogMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -31,6 +33,7 @@ public class AuditComponent extends AbstractAuditComponent {
             HttpServletRequest request,
             AbstractLoginUser loginUser,
             Object... reqArgs) {
+        String traceId = MDC.get(TraceFilter.TRACE_ID);
         AuditLogEntity recordEntity = new AuditLogEntity();
         recordEntity.setUserId(loginUser.getId()).setUserNickname(loginUser.getNickname())
                 .setOperation(auditOperation)
@@ -38,13 +41,7 @@ public class AuditComponent extends AbstractAuditComponent {
                 .setResultDetail(JsonUtils.toJSONString(spelReturnValue))
                 .setReqPath(request.getServletPath()).setReqMethod(request.getMethod())
                 .setCreated(new Date());
-
-        Object traceId = request.getAttribute("trace-id");
-        if (traceId instanceof Long) {
-            recordEntity.setTraceId(Long.parseLong(traceId + ""));
-        } else {
-            log.warn("LOST TRACE ID");
-        }
+        recordEntity.setTraceId(Long.parseLong(traceId));
 
         executorService.submit(() -> {
             auditLogMapper.insert(recordEntity);

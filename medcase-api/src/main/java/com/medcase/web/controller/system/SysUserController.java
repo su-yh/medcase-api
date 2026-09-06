@@ -6,24 +6,25 @@ import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.common.enums.BusinessType;
 import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
+import com.medcase.mvc.audit.AuditOperation;
 import com.medcase.mvc.authentication.annotation.CurrLoginUser;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
+import com.medcase.system.entity.SysRoleEntity;
+import com.medcase.system.entity.SysUserEntity;
 import com.medcase.system.service.SysDeptService;
 import com.medcase.system.service.SysPostService;
 import com.medcase.system.service.SysRoleService;
 import com.medcase.system.service.SysUserService;
-import com.medcase.system.entity.SysRoleEntity;
-import com.medcase.system.entity.SysUserEntity;
 import com.medcase.web.controller.system.dto.DeptQueryRequest;
 import com.medcase.web.controller.system.dto.PostResponse;
 import com.medcase.web.controller.system.dto.UserAuthRoleResponse;
 import com.medcase.web.controller.system.dto.UserDetailResponse;
-import com.medcase.web.controller.system.dto.UserProfileUpdateRequest;
 import com.medcase.web.controller.system.dto.UserQueryRequest;
 import com.medcase.web.controller.system.dto.UserResetPasswordRequest;
 import com.medcase.web.controller.system.dto.UserSaveRequest;
 import com.medcase.web.controller.system.dto.UserStatusRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -121,10 +122,17 @@ public class SysUserController {
     /**
      * 新增用户
      */
+    @AuditOperation("@audit.auditRecord(" +
+            "T(com.medcase.mvc.audit.AuditEnums).CREATE_ADMIN_USER, " +
+            "#spelReturnValue, #request, #loginUser, #user)")
+    // @AuditOperation()
     @PreAuthorize("@ss.hasPermi('system:user:add')")
     @Log(title = "用户管理", businessType = BusinessType.INSERT)
     @PostMapping
-    public void add(@Validated @RequestBody UserSaveRequest user) {
+    public void add(
+            HttpServletRequest request,
+            @CurrLoginUser LoginUser loginUser,
+            @Validated @RequestBody UserSaveRequest user) {
 
         if (!userService.checkUserNameUnique(user)) {
             throw ExceptionUtil.business(ErrorCodeEnums.USERNAME_EXISTS, user.getUserName());

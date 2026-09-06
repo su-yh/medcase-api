@@ -7,17 +7,20 @@ import com.baomidou.mybatisplus.annotation.EnumValue;
  * @since 2026-09-06
  */
 public enum AuditEnums implements IAudit {
+    CREATE_ADMIN_USER("create_admin_user", "创建后台用户"),
     ;
 
     @EnumValue
-    private final String operation;
+    private final String code;
+    private final String desc;
 
-    AuditEnums(String operation) {
-        this.operation = operation;
+    AuditEnums(String code, String desc) {
+        this.code = code;
+        this.desc = desc;
     }
 
     @Override
-    public String getOperation() {
-        return operation;
+    public String getCode() {
+        return code;
     }
 }
