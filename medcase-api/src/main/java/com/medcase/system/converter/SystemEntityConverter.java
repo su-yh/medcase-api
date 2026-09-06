@@ -6,8 +6,6 @@ import com.medcase.common.core.domain.entity.SysRole;
 import com.medcase.common.core.domain.entity.SysUser;
 import com.medcase.system.entity.SysDeptEntity;
 import com.medcase.system.entity.SysMenuEntity;
-import com.medcase.system.entity.SysNoticeEntity;
-import com.medcase.system.entity.SysPostEntity;
 import com.medcase.system.entity.SysRoleEntity;
 import com.medcase.system.entity.SysUserEntity;
 import org.springframework.beans.BeanUtils;
@@ -40,10 +38,6 @@ public final class SystemEntityConverter {
 
     public static SysRoleEntity toEntity(SysRole source) {
         return copy(source, SysRoleEntity.class);
-    }
-
-    public static SysRole toDomain(SysRoleEntity source) {
-        return copy(source, SysRole.class);
     }
 
     public static SysUserEntity toEntity(SysUser source) {
