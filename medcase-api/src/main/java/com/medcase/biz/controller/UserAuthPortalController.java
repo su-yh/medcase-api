@@ -7,11 +7,11 @@ import com.medcase.biz.request.UserRegisterSmsCodeRequest;
 import com.medcase.biz.service.UserAuthService;
 import com.medcase.biz.service.UserRegisterSmsCodeService;
 import com.medcase.common.core.domain.model.LoginUser;
-import com.medcase.common.enums.UserTypeEnums;
 import com.medcase.mvc.authentication.annotation.CurrLoginUser;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -53,15 +53,20 @@ public class UserAuthPortalController {
         smsCodeService.sendCode(request.getPhone());
     }
 
+    @PreAuthorize("@dp.hasAnyUserType(#user, " +
+            "T(com.medcase.common.enums.UserTypeEnums).DOCTOR, " +
+            "T(com.medcase.common.enums.UserTypeEnums).PATIENT)")
     @RequestMapping(value = "/logout", method = RequestMethod.POST)
-    public void logout(@CurrLoginUser(userType = {UserTypeEnums.DOCTOR, UserTypeEnums.PATIENT}) LoginUser user) {
+    public void logout(@CurrLoginUser LoginUser user) {
         log.trace("user auth controller logout");
         userAuthService.logout(user);
     }
 
+    @PreAuthorize("@dp.hasAnyUserType(#user, " +
+            "T(com.medcase.common.enums.UserTypeEnums).DOCTOR, " +
+            "T(com.medcase.common.enums.UserTypeEnums).PATIENT)")
     @DeleteMapping("/account")
-    public void deleteAccount(
-            @CurrLoginUser(userType = {UserTypeEnums.DOCTOR, UserTypeEnums.PATIENT}) LoginUser user) {
+    public void deleteAccount(@CurrLoginUser LoginUser user) {
         log.trace("user auth controller delete account, userId={}", user.getUserId());
         userAuthService.deleteAccount(user);
     }

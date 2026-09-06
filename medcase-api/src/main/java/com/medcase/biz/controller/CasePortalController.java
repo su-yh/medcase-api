@@ -5,7 +5,6 @@ import com.medcase.biz.request.CaseSubmitRequest;
 import com.medcase.biz.response.CaseVO;
 import com.medcase.biz.service.CaseService;
 import com.medcase.common.core.domain.model.LoginUser;
-import com.medcase.common.enums.UserTypeEnums;
 import com.medcase.common.validation.groups.ValidationGroups;
 import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
@@ -36,45 +35,60 @@ public class CasePortalController {
     private final CaseService caseService;
 
     @RequestMapping(method = RequestMethod.POST)
-    @PreAuthorize("@dp.hasAnyStatus(#user, T(com.medcase.common.enums.UserStatusEnums).OK)")
+    @PreAuthorize("@dp.hasAnyUserType(#user, " +
+            "T(com.medcase.common.enums.UserTypeEnums).DOCTOR, " +
+            "T(com.medcase.common.enums.UserTypeEnums).PATIENT) " +
+            "&& @dp.hasAnyStatus(#user, T(com.medcase.common.enums.UserStatusEnums).OK)")
     public void submit(
-            @CurrLoginUser(userType = {UserTypeEnums.DOCTOR, UserTypeEnums.PATIENT}) LoginUser user,
+            @CurrLoginUser LoginUser user,
             @RequestBody @Validated({ValidationGroups.Doctor.Submit.class, Default.class}) CaseSubmitRequest request) {
         log.trace("case controller submit");
         caseService.submit(user, request);
     }
 
     @RequestMapping(value = "/draft", method = RequestMethod.POST)
-    @PreAuthorize("@dp.hasAnyStatus(#user, T(com.medcase.common.enums.UserStatusEnums).OK)")
+    @PreAuthorize("@dp.hasAnyUserType(#user, " +
+            "T(com.medcase.common.enums.UserTypeEnums).DOCTOR, " +
+            "T(com.medcase.common.enums.UserTypeEnums).PATIENT) " +
+            "&& @dp.hasAnyStatus(#user, T(com.medcase.common.enums.UserStatusEnums).OK)")
     public void saveDraft(
-            @CurrLoginUser(userType = {UserTypeEnums.DOCTOR, UserTypeEnums.PATIENT}) LoginUser user,
+            @CurrLoginUser LoginUser user,
             @RequestBody CaseSubmitRequest request) {
         log.trace("case controller saveDraft, request={}", request);
         caseService.saveDraft(user, request);
     }
 
     @RequestMapping(method = RequestMethod.GET)
-    @PreAuthorize("@dp.hasAnyStatus(#user, T(com.medcase.common.enums.UserStatusEnums).OK)")
+    @PreAuthorize("@dp.hasAnyUserType(#user, " +
+            "T(com.medcase.common.enums.UserTypeEnums).DOCTOR, " +
+            "T(com.medcase.common.enums.UserTypeEnums).PATIENT) " +
+            "&& @dp.hasAnyStatus(#user, T(com.medcase.common.enums.UserStatusEnums).OK)")
     public PageResult<CaseVO> page(
-            @CurrLoginUser(userType = {UserTypeEnums.DOCTOR, UserTypeEnums.PATIENT}) LoginUser user,
+            @CurrLoginUser LoginUser user,
             PageParam pageParam, CasePageRequest request) {
         log.trace("case controller page, request={}", request);
         return caseService.page(user, pageParam, request);
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    @PreAuthorize("@dp.hasAnyStatus(#user, T(com.medcase.common.enums.UserStatusEnums).OK)")
+    @PreAuthorize("@dp.hasAnyUserType(#user, " +
+            "T(com.medcase.common.enums.UserTypeEnums).DOCTOR, " +
+            "T(com.medcase.common.enums.UserTypeEnums).PATIENT) " +
+            "&& @dp.hasAnyStatus(#user, T(com.medcase.common.enums.UserStatusEnums).OK)")
     public CaseVO detail(
-            @CurrLoginUser(userType = {UserTypeEnums.DOCTOR, UserTypeEnums.PATIENT}) LoginUser user,
+            @CurrLoginUser LoginUser user,
             @PathVariable Long id) {
         log.trace("case controller detail, id={}", id);
         return caseService.detail(user, id);
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
-    @PreAuthorize("@dp.hasAnyStatus(#user, T(com.medcase.common.enums.UserStatusEnums).OK)")
+    @PreAuthorize("@dp.hasAnyUserType(#user, " +
+            "T(com.medcase.common.enums.UserTypeEnums).DOCTOR, " +
+            "T(com.medcase.common.enums.UserTypeEnums).PATIENT) " +
+            "&& @dp.hasAnyStatus(#user, T(com.medcase.common.enums.UserStatusEnums).OK)")
     public void delete(
-            @CurrLoginUser(userType = {UserTypeEnums.DOCTOR, UserTypeEnums.PATIENT}) LoginUser user,
+            @CurrLoginUser LoginUser user,
             @PathVariable Long id) {
         log.trace("case controller delete, id={}", id);
         caseService.delete(user, id);

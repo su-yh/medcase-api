@@ -4,7 +4,6 @@ import com.medcase.common.annotation.Log;
 import com.medcase.common.core.domain.entity.SysUser;
 import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.common.enums.BusinessType;
-import com.medcase.common.enums.UserTypeEnums;
 import com.medcase.framework.web.service.SysPermissionService;
 import com.medcase.framework.web.service.TokenService;
 import com.medcase.mp.mybatis.PageParam;
@@ -55,12 +54,13 @@ public class SysRoleController {
     @Autowired
     private SysUserService userService;
 
-    @PreAuthorize("@ss.hasPermi('system:role:list')")
+    @PreAuthorize("@dp.hasAnyUserType(#loginUser, T(com.medcase.common.enums.UserTypeEnums).ADMIN) " +
+            "&& @ss.hasPermi('system:role:list')")
     @GetMapping("/list")
     public PageResult<SysRoleEntity> list(
             PageParam pageParam,
             RoleQueryRequest request,
-            @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
+            @CurrLoginUser LoginUser loginUser) {
 
         return roleService.selectPage(
                 pageParam, request, loginUser.getUserId(), loginUser.getUser().isAdmin());
@@ -69,11 +69,12 @@ public class SysRoleController {
     /**
      * 根据角色编号获取详细信息
      */
-    @PreAuthorize("@ss.hasPermi('system:role:query')")
+    @PreAuthorize("@dp.hasAnyUserType(#loginUser, T(com.medcase.common.enums.UserTypeEnums).ADMIN) " +
+            "&& @ss.hasPermi('system:role:query')")
     @GetMapping(value = "/{roleId}")
     public SysRoleEntity getInfo(
             @PathVariable Long roleId,
-            @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
+            @CurrLoginUser LoginUser loginUser) {
 
         return roleService.selectRoleById(
                 roleId, loginUser.getUserId(), loginUser.getUser().isAdmin());
@@ -82,11 +83,12 @@ public class SysRoleController {
     /**
      * 查询角色关联的菜单ID。
      */
-    @PreAuthorize("@ss.hasPermi('system:role:query')")
+    @PreAuthorize("@dp.hasAnyUserType(#loginUser, T(com.medcase.common.enums.UserTypeEnums).ADMIN) " +
+            "&& @ss.hasPermi('system:role:query')")
     @GetMapping("/{roleId}/menuIds")
     public List<Long> getRoleMenuIds(
             @PathVariable Long roleId,
-            @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
+            @CurrLoginUser LoginUser loginUser) {
         return roleService.selectRoleMenuIds(
                 roleId, loginUser.getUserId(), loginUser.getUser().isAdmin());
     }
@@ -109,12 +111,13 @@ public class SysRoleController {
     /**
      * 修改保存角色
      */
-    @PreAuthorize("@ss.hasPermi('system:role:edit')")
+    @PreAuthorize("@dp.hasAnyUserType(#loginUser, T(com.medcase.common.enums.UserTypeEnums).ADMIN) " +
+            "&& @ss.hasPermi('system:role:edit')")
     @Log(title = "角色管理", businessType = BusinessType.UPDATE)
     @PutMapping
     public void edit(
             @Validated @RequestBody RoleEditRequest request,
-            @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
+            @CurrLoginUser LoginUser loginUser) {
 
         if (roleService.updateRole(
                 request, loginUser.getUserId(), loginUser.getUser().isAdmin()) > 0) {
@@ -129,12 +132,13 @@ public class SysRoleController {
     /**
      * 状态修改
      */
-    @PreAuthorize("@ss.hasPermi('system:role:edit')")
+    @PreAuthorize("@dp.hasAnyUserType(#loginUser, T(com.medcase.common.enums.UserTypeEnums).ADMIN) " +
+            "&& @ss.hasPermi('system:role:edit')")
     @Log(title = "角色管理", businessType = BusinessType.UPDATE)
     @PutMapping("/changeStatus")
     public void changeStatus(
             @Validated @RequestBody RoleStatusRequest request,
-            @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
+            @CurrLoginUser LoginUser loginUser) {
 
         if (roleService.updateRoleStatus(
                 request, loginUser.getUserId(), loginUser.getUser().isAdmin()) <= 0) {
@@ -145,13 +149,14 @@ public class SysRoleController {
     /**
      * 修改角色关联菜单。
      */
-    @PreAuthorize("@ss.hasPermi('system:role:edit')")
+    @PreAuthorize("@dp.hasAnyUserType(#loginUser, T(com.medcase.common.enums.UserTypeEnums).ADMIN) " +
+            "&& @ss.hasPermi('system:role:edit')")
     @Log(title = "角色菜单管理", businessType = BusinessType.UPDATE)
     @PutMapping("/{roleId}/menus")
     public void updateRoleMenus(
             @PathVariable Long roleId,
             @Validated @RequestBody RoleMenuUpdateRequest request,
-            @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
+            @CurrLoginUser LoginUser loginUser) {
         if (roleService.updateRoleMenus(
                 roleId, request, loginUser.getUserId(),
                 loginUser.getUser().isAdmin(), loginUser.getUserId()) <= 0) {
@@ -162,12 +167,13 @@ public class SysRoleController {
     /**
      * 删除角色
      */
-    @PreAuthorize("@ss.hasPermi('system:role:remove')")
+    @PreAuthorize("@dp.hasAnyUserType(#loginUser, T(com.medcase.common.enums.UserTypeEnums).ADMIN) " +
+            "&& @ss.hasPermi('system:role:remove')")
     @Log(title = "角色管理", businessType = BusinessType.DELETE)
     @DeleteMapping("/{roleIds}")
     public void remove(
             @PathVariable Long[] roleIds,
-            @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
+            @CurrLoginUser LoginUser loginUser) {
 
         if (roleService.deleteRoleByIds(
                 roleIds, loginUser.getUserId(), loginUser.getUser().isAdmin()) <= 0) {
@@ -178,10 +184,11 @@ public class SysRoleController {
     /**
      * 获取角色选择框列表
      */
-    @PreAuthorize("@ss.hasPermi('system:role:query')")
+    @PreAuthorize("@dp.hasAnyUserType(#loginUser, T(com.medcase.common.enums.UserTypeEnums).ADMIN) " +
+            "&& @ss.hasPermi('system:role:query')")
     @GetMapping("/optionselect")
     public List<SysRoleEntity> optionselect(
-            @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
+            @CurrLoginUser LoginUser loginUser) {
 
         return roleService.selectRoleAll(
                 loginUser.getUserId(), loginUser.getUser().isAdmin());
@@ -190,12 +197,13 @@ public class SysRoleController {
     /**
      * 查询已分配用户角色列表
      */
-    @PreAuthorize("@ss.hasPermi('system:role:list')")
+    @PreAuthorize("@dp.hasAnyUserType(#loginUser, T(com.medcase.common.enums.UserTypeEnums).ADMIN) " +
+            "&& @ss.hasPermi('system:role:list')")
     @GetMapping("/authUser/allocatedList")
     public PageResult<SysUser> allocatedList(
             PageParam pageParam,
             SysUser user,
-            @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
+            @CurrLoginUser LoginUser loginUser) {
 
         roleService.selectRoleById(
                 user.getRoleId(), loginUser.getUserId(), loginUser.getUser().isAdmin());
@@ -205,12 +213,13 @@ public class SysRoleController {
     /**
      * 查询未分配用户角色列表
      */
-    @PreAuthorize("@ss.hasPermi('system:role:list')")
+    @PreAuthorize("@dp.hasAnyUserType(#loginUser, T(com.medcase.common.enums.UserTypeEnums).ADMIN) " +
+            "&& @ss.hasPermi('system:role:list')")
     @GetMapping("/authUser/unallocatedList")
     public PageResult<SysUser> unallocatedList(
             PageParam pageParam,
             SysUser user,
-            @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
+            @CurrLoginUser LoginUser loginUser) {
 
         roleService.selectRoleById(
                 user.getRoleId(), loginUser.getUserId(), loginUser.getUser().isAdmin());
@@ -220,12 +229,13 @@ public class SysRoleController {
     /**
      * 取消授权用户
      */
-    @PreAuthorize("@ss.hasPermi('system:role:edit')")
+    @PreAuthorize("@dp.hasAnyUserType(#loginUser, T(com.medcase.common.enums.UserTypeEnums).ADMIN) " +
+            "&& @ss.hasPermi('system:role:edit')")
     @Log(title = "角色管理", businessType = BusinessType.GRANT)
     @PutMapping("/authUser/cancel")
     public void cancelAuthUser(
             @RequestBody RoleUserRequest request,
-            @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
+            @CurrLoginUser LoginUser loginUser) {
 
         if (roleService.deleteAuthUser(
                 request.getUserId(), request.getRoleId(),
@@ -237,13 +247,14 @@ public class SysRoleController {
     /**
      * 批量取消授权用户
      */
-    @PreAuthorize("@ss.hasPermi('system:role:edit')")
+    @PreAuthorize("@dp.hasAnyUserType(#loginUser, T(com.medcase.common.enums.UserTypeEnums).ADMIN) " +
+            "&& @ss.hasPermi('system:role:edit')")
     @Log(title = "角色管理", businessType = BusinessType.GRANT)
     @PutMapping("/authUser/cancelAll")
     public void cancelAuthUserAll(
             Long roleId,
             Long[] userIds,
-            @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
+            @CurrLoginUser LoginUser loginUser) {
 
         if (roleService.deleteAuthUsers(
                 roleId, userIds, loginUser.getUserId(), loginUser.getUser().isAdmin()) <= 0) {
@@ -254,13 +265,14 @@ public class SysRoleController {
     /**
      * 批量选择用户授权
      */
-    @PreAuthorize("@ss.hasPermi('system:role:edit')")
+    @PreAuthorize("@dp.hasAnyUserType(#loginUser, T(com.medcase.common.enums.UserTypeEnums).ADMIN) " +
+            "&& @ss.hasPermi('system:role:edit')")
     @Log(title = "角色管理", businessType = BusinessType.GRANT)
     @PutMapping("/authUser/selectAll")
     public void selectAuthUserAll(
             Long roleId,
             Long[] userIds,
-            @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
+            @CurrLoginUser LoginUser loginUser) {
 
         if (roleService.insertAuthUsers(
                 roleId, userIds, loginUser.getUserId(), loginUser.getUser().isAdmin()) <= 0) {

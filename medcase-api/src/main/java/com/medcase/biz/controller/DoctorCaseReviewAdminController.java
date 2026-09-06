@@ -44,19 +44,21 @@ public class DoctorCaseReviewAdminController {
         return caseReviewService.detail(id, UserTypeEnums.DOCTOR);
     }
 
-    @PreAuthorize("@ss.hasPermi('doctor:case:review')")
+    @PreAuthorize("@dp.hasAnyUserType(#adminUser, T(com.medcase.common.enums.UserTypeEnums).ADMIN) " +
+            "&& @ss.hasPermi('doctor:case:review')")
     @PostMapping("/{id}/review")
     public void review(
-            @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser adminUser,
+            @CurrLoginUser LoginUser adminUser,
             @PathVariable Long id,
             @Valid @RequestBody CaseReviewRequest request) {
         caseReviewService.review(id, request, adminUser, UserTypeEnums.DOCTOR);
     }
 
-    @PreAuthorize("@ss.hasPermi('doctor:case:settle')")
+    @PreAuthorize("@dp.hasAnyUserType(#adminUser, T(com.medcase.common.enums.UserTypeEnums).ADMIN) " +
+            "&& @ss.hasPermi('doctor:case:settle')")
     @PostMapping("/{id}/settle")
     public void settle(
-            @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser adminUser,
+            @CurrLoginUser LoginUser adminUser,
             @PathVariable Long id) {
         caseReviewService.settle(id, adminUser, UserTypeEnums.DOCTOR);
     }

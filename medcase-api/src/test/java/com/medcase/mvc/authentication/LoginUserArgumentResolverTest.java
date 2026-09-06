@@ -1,7 +1,7 @@
 package com.medcase.mvc.authentication;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.medcase.common.core.domain.entity.SysUser;
 import com.medcase.common.core.domain.model.LoginUser;
@@ -21,11 +21,11 @@ class LoginUserArgumentResolverTest {
     private final LoginUserArgumentResolver resolver = new LoginUserArgumentResolver();
 
     @Test
-    void currentUserAnnotationDefaultsToAllUserTypes() throws Exception {
-        Method userType = CurrLoginUser.class.getMethod("userType");
+    void currentUserAnnotationOnlyControlsRequiredLogin() throws Exception {
+        Method required = CurrLoginUser.class.getMethod("required");
 
-        assertEquals(UserTypeEnums[].class, userType.getReturnType());
-        assertArrayEquals(new UserTypeEnums[0], (UserTypeEnums[]) userType.getDefaultValue());
+        assertEquals(boolean.class, required.getReturnType());
+        assertThrows(NoSuchMethodException.class, () -> CurrLoginUser.class.getMethod("userType"));
     }
 
     @AfterEach
@@ -88,14 +88,13 @@ class LoginUserArgumentResolverTest {
     }
 
     private static class TestController {
-        void currentUser(@CurrLoginUser(userType = UserTypeEnums.DOCTOR) LoginUser loginUser) {
+        void currentUser(@CurrLoginUser LoginUser loginUser) {
         }
 
         void currentUserWithoutUserType(@CurrLoginUser LoginUser loginUser) {
         }
 
-        void currentUserForAdminOrDoctor(
-                @CurrLoginUser(userType = {UserTypeEnums.ADMIN, UserTypeEnums.DOCTOR}) LoginUser loginUser) {
+        void currentUserForAdminOrDoctor(@CurrLoginUser LoginUser loginUser) {
         }
     }
 }

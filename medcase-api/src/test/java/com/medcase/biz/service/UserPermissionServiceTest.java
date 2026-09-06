@@ -43,6 +43,25 @@ class UserPermissionServiceTest {
                 UserStatusEnums.OK, UserStatusEnums.REVIEW_FAILED));
     }
 
+    @Test
+    void adminMatchesAdminUserType() {
+        assertTrue(userPermissionService.hasAnyUserType(
+                loginUser(UserTypeEnums.ADMIN, UserStatusEnums.OK), UserTypeEnums.ADMIN));
+    }
+
+    @Test
+    void portalUserMatchesAnyPortalUserType() {
+        assertTrue(userPermissionService.hasAnyUserType(
+                loginUser(UserTypeEnums.PATIENT, UserStatusEnums.OK),
+                UserTypeEnums.DOCTOR, UserTypeEnums.PATIENT));
+    }
+
+    @Test
+    void portalUserDoesNotMatchAdminUserType() {
+        assertFalse(userPermissionService.hasAnyUserType(
+                loginUser(UserTypeEnums.PATIENT, UserStatusEnums.OK), UserTypeEnums.ADMIN));
+    }
+
     private LoginUser loginUser(UserTypeEnums userType, UserStatusEnums status) {
         SysUser user = new SysUser();
         user.setUserType(userType);

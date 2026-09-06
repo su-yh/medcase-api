@@ -18,7 +18,6 @@ import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
 import com.medcase.common.core.text.Convert;
 import com.medcase.common.enums.BusinessType;
-import com.medcase.common.enums.UserTypeEnums;
 import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.mvc.authentication.annotation.CurrLoginUser;
 import com.medcase.system.entity.SysNoticeEntity;
@@ -104,10 +103,11 @@ public class SysNoticeController {
     /**
      * 首页顶部公告列表（返回全部正常公告，带当前用户已读标记，最多5条）
      */
+    @PreAuthorize("@dp.hasAnyUserType(#loginUser, T(com.medcase.common.enums.UserTypeEnums).ADMIN)")
     @GetMapping("/listTop")
     @ResponseBody
     public NoticeTopResponse listTop(
-            @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
+            @CurrLoginUser LoginUser loginUser) {
 
         List<NoticeTopItemResponse> list = noticeReadService.selectNoticeListWithReadStatus(
                 loginUser.getUserId(), 5);
@@ -120,11 +120,12 @@ public class SysNoticeController {
     /**
      * 标记公告已读
      */
+    @PreAuthorize("@dp.hasAnyUserType(#loginUser, T(com.medcase.common.enums.UserTypeEnums).ADMIN)")
     @PostMapping("/markRead")
     @ResponseBody
     public void markRead(
             Long noticeId,
-            @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
+            @CurrLoginUser LoginUser loginUser) {
 
         noticeReadService.markRead(noticeId, loginUser.getUserId());
     }
@@ -132,11 +133,12 @@ public class SysNoticeController {
     /**
      * 批量标记已读
      */
+    @PreAuthorize("@dp.hasAnyUserType(#loginUser, T(com.medcase.common.enums.UserTypeEnums).ADMIN)")
     @PostMapping("/markReadAll")
     @ResponseBody
     public void markReadAll(
             String ids,
-            @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
+            @CurrLoginUser LoginUser loginUser) {
 
         Long[] noticeIds = Convert.toLongArray(ids);
         noticeReadService.markReadBatch(loginUser.getUserId(), noticeIds);

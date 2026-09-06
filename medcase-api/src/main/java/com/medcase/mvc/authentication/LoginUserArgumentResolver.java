@@ -1,19 +1,16 @@
 package com.medcase.mvc.authentication;
 
 import com.medcase.common.core.domain.model.LoginUser;
-import com.medcase.common.enums.UserTypeEnums;
 import com.medcase.common.utils.SecurityUtils;
 import com.medcase.mvc.authentication.annotation.CurrLoginUser;
-import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
+import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import org.jspecify.annotations.NonNull;
 import org.springframework.core.MethodParameter;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
-
-import java.util.Arrays;
 
 /**
  * 自定义参数解析器的实现，该实现针对在Controller 的handler 接口方法中的参数做匹配。
@@ -46,18 +43,8 @@ public class LoginUserArgumentResolver implements HandlerMethodArgumentResolver 
             if (ann.required()) {    // 用户必须登录
                 throw ExceptionUtil.business(ErrorCodeEnums.USER_NOT_LOGIN);
             }
-        } else {
-            if (ann.userType().length > 0) {
-                UserTypeEnums userType = currUser.getUser().getUserType();
-                boolean matched = Arrays.stream(ann.userType())
-                        .anyMatch(allowedType -> allowedType == userType);
-                if (!matched) {
-                    throw ExceptionUtil.business(ErrorCodeEnums.USER_TYPE_NOT_MATCH);
-                }
-            }
         }
 
         return currUser;
     }
 }
-

@@ -18,6 +18,7 @@ import com.medcase.system.service.SysMenuService;
 import com.medcase.web.controller.system.dto.LoginResponse;
 import com.medcase.web.controller.system.dto.LoginUserInfoResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -73,9 +74,10 @@ public class SysLoginController {
      * 
      * @return 用户信息
      */
+    @PreAuthorize("@dp.hasAnyUserType(#loginUser, T(com.medcase.common.enums.UserTypeEnums).ADMIN)")
     @GetMapping("getInfo")
     public LoginUserInfoResponse getInfo(
-            @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
+            @CurrLoginUser LoginUser loginUser) {
 
         SysUser user = loginUser.getUser();
         // 角色集合
@@ -102,9 +104,10 @@ public class SysLoginController {
      * 
      * @return 路由信息
      */
+    @PreAuthorize("@dp.hasAnyUserType(#loginUser, T(com.medcase.common.enums.UserTypeEnums).ADMIN)")
     @GetMapping("getRouters")
     public List<RouterVo> getRouters(
-            @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
+            @CurrLoginUser LoginUser loginUser) {
 
         List<SysMenu> menus = menuService.selectMenuTreeByUserId(loginUser.getUserId());
         return menuService.buildMenus(menus);

@@ -2,6 +2,7 @@ package com.medcase.web.controller.system;
 
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -16,7 +17,6 @@ import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.common.enums.BusinessType;
 import com.medcase.common.utils.DateUtils;
 import com.medcase.framework.web.service.TokenService;
-import com.medcase.common.enums.UserTypeEnums;
 import com.medcase.mvc.authentication.annotation.CurrLoginUser;
 import com.medcase.system.service.SysUserService;
 import com.medcase.web.controller.system.dto.ProfileResponse;
@@ -42,9 +42,10 @@ public class SysProfileController {
     /**
      * 个人信息
      */
+    @PreAuthorize("@dp.hasAnyUserType(#loginUser, T(com.medcase.common.enums.UserTypeEnums).ADMIN)")
     @GetMapping
     public ProfileResponse profile(
-            @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
+            @CurrLoginUser LoginUser loginUser) {
 
         SysUser user = loginUser.getUser();
         return new ProfileResponse(
@@ -57,10 +58,11 @@ public class SysProfileController {
      * 修改用户
      */
     @Log(title = "个人信息", businessType = BusinessType.UPDATE)
+    @PreAuthorize("@dp.hasAnyUserType(#loginUser, T(com.medcase.common.enums.UserTypeEnums).ADMIN)")
     @PutMapping
     public void updateProfile(
             @RequestBody SysUser user,
-            @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
+            @CurrLoginUser LoginUser loginUser) {
 
         SysUser currentUser = loginUser.getUser();
         currentUser.setNickName(user.getNickName());
@@ -86,10 +88,11 @@ public class SysProfileController {
      * 重置密码
      */
     @Log(title = "个人信息", businessType = BusinessType.UPDATE)
+    @PreAuthorize("@dp.hasAnyUserType(#loginUser, T(com.medcase.common.enums.UserTypeEnums).ADMIN)")
     @PutMapping("/updatePwd")
     public void updatePwd(
             @RequestBody Map<String, String> params,
-            @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
+            @CurrLoginUser LoginUser loginUser) {
 
         String oldPassword = params.get("oldPassword");
         String newPassword = params.get("newPassword");

@@ -2,6 +2,7 @@ package com.medcase.web.controller.system;
 
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -31,10 +32,11 @@ public class SysIndexController {
     /**
      * 解锁屏幕
      */
+    @PreAuthorize("@dp.hasAnyUserType(#loginUser, T(com.medcase.common.enums.UserTypeEnums).ADMIN)")
     @PostMapping("/unlockscreen")
     public void unlockScreen(
             @RequestBody Map<String, String> body,
-            @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
+            @CurrLoginUser LoginUser loginUser) {
 
         String password = body.get("password");
         if (!StringUtils.hasText(password)) {

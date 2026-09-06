@@ -22,7 +22,6 @@ import com.medcase.mvc.exception.ExceptionUtil;
 import com.medcase.common.core.domain.entity.SysMenu;
 import com.medcase.common.core.domain.TreeSelect;
 import com.medcase.common.enums.BusinessType;
-import com.medcase.common.enums.UserTypeEnums;
 import com.medcase.mvc.authentication.annotation.CurrLoginUser;
 import com.medcase.system.service.SysMenuService;
 
@@ -39,11 +38,12 @@ public class SysMenuController {
     /**
      * 获取菜单列表
      */
-    @PreAuthorize("@ss.hasPermi('system:menu:list')")
+    @PreAuthorize("@dp.hasAnyUserType(#loginUser, T(com.medcase.common.enums.UserTypeEnums).ADMIN) " +
+            "&& @ss.hasPermi('system:menu:list')")
     @GetMapping("/list")
     public List<SysMenu> list(
             SysMenu menu,
-            @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
+            @CurrLoginUser LoginUser loginUser) {
 
         List<SysMenu> menus = menuService.selectMenuList(menu, loginUser.getUserId());
         return menus;
@@ -62,10 +62,11 @@ public class SysMenuController {
     /**
      * 获取菜单下拉树列表
      */
+    @PreAuthorize("@dp.hasAnyUserType(#loginUser, T(com.medcase.common.enums.UserTypeEnums).ADMIN)")
     @GetMapping("/treeselect")
     public List<TreeSelect> treeselect(
             SysMenu menu,
-            @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
+            @CurrLoginUser LoginUser loginUser) {
 
         List<SysMenu> menus = menuService.selectMenuList(menu, loginUser.getUserId());
         return menuService.buildMenuTreeSelect(menus);

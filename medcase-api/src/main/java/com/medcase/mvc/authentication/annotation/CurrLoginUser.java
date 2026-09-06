@@ -1,6 +1,5 @@
 package com.medcase.mvc.authentication.annotation;
 
-import com.medcase.common.enums.UserTypeEnums;
 import com.medcase.mvc.authentication.LoginUserArgumentResolver;
 
 import java.lang.annotation.Documented;
@@ -18,7 +17,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface CurrLoginUser {
-    UserTypeEnums[] userType() default {};
-
     boolean required() default true;    // 用户是否必须登录
 }

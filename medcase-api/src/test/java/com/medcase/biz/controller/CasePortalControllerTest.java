@@ -37,13 +37,16 @@ class CasePortalControllerTest {
     }
 
     @Test
-    void caseControllerRequiresApprovedDoctor() {
+    void caseControllerRequiresApprovedPortalUser() {
         Arrays.stream(CasePortalController.class.getDeclaredMethods())
                 .filter(method -> method.isAnnotationPresent(RequestMapping.class))
                 .forEach(method -> {
                     PreAuthorize preAuthorize = method.getAnnotation(PreAuthorize.class);
                     assertEquals(
-                            "@dp.hasAnyStatus(#user, T(com.medcase.common.enums.UserStatusEnums).OK)",
+                            "@dp.hasAnyUserType(#user, " +
+                                    "T(com.medcase.common.enums.UserTypeEnums).DOCTOR, " +
+                                    "T(com.medcase.common.enums.UserTypeEnums).PATIENT) " +
+                                    "&& @dp.hasAnyStatus(#user, T(com.medcase.common.enums.UserStatusEnums).OK)",
                             preAuthorize.value());
                 });
     }

@@ -30,4 +30,18 @@ public class UserPermissionService {
         return Arrays.stream(statuses)
                 .anyMatch(status -> status != null && status.getCode().equals(user.getUser().getStatus()));
     }
+
+    /**
+     * 判断当前用户类型是否属于允许的类型列表。
+     *
+     * @param user 当前登录用户
+     * @param userTypes 允许的用户类型
+     * @return 用户类型命中时返回 true
+     */
+    public boolean hasAnyUserType(@NonNull LoginUser user, UserTypeEnums... userTypes) {
+        UserTypeEnums currentUserType = user.getUser() == null
+                ? null : user.getUser().getUserType();
+        return Arrays.stream(userTypes)
+                .anyMatch(userType -> userType != null && userType == currentUserType);
+    }
 }
