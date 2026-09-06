@@ -2,11 +2,13 @@ package com.medcase.system.service;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.medcase.system.entity.SysRoleEntity;
+import com.medcase.system.entity.SysRoleMenuEntity;
 import com.medcase.system.mapper.SysRoleMapper;
 import com.medcase.system.mapper.SysRoleMenuMapper;
 import com.medcase.system.mapper.SysUserRoleMapper;
 import com.medcase.web.controller.system.dto.RoleAddRequest;
 import com.medcase.web.controller.system.dto.RoleEditRequest;
+import com.medcase.web.controller.system.dto.RoleMenuUpdateRequest;
 import com.medcase.web.controller.system.dto.RoleStatusRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,12 +17,14 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.List;
+import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -137,6 +141,53 @@ class SysRoleServiceCacheTest {
         roleService.selectRoleAll();
 
         verify(roleMapper, times(2)).selectList();
+    }
+
+    @Test
+    void updateRoleDoesNotChangeRoleMenus() {
+
+        when(roleMapper.updateById(any(SysRoleEntity.class))).thenReturn(1);
+
+        RoleEditRequest request = new RoleEditRequest();
+        request.setRoleId(1L);
+        request.setRoleName("审核员");
+        request.setRoleKey("reviewer");
+
+        roleService.updateRole(request, "admin");
+
+        verify(roleMenuMapper, never()).deleteByRoleId(1L);
+        verify(roleMenuMapper, never()).insertRoleMenus(any());
+    }
+
+    @Test
+    void updateRoleMenusReplacesMenuRelations() {
+
+        when(roleMapper.updateById(any(SysRoleEntity.class))).thenReturn(1);
+        RoleMenuUpdateRequest request = new RoleMenuUpdateRequest();
+        request.setMenuIds(new Long[] {10L, 20L});
+        request.setMenuCheckStrictly(true);
+
+        roleService.updateRoleMenus(1L, request);
+
+        org.mockito.ArgumentCaptor<SysRoleEntity> roleCaptor = forClass(SysRoleEntity.class);
+        verify(roleMapper).updateById(roleCaptor.capture());
+        assertEquals(Boolean.TRUE, roleCaptor.getValue().getMenuCheckStrictly());
+        verify(roleMenuMapper).deleteByRoleId(1L);
+        org.mockito.ArgumentCaptor<Collection> captor = forClass(Collection.class);
+        verify(roleMenuMapper).insertRoleMenus(captor.capture());
+        Collection<?> relations = captor.getValue();
+        assertEquals(2, relations.size());
+        assertEquals(10L, ((SysRoleMenuEntity) relations.toArray()[0]).getMenuId());
+        assertEquals(20L, ((SysRoleMenuEntity) relations.toArray()[1]).getMenuId());
+    }
+
+    @Test
+    void selectRoleMenuIdsReadsRoleMenuRelations() {
+
+        when(roleMenuMapper.selectMenuIdsByRoleId(1L)).thenReturn(List.of(10L, 20L));
+
+        assertEquals(List.of(10L, 20L), roleService.selectRoleMenuIds(1L));
+        verify(roleMenuMapper).selectMenuIdsByRoleId(1L);
     }
 
     @Test

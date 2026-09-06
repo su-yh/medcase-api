@@ -12,7 +12,6 @@ import com.medcase.system.converter.SystemEntityConverter;
 import com.medcase.system.domain.vo.MetaVo;
 import com.medcase.system.domain.vo.RouterVo;
 import com.medcase.system.entity.SysMenuEntity;
-import com.medcase.system.entity.SysRoleEntity;
 import com.medcase.system.mapper.SysMenuMapper;
 import com.medcase.system.mapper.SysRoleMenuMapper;
 import org.slf4j.Logger;
@@ -44,9 +43,6 @@ public class SysMenuService {
 
     @Autowired
     private SysMenuMapper menuMapper;
-
-    @Autowired
-    private SysRoleService roleService;
 
     @Autowired
     private SysRoleMenuMapper roleMenuMapper;
@@ -136,16 +132,6 @@ public class SysMenuService {
             menus = menuMapper.selectMenuTreeByUserId(userId);
         }
         return getChildPerms(menus, MENU_ROOT_ID);
-    }
-
-    /**
-     * 根据角色ID查询菜单树信息
-     * @param roleId 角色ID
-     * @return 选中菜单列表
-     */
-    public List<Long> selectMenuListByRoleId(Long roleId) {
-        SysRoleEntity sysRoleEntity = roleService.selectRoleById(roleId);
-        return menuMapper.selectMenuListByRoleId(roleId, sysRoleEntity.getMenuCheckStrictly());
     }
 
     /**

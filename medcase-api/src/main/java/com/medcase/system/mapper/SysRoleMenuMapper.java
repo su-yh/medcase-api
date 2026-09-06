@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Mapper;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 @Mapper
 public interface SysRoleMenuMapper extends BaseMapperX<SysRoleMenuEntity> {
@@ -19,6 +20,14 @@ public interface SysRoleMenuMapper extends BaseMapperX<SysRoleMenuEntity> {
 
     default int deleteByRoleIds(Long[] roleIds) {
         return delete(build().in(SysRoleMenuEntity::getRoleId, Arrays.asList(roleIds)));
+    }
+
+    default List<Long> selectMenuIdsByRoleId(Long roleId) {
+        List<SysRoleMenuEntity> relations = selectList(SysRoleMenuEntity::getRoleId, roleId);
+        if (relations == null || relations.isEmpty()) {
+            return List.of();
+        }
+        return relations.stream().map(SysRoleMenuEntity::getMenuId).toList();
     }
 
     default void insertRoleMenus(Collection<SysRoleMenuEntity> entities) {

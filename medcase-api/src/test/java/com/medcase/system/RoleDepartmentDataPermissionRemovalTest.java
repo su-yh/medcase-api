@@ -31,7 +31,6 @@ class RoleDepartmentDataPermissionRemovalTest {
         assertThat(Files.exists(Path.of("src/main/java/com/medcase/web/controller/system/dto/Role" + "DeptTreeResponse.java")))
                 .isFalse();
 
-        String roleMapper = Files.readString(Path.of("src/main/resources/mapper/system/SysRoleMapper.xml"));
         String userMapper = Files.readString(Path.of("src/main/resources/mapper/system/SysUserMapper.xml"));
         String systemSql = Files.readString(Path.of(
                 "src/main/resources/db/migration/master/V01_00_00/V01_00_00_001__system.sql"));
@@ -45,7 +44,7 @@ class RoleDepartmentDataPermissionRemovalTest {
         String dataScopeColumn = "data_" + "scope";
         String deptStrictColumn = "dept_" + "check_strictly";
 
-        assertThat(roleMapper).doesNotContain(dataScopeColumn, deptStrictColumn);
+        assertThat(Files.exists(Path.of("src/main/resources/mapper/system/SysRoleMapper.xml"))).isFalse();
         assertThat(userMapper).doesNotContain(dataScopeColumn);
         assertThat(systemSql).contains(roleDeptTable, dataScopeColumn, deptStrictColumn);
         assertThat(roleDeptMigration).contains("drop table if exists " + roleDeptTable);
@@ -65,7 +64,7 @@ class RoleDepartmentDataPermissionRemovalTest {
 
         assertThat(deptController).contains("@RequestMapping(\"/system/dept\")");
         assertThat(userController).contains("@GetMapping(\"/deptTree\")");
-        assertThat(roleService).contains("insertRoleMenu");
+        assertThat(roleService).contains("updateRoleMenus");
     }
 
     private Field findField(String fieldName) {

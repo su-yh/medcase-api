@@ -4,8 +4,12 @@ import com.medcase.common.core.domain.entity.SysUser;
 import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
 import com.medcase.system.service.SysRoleService;
+import com.medcase.web.controller.system.dto.RoleAddRequest;
+import com.medcase.web.controller.system.dto.RoleEditRequest;
+import com.medcase.web.controller.system.dto.RoleMenuUpdateRequest;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.lang.reflect.Method;
@@ -15,6 +19,7 @@ import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class SysRoleControllerPageTest {
@@ -63,5 +68,30 @@ class SysRoleControllerPageTest {
                         method.getName() + " should not use SysRole in service layer");
             }
         }
+    }
+
+    @Test
+    void roleMutationRequestsDoNotContainMenuIds() {
+        assertThrows(NoSuchFieldException.class, () -> RoleAddRequest.class.getDeclaredField("menuIds"));
+        assertThrows(NoSuchFieldException.class, () -> RoleEditRequest.class.getDeclaredField("menuIds"));
+    }
+
+    @Test
+    void roleMenuEndpointsAreSeparateFromRoleMutation() throws NoSuchMethodException {
+        Method select = SysRoleController.class.getMethod("getRoleMenuIds", Long.class);
+        Method update = SysRoleController.class.getMethod("updateRoleMenus", Long.class, RoleMenuUpdateRequest.class);
+
+        assertTrue(Arrays.asList(select.getAnnotation(GetMapping.class).value())
+                .contains("/{roleId}/menuIds"));
+        assertTrue(Arrays.asList(update.getAnnotation(PutMapping.class).value())
+                .contains("/{roleId}/menus"));
+        assertTrue(Arrays.stream(update.getParameters())
+                .anyMatch(parameter -> parameter.isAnnotationPresent(RequestBody.class)));
+    }
+
+    @Test
+    void roleMenuRequestIncludesMenuCheckStrictly() throws NoSuchFieldException {
+        assertEquals(boolean.class,
+                RoleMenuUpdateRequest.class.getDeclaredField("menuCheckStrictly").getType());
     }
 }

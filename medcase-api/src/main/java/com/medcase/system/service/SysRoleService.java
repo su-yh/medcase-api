@@ -15,6 +15,7 @@ import com.medcase.system.mapper.SysRoleMenuMapper;
 import com.medcase.system.mapper.SysUserRoleMapper;
 import com.medcase.web.controller.system.dto.RoleAddRequest;
 import com.medcase.web.controller.system.dto.RoleEditRequest;
+import com.medcase.web.controller.system.dto.RoleMenuUpdateRequest;
 import com.medcase.web.controller.system.dto.RoleQueryRequest;
 import com.medcase.web.controller.system.dto.RoleStatusRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -235,7 +236,7 @@ public class SysRoleService {
                 roleCache.invalidate(ALL_ROLES_CACHE_KEY);
             }
         }
-        return insertRoleMenu(role.getRoleId(), request.getMenuIds());
+        return row;
     }
 
     /**
@@ -264,13 +265,13 @@ public class SysRoleService {
             throw ExceptionUtil.business(ErrorCodeEnums.ROLE_KEY_EXISTS);
         }
 
-        roleMapper.updateById(role);
-        // 删除角色与菜单关联
-        roleMenuMapper.deleteByRoleId(role.getRoleId());
-        synchronized (roleCacheLoadLock) {
-            roleCache.invalidate(ALL_ROLES_CACHE_KEY);
+        int row = roleMapper.updateById(role);
+        if (row > 0) {
+            synchronized (roleCacheLoadLock) {
+                roleCache.invalidate(ALL_ROLES_CACHE_KEY);
+            }
         }
-        return insertRoleMenu(role.getRoleId(), request.getMenuIds());
+        return row;
     }
 
     /**
@@ -296,16 +297,37 @@ public class SysRoleService {
     }
 
     /**
-     * 新增角色菜单信息
-     * 
+     * 查询角色关联的菜单ID。
+     *
      * @param roleId 角色ID
+     * @return 菜单ID列表
      */
-    public int insertRoleMenu(Long roleId, Long[] menuIds) {
-        int rows = 1;
-        // 新增用户与角色管理
+    public List<Long> selectRoleMenuIds(Long roleId) {
+        return roleMenuMapper.selectMenuIdsByRoleId(roleId);
+    }
+
+    /**
+     * 修改角色关联菜单。
+     *
+     * @param roleId 角色ID
+     * @param request 角色菜单关联修改请求
+     * @return 结果
+     */
+    @Transactional
+    public int updateRoleMenus(Long roleId, RoleMenuUpdateRequest request) {
+        SysRoleEntity role = new SysRoleEntity();
+        role.setRoleId(roleId);
+        role.setMenuCheckStrictly(request.isMenuCheckStrictly());
+        int row = roleMapper.updateById(role);
+        if (row <= 0) {
+            return row;
+        }
+
+        roleMenuMapper.deleteByRoleId(roleId);
         List<SysRoleMenuEntity> list = new ArrayList<>();
+        Long[] menuIds = request.getMenuIds();
         if (menuIds == null) {
-            return rows;
+            return row;
         }
         for (Long menuId : menuIds) {
 
@@ -316,9 +338,9 @@ public class SysRoleService {
         }
         if (!list.isEmpty()) {
             roleMenuMapper.insertRoleMenus(list);
-            rows = list.size();
+            row = list.size();
         }
-        return rows;
+        return row;
     }
 
     /**

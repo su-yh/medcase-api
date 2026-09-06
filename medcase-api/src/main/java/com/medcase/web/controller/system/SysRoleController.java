@@ -1,6 +1,26 @@
 package com.medcase.web.controller.system;
 
-import java.util.List;
+import com.medcase.common.annotation.Log;
+import com.medcase.common.core.domain.entity.SysUser;
+import com.medcase.common.core.domain.model.LoginUser;
+import com.medcase.common.enums.BusinessType;
+import com.medcase.common.enums.UserTypeEnums;
+import com.medcase.framework.web.service.SysPermissionService;
+import com.medcase.framework.web.service.TokenService;
+import com.medcase.mp.mybatis.PageParam;
+import com.medcase.mp.mybatis.PageResult;
+import com.medcase.mvc.authentication.annotation.CurrLoginUser;
+import com.medcase.mvc.constants.enums.ErrorCodeEnums;
+import com.medcase.mvc.exception.ExceptionUtil;
+import com.medcase.system.entity.SysRoleEntity;
+import com.medcase.system.service.SysRoleService;
+import com.medcase.system.service.SysUserService;
+import com.medcase.web.controller.system.dto.RoleAddRequest;
+import com.medcase.web.controller.system.dto.RoleEditRequest;
+import com.medcase.web.controller.system.dto.RoleMenuUpdateRequest;
+import com.medcase.web.controller.system.dto.RoleQueryRequest;
+import com.medcase.web.controller.system.dto.RoleStatusRequest;
+import com.medcase.web.controller.system.dto.RoleUserRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -12,26 +32,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import com.medcase.common.annotation.Log;
-import com.medcase.mvc.constants.enums.ErrorCodeEnums;
-import com.medcase.mvc.exception.ExceptionUtil;
-import com.medcase.common.core.domain.entity.SysUser;
-import com.medcase.common.enums.BusinessType;
-import com.medcase.common.enums.UserTypeEnums;
-import com.medcase.common.core.domain.model.LoginUser;
-import com.medcase.framework.web.service.SysPermissionService;
-import com.medcase.framework.web.service.TokenService;
-import com.medcase.mvc.authentication.annotation.CurrLoginUser;
-import com.medcase.mp.mybatis.PageParam;
-import com.medcase.mp.mybatis.PageResult;
-import com.medcase.system.entity.SysRoleEntity;
-import com.medcase.system.service.SysRoleService;
-import com.medcase.system.service.SysUserService;
-import com.medcase.web.controller.system.dto.RoleAddRequest;
-import com.medcase.web.controller.system.dto.RoleEditRequest;
-import com.medcase.web.controller.system.dto.RoleQueryRequest;
-import com.medcase.web.controller.system.dto.RoleStatusRequest;
-import com.medcase.web.controller.system.dto.RoleUserRequest;
+
+import java.util.List;
 
 /**
  * 角色信息
@@ -70,6 +72,15 @@ public class SysRoleController {
     public SysRoleEntity getInfo(@PathVariable Long roleId) {
 
         return roleService.selectRoleById(roleId);
+    }
+
+    /**
+     * 查询角色关联的菜单ID。
+     */
+    @PreAuthorize("@ss.hasPermi('system:role:query')")
+    @GetMapping("/{roleId}/menuIds")
+    public List<Long> getRoleMenuIds(@PathVariable Long roleId) {
+        return roleService.selectRoleMenuIds(roleId);
     }
 
     /**
@@ -119,6 +130,20 @@ public class SysRoleController {
 
         if (roleService.updateRoleStatus(request, loginUser.getUsername()) <= 0) {
             throw ExceptionUtil.business(ErrorCodeEnums.ROLE_STATUS_UPDATE_FAILED);
+        }
+    }
+
+    /**
+     * 修改角色关联菜单。
+     */
+    @PreAuthorize("@ss.hasPermi('system:role:edit')")
+    @Log(title = "角色菜单管理", businessType = BusinessType.UPDATE)
+    @PutMapping("/{roleId}/menus")
+    public void updateRoleMenus(
+            @PathVariable Long roleId,
+            @Validated @RequestBody RoleMenuUpdateRequest request) {
+        if (roleService.updateRoleMenus(roleId, request) <= 0) {
+            throw ExceptionUtil.business(ErrorCodeEnums.OPERATION_FAILED);
         }
     }
 

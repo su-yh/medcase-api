@@ -27,9 +27,6 @@ public interface SysMenuMapper extends BaseMapperX<SysMenuEntity> {
 
     List<SysMenu> selectMenuTreeByUserId(Long userId);
 
-    List<Long> selectMenuListByRoleId(
-            @Param("roleId") Long roleId, @Param("menuCheckStrictly") boolean menuCheckStrictly);
-
     List<SysMenu> selectMenusByPathOrRouteName(
             @Param("path") String path, @Param("routeName") String routeName);
 

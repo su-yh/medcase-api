@@ -21,7 +21,6 @@ import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
 import com.medcase.common.core.domain.entity.SysMenu;
 import com.medcase.common.core.domain.TreeSelect;
-import com.medcase.web.controller.system.dto.MenuRoleTreeResponse;
 import com.medcase.common.enums.BusinessType;
 import com.medcase.common.enums.UserTypeEnums;
 import com.medcase.mvc.authentication.annotation.CurrLoginUser;
@@ -70,20 +69,6 @@ public class SysMenuController {
 
         List<SysMenu> menus = menuService.selectMenuList(menu, loginUser.getUserId());
         return menuService.buildMenuTreeSelect(menus);
-    }
-
-    /**
-     * 加载对应角色菜单列表树
-     */
-    @GetMapping(value = "/roleMenuTreeselect/{roleId}")
-    public MenuRoleTreeResponse roleMenuTreeselect(
-            @PathVariable("roleId") Long roleId,
-            @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
-
-        List<SysMenu> menus = menuService.selectMenuList(loginUser.getUserId());
-        return new MenuRoleTreeResponse(
-                menuService.selectMenuListByRoleId(roleId),
-                menuService.buildMenuTreeSelect(menus));
     }
 
     /**

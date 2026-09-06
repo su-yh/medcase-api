@@ -31,5 +31,4 @@ public class RoleEditRequest {
 
     private String remark;
 
-    private Long[] menuIds;
 }

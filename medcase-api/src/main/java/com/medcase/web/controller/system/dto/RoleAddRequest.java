@@ -28,5 +28,4 @@ public class RoleAddRequest {
 
     private String remark;
 
-    private Long[] menuIds;
 }
