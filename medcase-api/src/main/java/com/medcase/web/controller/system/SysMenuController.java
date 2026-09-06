@@ -77,9 +77,7 @@ public class SysMenuController {
     @PreAuthorize("@ss.hasPermi('system:menu:add')")
     @Log(title = "菜单管理", businessType = BusinessType.INSERT)
     @PostMapping
-    public void add(
-            @Validated @RequestBody SysMenu menu,
-            @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
+    public void add(@Validated @RequestBody SysMenu menu) {
 
         if (!menuService.checkMenuNameUnique(menu)) {
             throw ExceptionUtil.business(ErrorCodeEnums.MENU_NAME_EXISTS);
@@ -92,7 +90,6 @@ public class SysMenuController {
         else if (!menuService.checkRouteConfigUnique(menu)) {
             throw ExceptionUtil.business(ErrorCodeEnums.MENU_ROUTE_EXISTS);
         }
-        menu.setCreateBy(loginUser.getUsername());
         if (menuService.insertMenu(menu) <= 0) {
             throw ExceptionUtil.business(ErrorCodeEnums.MENU_OPERATION_FAILED);
         }
@@ -104,9 +101,7 @@ public class SysMenuController {
     @PreAuthorize("@ss.hasPermi('system:menu:edit')")
     @Log(title = "菜单管理", businessType = BusinessType.UPDATE)
     @PutMapping
-    public void edit(
-            @Validated @RequestBody SysMenu menu,
-            @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
+    public void edit(@Validated @RequestBody SysMenu menu) {
 
         if (!menuService.checkMenuNameUnique(menu)) {
             throw ExceptionUtil.business(ErrorCodeEnums.MENU_NAME_EXISTS);
@@ -122,7 +117,6 @@ public class SysMenuController {
         else if (!menuService.checkRouteConfigUnique(menu)) {
             throw ExceptionUtil.business(ErrorCodeEnums.MENU_ROUTE_EXISTS);
         }
-        menu.setUpdateBy(loginUser.getUsername());
         if (menuService.updateMenu(menu) <= 0) {
             throw ExceptionUtil.business(ErrorCodeEnums.MENU_OPERATION_FAILED);
         }

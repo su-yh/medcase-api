@@ -24,9 +24,5 @@ public class SysConfigEntity extends AbstractBaseEntity {
 
     private String configType;
 
-    private String createBy;
-
-    private String updateBy;
-
     private String remark;
 }

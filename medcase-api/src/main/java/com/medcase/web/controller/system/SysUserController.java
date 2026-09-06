@@ -120,9 +120,7 @@ public class SysUserController {
     @PreAuthorize("@ss.hasPermi('system:user:add')")
     @Log(title = "用户管理", businessType = BusinessType.INSERT)
     @PostMapping
-    public void add(
-            @Validated @RequestBody SysUser user,
-            @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
+    public void add(@Validated @RequestBody SysUser user) {
 
         if (!userService.checkUserNameUnique(user)) {
             throw ExceptionUtil.business(ErrorCodeEnums.USERNAME_EXISTS, user.getUserName());
@@ -133,7 +131,6 @@ public class SysUserController {
         else if (StringUtils.hasText(user.getEmail()) && !userService.checkEmailUnique(user)) {
             throw ExceptionUtil.business(ErrorCodeEnums.EMAIL_EXISTS, user.getUserName());
         }
-        user.setCreateBy(loginUser.getUsername());
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         if (userService.insertUser(user) <= 0) {
             throw ExceptionUtil.business(ErrorCodeEnums.USER_OPERATION_FAILED);
@@ -146,9 +143,7 @@ public class SysUserController {
     @PreAuthorize("@ss.hasPermi('system:user:edit')")
     @Log(title = "用户管理", businessType = BusinessType.UPDATE)
     @PutMapping
-    public void edit(
-            @Validated @RequestBody SysUser user,
-            @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
+    public void edit(@Validated @RequestBody SysUser user) {
 
         user.setPassword(null);
 
@@ -162,7 +157,6 @@ public class SysUserController {
         else if (StringUtils.hasText(user.getEmail()) && !userService.checkEmailUnique(user)) {
             throw ExceptionUtil.business(ErrorCodeEnums.EMAIL_EXISTS, user.getUserName());
         }
-        user.setUpdateBy(loginUser.getUsername());
         if (userService.updateUser(user) <= 0) {
             throw ExceptionUtil.business(ErrorCodeEnums.USER_OPERATION_FAILED);
         }
@@ -198,7 +192,6 @@ public class SysUserController {
 
         userService.checkUserAllowed(user);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user.setUpdateBy(loginUser.getUsername());
         if (userService.resetPwd(user) <= 0) {
             throw ExceptionUtil.business(ErrorCodeEnums.USER_OPERATION_FAILED);
         }
@@ -215,7 +208,6 @@ public class SysUserController {
             @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
 
         userService.checkUserAllowed(user);
-        user.setUpdateBy(loginUser.getUsername());
         if (userService.updateUserStatus(user) <= 0) {
             throw ExceptionUtil.business(ErrorCodeEnums.USER_OPERATION_FAILED);
         }

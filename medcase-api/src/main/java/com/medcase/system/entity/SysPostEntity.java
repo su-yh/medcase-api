@@ -24,9 +24,5 @@ public class SysPostEntity extends AbstractBaseEntity {
 
     private String status;
 
-    private String createBy;
-
-    private String updateBy;
-
     private String remark;
 }

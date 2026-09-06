@@ -63,7 +63,7 @@ public class SysRoleController {
             @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
 
         return roleService.selectPage(
-                pageParam, request, loginUser.getUsername(), loginUser.getUser().isAdmin());
+                pageParam, request, loginUser.getUserId(), loginUser.getUser().isAdmin());
     }
 
     /**
@@ -76,7 +76,7 @@ public class SysRoleController {
             @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
 
         return roleService.selectRoleById(
-                roleId, loginUser.getUsername(), loginUser.getUser().isAdmin());
+                roleId, loginUser.getUserId(), loginUser.getUser().isAdmin());
     }
 
     /**
@@ -88,7 +88,7 @@ public class SysRoleController {
             @PathVariable Long roleId,
             @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
         return roleService.selectRoleMenuIds(
-                roleId, loginUser.getUsername(), loginUser.getUser().isAdmin());
+                roleId, loginUser.getUserId(), loginUser.getUser().isAdmin());
     }
 
     /**
@@ -98,10 +98,9 @@ public class SysRoleController {
     @Log(title = "角色管理", businessType = BusinessType.INSERT)
     @PostMapping
     public void add(
-            @Validated @RequestBody RoleAddRequest request,
-            @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
+            @Validated @RequestBody RoleAddRequest request) {
 
-        if (roleService.insertRole(request, loginUser.getUsername()) <= 0) {
+        if (roleService.insertRole(request) <= 0) {
             throw ExceptionUtil.business(ErrorCodeEnums.OPERATION_FAILED);
         }
 
@@ -118,7 +117,7 @@ public class SysRoleController {
             @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
 
         if (roleService.updateRole(
-                request, loginUser.getUsername(), loginUser.getUser().isAdmin()) > 0) {
+                request, loginUser.getUserId(), loginUser.getUser().isAdmin()) > 0) {
 
             // 刷新所有持有该角色的在线用户权限
             tokenService.refreshPermissionByRoleId(request.getRoleId(), permissionService);
@@ -138,7 +137,7 @@ public class SysRoleController {
             @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
 
         if (roleService.updateRoleStatus(
-                request, loginUser.getUsername(), loginUser.getUser().isAdmin()) <= 0) {
+                request, loginUser.getUserId(), loginUser.getUser().isAdmin()) <= 0) {
             throw ExceptionUtil.business(ErrorCodeEnums.ROLE_STATUS_UPDATE_FAILED);
         }
     }
@@ -154,7 +153,7 @@ public class SysRoleController {
             @Validated @RequestBody RoleMenuUpdateRequest request,
             @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
         if (roleService.updateRoleMenus(
-                roleId, request, loginUser.getUsername(),
+                roleId, request, loginUser.getUserId(),
                 loginUser.getUser().isAdmin(), loginUser.getUserId()) <= 0) {
             throw ExceptionUtil.business(ErrorCodeEnums.OPERATION_FAILED);
         }
@@ -171,7 +170,7 @@ public class SysRoleController {
             @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
 
         if (roleService.deleteRoleByIds(
-                roleIds, loginUser.getUsername(), loginUser.getUser().isAdmin()) <= 0) {
+                roleIds, loginUser.getUserId(), loginUser.getUser().isAdmin()) <= 0) {
             throw ExceptionUtil.business(ErrorCodeEnums.ROLE_DELETE_FAILED);
         }
     }
@@ -185,7 +184,7 @@ public class SysRoleController {
             @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
 
         return roleService.selectRoleAll(
-                loginUser.getUsername(), loginUser.getUser().isAdmin());
+                loginUser.getUserId(), loginUser.getUser().isAdmin());
     }
 
     /**
@@ -199,7 +198,7 @@ public class SysRoleController {
             @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
 
         roleService.selectRoleById(
-                user.getRoleId(), loginUser.getUsername(), loginUser.getUser().isAdmin());
+                user.getRoleId(), loginUser.getUserId(), loginUser.getUser().isAdmin());
         return userService.selectAllocatedPage(user, pageParam);
     }
 
@@ -214,7 +213,7 @@ public class SysRoleController {
             @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
 
         roleService.selectRoleById(
-                user.getRoleId(), loginUser.getUsername(), loginUser.getUser().isAdmin());
+                user.getRoleId(), loginUser.getUserId(), loginUser.getUser().isAdmin());
         return userService.selectUnallocatedPage(user, pageParam);
     }
 
@@ -230,7 +229,7 @@ public class SysRoleController {
 
         if (roleService.deleteAuthUser(
                 request.getUserId(), request.getRoleId(),
-                loginUser.getUsername(), loginUser.getUser().isAdmin()) <= 0) {
+                loginUser.getUserId(), loginUser.getUser().isAdmin()) <= 0) {
             throw ExceptionUtil.business(ErrorCodeEnums.ROLE_AUTH_USER_DELETE_FAILED);
         }
     }
@@ -247,7 +246,7 @@ public class SysRoleController {
             @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
 
         if (roleService.deleteAuthUsers(
-                roleId, userIds, loginUser.getUsername(), loginUser.getUser().isAdmin()) <= 0) {
+                roleId, userIds, loginUser.getUserId(), loginUser.getUser().isAdmin()) <= 0) {
             throw ExceptionUtil.business(ErrorCodeEnums.ROLE_AUTH_USER_DELETE_FAILED);
         }
     }
@@ -264,7 +263,7 @@ public class SysRoleController {
             @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
 
         if (roleService.insertAuthUsers(
-                roleId, userIds, loginUser.getUsername(), loginUser.getUser().isAdmin()) <= 0) {
+                roleId, userIds, loginUser.getUserId(), loginUser.getUser().isAdmin()) <= 0) {
             throw ExceptionUtil.business(ErrorCodeEnums.ROLE_AUTH_USER_SELECT_FAILED);
         }
     }

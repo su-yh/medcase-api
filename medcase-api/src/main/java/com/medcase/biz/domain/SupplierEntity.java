@@ -31,9 +31,5 @@ public class SupplierEntity extends AbstractBaseEntity {
 
     private SupplierStatusEnums status;
 
-    private String createBy;
-
-    private String updateBy;
-
     private String remark;
 }

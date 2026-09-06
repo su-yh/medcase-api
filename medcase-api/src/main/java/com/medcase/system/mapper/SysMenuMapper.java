@@ -43,8 +43,9 @@ public interface SysMenuMapper extends BaseMapperX<SysMenuEntity> {
     }
 
     default int updateMenuSort(Long menuId, Integer orderNum) {
-        return update(null, new LambdaUpdateWrapper<SysMenuEntity>()
-                .set(SysMenuEntity::getOrderNum, orderNum)
+        SysMenuEntity entity = new SysMenuEntity();
+        entity.setOrderNum(orderNum);
+        return update(entity, new LambdaUpdateWrapper<SysMenuEntity>()
                 .eq(SysMenuEntity::getMenuId, menuId));
     }
 

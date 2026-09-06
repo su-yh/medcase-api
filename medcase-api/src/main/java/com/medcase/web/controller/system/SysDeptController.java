@@ -16,14 +16,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.medcase.common.annotation.Log;
 import com.medcase.common.constant.UserConstants;
-import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
 import com.medcase.common.core.domain.entity.SysDept;
 import com.medcase.common.enums.BusinessType;
-import com.medcase.common.enums.UserTypeEnums;
 import com.medcase.system.service.SysDeptService;
-import com.medcase.mvc.authentication.annotation.CurrLoginUser;
 import com.medcase.web.controller.system.dto.DeptQueryRequest;
 
 /**
@@ -80,14 +77,11 @@ public class SysDeptController {
     @PreAuthorize("@ss.hasPermi('system:dept:add')")
     @Log(title = "部门管理", businessType = BusinessType.INSERT)
     @PostMapping
-    public void add(
-            @Validated @RequestBody SysDept dept,
-            @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
+    public void add(@Validated @RequestBody SysDept dept) {
 
         if (!deptService.checkDeptNameUnique(dept)) {
             throw ExceptionUtil.business(ErrorCodeEnums.DEPT_NAME_EXISTS);
         }
-        dept.setCreateBy(loginUser.getUsername());
         if (deptService.insertDept(dept) <= 0) {
             throw ExceptionUtil.business(ErrorCodeEnums.DEPT_OPERATION_FAILED);
         }
@@ -99,9 +93,7 @@ public class SysDeptController {
     @PreAuthorize("@ss.hasPermi('system:dept:edit')")
     @Log(title = "部门管理", businessType = BusinessType.UPDATE)
     @PutMapping
-    public void edit(
-            @Validated @RequestBody SysDept dept,
-            @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
+    public void edit(@Validated @RequestBody SysDept dept) {
 
         Long deptId = dept.getDeptId();
         if (!deptService.checkDeptNameUnique(dept)) {
@@ -114,7 +106,6 @@ public class SysDeptController {
                 && deptService.selectNormalChildrenDeptById(deptId) > 0) {
             throw ExceptionUtil.business(ErrorCodeEnums.DEPT_ENABLED_CHILDREN);
         }
-        dept.setUpdateBy(loginUser.getUsername());
         if (deptService.updateDept(dept) <= 0) {
             throw ExceptionUtil.business(ErrorCodeEnums.DEPT_OPERATION_FAILED);
         }

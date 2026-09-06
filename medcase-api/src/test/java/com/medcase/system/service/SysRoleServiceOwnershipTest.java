@@ -54,21 +54,21 @@ class SysRoleServiceOwnershipTest {
     void nonAdminRoleListIsFilteredByCreator() {
         PageParam pageParam = new PageParam();
         RoleQueryRequest request = new RoleQueryRequest();
-        when(roleMapper.selectPage(pageParam, request, "operator"))
+        when(roleMapper.selectPage(pageParam, request, 2L))
                 .thenReturn(new PageResult<SysRoleEntity>(List.of(), 0L));
 
-        roleService.selectPage(pageParam, request, "operator", false);
+        roleService.selectPage(pageParam, request, 2L, false);
 
-        verify(roleMapper).selectPage(pageParam, request, "operator");
+        verify(roleMapper).selectPage(pageParam, request, 2L);
     }
 
     @Test
     void nonAdminRoleOptionsAreFilteredByCreator() {
         when(roleMapper.selectList()).thenReturn(List.of(
-                role(1L, "operator"),
-                role(2L, "another")));
+                role(1L, 2L, "operator"),
+                role(2L, 3L, "another")));
 
-        List<SysRoleEntity> roles = roleService.selectRoleAll("operator", false);
+        List<SysRoleEntity> roles = roleService.selectRoleAll(2L, false);
 
         verify(roleMapper).selectList();
         org.junit.jupiter.api.Assertions.assertEquals(1, roles.size());
@@ -77,16 +77,16 @@ class SysRoleServiceOwnershipTest {
 
     @Test
     void nonAdminCannotReadRoleCreatedByAnotherUser() {
-        SysRoleEntity role = role(1L, "owner");
+        SysRoleEntity role = role(1L, 3L, "owner");
         when(roleMapper.selectList()).thenReturn(List.of(role));
 
         assertThrows(AbstractBusinessException.class,
-                () -> roleService.selectRoleById(1L, "operator", false));
+                () -> roleService.selectRoleById(1L, 2L, false));
     }
 
     @Test
     void nonAdminCannotAssignMenuOutsideOwnMenus() {
-        SysRoleEntity role = role(1L, "operator");
+        SysRoleEntity role = role(1L, 2L, "operator");
         when(roleMapper.selectList()).thenReturn(List.of(role));
 
         SysMenu ownedMenu = new SysMenu();
@@ -97,7 +97,7 @@ class SysRoleServiceOwnershipTest {
         request.setMenuIds(new Long[] {20L});
 
         assertThrows(AbstractBusinessException.class,
-                () -> roleService.updateRoleMenus(1L, request, "operator", false, 2L));
+                () -> roleService.updateRoleMenus(1L, request, 2L, false, 2L));
 
         verify(roleMapper, never()).updateById(any(SysRoleEntity.class));
         verify(roleMenuMapper, never()).deleteByRoleId(1L);
@@ -105,17 +105,18 @@ class SysRoleServiceOwnershipTest {
 
     @Test
     void adminCanReadRoleCreatedByAnotherUser() {
-        SysRoleEntity role = role(1L, "owner");
+        SysRoleEntity role = role(1L, 3L, "owner");
         when(roleMapper.selectList()).thenReturn(List.of(role));
 
-        roleService.selectRoleById(1L, "admin", true);
+        roleService.selectRoleById(1L, 1L, true);
 
         verify(roleMapper).selectList();
     }
 
-    private SysRoleEntity role(Long roleId, String createBy) {
+    private SysRoleEntity role(Long roleId, Long createUserId, String createBy) {
         SysRoleEntity role = new SysRoleEntity();
         role.setRoleId(roleId);
+        role.setCreateUserId(createUserId);
         role.setCreateBy(createBy);
         return role;
     }

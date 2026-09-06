@@ -38,21 +38,20 @@ public class SupplierService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void create(SupplierSaveRequest request, String username) {
+    public void create(SupplierSaveRequest request) {
         validateStatus(request.getStatus());
         String name = request.getName().trim();
         ensureNameUnique(null, name);
 
         SupplierEntity entity = toEntity(request);
         entity.setName(name);
-        entity.setCreateBy(username);
         if (supplierMapper.insert(entity) <= 0) {
             throw ExceptionUtil.business(ErrorCodeEnums.SUPPLIER_OPERATION_FAILED);
         }
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void update(SupplierSaveRequest request, String username) {
+    public void update(SupplierSaveRequest request) {
         if (request.getSupplierId() == null || supplierMapper.selectById(request.getSupplierId()) == null) {
             throw ExceptionUtil.business(ErrorCodeEnums.SUPPLIER_NOT_FOUND);
         }
@@ -63,14 +62,13 @@ public class SupplierService {
 
         SupplierEntity entity = toEntity(request);
         entity.setName(name);
-        entity.setUpdateBy(username);
         if (supplierMapper.updateById(entity) <= 0) {
             throw ExceptionUtil.business(ErrorCodeEnums.SUPPLIER_OPERATION_FAILED);
         }
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void updateStatus(Long supplierId, SupplierStatusRequest request, String username) {
+    public void updateStatus(Long supplierId, SupplierStatusRequest request) {
         if (supplierMapper.selectById(supplierId) == null) {
             throw ExceptionUtil.business(ErrorCodeEnums.SUPPLIER_NOT_FOUND);
         }
@@ -81,7 +79,6 @@ public class SupplierService {
         SupplierEntity entity = new SupplierEntity();
         entity.setId(supplierId);
         entity.setStatus(request.getStatus());
-        entity.setUpdateBy(username);
         if (supplierMapper.updateById(entity) <= 0) {
             throw ExceptionUtil.business(ErrorCodeEnums.SUPPLIER_STATUS_UPDATE_FAILED);
         }

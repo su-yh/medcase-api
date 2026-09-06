@@ -79,12 +79,9 @@ public class SysNoticeController {
     @PreAuthorize("@ss.hasPermi('system:notice:add')")
     @Log(title = "通知公告", businessType = BusinessType.INSERT)
     @PostMapping
-    public void add(
-            @Validated @RequestBody NoticeSaveRequest request,
-            @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
+    public void add(@Validated @RequestBody NoticeSaveRequest request) {
 
         SysNoticeEntity notice = toEntity(request);
-        notice.setCreateBy(loginUser.getUsername());
         if (noticeService.insertNotice(notice) <= 0) {
             throw ExceptionUtil.business(ErrorCodeEnums.NOTICE_OPERATION_FAILED);
         }
@@ -96,12 +93,9 @@ public class SysNoticeController {
     @PreAuthorize("@ss.hasPermi('system:notice:edit')")
     @Log(title = "通知公告", businessType = BusinessType.UPDATE)
     @PutMapping
-    public void edit(
-            @Validated @RequestBody NoticeSaveRequest request,
-            @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
+    public void edit(@Validated @RequestBody NoticeSaveRequest request) {
 
         SysNoticeEntity notice = toEntity(request);
-        notice.setUpdateBy(loginUser.getUsername());
         if (noticeService.updateNotice(notice) <= 0) {
             throw ExceptionUtil.business(ErrorCodeEnums.NOTICE_OPERATION_FAILED);
         }

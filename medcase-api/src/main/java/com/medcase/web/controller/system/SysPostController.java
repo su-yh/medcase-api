@@ -71,9 +71,7 @@ public class SysPostController {
     @PreAuthorize("@ss.hasPermi('system:post:add')")
     @Log(title = "岗位管理", businessType = BusinessType.INSERT)
     @PostMapping
-    public void add(
-            @Validated @RequestBody PostSaveRequest request,
-            @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
+    public void add(@Validated @RequestBody PostSaveRequest request) {
 
         if (!postService.checkPostNameUnique(request.getPostId(), request.getPostName())) {
             throw ExceptionUtil.business(ErrorCodeEnums.POST_NAME_EXISTS);
@@ -82,7 +80,6 @@ public class SysPostController {
             throw ExceptionUtil.business(ErrorCodeEnums.POST_CODE_EXISTS);
         }
         SysPostEntity post = toEntity(request);
-        post.setCreateBy(loginUser.getUsername());
         if (postService.insertPost(post) <= 0) {
             throw ExceptionUtil.business(ErrorCodeEnums.POST_OPERATION_FAILED);
         }
@@ -94,9 +91,7 @@ public class SysPostController {
     @PreAuthorize("@ss.hasPermi('system:post:edit')")
     @Log(title = "岗位管理", businessType = BusinessType.UPDATE)
     @PutMapping
-    public void edit(
-            @Validated @RequestBody PostSaveRequest request,
-            @CurrLoginUser(userType = UserTypeEnums.ADMIN) LoginUser loginUser) {
+    public void edit(@Validated @RequestBody PostSaveRequest request) {
 
         if (!postService.checkPostNameUnique(request.getPostId(), request.getPostName())) {
             throw ExceptionUtil.business(ErrorCodeEnums.POST_NAME_EXISTS);
@@ -105,7 +100,6 @@ public class SysPostController {
             throw ExceptionUtil.business(ErrorCodeEnums.POST_CODE_EXISTS);
         }
         SysPostEntity post = toEntity(request);
-        post.setUpdateBy(loginUser.getUsername());
         if (postService.updatePost(post) <= 0) {
             throw ExceptionUtil.business(ErrorCodeEnums.POST_OPERATION_FAILED);
         }

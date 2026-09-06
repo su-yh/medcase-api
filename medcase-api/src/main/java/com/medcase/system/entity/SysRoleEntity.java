@@ -30,10 +30,6 @@ public class SysRoleEntity extends AbstractBaseEntity {
 
     private String delFlag;
 
-    private String createBy;
-
-    private String updateBy;
-
     private String remark;
 
     @TableField(exist = false)

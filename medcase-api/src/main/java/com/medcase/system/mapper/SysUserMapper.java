@@ -130,40 +130,46 @@ public interface SysUserMapper extends BaseMapperX<SysUserEntity> {
     }
 
     default int updateUserStatus(Long userId, String status) {
-        return update(null, new LambdaUpdateWrapper<SysUserEntity>()
-                .set(SysUserEntity::getStatus, status)
+        SysUserEntity entity = new SysUserEntity();
+        entity.setStatus(status);
+        return update(entity, new LambdaUpdateWrapper<SysUserEntity>()
                 .eq(SysUserEntity::getUserId, userId));
     }
 
     default int updateUserAvatar(Long userId, FileAttachment avatar) {
-        return update(null, new LambdaUpdateWrapper<SysUserEntity>()
-                .set(SysUserEntity::getAvatar, avatar)
+        SysUserEntity entity = new SysUserEntity();
+        entity.setAvatar(avatar);
+        return update(entity, new LambdaUpdateWrapper<SysUserEntity>()
                 .eq(SysUserEntity::getUserId, userId));
     }
 
     default int updateLoginInfo(Long userId, String loginIp, Date loginDate) {
-        return update(null, new LambdaUpdateWrapper<SysUserEntity>()
-                .set(SysUserEntity::getLoginIp, loginIp)
-                .set(SysUserEntity::getLoginDate, loginDate)
+        SysUserEntity entity = new SysUserEntity();
+        entity.setLoginIp(loginIp);
+        entity.setLoginDate(loginDate);
+        return update(entity, new LambdaUpdateWrapper<SysUserEntity>()
                 .eq(SysUserEntity::getUserId, userId));
     }
 
     default int resetUserPassword(Long userId, String password, Date pwdUpdateDate) {
-        return update(null, new LambdaUpdateWrapper<SysUserEntity>()
-                .set(SysUserEntity::getPwdUpdateDate, pwdUpdateDate)
-                .set(SysUserEntity::getPassword, password)
+        SysUserEntity entity = new SysUserEntity();
+        entity.setPwdUpdateDate(pwdUpdateDate);
+        entity.setPassword(password);
+        return update(entity, new LambdaUpdateWrapper<SysUserEntity>()
                 .eq(SysUserEntity::getUserId, userId));
     }
 
     default int deleteUserById(Long userId) {
-        return update(null, new LambdaUpdateWrapper<SysUserEntity>()
-                .set(SysUserEntity::getDelFlag, "2")
+        SysUserEntity entity = new SysUserEntity();
+        entity.setDelFlag("2");
+        return update(entity, new LambdaUpdateWrapper<SysUserEntity>()
                 .eq(SysUserEntity::getUserId, userId));
     }
 
     default int deleteUsersByIds(Long[] userIds) {
-        return update(null, new LambdaUpdateWrapper<SysUserEntity>()
-                .set(SysUserEntity::getDelFlag, "2")
+        SysUserEntity entity = new SysUserEntity();
+        entity.setDelFlag("2");
+        return update(entity, new LambdaUpdateWrapper<SysUserEntity>()
                 .in(SysUserEntity::getUserId, Arrays.asList(userIds)));
     }
 }

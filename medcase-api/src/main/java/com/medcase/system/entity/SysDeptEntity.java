@@ -33,8 +33,4 @@ public class SysDeptEntity extends AbstractBaseEntity {
     private String status;
 
     private String delFlag;
-
-    private String createBy;
-
-    private String updateBy;
 }

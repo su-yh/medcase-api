@@ -39,8 +39,9 @@ public interface SysDictDataMapper extends BaseMapperX<SysDictDataEntity> {
     }
 
     default int updateDictType(String oldDictType, String newDictType) {
-        return update(null, new LambdaUpdateWrapper<SysDictDataEntity>()
-                .set(SysDictDataEntity::getDictType, newDictType)
+        SysDictDataEntity entity = new SysDictDataEntity();
+        entity.setDictType(newDictType);
+        return update(entity, new LambdaUpdateWrapper<SysDictDataEntity>()
                 .eq(SysDictDataEntity::getDictType, oldDictType));
     }
 

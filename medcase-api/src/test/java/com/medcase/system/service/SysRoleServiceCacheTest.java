@@ -91,7 +91,7 @@ class SysRoleServiceCacheTest {
 
         roleService.selectRoleAll();
         RoleAddRequest addRole = new RoleAddRequest();
-        roleService.insertRole(addRole, "admin");
+        roleService.insertRole(addRole);
         roleService.selectRoleAll();
 
         verify(roleMapper, times(2)).selectList();
@@ -112,7 +112,7 @@ class SysRoleServiceCacheTest {
         request.setStatus("0");
         request.setRemark("病例审核角色");
 
-        roleService.insertRole(request, "admin");
+        roleService.insertRole(request);
 
         org.mockito.ArgumentCaptor<SysRoleEntity> captor = forClass(SysRoleEntity.class);
         verify(roleMapper).insert(captor.capture());
@@ -123,7 +123,6 @@ class SysRoleServiceCacheTest {
         assertEquals(Boolean.TRUE, role.getMenuCheckStrictly());
         assertEquals("0", role.getStatus());
         assertEquals("病例审核角色", role.getRemark());
-        assertEquals("admin", role.getCreateBy());
     }
 
     @Test
@@ -137,7 +136,7 @@ class SysRoleServiceCacheTest {
         roleService.selectRoleAll();
         RoleEditRequest updateRole = new RoleEditRequest();
         updateRole.setRoleId(1L);
-        roleService.updateRole(updateRole, "admin", true);
+        roleService.updateRole(updateRole, 1L, true);
         roleService.selectRoleAll();
 
         verify(roleMapper, times(2)).selectList();
@@ -154,7 +153,7 @@ class SysRoleServiceCacheTest {
         request.setRoleName("审核员");
         request.setRoleKey("reviewer");
 
-        roleService.updateRole(request, "admin", true);
+        roleService.updateRole(request, 1L, true);
 
         verify(roleMenuMapper, never()).deleteByRoleId(1L);
         verify(roleMenuMapper, never()).insertRoleMenus(any());
@@ -169,7 +168,7 @@ class SysRoleServiceCacheTest {
         request.setMenuIds(new Long[] {10L, 20L});
         request.setMenuCheckStrictly(true);
 
-        roleService.updateRoleMenus(1L, request, "admin", true, 1L);
+        roleService.updateRoleMenus(1L, request, 1L, true, 1L);
 
         org.mockito.ArgumentCaptor<SysRoleEntity> roleCaptor = forClass(SysRoleEntity.class);
         verify(roleMapper).updateById(roleCaptor.capture());
@@ -190,7 +189,7 @@ class SysRoleServiceCacheTest {
         when(roleMenuMapper.selectMenuIdsByRoleId(1L)).thenReturn(List.of(10L, 20L));
 
         assertEquals(List.of(10L, 20L),
-                roleService.selectRoleMenuIds(1L, "admin", true));
+                roleService.selectRoleMenuIds(1L, 1L, true));
         verify(roleMenuMapper).selectMenuIdsByRoleId(1L);
     }
 
@@ -204,7 +203,7 @@ class SysRoleServiceCacheTest {
         roleService.selectRoleAll();
         RoleStatusRequest updateRole = new RoleStatusRequest();
         updateRole.setRoleId(1L);
-        roleService.updateRoleStatus(updateRole, "admin", true);
+        roleService.updateRoleStatus(updateRole, 1L, true);
         roleService.selectRoleAll();
 
         verify(roleMapper, times(2)).selectList();
@@ -220,7 +219,7 @@ class SysRoleServiceCacheTest {
         when(roleMapper.deleteRolesByIds(new Long[] {1L})).thenReturn(1);
 
         roleService.selectRoleAll();
-        roleService.deleteRoleByIds(new Long[] {1L}, "admin", true);
+        roleService.deleteRoleByIds(new Long[] {1L}, 1L, true);
         roleService.selectRoleAll();
 
         verify(roleMapper, times(2)).selectList();

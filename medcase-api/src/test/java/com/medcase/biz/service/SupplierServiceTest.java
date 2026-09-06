@@ -37,7 +37,7 @@ class SupplierServiceTest {
 
         AbstractBusinessException exception = assertThrows(
                 AbstractBusinessException.class,
-                () -> supplierService.create(request, "admin"));
+                () -> supplierService.create(request));
 
         assertEquals(ErrorCodeEnums.SUPPLIER_STATUS_INVALID, exception.getEc());
         verify(supplierMapper, never()).insert(any(SupplierEntity.class));
@@ -52,7 +52,7 @@ class SupplierServiceTest {
 
         AbstractBusinessException exception = assertThrows(
                 AbstractBusinessException.class,
-                () -> supplierService.update(request, "admin"));
+                () -> supplierService.update(request));
 
         assertEquals(ErrorCodeEnums.SUPPLIER_STATUS_INVALID, exception.getEc());
         verify(supplierMapper, never()).updateById(any(SupplierEntity.class));
@@ -65,7 +65,7 @@ class SupplierServiceTest {
 
         AbstractBusinessException exception = assertThrows(
                 AbstractBusinessException.class,
-                () -> supplierService.create(request, "admin"));
+                () -> supplierService.create(request));
 
         assertEquals(ErrorCodeEnums.SUPPLIER_NICKNAME_EXISTS, exception.getEc());
         verify(supplierMapper, never()).insert(any(SupplierEntity.class));

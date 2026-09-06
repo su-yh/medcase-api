@@ -44,9 +44,5 @@ public class SysMenuEntity extends AbstractBaseEntity {
 
     private String icon;
 
-    private String createBy;
-
-    private String updateBy;
-
     private String remark;
 }

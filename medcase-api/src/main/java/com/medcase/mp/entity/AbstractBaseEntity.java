@@ -16,7 +16,19 @@ import java.util.Date;
 public abstract class AbstractBaseEntity {
 
     @TableField(fill = FieldFill.INSERT)
+    private Long createUserId;
+
+    @TableField(fill = FieldFill.INSERT)
+    private String createBy;
+
+    @TableField(fill = FieldFill.INSERT)
     private Date createTime;
+
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+    private Long updateUserId;
+
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+    private String updateBy;
 
     @TableField(fill = FieldFill.INSERT_UPDATE)
     private Date updateTime;

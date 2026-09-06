@@ -68,9 +68,5 @@ public class SysUserEntity extends AbstractBaseEntity {
 
     private Date pwdUpdateDate;
 
-    private String createBy;
-
-    private String updateBy;
-
     private String remark;
 }

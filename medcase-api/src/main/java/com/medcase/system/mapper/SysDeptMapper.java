@@ -26,26 +26,30 @@ public interface SysDeptMapper extends BaseMapperX<SysDeptEntity> {
         if (deptIds == null || deptIds.isEmpty()) {
             return 0;
         }
-        return update(null, new LambdaUpdateWrapper<SysDeptEntity>()
-                .set(SysDeptEntity::getStatus, "0")
+        SysDeptEntity entity = new SysDeptEntity();
+        entity.setStatus("0");
+        return update(entity, new LambdaUpdateWrapper<SysDeptEntity>()
                 .in(SysDeptEntity::getDeptId, deptIds));
     }
 
     default int updateDeptAncestors(Long deptId, String ancestors) {
-        return update(null, new LambdaUpdateWrapper<SysDeptEntity>()
-                .set(SysDeptEntity::getAncestors, ancestors)
+        SysDeptEntity entity = new SysDeptEntity();
+        entity.setAncestors(ancestors);
+        return update(entity, new LambdaUpdateWrapper<SysDeptEntity>()
                 .eq(SysDeptEntity::getDeptId, deptId));
     }
 
     default int updateDeptSort(Long deptId, Integer orderNum) {
-        return update(null, new LambdaUpdateWrapper<SysDeptEntity>()
-                .set(SysDeptEntity::getOrderNum, orderNum)
+        SysDeptEntity entity = new SysDeptEntity();
+        entity.setOrderNum(orderNum);
+        return update(entity, new LambdaUpdateWrapper<SysDeptEntity>()
                 .eq(SysDeptEntity::getDeptId, deptId));
     }
 
     default int deleteDeptById(Long deptId) {
-        return update(null, new LambdaUpdateWrapper<SysDeptEntity>()
-                .set(SysDeptEntity::getDelFlag, "2")
+        SysDeptEntity entity = new SysDeptEntity();
+        entity.setDelFlag("2");
+        return update(entity, new LambdaUpdateWrapper<SysDeptEntity>()
                 .eq(SysDeptEntity::getDeptId, deptId));
     }
 }
