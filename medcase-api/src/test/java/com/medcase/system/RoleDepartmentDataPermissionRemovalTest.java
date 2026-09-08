@@ -35,7 +35,7 @@ class RoleDepartmentDataPermissionRemovalTest {
         String systemSql = Files.readString(Path.of(
                 "src/main/resources/db/migration/master/V01_00_00/V01_00_00_001__system.sql"));
         String roleDeptMigration = Files.readString(Path.of(
-                "src/main/resources/db/migration/master/V01_01_00/V01_01_00_001__drop-sys-role-dept.sql"));
+                "src/main/resources/db/migration/master/V01_01_00/V01_01_00_001__alter.sql"));
         String dataScopeMigration = Files.readString(Path.of(
                 "src/main/resources/db/migration/master/V01_01_00/V01_01_00_002__drop-role-data-scope.sql"));
         String deptStrictMigration = Files.readString(Path.of(
