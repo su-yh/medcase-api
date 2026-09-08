@@ -1,11 +1,13 @@
 package com.medcase.mvc.audit;
 
 import com.baomidou.mybatisplus.annotation.EnumValue;
+import lombok.Getter;
 
 /**
  * @author suyh
  * @since 2026-09-06
  */
+@Getter
 public enum AuditEnums implements IAudit {
     CREATE_ADMIN_USER("create_admin_user", "创建后台用户"),
     ;

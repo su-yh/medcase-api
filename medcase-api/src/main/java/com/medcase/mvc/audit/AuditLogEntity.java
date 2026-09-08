@@ -20,7 +20,7 @@ public class AuditLogEntity {
     private Long id;
 
     @TableField("trace_id")
-    private Long traceId;
+    private String traceId;
 
     @TableField("user_id")
     private Long userId;
@@ -36,9 +36,6 @@ public class AuditLogEntity {
 
     @TableField("result_detail")
     private String resultDetail;
-
-    @TableField("result_code")
-    private String resultCode;
 
     @TableField("req_path")
     private String reqPath;

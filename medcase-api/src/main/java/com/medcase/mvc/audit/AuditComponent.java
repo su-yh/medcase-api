@@ -41,7 +41,7 @@ public class AuditComponent extends AbstractAuditComponent {
                 .setResultDetail(JsonUtils.toJSONString(spelReturnValue))
                 .setReqPath(request.getServletPath()).setReqMethod(request.getMethod())
                 .setCreated(new Date());
-        recordEntity.setTraceId(Long.parseLong(traceId));
+        recordEntity.setTraceId(traceId);
 
         executorService.submit(() -> {
             auditLogMapper.insert(recordEntity);
