@@ -144,7 +144,7 @@ public class SysMenuService {
         for (SysMenuEntity menu : menus) {
 
             RouterVo router = new RouterVo();
-            router.setHidden(!menu.isVisible());
+            router.setHidden(!menu.getVisible());
             router.setRouteName(getRouteName(menu));
             router.setRoutePath(menu.getRoutePath());
             router.setVueComponentPath(menu.getVueComponentPath());

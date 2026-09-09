@@ -36,7 +36,7 @@ public class SysMenuEntity extends AbstractBaseEntity {
 
     private String menuType;
 
-    private boolean visible;
+    private Boolean visible;
 
     private String status;
 
