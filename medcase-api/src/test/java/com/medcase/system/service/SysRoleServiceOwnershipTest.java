@@ -90,7 +90,7 @@ class SysRoleServiceOwnershipTest {
         when(roleMapper.selectList()).thenReturn(List.of(role));
 
         SysMenuEntity ownedMenu = new SysMenuEntity();
-        ownedMenu.setMenuId(10L);
+        ownedMenu.setId(10L);
         when(menuService.selectMenuList(2L)).thenReturn(List.of(ownedMenu));
 
         RoleMenuUpdateRequest request = new RoleMenuUpdateRequest();

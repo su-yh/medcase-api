@@ -10,7 +10,7 @@ public class MenuQueryRequest {
 
     private String menuName;
 
-    private String visible;
+    private Boolean visible;
 
     private String status;
 }

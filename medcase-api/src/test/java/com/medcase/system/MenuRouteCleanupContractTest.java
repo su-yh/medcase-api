@@ -24,6 +24,27 @@ class MenuRouteCleanupContractTest {
     }
 
     @Test
+    void menuUsesNewColumnNamesAndVisibleBoolean() throws NoSuchFieldException {
+        assertThat(findField(SysMenuEntity.class, "id")).isNotNull();
+        assertThat(findField(SysMenuEntity.class, "routePath")).isNotNull();
+        assertThat(findField(SysMenuEntity.class, "vueComponentPath")).isNotNull();
+        assertThat(SysMenuEntity.class.getDeclaredField("visible").getType()).isEqualTo(boolean.class);
+
+        assertThat(findField(MenuSaveRequest.class, "id")).isNotNull();
+        assertThat(findField(MenuSaveRequest.class, "routePath")).isNotNull();
+        assertThat(findField(MenuSaveRequest.class, "vueComponentPath")).isNotNull();
+        assertThat(MenuSaveRequest.class.getDeclaredField("visible").getType()).isEqualTo(Boolean.class);
+    }
+
+    @Test
+    void routerResponseUsesBackendMenuFieldNames() {
+        assertThat(findField(RouterVo.class, "routePath")).isNotNull();
+        assertThat(findField(RouterVo.class, "vueComponentPath")).isNotNull();
+        assertThat(findField(RouterVo.class, "path")).isNull();
+        assertThat(findField(RouterVo.class, "component")).isNull();
+    }
+
+    @Test
     void menuSqlAndServiceDoNotUseRemovedRouteFeatures() throws IOException {
         String mapperXml = Files.readString(Path.of(
                 "src/main/resources/mapper/system/SysMenuMapper.xml"));
@@ -45,6 +66,20 @@ class MenuRouteCleanupContractTest {
 
         assertThat(queryMigration).contains("alter table sys_menu drop column query");
         assertThat(frameMigration).contains("alter table sys_menu drop column is_frame");
+    }
+
+    @Test
+    void newMenuContractIsMigratedIncrementally() throws IOException {
+        String migration = Files.readString(Path.of(
+                "src/main/resources/db/migration/master/V01_01_00/V01_01_00_008__rename-menu-columns.sql"));
+
+        assertThat(migration).contains(
+                "rename column menu_id to id",
+                "rename column path to route_path",
+                "rename column component to vue_component_path",
+                "modify column visible tinyint",
+                "update sys_menu set visible",
+                "create unique index uk_sys_menu_route_name");
     }
 
     private Field findField(Class<?> type, String fieldName) {

@@ -362,8 +362,8 @@ public class SysRoleService {
             Long[] requestedMenuIds = request.getMenuIds();
             if (menus != null) {
                 for (SysMenuEntity menu : menus) {
-                    if (menu != null && menu.getMenuId() != null) {
-                        menuIds.add(menu.getMenuId());
+                    if (menu != null && menu.getId() != null) {
+                        menuIds.add(menu.getId());
                     }
                 }
             }

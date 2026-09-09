@@ -15,12 +15,12 @@ public class RouterVo {
     /**
      * 路由名字
      */
-    private String name;
+    private String routeName;
 
     /**
      * 路由地址
      */
-    private String path;
+    private String routePath;
 
     /**
      * 是否隐藏路由，当设置 true 的时候该路由不会再侧边栏出现
@@ -35,7 +35,7 @@ public class RouterVo {
     /**
      * 组件地址
      */
-    private String component;
+    private String vueComponentPath;
 
     /**
      * 当你一个路由下面的 children 声明的路由大于1个时，自动会变成嵌套的模式--如组件页面

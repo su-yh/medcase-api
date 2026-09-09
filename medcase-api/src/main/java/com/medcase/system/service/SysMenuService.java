@@ -144,13 +144,13 @@ public class SysMenuService {
         for (SysMenuEntity menu : menus) {
 
             RouterVo router = new RouterVo();
-            router.setHidden("1".equals(menu.getVisible()));
-            router.setName(getRouteName(menu));
-            router.setPath(menu.getPath());
-            router.setComponent(menu.getComponent());
+            router.setHidden(!menu.isVisible());
+            router.setRouteName(getRouteName(menu));
+            router.setRoutePath(menu.getRoutePath());
+            router.setVueComponentPath(menu.getVueComponentPath());
             router.setMeta(new MetaVo(
                     menu.getMenuName(), menu.getIcon(), org.apache.commons.lang3.Strings.CS.equals("1", menu.getIsCache()),
-                    menu.getPath()));
+                    menu.getRoutePath()));
             List<SysMenuEntity> cMenus = menu.getChildren();
             if (!org.springframework.util.CollectionUtils.isEmpty(cMenus)
                     && UserConstants.TYPE_DIR.equals(menu.getMenuType())) {
@@ -172,7 +172,7 @@ public class SysMenuService {
     public List<SysMenuEntity> buildMenuTree(List<SysMenuEntity> menus) {
 
         List<SysMenuEntity> returnList = new ArrayList<SysMenuEntity>();
-        List<Long> tempList = menus.stream().map(SysMenuEntity::getMenuId).collect(Collectors.toList());
+        List<Long> tempList = menus.stream().map(SysMenuEntity::getId).collect(Collectors.toList());
         for (Iterator<SysMenuEntity> iterator = menus.iterator(); iterator.hasNext();) {
 
             SysMenuEntity menu = iterator.next();
@@ -294,9 +294,9 @@ public class SysMenuService {
      */
     public boolean checkMenuNameUnique(MenuSaveRequest menu) {
 
-        Long menuId = menu.getMenuId() == null ? -1L : menu.getMenuId();
+        Long menuId = menu.getId() == null ? -1L : menu.getId();
         SysMenuEntity info = menuMapper.selectMenuByName(menu.getMenuName(), menu.getParentId());
-        if (info != null && info.getMenuId().longValue() != menuId.longValue()) {
+        if (info != null && info.getId().longValue() != menuId.longValue()) {
 
             return UserConstants.NOT_UNIQUE;
         }
@@ -310,33 +310,37 @@ public class SysMenuService {
      */
     public boolean checkRouteConfigUnique(MenuSaveRequest menu) {
 
-        Long menuId = menu.getMenuId() == null ? -1L : menu.getMenuId();
+        if (!UserConstants.TYPE_MENU.equals(menu.getMenuType())) {
+            return UserConstants.UNIQUE;
+        }
+        if (!org.springframework.util.StringUtils.hasText(menu.getRouteName())) {
+            return UserConstants.NOT_UNIQUE;
+        }
+
+        Long menuId = menu.getId() == null ? -1L : menu.getId();
         Long parentId = menu.getParentId();
-        String path = menu.getPath();
-        String routeName = !org.springframework.util.StringUtils.hasText(menu.getRouteName())
-                ? path : menu.getRouteName();
-        List<SysMenuEntity> sysMenuList = menuMapper.selectMenusByPathOrRouteName(path, routeName);
+        String routePath = menu.getRoutePath();
+        String routeName = menu.getRouteName();
+        List<SysMenuEntity> sysMenuList = menuMapper.selectMenusByPathOrRouteName(routePath, routeName);
         for (SysMenuEntity sysMenu : sysMenuList) {
 
-            if (sysMenu.getMenuId().longValue() != menuId.longValue()) {
+            if (sysMenu.getId().longValue() != menuId.longValue()) {
 
                 Long dbParentId = sysMenu.getParentId();
-                String dbPath = sysMenu.getPath();
-                String dbRouteName = !org.springframework.util.StringUtils.hasText(sysMenu.getRouteName())
-                        ? dbPath : sysMenu.getRouteName();
-                if (org.apache.commons.lang3.Strings.CI.equalsAny(path, dbPath)
+                String dbRoutePath = sysMenu.getRoutePath();
+                if (org.apache.commons.lang3.Strings.CI.equalsAny(routePath, dbRoutePath)
                         && parentId.longValue() == dbParentId.longValue()) {
 
-                    log.warn("[同级路由冲突] 同级下已存在相同路由路径 '{}'，冲突菜单：{}", dbPath, sysMenu.getMenuName());
+                    log.warn("[同级路由冲突] 同级下已存在相同路由路径 '{}'，冲突菜单：{}", dbRoutePath, sysMenu.getMenuName());
                     return UserConstants.NOT_UNIQUE;
                 }
-                else if (org.apache.commons.lang3.Strings.CI.equalsAny(path, dbPath)
+                else if (org.apache.commons.lang3.Strings.CI.equalsAny(routePath, dbRoutePath)
                         && parentId.longValue() == MENU_ROOT_ID) {
 
-                    log.warn("[根目录路由冲突] 根目录下路由 '{}' 必须唯一，已被菜单 '{}' 占用", path, sysMenu.getMenuName());
+                    log.warn("[根目录路由冲突] 根目录下路由 '{}' 必须唯一，已被菜单 '{}' 占用", routePath, sysMenu.getMenuName());
                     return UserConstants.NOT_UNIQUE;
                 }
-                else if (org.apache.commons.lang3.Strings.CI.equalsAny(routeName, dbRouteName)) {
+                else if (org.apache.commons.lang3.Strings.CI.equalsAny(routeName, sysMenu.getRouteName())) {
 
                     log.warn("[路由名称冲突] 路由名称 '{}' 需全局唯一，已被菜单 '{}' 使用", routeName, sysMenu.getMenuName());
                     return UserConstants.NOT_UNIQUE;
@@ -353,7 +357,7 @@ public class SysMenuService {
      */
     public String getRouteName(SysMenuEntity menu) {
 
-        return getRouteName(menu.getRouteName(), menu.getPath());
+        return menu.getRouteName();
     }
 
     /**
@@ -364,8 +368,7 @@ public class SysMenuService {
      */
     public String getRouteName(String name, String path) {
 
-        String routerName = org.springframework.util.StringUtils.hasText(name) ? name : path;
-        return org.springframework.util.StringUtils.capitalize(routerName);
+        return name;
     }
 
     /**
@@ -419,7 +422,7 @@ public class SysMenuService {
         while (it.hasNext()) {
 
             SysMenuEntity n = it.next();
-            if (n.getParentId().longValue() == t.getMenuId().longValue()) {
+            if (n.getParentId().longValue() == t.getId().longValue()) {
 
                 tlist.add(n);
             }
@@ -437,16 +440,16 @@ public class SysMenuService {
 
     private SysMenuEntity toEntity(MenuSaveRequest request) {
         SysMenuEntity entity = new SysMenuEntity();
-        entity.setMenuId(request.getMenuId());
+        entity.setId(request.getId());
         entity.setParentId(request.getParentId());
         entity.setMenuName(request.getMenuName());
         entity.setOrderNum(request.getOrderNum());
-        entity.setPath(request.getPath());
-        entity.setComponent(request.getComponent());
+        entity.setRoutePath(request.getRoutePath());
+        entity.setVueComponentPath(request.getVueComponentPath());
         entity.setRouteName(request.getRouteName());
         entity.setIsCache(request.getIsCache());
         entity.setMenuType(request.getMenuType());
-        entity.setVisible(request.getVisible());
+        entity.setVisible(Boolean.TRUE.equals(request.getVisible()));
         entity.setStatus(request.getStatus());
         entity.setPerms(request.getPerms());
         entity.setIcon(request.getIcon());

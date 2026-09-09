@@ -28,7 +28,7 @@ public interface SysMenuMapper extends BaseMapperX<SysMenuEntity> {
     List<SysMenuEntity> selectMenuTreeByUserId(Long userId);
 
     List<SysMenuEntity> selectMenusByPathOrRouteName(
-            @Param("path") String path, @Param("routeName") String routeName);
+            @Param("routePath") String routePath, @Param("routeName") String routeName);
 
     default int selectChildrenCount(Long menuId) {
         return Math.toIntExact(selectCount(
@@ -46,7 +46,7 @@ public interface SysMenuMapper extends BaseMapperX<SysMenuEntity> {
         SysMenuEntity entity = new SysMenuEntity();
         entity.setOrderNum(orderNum);
         return update(entity, new LambdaUpdateWrapper<SysMenuEntity>()
-                .eq(SysMenuEntity::getMenuId, menuId));
+                .eq(SysMenuEntity::getId, menuId));
     }
 
 }

@@ -1,7 +1,6 @@
 package com.medcase.web.controller.system;
 
 import java.util.List;
-import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -14,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.medcase.common.annotation.Log;
-import com.medcase.common.constant.UserConstants;
 import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
@@ -55,10 +53,10 @@ public class SysMenuController {
      * 根据菜单编号获取详细信息
      */
     @PreAuthorize("@ss.hasPermi('system:menu:query')")
-    @GetMapping(value = "/{menuId}")
-    public SysMenuEntity getInfo(@PathVariable Long menuId) {
+    @GetMapping(value = "/{id}")
+    public SysMenuEntity getInfo(@PathVariable Long id) {
 
-        return menuService.selectMenuById(menuId);
+        return menuService.selectMenuById(id);
     }
 
     /**
@@ -104,7 +102,7 @@ public class SysMenuController {
         if (!menuService.checkMenuNameUnique(menu)) {
             throw ExceptionUtil.business(ErrorCodeEnums.MENU_NAME_EXISTS);
         }
-        else if (menu.getMenuId().equals(menu.getParentId())) {
+        else if (menu.getId().equals(menu.getParentId())) {
             throw ExceptionUtil.business(ErrorCodeEnums.MENU_PARENT_SELF);
         }
         else if (!menuService.checkRouteConfigUnique(menu)) {
@@ -133,16 +131,16 @@ public class SysMenuController {
      */
     @PreAuthorize("@ss.hasPermi('system:menu:remove')")
     @Log(title = "菜单管理", businessType = BusinessType.DELETE)
-    @DeleteMapping("/{menuId}")
-    public void remove(@PathVariable("menuId") Long menuId) {
+    @DeleteMapping("/{id}")
+    public void remove(@PathVariable("id") Long id) {
 
-        if (menuService.hasChildByMenuId(menuId)) {
+        if (menuService.hasChildByMenuId(id)) {
             throw ExceptionUtil.business(ErrorCodeEnums.MENU_HAS_CHILDREN);
         }
-        if (menuService.checkMenuExistRole(menuId)) {
+        if (menuService.checkMenuExistRole(id)) {
             throw ExceptionUtil.business(ErrorCodeEnums.MENU_ASSIGNED);
         }
-        if (menuService.deleteMenuById(menuId) <= 0) {
+        if (menuService.deleteMenuById(id) <= 0) {
             throw ExceptionUtil.business(ErrorCodeEnums.MENU_OPERATION_FAILED);
         }
     }

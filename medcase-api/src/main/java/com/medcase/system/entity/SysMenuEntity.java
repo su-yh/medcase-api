@@ -17,8 +17,8 @@ import java.util.List;
 @TableName(value = "sys_menu", autoResultMap = true)
 public class SysMenuEntity extends AbstractBaseEntity {
 
-    @TableId(value = "menu_id", type = IdType.AUTO)
-    private Long menuId;
+    @TableId(value = "id", type = IdType.AUTO)
+    private Long id;
 
     private String menuName;
 
@@ -26,9 +26,9 @@ public class SysMenuEntity extends AbstractBaseEntity {
 
     private Integer orderNum;
 
-    private String path;
+    private String routePath;
 
-    private String component;
+    private String vueComponentPath;
 
     private String routeName;
 
@@ -36,7 +36,7 @@ public class SysMenuEntity extends AbstractBaseEntity {
 
     private String menuType;
 
-    private String visible;
+    private boolean visible;
 
     private String status;
 
