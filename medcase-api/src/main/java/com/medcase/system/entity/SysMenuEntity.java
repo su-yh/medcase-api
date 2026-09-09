@@ -30,11 +30,7 @@ public class SysMenuEntity extends AbstractBaseEntity {
 
     private String component;
 
-    private String query;
-
     private String routeName;
-
-    private String isFrame;
 
     private String isCache;
 

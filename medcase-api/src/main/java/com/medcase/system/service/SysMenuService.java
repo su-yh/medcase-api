@@ -1,6 +1,5 @@
 package com.medcase.system.service;
 
-import com.medcase.common.constant.Constants;
 import com.medcase.common.constant.UserConstants;
 import com.medcase.common.core.domain.TreeSelect;
 import com.medcase.common.core.text.Convert;
@@ -20,8 +19,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -147,9 +146,8 @@ public class SysMenuService {
             RouterVo router = new RouterVo();
             router.setHidden("1".equals(menu.getVisible()));
             router.setName(getRouteName(menu));
-            router.setPath(getRouterPath(menu));
-            router.setComponent(getComponent(menu));
-            router.setQuery(menu.getQuery());
+            router.setPath(menu.getPath());
+            router.setComponent(menu.getComponent());
             router.setMeta(new MetaVo(
                     menu.getMenuName(), menu.getIcon(), org.apache.commons.lang3.Strings.CS.equals("1", menu.getIsCache()),
                     menu.getPath()));
@@ -160,35 +158,6 @@ public class SysMenuService {
                 router.setAlwaysShow(true);
                 router.setRedirect("noRedirect");
                 router.setChildren(buildMenus(cMenus));
-            }
-            else if (isMenuFrame(menu)) {
-
-                router.setMeta(null);
-                List<RouterVo> childrenList = new ArrayList<RouterVo>();
-                RouterVo children = new RouterVo();
-                children.setPath(menu.getPath());
-                children.setComponent(menu.getComponent());
-                children.setName(getRouteName(menu.getRouteName(), menu.getPath()));
-                children.setMeta(new MetaVo(
-                        menu.getMenuName(), menu.getIcon(),
-                        org.apache.commons.lang3.Strings.CS.equals("1", menu.getIsCache()), menu.getPath()));
-                children.setQuery(menu.getQuery());
-                childrenList.add(children);
-                router.setChildren(childrenList);
-            }
-            else if (menu.getParentId().intValue() == MENU_ROOT_ID && isInnerLink(menu)) {
-
-                router.setMeta(new MetaVo(menu.getMenuName(), menu.getIcon()));
-                router.setPath("/");
-                List<RouterVo> childrenList = new ArrayList<RouterVo>();
-                RouterVo children = new RouterVo();
-                String routerPath = innerLinkReplaceEach(menu.getPath());
-                children.setPath(routerPath);
-                children.setComponent(UserConstants.INNER_LINK);
-                children.setName(getRouteName(menu.getRouteName(), routerPath));
-                children.setMeta(new MetaVo(menu.getMenuName(), menu.getIcon(), menu.getPath()));
-                childrenList.add(children);
-                router.setChildren(childrenList);
             }
             routers.add(router);
         }
@@ -384,11 +353,6 @@ public class SysMenuService {
      */
     public String getRouteName(SysMenuEntity menu) {
 
-        // 非外链并且是一级目录（类型为目录）
-        if (isMenuFrame(menu)) {
-
-            return "";
-        }
         return getRouteName(menu.getRouteName(), menu.getPath());
     }
 
@@ -402,90 +366,6 @@ public class SysMenuService {
 
         String routerName = org.springframework.util.StringUtils.hasText(name) ? name : path;
         return org.springframework.util.StringUtils.capitalize(routerName);
-    }
-
-    /**
-     * 获取路由地址
-     * @param menu 菜单信息
-     * @return 路由地址
-     */
-    public String getRouterPath(SysMenuEntity menu) {
-
-        String routerPath = menu.getPath();
-        // 内链打开外网方式
-        if (menu.getParentId().intValue() != MENU_ROOT_ID && isInnerLink(menu)) {
-
-            routerPath = innerLinkReplaceEach(routerPath);
-        }
-        // 非外链并且是一级目录（类型为目录）
-        if (MENU_ROOT_ID == menu.getParentId().intValue() && UserConstants.TYPE_DIR.equals(menu.getMenuType())
-                && UserConstants.NO_FRAME.equals(menu.getIsFrame())) {
-
-            routerPath = "/" + menu.getPath();
-        }
-        // 非外链并且是一级目录（类型为菜单）
-        else if (isMenuFrame(menu)) {
-
-            routerPath = "/";
-        }
-        return routerPath;
-    }
-
-    /**
-     * 获取组件信息
-     * @param menu 菜单信息
-     * @return 组件信息
-     */
-    public String getComponent(SysMenuEntity menu) {
-
-        String component = UserConstants.LAYOUT;
-        if (org.springframework.util.StringUtils.hasText(menu.getComponent()) && !isMenuFrame(menu)) {
-
-            component = menu.getComponent();
-        }
-        else if (!org.springframework.util.StringUtils.hasText(menu.getComponent())
-                && menu.getParentId().intValue() != MENU_ROOT_ID && isInnerLink(menu)) {
-
-            component = UserConstants.INNER_LINK;
-        }
-        else if (!org.springframework.util.StringUtils.hasText(menu.getComponent()) && isParentView(menu)) {
-
-            component = UserConstants.PARENT_VIEW;
-        }
-        return component;
-    }
-
-    /**
-     * 是否为菜单内部跳转
-     * @param menu 菜单信息
-     * @return 结果
-     */
-    public boolean isMenuFrame(SysMenuEntity menu) {
-
-        return menu.getParentId().intValue() == MENU_ROOT_ID && UserConstants.TYPE_MENU.equals(menu.getMenuType())
-                && menu.getIsFrame().equals(UserConstants.NO_FRAME);
-    }
-
-    /**
-     * 是否为parent_view组件
-     * @param menu 菜单信息
-     * @return 结果
-     */
-    public boolean isParentView(SysMenuEntity menu) {
-
-        return menu.getParentId().intValue() != MENU_ROOT_ID && UserConstants.TYPE_DIR.equals(menu.getMenuType());
-    }
-
-    /**
-     * 是否为内链组件
-     * @param menu 菜单信息
-     * @return 结果
-     */
-    public boolean isInnerLink(SysMenuEntity menu) {
-
-        return menu.getIsFrame().equals(UserConstants.NO_FRAME)
-                && org.apache.commons.lang3.Strings.CS.startsWithAny(
-                        menu.getPath(), Constants.HTTP, Constants.HTTPS);
     }
 
     /**
@@ -555,17 +435,6 @@ public class SysMenuService {
         return getChildList(list, t).size() > 0;
     }
 
-    /**
-     * 内链域名特殊字符替换
-     * @return 替换后的内链域名
-     */
-    public String innerLinkReplaceEach(String path) {
-
-        return org.apache.commons.lang3.StringUtils.replaceEach(
-                path, new String[] { Constants.HTTP, Constants.HTTPS, Constants.WWW, ".", ":" },
-                new String[] { "", "", "", "/", "/" });
-    }
-
     private SysMenuEntity toEntity(MenuSaveRequest request) {
         SysMenuEntity entity = new SysMenuEntity();
         entity.setMenuId(request.getMenuId());
@@ -574,9 +443,7 @@ public class SysMenuService {
         entity.setOrderNum(request.getOrderNum());
         entity.setPath(request.getPath());
         entity.setComponent(request.getComponent());
-        entity.setQuery(request.getQuery());
         entity.setRouteName(request.getRouteName());
-        entity.setIsFrame(request.getIsFrame());
         entity.setIsCache(request.getIsCache());
         entity.setMenuType(request.getMenuType());
         entity.setVisible(request.getVisible());

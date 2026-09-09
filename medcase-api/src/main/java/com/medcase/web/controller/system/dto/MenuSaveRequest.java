@@ -28,11 +28,7 @@ public class MenuSaveRequest {
     @Size(max = 200, message = "组件路径不能超过255个字符")
     private String component;
 
-    private String query;
-
     private String routeName;
-
-    private String isFrame;
 
     private String isCache;
 

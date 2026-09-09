@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.medcase.common.annotation.Log;
-import com.medcase.common.constant.Constants;
 import com.medcase.common.constant.UserConstants;
 import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
@@ -86,11 +85,6 @@ public class SysMenuController {
         if (!menuService.checkMenuNameUnique(menu)) {
             throw ExceptionUtil.business(ErrorCodeEnums.MENU_NAME_EXISTS);
         }
-        else if (UserConstants.YES_FRAME.equals(menu.getIsFrame())
-                && !org.apache.commons.lang3.Strings.CS.startsWithAny(
-                menu.getPath(), Constants.HTTP, Constants.HTTPS)) {
-            throw ExceptionUtil.business(ErrorCodeEnums.MENU_FRAME_URL_INVALID);
-        }
         else if (!menuService.checkRouteConfigUnique(menu)) {
             throw ExceptionUtil.business(ErrorCodeEnums.MENU_ROUTE_EXISTS);
         }
@@ -109,11 +103,6 @@ public class SysMenuController {
 
         if (!menuService.checkMenuNameUnique(menu)) {
             throw ExceptionUtil.business(ErrorCodeEnums.MENU_NAME_EXISTS);
-        }
-        else if (UserConstants.YES_FRAME.equals(menu.getIsFrame())
-                && !org.apache.commons.lang3.Strings.CS.startsWithAny(
-                menu.getPath(), Constants.HTTP, Constants.HTTPS)) {
-            throw ExceptionUtil.business(ErrorCodeEnums.MENU_FRAME_URL_INVALID);
         }
         else if (menu.getMenuId().equals(menu.getParentId())) {
             throw ExceptionUtil.business(ErrorCodeEnums.MENU_PARENT_SELF);
