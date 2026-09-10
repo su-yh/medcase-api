@@ -1,7 +1,6 @@
 package com.medcase.system;
 
 import com.medcase.system.entity.SysMenuEntity;
-import com.medcase.system.domain.vo.RouterVo;
 import com.medcase.web.controller.system.dto.MenuSaveRequest;
 import org.junit.jupiter.api.Test;
 
@@ -20,7 +19,7 @@ class MenuRouteCleanupContractTest {
         assertThat(findField(SysMenuEntity.class, "isFrame")).isNull();
         assertThat(findField(MenuSaveRequest.class, "query")).isNull();
         assertThat(findField(MenuSaveRequest.class, "isFrame")).isNull();
-        assertThat(findField(RouterVo.class, "query")).isNull();
+        assertThat(Files.exists(Path.of("src/main/java/com/medcase/system/domain/vo/RouterVo.java"))).isFalse();
     }
 
     @Test
@@ -28,7 +27,9 @@ class MenuRouteCleanupContractTest {
         assertThat(findField(SysMenuEntity.class, "id")).isNotNull();
         assertThat(findField(SysMenuEntity.class, "routePath")).isNotNull();
         assertThat(findField(SysMenuEntity.class, "vueComponentPath")).isNotNull();
-        assertThat(SysMenuEntity.class.getDeclaredField("visible").getType()).isEqualTo(boolean.class);
+        assertThat(SysMenuEntity.class.getDeclaredField("visible").getType()).isEqualTo(Boolean.class);
+        assertThat(findField(SysMenuEntity.class, "children")).isNull();
+        assertThat(findField(SysMenuEntity.class, "parentName")).isNull();
 
         assertThat(findField(MenuSaveRequest.class, "id")).isNotNull();
         assertThat(findField(MenuSaveRequest.class, "routePath")).isNotNull();
@@ -37,11 +38,14 @@ class MenuRouteCleanupContractTest {
     }
 
     @Test
-    void routerResponseUsesBackendMenuFieldNames() {
-        assertThat(findField(RouterVo.class, "routePath")).isNotNull();
-        assertThat(findField(RouterVo.class, "vueComponentPath")).isNotNull();
-        assertThat(findField(RouterVo.class, "path")).isNull();
-        assertThat(findField(RouterVo.class, "component")).isNull();
+    void menuEndpointsReturnFlatMenuEntities() throws IOException {
+        String loginController = Files.readString(Path.of(
+                "src/main/java/com/medcase/web/controller/system/SysLoginController.java"));
+        String menuController = Files.readString(Path.of(
+                "src/main/java/com/medcase/web/controller/system/SysMenuController.java"));
+
+        assertThat(loginController).contains("public List<SysMenuEntity> getRouters");
+        assertThat(menuController).contains("public List<SysMenuEntity> treeselect");
     }
 
     @Test
@@ -52,9 +56,18 @@ class MenuRouteCleanupContractTest {
                 "src/main/java/com/medcase/system/service/SysMenuService.java"));
 
         assertThat(mapperXml).doesNotContain("is_frame", "`query`", "property=\"isFrame\"", "property=\"query\"");
+        assertThat(mapperXml).doesNotContain("property=\"parentName\"");
         assertThat(menuService).doesNotContain(
                 "isMenuFrame", "isParentView", "isInnerLink", "innerLinkReplaceEach",
-                "UserConstants.LAYOUT", "UserConstants.PARENT_VIEW", "UserConstants.INNER_LINK");
+                "UserConstants.LAYOUT", "UserConstants.PARENT_VIEW", "UserConstants.INNER_LINK",
+                "RouterVo", "TreeSelect", "MetaVo", "buildMenus", "buildMenuTreeSelect");
+    }
+
+    @Test
+    void menuTreeConversionIsNotKeptInBackendService() throws IOException {
+        String menuService = Files.readString(Path.of(
+                "src/main/java/com/medcase/system/service/SysMenuService.java"));
+        assertThat(menuService).doesNotContain("buildMenus", "buildMenuTreeSelect", "RouterVo", "TreeSelect");
     }
 
     @Test
@@ -90,4 +103,5 @@ class MenuRouteCleanupContractTest {
             return null;
         }
     }
+
 }

@@ -10,7 +10,6 @@ import com.medcase.framework.web.service.SysPermissionService;
 import com.medcase.framework.web.service.TokenService;
 import com.medcase.framework.web.service.UserLoginService;
 import com.medcase.mvc.authentication.annotation.CurrLoginUser;
-import com.medcase.system.domain.vo.RouterVo;
 import com.medcase.system.entity.SysMenuEntity;
 import com.medcase.system.entity.SysUserEntity;
 import com.medcase.system.service.SysConfigService;
@@ -106,11 +105,9 @@ public class SysLoginController {
      */
     @PreAuthorize("@dp.hasAnyUserType(#loginUser, T(com.medcase.common.enums.UserTypeEnums).ADMIN)")
     @GetMapping("getRouters")
-    public List<RouterVo> getRouters(
+    public List<SysMenuEntity> getRouters(
             @CurrLoginUser LoginUser loginUser) {
-
-        List<SysMenuEntity> menus = menuService.selectMenuTreeByUserId(loginUser.getUserId());
-        return menuService.buildMenus(menus);
+        return menuService.selectMenuTreeByUserId(loginUser.getUserId());
     }
 
     // 获取用户密码自定义配置规则

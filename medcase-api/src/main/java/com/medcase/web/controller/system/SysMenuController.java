@@ -16,7 +16,6 @@ import com.medcase.common.annotation.Log;
 import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
-import com.medcase.common.core.domain.TreeSelect;
 import com.medcase.common.enums.BusinessType;
 import com.medcase.mvc.authentication.annotation.CurrLoginUser;
 import com.medcase.system.entity.SysMenuEntity;
@@ -64,12 +63,10 @@ public class SysMenuController {
      */
     @PreAuthorize("@dp.hasAnyUserType(#loginUser, T(com.medcase.common.enums.UserTypeEnums).ADMIN)")
     @GetMapping("/treeselect")
-    public List<TreeSelect> treeselect(
+    public List<SysMenuEntity> treeselect(
             MenuQueryRequest menu,
             @CurrLoginUser LoginUser loginUser) {
-
-        List<SysMenuEntity> menus = menuService.selectMenuList(menu, loginUser.getUserId());
-        return menuService.buildMenuTreeSelect(menus);
+        return menuService.selectMenuList(menu, loginUser.getUserId());
     }
 
     /**

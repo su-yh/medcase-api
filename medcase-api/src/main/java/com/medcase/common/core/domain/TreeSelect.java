@@ -6,7 +6,6 @@ import java.util.stream.Collectors;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.medcase.common.constant.UserConstants;
 import com.medcase.system.entity.SysDeptEntity;
-import com.medcase.system.entity.SysMenuEntity;
 import lombok.Data;
 
 /**
@@ -42,13 +41,6 @@ public class TreeSelect implements Serializable {
         this.label = dept.getDeptName();
         this.disabled = UserConstants.DEPT_DISABLE.equals(dept.getStatus());
         this.children = dept.getChildren().stream().map(TreeSelect::new).collect(Collectors.toList());
-    }
-
-    public TreeSelect(SysMenuEntity menu) {
-
-        this.id = menu.getId();
-        this.label = menu.getMenuName();
-        this.children = menu.getChildren().stream().map(TreeSelect::new).collect(Collectors.toList());
     }
 
 }
