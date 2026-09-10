@@ -10,8 +10,7 @@ import com.medcase.system.mapper.SysMenuMapper;
 import com.medcase.system.mapper.SysRoleMenuMapper;
 import com.medcase.web.controller.system.dto.MenuQueryRequest;
 import com.medcase.web.controller.system.dto.MenuSaveRequest;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,12 +24,8 @@ import java.util.Set;
  * 菜单 业务层处理
  */
 @Service
+@Slf4j
 public class SysMenuService {
-
-    private static final Logger log = LoggerFactory.getLogger(SysMenuService.class);
-
-    public static final String PREMISSION_STRING = "perms[\"{0}\"]";
-
     public static final Long MENU_ROOT_ID = 0L;
 
     @Autowired
@@ -45,7 +40,6 @@ public class SysMenuService {
      * @return 菜单列表
      */
     public List<SysMenuEntity> selectMenuList(Long userId) {
-
         return selectMenuList(new MenuQueryRequest(), userId);
     }
 
@@ -55,15 +49,12 @@ public class SysMenuService {
      * @return 菜单列表
      */
     public List<SysMenuEntity> selectMenuList(MenuQueryRequest menu, Long userId) {
-
-        List<SysMenuEntity> menuList = null;
+        List<SysMenuEntity> menuList;
         // 管理员显示所有菜单信息
         if (SecurityUtils.isAdmin(userId)) {
-
             menuList = menuMapper.selectMenuList(menu);
         }
         else {
-
             menuList = menuMapper.selectMenuListByUserId(menu, userId);
         }
         return menuList;
@@ -75,13 +66,10 @@ public class SysMenuService {
      * @return 权限列表
      */
     public Set<String> selectMenuPermsByUserId(Long userId) {
-
         List<String> perms = menuMapper.selectMenuPermsByUserId(userId);
         Set<String> permsSet = new HashSet<>();
         for (String perm : perms) {
-
             if (org.springframework.util.StringUtils.hasText(perm)) {
-
                 permsSet.addAll(Arrays.asList(perm.trim().split(",")));
             }
         }
@@ -94,13 +82,10 @@ public class SysMenuService {
      * @return 权限列表
      */
     public Set<String> selectMenuPermsByRoleId(Long roleId) {
-
         List<String> perms = menuMapper.selectMenuPermsByRoleId(roleId);
         Set<String> permsSet = new HashSet<>();
         for (String perm : perms) {
-
             if (org.springframework.util.StringUtils.hasText(perm)) {
-
                 permsSet.addAll(Arrays.asList(perm.trim().split(",")));
             }
         }
@@ -143,7 +128,6 @@ public class SysMenuService {
      * @return 结果
      */
     public boolean checkMenuExistRole(Long menuId) {
-
         int result = Math.toIntExact(roleMenuMapper.countByMenuId(menuId));
         return result > 0;
     }
@@ -154,10 +138,8 @@ public class SysMenuService {
      * @return 结果
      */
     public int insertMenu(MenuSaveRequest menu) {
-
         SysMenuEntity entity = toEntity(menu);
-        int row = menuMapper.insert(entity);
-        return row;
+        return menuMapper.insert(entity);
     }
 
     /**
@@ -166,7 +148,6 @@ public class SysMenuService {
      * @return 结果
      */
     public int updateMenu(MenuSaveRequest menu) {
-
         return menuMapper.updateById(toEntity(menu));
     }
 
@@ -177,17 +158,11 @@ public class SysMenuService {
      */
     @Transactional
     public void updateMenuSort(String[] menuIds, String[] orderNums) {
-
         try {
-
             for (int i = 0; i < menuIds.length; i++) {
-
-                menuMapper.updateMenuSort(
-                        Convert.toLong(menuIds[i]), Convert.toInt(orderNums[i]));
+                menuMapper.updateMenuSort(Convert.toLong(menuIds[i]), Convert.toInt(orderNums[i]));
             }
-        }
-        catch (Exception e) {
-
+        } catch (Exception e) {
             throw ExceptionUtil.business(ErrorCodeEnums.MENU_SORT_SAVE_FAILED);
         }
     }
@@ -198,7 +173,6 @@ public class SysMenuService {
      * @return 结果
      */
     public int deleteMenuById(Long menuId) {
-
         return menuMapper.deleteById(menuId);
     }
 
@@ -208,11 +182,9 @@ public class SysMenuService {
      * @return 结果
      */
     public boolean checkMenuNameUnique(MenuSaveRequest menu) {
-
         Long menuId = menu.getId() == null ? -1L : menu.getId();
         SysMenuEntity info = menuMapper.selectMenuByName(menu.getMenuName(), menu.getParentId());
         if (info != null && info.getId().longValue() != menuId.longValue()) {
-
             return UserConstants.NOT_UNIQUE;
         }
         return UserConstants.UNIQUE;
@@ -224,7 +196,6 @@ public class SysMenuService {
      * @return 结果
      */
     public boolean checkRouteConfigUnique(MenuSaveRequest menu) {
-
         if (!UserConstants.TYPE_MENU.equals(menu.getMenuType())) {
             return UserConstants.UNIQUE;
         }
@@ -238,25 +209,20 @@ public class SysMenuService {
         String routeName = menu.getRouteName();
         List<SysMenuEntity> sysMenuList = menuMapper.selectMenusByPathOrRouteName(routePath, routeName);
         for (SysMenuEntity sysMenu : sysMenuList) {
-
             if (sysMenu.getId().longValue() != menuId.longValue()) {
-
                 Long dbParentId = sysMenu.getParentId();
                 String dbRoutePath = sysMenu.getRoutePath();
                 if (org.apache.commons.lang3.Strings.CI.equalsAny(routePath, dbRoutePath)
                         && parentId.longValue() == dbParentId.longValue()) {
-
                     log.warn("[同级路由冲突] 同级下已存在相同路由路径 '{}'，冲突菜单：{}", dbRoutePath, sysMenu.getMenuName());
                     return UserConstants.NOT_UNIQUE;
                 }
                 else if (org.apache.commons.lang3.Strings.CI.equalsAny(routePath, dbRoutePath)
                         && parentId.longValue() == MENU_ROOT_ID) {
-
                     log.warn("[根目录路由冲突] 根目录下路由 '{}' 必须唯一，已被菜单 '{}' 占用", routePath, sysMenu.getMenuName());
                     return UserConstants.NOT_UNIQUE;
                 }
                 else if (org.apache.commons.lang3.Strings.CI.equalsAny(routeName, sysMenu.getRouteName())) {
-
                     log.warn("[路由名称冲突] 路由名称 '{}' 需全局唯一，已被菜单 '{}' 使用", routeName, sysMenu.getMenuName());
                     return UserConstants.NOT_UNIQUE;
                 }

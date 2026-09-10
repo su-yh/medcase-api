@@ -1,6 +1,16 @@
 package com.medcase.web.controller.system;
 
-import java.util.List;
+import com.medcase.common.annotation.Log;
+import com.medcase.common.core.domain.model.LoginUser;
+import com.medcase.common.enums.BusinessType;
+import com.medcase.mvc.authentication.annotation.CurrLoginUser;
+import com.medcase.mvc.constants.enums.ErrorCodeEnums;
+import com.medcase.mvc.exception.ExceptionUtil;
+import com.medcase.system.entity.SysMenuEntity;
+import com.medcase.system.service.SysMenuService;
+import com.medcase.web.controller.system.dto.MenuQueryRequest;
+import com.medcase.web.controller.system.dto.MenuSaveRequest;
+import com.medcase.web.controller.system.dto.MenuSortRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -12,17 +22,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import com.medcase.common.annotation.Log;
-import com.medcase.common.core.domain.model.LoginUser;
-import com.medcase.mvc.constants.enums.ErrorCodeEnums;
-import com.medcase.mvc.exception.ExceptionUtil;
-import com.medcase.common.enums.BusinessType;
-import com.medcase.mvc.authentication.annotation.CurrLoginUser;
-import com.medcase.system.entity.SysMenuEntity;
-import com.medcase.system.service.SysMenuService;
-import com.medcase.web.controller.system.dto.MenuQueryRequest;
-import com.medcase.web.controller.system.dto.MenuSaveRequest;
-import com.medcase.web.controller.system.dto.MenuSortRequest;
+
+import java.util.List;
 
 /**
  * 菜单信息
@@ -43,9 +44,7 @@ public class SysMenuController {
     public List<SysMenuEntity> list(
             MenuQueryRequest menu,
             @CurrLoginUser LoginUser loginUser) {
-
-        List<SysMenuEntity> menus = menuService.selectMenuList(menu, loginUser.getUserId());
-        return menus;
+        return menuService.selectMenuList(menu, loginUser.getUserId());
     }
 
     /**
@@ -54,7 +53,6 @@ public class SysMenuController {
     @PreAuthorize("@ss.hasPermi('system:menu:query')")
     @GetMapping(value = "/{id}")
     public SysMenuEntity getInfo(@PathVariable Long id) {
-
         return menuService.selectMenuById(id);
     }
 
@@ -76,11 +74,9 @@ public class SysMenuController {
     @Log(title = "菜单管理", businessType = BusinessType.INSERT)
     @PostMapping
     public void add(@Validated @RequestBody MenuSaveRequest menu) {
-
         if (!menuService.checkMenuNameUnique(menu)) {
             throw ExceptionUtil.business(ErrorCodeEnums.MENU_NAME_EXISTS);
-        }
-        else if (!menuService.checkRouteConfigUnique(menu)) {
+        } else if (!menuService.checkRouteConfigUnique(menu)) {
             throw ExceptionUtil.business(ErrorCodeEnums.MENU_ROUTE_EXISTS);
         }
         if (menuService.insertMenu(menu) <= 0) {
@@ -95,14 +91,13 @@ public class SysMenuController {
     @Log(title = "菜单管理", businessType = BusinessType.UPDATE)
     @PutMapping
     public void edit(@Validated @RequestBody MenuSaveRequest menu) {
-
         if (!menuService.checkMenuNameUnique(menu)) {
             throw ExceptionUtil.business(ErrorCodeEnums.MENU_NAME_EXISTS);
         }
-        else if (menu.getId().equals(menu.getParentId())) {
+        if (menu.getId().equals(menu.getParentId())) {
             throw ExceptionUtil.business(ErrorCodeEnums.MENU_PARENT_SELF);
         }
-        else if (!menuService.checkRouteConfigUnique(menu)) {
+        if (!menuService.checkRouteConfigUnique(menu)) {
             throw ExceptionUtil.business(ErrorCodeEnums.MENU_ROUTE_EXISTS);
         }
         if (menuService.updateMenu(menu) <= 0) {
@@ -117,7 +112,6 @@ public class SysMenuController {
     @Log(title = "保存菜单排序", businessType = BusinessType.UPDATE)
     @PutMapping("/updateSort")
     public void updateSort(@Validated @RequestBody MenuSortRequest request) {
-
         String[] menuIds = request.getMenuIds().split(",");
         String[] orderNums = request.getOrderNums().split(",");
         menuService.updateMenuSort(menuIds, orderNums);
@@ -130,7 +124,6 @@ public class SysMenuController {
     @Log(title = "菜单管理", businessType = BusinessType.DELETE)
     @DeleteMapping("/{id}")
     public void remove(@PathVariable("id") Long id) {
-
         if (menuService.hasChildByMenuId(id)) {
             throw ExceptionUtil.business(ErrorCodeEnums.MENU_HAS_CHILDREN);
         }
