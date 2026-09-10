@@ -49,15 +49,10 @@ public class SysMenuService {
      * @return 菜单列表
      */
     public List<SysMenuEntity> selectMenuList(MenuQueryRequest menu, Long userId) {
-        List<SysMenuEntity> menuList;
         // 管理员显示所有菜单信息
-        if (SecurityUtils.isAdmin(userId)) {
-            menuList = menuMapper.selectMenuList(menu);
-        }
-        else {
-            menuList = menuMapper.selectMenuListByUserId(menu, userId);
-        }
-        return menuList;
+        return SecurityUtils.isAdmin(userId)
+                ? menuMapper.selectMenuList(menu)
+                : menuMapper.selectMenuListByUserId(menu, userId);
     }
 
     /**
