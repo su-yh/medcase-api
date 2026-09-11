@@ -2,8 +2,8 @@ package com.medcase.web.controller.monitor;
 
 import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
+import com.medcase.mvc.audit.AuditLogEntity;
 import com.medcase.web.controller.monitor.dto.AuditLogQueryRequest;
-import com.medcase.web.controller.monitor.dto.AuditLogResponse;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
@@ -20,7 +20,7 @@ class AuditLogControllerContractTest {
 
         assertEquals(PageResult.class, method.getReturnType());
         ParameterizedType pageResultType = (ParameterizedType) method.getGenericReturnType();
-        assertEquals(AuditLogResponse.class, pageResultType.getActualTypeArguments()[0]);
+        assertEquals(AuditLogEntity.class, pageResultType.getActualTypeArguments()[0]);
     }
 
     @Test

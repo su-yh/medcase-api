@@ -2,10 +2,10 @@ package com.medcase.web.controller.monitor;
 
 import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
+import com.medcase.mvc.audit.AuditLogEntity;
 import com.medcase.web.controller.monitor.dto.LogininforQueryRequest;
 import com.medcase.web.controller.monitor.dto.LogininforResponse;
 import com.medcase.web.controller.monitor.dto.AuditLogQueryRequest;
-import com.medcase.web.controller.monitor.dto.AuditLogResponse;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
@@ -17,7 +17,7 @@ class SystemMonitorPageControllerTest {
     @Test
     void monitorListControllersShouldUsePageParam() throws NoSuchMethodException {
         assertListMethod(SysLogininforController.class, LogininforQueryRequest.class, LogininforResponse.class);
-        assertListMethod(AuditLogController.class, AuditLogQueryRequest.class, AuditLogResponse.class);
+        assertListMethod(AuditLogController.class, AuditLogQueryRequest.class, AuditLogEntity.class);
     }
 
     private void assertListMethod(

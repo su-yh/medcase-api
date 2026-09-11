@@ -19,8 +19,6 @@ public class AuditLogService {
 
     public PageResult<AuditLogEntity> selectPage(
             PageParam pageParam, AuditLogQueryRequest request) {
-        return auditLogMapper.selectPage(
-                pageParam, request.getUserNicknameLike(), request.getOperationLike(),
-                request.getReqPathLike(), request.getBeginTime(), request.getEndTime());
+        return auditLogMapper.selectPage(pageParam, request);
     }
 }
