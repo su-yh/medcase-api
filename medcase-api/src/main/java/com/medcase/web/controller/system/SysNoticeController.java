@@ -13,12 +13,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-import com.medcase.common.annotation.Log;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
 import com.medcase.common.core.text.Convert;
-import com.medcase.common.enums.BusinessType;
 import com.medcase.common.core.domain.model.LoginUser;
+import com.medcase.mvc.audit.AuditOperation;
 import com.medcase.mvc.authentication.annotation.CurrLoginUser;
 import com.medcase.system.entity.SysNoticeEntity;
 import com.medcase.system.service.SysNoticeReadService;
@@ -31,6 +30,7 @@ import com.medcase.web.controller.system.dto.NoticeResponse;
 import com.medcase.web.controller.system.dto.NoticeSaveRequest;
 import com.medcase.web.controller.system.dto.NoticeTopItemResponse;
 import com.medcase.web.controller.system.dto.NoticeTopResponse;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * 公告 信息操作处理
@@ -75,10 +75,15 @@ public class SysNoticeController {
     /**
      * 新增通知公告
      */
+    @AuditOperation("@audit.auditRecord(" +
+            "T(com.medcase.mvc.audit.AuditEnums).CREATE_NOTICE, " +
+            "#spelReturnValue, #servletRequest, #loginUser, #request)")
     @PreAuthorize("@ss.hasPermi('system:notice:add')")
-    @Log(title = "通知公告", businessType = BusinessType.INSERT)
     @PostMapping
-    public void add(@Validated @RequestBody NoticeSaveRequest request) {
+    public void add(
+            HttpServletRequest servletRequest,
+            @CurrLoginUser LoginUser loginUser,
+            @Validated @RequestBody NoticeSaveRequest request) {
 
         SysNoticeEntity notice = toEntity(request);
         if (noticeService.insertNotice(notice) <= 0) {
@@ -89,10 +94,15 @@ public class SysNoticeController {
     /**
      * 修改通知公告
      */
+    @AuditOperation("@audit.auditRecord(" +
+            "T(com.medcase.mvc.audit.AuditEnums).UPDATE_NOTICE, " +
+            "#spelReturnValue, #servletRequest, #loginUser, #request)")
     @PreAuthorize("@ss.hasPermi('system:notice:edit')")
-    @Log(title = "通知公告", businessType = BusinessType.UPDATE)
     @PutMapping
-    public void edit(@Validated @RequestBody NoticeSaveRequest request) {
+    public void edit(
+            HttpServletRequest servletRequest,
+            @CurrLoginUser LoginUser loginUser,
+            @Validated @RequestBody NoticeSaveRequest request) {
 
         SysNoticeEntity notice = toEntity(request);
         if (noticeService.updateNotice(notice) <= 0) {
@@ -162,10 +172,15 @@ public class SysNoticeController {
     /**
      * 删除通知公告
      */
+    @AuditOperation("@audit.auditRecord(" +
+            "T(com.medcase.mvc.audit.AuditEnums).DELETE_NOTICE, " +
+            "#spelReturnValue, #servletRequest, #loginUser, #noticeIds)")
     @PreAuthorize("@ss.hasPermi('system:notice:remove')")
-    @Log(title = "通知公告", businessType = BusinessType.DELETE)
     @DeleteMapping("/{noticeIds}")
-    public void remove(@PathVariable Long[] noticeIds) {
+    public void remove(
+            HttpServletRequest servletRequest,
+            @CurrLoginUser LoginUser loginUser,
+            @PathVariable Long[] noticeIds) {
 
         noticeReadService.deleteByNoticeIds(noticeIds);
         if (noticeService.deleteNoticeByIds(noticeIds) <= 0) {

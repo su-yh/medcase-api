@@ -17,7 +17,6 @@ class SystemServiceStructureTest {
                 "SysMenuService",
                 "SysNoticeReadService",
                 "SysNoticeService",
-                "SysOperLogService",
                 "SysPostService",
                 "SysRoleService",
                 "SysUserOnlineService",

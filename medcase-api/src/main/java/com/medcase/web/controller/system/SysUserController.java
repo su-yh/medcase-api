@@ -1,9 +1,7 @@
 package com.medcase.web.controller.system;
 
-import com.medcase.common.annotation.Log;
 import com.medcase.common.core.domain.TreeSelect;
 import com.medcase.common.core.domain.model.LoginUser;
-import com.medcase.common.enums.BusinessType;
 import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
 import com.medcase.mvc.audit.AuditOperation;
@@ -126,7 +124,6 @@ public class SysUserController {
             "T(com.medcase.mvc.audit.AuditEnums).CREATE_ADMIN_USER, " +
             "#spelReturnValue, #request, #loginUser, #user)")
     @PreAuthorize("@ss.hasPermi('system:user:add')")
-    @Log(title = "用户管理", businessType = BusinessType.INSERT)
     @PostMapping
     public void add(
             HttpServletRequest request,
@@ -151,10 +148,15 @@ public class SysUserController {
     /**
      * 修改用户
      */
+    @AuditOperation("@audit.auditRecord(" +
+            "T(com.medcase.mvc.audit.AuditEnums).UPDATE_ADMIN_USER, " +
+            "#spelReturnValue, #request, #loginUser, #user)")
     @PreAuthorize("@ss.hasPermi('system:user:edit')")
-    @Log(title = "用户管理", businessType = BusinessType.UPDATE)
     @PutMapping
-    public void edit(@Validated @RequestBody UserSaveRequest user) {
+    public void edit(
+            HttpServletRequest request,
+            @CurrLoginUser LoginUser loginUser,
+            @Validated @RequestBody UserSaveRequest user) {
 
         user.setPassword(null);
 
@@ -176,11 +178,14 @@ public class SysUserController {
     /**
      * 删除用户
      */
+    @AuditOperation("@audit.auditRecord(" +
+            "T(com.medcase.mvc.audit.AuditEnums).DELETE_ADMIN_USER, " +
+            "#spelReturnValue, #request, #loginUser, #userIds)")
     @PreAuthorize("@dp.hasAnyUserType(#loginUser, T(com.medcase.common.enums.UserTypeEnums).ADMIN) " +
             "&& @ss.hasPermi('system:user:remove')")
-    @Log(title = "用户管理", businessType = BusinessType.DELETE)
     @DeleteMapping("/{userIds}")
     public void remove(
+            HttpServletRequest request,
             @PathVariable Long[] userIds,
             @CurrLoginUser LoginUser loginUser) {
 
@@ -195,11 +200,14 @@ public class SysUserController {
     /**
      * 重置密码
      */
+    @AuditOperation("@audit.auditRecord(" +
+            "T(com.medcase.mvc.audit.AuditEnums).RESET_ADMIN_USER_PASSWORD, " +
+            "#spelReturnValue, #request, #loginUser, #user)")
     @PreAuthorize("@dp.hasAnyUserType(#loginUser, T(com.medcase.common.enums.UserTypeEnums).ADMIN) " +
             "&& @ss.hasPermi('system:user:resetPwd')")
-    @Log(title = "用户管理", businessType = BusinessType.UPDATE)
     @PutMapping("/resetPwd")
     public void resetPwd(
+            HttpServletRequest request,
             @Validated @RequestBody UserResetPasswordRequest user,
             @CurrLoginUser LoginUser loginUser) {
 
@@ -213,11 +221,14 @@ public class SysUserController {
     /**
      * 状态修改
      */
+    @AuditOperation("@audit.auditRecord(" +
+            "T(com.medcase.mvc.audit.AuditEnums).UPDATE_ADMIN_USER_STATUS, " +
+            "#spelReturnValue, #request, #loginUser, #user)")
     @PreAuthorize("@dp.hasAnyUserType(#loginUser, T(com.medcase.common.enums.UserTypeEnums).ADMIN) " +
             "&& @ss.hasPermi('system:user:edit')")
-    @Log(title = "用户管理", businessType = BusinessType.UPDATE)
     @PutMapping("/changeStatus")
     public void changeStatus(
+            HttpServletRequest request,
             @Validated @RequestBody UserStatusRequest user,
             @CurrLoginUser LoginUser loginUser) {
 
@@ -242,10 +253,16 @@ public class SysUserController {
     /**
      * 用户授权角色
      */
+    @AuditOperation("@audit.auditRecord(" +
+            "T(com.medcase.mvc.audit.AuditEnums).UPDATE_ADMIN_USER_ROLES, " +
+            "#spelReturnValue, #request, #loginUser, #userId, #roleIds)")
     @PreAuthorize("@ss.hasPermi('system:user:edit')")
-    @Log(title = "用户管理", businessType = BusinessType.GRANT)
     @PutMapping("/authRole")
-    public void insertAuthRole(Long userId, Long[] roleIds) {
+    public void insertAuthRole(
+            HttpServletRequest request,
+            @CurrLoginUser LoginUser loginUser,
+            Long userId,
+            Long[] roleIds) {
 
         userService.insertUserAuth(userId, roleIds);
     }

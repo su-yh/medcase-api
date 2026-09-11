@@ -3,7 +3,6 @@ package com.medcase.system.service;
 import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
 import com.medcase.system.entity.SysLogininforEntity;
-import com.medcase.system.entity.SysOperLogEntity;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
@@ -15,8 +14,6 @@ class SystemMonitorPageServiceTest {
     void monitorServicesShouldUsePageParam() throws NoSuchMethodException {
         assertPageMethod(SysLogininforService.class, SysLogininforEntity.class,
                 String.class, String.class, String.class, String.class, String.class);
-        assertPageMethod(SysOperLogService.class, SysOperLogEntity.class,
-                String.class, String.class, Integer.class, Integer.class, String.class, String.class, String.class);
     }
 
     private void assertPageMethod(

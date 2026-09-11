@@ -1,8 +1,10 @@
 package com.medcase.web.controller.monitor;
 
-import com.medcase.common.annotation.Log;
-import com.medcase.common.enums.BusinessType;
+import jakarta.servlet.http.HttpServletRequest;
+import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.framework.web.service.SysPasswordService;
+import com.medcase.mvc.audit.AuditOperation;
+import com.medcase.mvc.authentication.annotation.CurrLoginUser;
 import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
@@ -36,7 +38,6 @@ public class SysLogininforController {
     @PreAuthorize("@ss.hasPermi('monitor:logininfor:list')")
     @GetMapping("/list")
     public PageResult<LogininforResponse> list(PageParam pageParam, LogininforQueryRequest request) {
-
         PageResult<SysLogininforEntity> entityPage = logininforService.selectPage(
                 pageParam, request.getIpaddr(), request.getStatus(), request.getUserName(),
                 request.getBeginTime(), request.getEndTime());
@@ -49,28 +50,39 @@ public class SysLogininforController {
     }
 
     @PreAuthorize("@ss.hasPermi('monitor:logininfor:remove')")
-    @Log(title = "登录日志", businessType = BusinessType.DELETE)
+    @AuditOperation("@audit.auditRecord(" +
+            "T(com.medcase.mvc.audit.AuditEnums).DELETE_LOGIN_LOG, " +
+            "#spelReturnValue, #servletRequest, #loginUser, #infoIds)")
     @DeleteMapping("/{infoIds}")
-    public void remove(@PathVariable Long[] infoIds) {
-
+    public void remove(
+            HttpServletRequest servletRequest,
+            @CurrLoginUser LoginUser loginUser,
+            @PathVariable Long[] infoIds) {
         if (logininforService.deleteLogininforByIds(infoIds) <= 0) {
             throw ExceptionUtil.business(ErrorCodeEnums.OPERATION_FAILED);
         }
     }
 
     @PreAuthorize("@ss.hasPermi('monitor:logininfor:remove')")
-    @Log(title = "登录日志", businessType = BusinessType.CLEAN)
+    @AuditOperation("@audit.auditRecord(" +
+            "T(com.medcase.mvc.audit.AuditEnums).CLEAN_LOGIN_LOG, " +
+            "#spelReturnValue, #servletRequest, #loginUser)")
     @DeleteMapping("/clean")
-    public void clean() {
-
+    public void clean(
+            HttpServletRequest servletRequest,
+            @CurrLoginUser LoginUser loginUser) {
         logininforService.cleanLogininfor();
     }
 
     @PreAuthorize("@ss.hasPermi('monitor:logininfor:unlock')")
-    @Log(title = "账户解锁", businessType = BusinessType.OTHER)
+    @AuditOperation("@audit.auditRecord(" +
+            "T(com.medcase.mvc.audit.AuditEnums).UNLOCK_LOGIN_USER, " +
+            "#spelReturnValue, #servletRequest, #loginUser, #userName)")
     @GetMapping("/unlock/{userName}")
-    public void unlock(@PathVariable("userName") String userName) {
-
+    public void unlock(
+            HttpServletRequest servletRequest,
+            @CurrLoginUser LoginUser loginUser,
+            @PathVariable("userName") String userName) {
         passwordService.clearLoginRecordCache(userName);
     }
 }

@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import jakarta.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Parameter;
@@ -85,7 +86,8 @@ class SysRoleControllerPageTest {
         Method select = SysRoleController.class.getMethod(
                 "getRoleMenuIds", Long.class, LoginUser.class);
         Method update = SysRoleController.class.getMethod(
-                "updateRoleMenus", Long.class, RoleMenuUpdateRequest.class, LoginUser.class);
+                "updateRoleMenus", HttpServletRequest.class, Long.class,
+                RoleMenuUpdateRequest.class, LoginUser.class);
 
         assertTrue(Arrays.asList(select.getAnnotation(GetMapping.class).value())
                 .contains("/{roleId}/menuIds"));

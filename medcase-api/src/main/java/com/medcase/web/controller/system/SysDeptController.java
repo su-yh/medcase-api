@@ -13,16 +13,18 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import com.medcase.common.annotation.Log;
 import com.medcase.common.constant.UserConstants;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
-import com.medcase.common.enums.BusinessType;
+import com.medcase.common.core.domain.model.LoginUser;
+import com.medcase.mvc.audit.AuditOperation;
+import com.medcase.mvc.authentication.annotation.CurrLoginUser;
 import com.medcase.system.entity.SysDeptEntity;
 import com.medcase.system.service.SysDeptService;
 import com.medcase.web.controller.system.dto.DeptQueryRequest;
 import com.medcase.web.controller.system.dto.DeptSaveRequest;
 import com.medcase.web.controller.system.dto.DeptSortRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * 部门信息
@@ -75,10 +77,15 @@ public class SysDeptController {
     /**
      * 新增部门
      */
+    @AuditOperation("@audit.auditRecord(" +
+            "T(com.medcase.mvc.audit.AuditEnums).CREATE_DEPT, " +
+            "#spelReturnValue, #servletRequest, #loginUser, #dept)")
     @PreAuthorize("@ss.hasPermi('system:dept:add')")
-    @Log(title = "部门管理", businessType = BusinessType.INSERT)
     @PostMapping
-    public void add(@Validated @RequestBody DeptSaveRequest dept) {
+    public void add(
+            HttpServletRequest servletRequest,
+            @CurrLoginUser LoginUser loginUser,
+            @Validated @RequestBody DeptSaveRequest dept) {
 
         if (!deptService.checkDeptNameUnique(dept)) {
             throw ExceptionUtil.business(ErrorCodeEnums.DEPT_NAME_EXISTS);
@@ -91,10 +98,15 @@ public class SysDeptController {
     /**
      * 修改部门
      */
+    @AuditOperation("@audit.auditRecord(" +
+            "T(com.medcase.mvc.audit.AuditEnums).UPDATE_DEPT, " +
+            "#spelReturnValue, #servletRequest, #loginUser, #dept)")
     @PreAuthorize("@ss.hasPermi('system:dept:edit')")
-    @Log(title = "部门管理", businessType = BusinessType.UPDATE)
     @PutMapping
-    public void edit(@Validated @RequestBody DeptSaveRequest dept) {
+    public void edit(
+            HttpServletRequest servletRequest,
+            @CurrLoginUser LoginUser loginUser,
+            @Validated @RequestBody DeptSaveRequest dept) {
 
         Long deptId = dept.getDeptId();
         if (!deptService.checkDeptNameUnique(dept)) {
@@ -115,10 +127,15 @@ public class SysDeptController {
     /**
      * 保存部门排序
      */
+    @AuditOperation("@audit.auditRecord(" +
+            "T(com.medcase.mvc.audit.AuditEnums).UPDATE_DEPT_SORT, " +
+            "#spelReturnValue, #servletRequest, #loginUser, #request)")
     @PreAuthorize("@ss.hasPermi('system:dept:edit')")
-    @Log(title = "保存部门排序", businessType = BusinessType.UPDATE)
     @PutMapping("/updateSort")
-    public void updateSort(@Validated @RequestBody DeptSortRequest request) {
+    public void updateSort(
+            HttpServletRequest servletRequest,
+            @CurrLoginUser LoginUser loginUser,
+            @Validated @RequestBody DeptSortRequest request) {
 
         String[] deptIds = request.getDeptIds().split(",");
         String[] orderNums = request.getOrderNums().split(",");
@@ -128,10 +145,15 @@ public class SysDeptController {
     /**
      * 删除部门
      */
+    @AuditOperation("@audit.auditRecord(" +
+            "T(com.medcase.mvc.audit.AuditEnums).DELETE_DEPT, " +
+            "#spelReturnValue, #servletRequest, #loginUser, #deptId)")
     @PreAuthorize("@ss.hasPermi('system:dept:remove')")
-    @Log(title = "部门管理", businessType = BusinessType.DELETE)
     @DeleteMapping("/{deptId}")
-    public void remove(@PathVariable Long deptId) {
+    public void remove(
+            HttpServletRequest servletRequest,
+            @CurrLoginUser LoginUser loginUser,
+            @PathVariable Long deptId) {
 
         if (deptService.hasChildByDeptId(deptId)) {
             throw ExceptionUtil.business(ErrorCodeEnums.DEPT_HAS_CHILDREN);

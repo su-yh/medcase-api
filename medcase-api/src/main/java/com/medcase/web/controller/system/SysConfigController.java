@@ -1,16 +1,18 @@
 package com.medcase.web.controller.system;
 
-import com.medcase.common.annotation.Log;
-import com.medcase.common.enums.BusinessType;
+import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
 import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
+import com.medcase.mvc.audit.AuditOperation;
+import com.medcase.mvc.authentication.annotation.CurrLoginUser;
 import com.medcase.system.entity.SysConfigEntity;
 import com.medcase.system.service.SysConfigService;
 import com.medcase.web.controller.system.dto.ConfigQueryRequest;
 import com.medcase.web.controller.system.dto.ConfigResponse;
 import com.medcase.web.controller.system.dto.ConfigSaveRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -74,10 +76,15 @@ public class SysConfigController {
     /**
      * 新增参数配置
      */
+    @AuditOperation("@audit.auditRecord(" +
+            "T(com.medcase.mvc.audit.AuditEnums).CREATE_CONFIG, " +
+            "#spelReturnValue, #servletRequest, #loginUser, #request)")
     @PreAuthorize("@ss.hasPermi('system:config:add')")
-    @Log(title = "参数管理", businessType = BusinessType.INSERT)
     @PostMapping
-    public void add(@Validated @RequestBody ConfigSaveRequest request) {
+    public void add(
+            HttpServletRequest servletRequest,
+            @CurrLoginUser LoginUser loginUser,
+            @Validated @RequestBody ConfigSaveRequest request) {
 
         if (!configService.checkConfigKeyUnique(request.getConfigId(), request.getConfigKey())) {
             throw ExceptionUtil.business(ErrorCodeEnums.CONFIG_KEY_EXISTS);
@@ -91,10 +98,15 @@ public class SysConfigController {
     /**
      * 修改参数配置
      */
+    @AuditOperation("@audit.auditRecord(" +
+            "T(com.medcase.mvc.audit.AuditEnums).UPDATE_CONFIG, " +
+            "#spelReturnValue, #servletRequest, #loginUser, #request)")
     @PreAuthorize("@ss.hasPermi('system:config:edit')")
-    @Log(title = "参数管理", businessType = BusinessType.UPDATE)
     @PutMapping
-    public void edit(@Validated @RequestBody ConfigSaveRequest request) {
+    public void edit(
+            HttpServletRequest servletRequest,
+            @CurrLoginUser LoginUser loginUser,
+            @Validated @RequestBody ConfigSaveRequest request) {
 
         if (!configService.checkConfigKeyUnique(request.getConfigId(), request.getConfigKey())) {
             throw ExceptionUtil.business(ErrorCodeEnums.CONFIG_KEY_EXISTS);
@@ -108,10 +120,15 @@ public class SysConfigController {
     /**
      * 删除参数配置
      */
+    @AuditOperation("@audit.auditRecord(" +
+            "T(com.medcase.mvc.audit.AuditEnums).DELETE_CONFIG, " +
+            "#spelReturnValue, #servletRequest, #loginUser, #configIds)")
     @PreAuthorize("@ss.hasPermi('system:config:remove')")
-    @Log(title = "参数管理", businessType = BusinessType.DELETE)
     @DeleteMapping("/{configIds}")
-    public void remove(@PathVariable Long[] configIds) {
+    public void remove(
+            HttpServletRequest servletRequest,
+            @CurrLoginUser LoginUser loginUser,
+            @PathVariable Long[] configIds) {
 
         configService.deleteConfigByIds(configIds);
     }
@@ -119,10 +136,14 @@ public class SysConfigController {
     /**
      * 刷新参数缓存
      */
+    @AuditOperation("@audit.auditRecord(" +
+            "T(com.medcase.mvc.audit.AuditEnums).REFRESH_CONFIG_CACHE, " +
+            "#spelReturnValue, #servletRequest, #loginUser)")
     @PreAuthorize("@ss.hasPermi('system:config:remove')")
-    @Log(title = "参数管理", businessType = BusinessType.CLEAN)
     @DeleteMapping("/refreshCache")
-    public void refreshCache() {
+    public void refreshCache(
+            HttpServletRequest servletRequest,
+            @CurrLoginUser LoginUser loginUser) {
 
         configService.resetConfigCache();
     }

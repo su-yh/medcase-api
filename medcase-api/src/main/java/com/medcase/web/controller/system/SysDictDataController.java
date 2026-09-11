@@ -13,16 +13,18 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import com.medcase.common.annotation.Log;
+import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
-import com.medcase.common.enums.BusinessType;
 import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
+import com.medcase.mvc.audit.AuditOperation;
+import com.medcase.mvc.authentication.annotation.CurrLoginUser;
 import com.medcase.system.entity.SysDictDataEntity;
 import com.medcase.system.service.SysDictDataService;
 import com.medcase.web.controller.system.dto.DictDataQueryRequest;
 import com.medcase.web.controller.system.dto.DictDataSaveRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * 数据字典信息
@@ -70,10 +72,15 @@ public class SysDictDataController {
     /**
      * 新增字典类型
      */
+    @AuditOperation("@audit.auditRecord(" +
+            "T(com.medcase.mvc.audit.AuditEnums).CREATE_DICT_DATA, " +
+            "#spelReturnValue, #servletRequest, #loginUser, #request)")
     @PreAuthorize("@ss.hasPermi('system:dict:add')")
-    @Log(title = "字典数据", businessType = BusinessType.INSERT)
     @PostMapping
-    public void add(@Validated @RequestBody DictDataSaveRequest request) {
+    public void add(
+            HttpServletRequest servletRequest,
+            @CurrLoginUser LoginUser loginUser,
+            @Validated @RequestBody DictDataSaveRequest request) {
 
         SysDictDataEntity dict = toEntity(request);
         if (dictDataService.insertDictData(dict) <= 0) {
@@ -84,10 +91,15 @@ public class SysDictDataController {
     /**
      * 修改保存字典类型
      */
+    @AuditOperation("@audit.auditRecord(" +
+            "T(com.medcase.mvc.audit.AuditEnums).UPDATE_DICT_DATA, " +
+            "#spelReturnValue, #servletRequest, #loginUser, #request)")
     @PreAuthorize("@ss.hasPermi('system:dict:edit')")
-    @Log(title = "字典数据", businessType = BusinessType.UPDATE)
     @PutMapping
-    public void edit(@Validated @RequestBody DictDataSaveRequest request) {
+    public void edit(
+            HttpServletRequest servletRequest,
+            @CurrLoginUser LoginUser loginUser,
+            @Validated @RequestBody DictDataSaveRequest request) {
 
         SysDictDataEntity dict = toEntity(request);
         if (dictDataService.updateDictData(dict) <= 0) {
@@ -98,10 +110,15 @@ public class SysDictDataController {
     /**
      * 删除字典类型
      */
+    @AuditOperation("@audit.auditRecord(" +
+            "T(com.medcase.mvc.audit.AuditEnums).DELETE_DICT_DATA, " +
+            "#spelReturnValue, #servletRequest, #loginUser, #dictCodes)")
     @PreAuthorize("@ss.hasPermi('system:dict:remove')")
-    @Log(title = "字典类型", businessType = BusinessType.DELETE)
     @DeleteMapping("/{dictCodes}")
-    public void remove(@PathVariable Long[] dictCodes) {
+    public void remove(
+            HttpServletRequest servletRequest,
+            @CurrLoginUser LoginUser loginUser,
+            @PathVariable Long[] dictCodes) {
 
         dictDataService.deleteDictDataByIds(dictCodes);
     }

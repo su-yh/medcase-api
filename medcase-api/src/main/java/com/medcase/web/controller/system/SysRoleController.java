@@ -1,12 +1,11 @@
 package com.medcase.web.controller.system;
 
-import com.medcase.common.annotation.Log;
 import com.medcase.common.core.domain.model.LoginUser;
-import com.medcase.common.enums.BusinessType;
 import com.medcase.framework.web.service.SysPermissionService;
 import com.medcase.framework.web.service.TokenService;
 import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
+import com.medcase.mvc.audit.AuditOperation;
 import com.medcase.mvc.authentication.annotation.CurrLoginUser;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
@@ -21,6 +20,7 @@ import com.medcase.web.controller.system.dto.RoleQueryRequest;
 import com.medcase.web.controller.system.dto.RoleStatusRequest;
 import com.medcase.web.controller.system.dto.RoleUserRequest;
 import com.medcase.web.controller.system.dto.UserQueryRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -97,10 +97,14 @@ public class SysRoleController {
     /**
      * 新增角色
      */
+    @AuditOperation("@audit.auditRecord(" +
+            "T(com.medcase.mvc.audit.AuditEnums).CREATE_ROLE, " +
+            "#spelReturnValue, #servletRequest, #loginUser, #request)")
     @PreAuthorize("@ss.hasPermi('system:role:add')")
-    @Log(title = "角色管理", businessType = BusinessType.INSERT)
     @PostMapping
     public void add(
+            HttpServletRequest servletRequest,
+            @CurrLoginUser LoginUser loginUser,
             @Validated @RequestBody RoleAddRequest request) {
 
         if (roleService.insertRole(request) <= 0) {
@@ -112,11 +116,14 @@ public class SysRoleController {
     /**
      * 修改保存角色
      */
+    @AuditOperation("@audit.auditRecord(" +
+            "T(com.medcase.mvc.audit.AuditEnums).UPDATE_ROLE, " +
+            "#spelReturnValue, #servletRequest, #loginUser, #request)")
     @PreAuthorize("@dp.hasAnyUserType(#loginUser, T(com.medcase.common.enums.UserTypeEnums).ADMIN) " +
             "&& @ss.hasPermi('system:role:edit')")
-    @Log(title = "角色管理", businessType = BusinessType.UPDATE)
     @PutMapping
     public void edit(
+            HttpServletRequest servletRequest,
             @Validated @RequestBody RoleEditRequest request,
             @CurrLoginUser LoginUser loginUser) {
 
@@ -133,11 +140,14 @@ public class SysRoleController {
     /**
      * 状态修改
      */
+    @AuditOperation("@audit.auditRecord(" +
+            "T(com.medcase.mvc.audit.AuditEnums).UPDATE_ROLE_STATUS, " +
+            "#spelReturnValue, #servletRequest, #loginUser, #request)")
     @PreAuthorize("@dp.hasAnyUserType(#loginUser, T(com.medcase.common.enums.UserTypeEnums).ADMIN) " +
             "&& @ss.hasPermi('system:role:edit')")
-    @Log(title = "角色管理", businessType = BusinessType.UPDATE)
     @PutMapping("/changeStatus")
     public void changeStatus(
+            HttpServletRequest servletRequest,
             @Validated @RequestBody RoleStatusRequest request,
             @CurrLoginUser LoginUser loginUser) {
 
@@ -150,11 +160,14 @@ public class SysRoleController {
     /**
      * 修改角色关联菜单。
      */
+    @AuditOperation("@audit.auditRecord(" +
+            "T(com.medcase.mvc.audit.AuditEnums).UPDATE_ROLE_MENUS, " +
+            "#spelReturnValue, #servletRequest, #loginUser, #roleId, #request)")
     @PreAuthorize("@dp.hasAnyUserType(#loginUser, T(com.medcase.common.enums.UserTypeEnums).ADMIN) " +
             "&& @ss.hasPermi('system:role:edit')")
-    @Log(title = "角色菜单管理", businessType = BusinessType.UPDATE)
     @PutMapping("/{roleId}/menus")
     public void updateRoleMenus(
+            HttpServletRequest servletRequest,
             @PathVariable Long roleId,
             @Validated @RequestBody RoleMenuUpdateRequest request,
             @CurrLoginUser LoginUser loginUser) {
@@ -168,11 +181,14 @@ public class SysRoleController {
     /**
      * 删除角色
      */
+    @AuditOperation("@audit.auditRecord(" +
+            "T(com.medcase.mvc.audit.AuditEnums).DELETE_ROLE, " +
+            "#spelReturnValue, #servletRequest, #loginUser, #roleIds)")
     @PreAuthorize("@dp.hasAnyUserType(#loginUser, T(com.medcase.common.enums.UserTypeEnums).ADMIN) " +
             "&& @ss.hasPermi('system:role:remove')")
-    @Log(title = "角色管理", businessType = BusinessType.DELETE)
     @DeleteMapping("/{roleIds}")
     public void remove(
+            HttpServletRequest servletRequest,
             @PathVariable Long[] roleIds,
             @CurrLoginUser LoginUser loginUser) {
 
@@ -230,11 +246,14 @@ public class SysRoleController {
     /**
      * 取消授权用户
      */
+    @AuditOperation("@audit.auditRecord(" +
+            "T(com.medcase.mvc.audit.AuditEnums).CANCEL_ROLE_USER, " +
+            "#spelReturnValue, #servletRequest, #loginUser, #request)")
     @PreAuthorize("@dp.hasAnyUserType(#loginUser, T(com.medcase.common.enums.UserTypeEnums).ADMIN) " +
             "&& @ss.hasPermi('system:role:edit')")
-    @Log(title = "角色管理", businessType = BusinessType.GRANT)
     @PutMapping("/authUser/cancel")
     public void cancelAuthUser(
+            HttpServletRequest servletRequest,
             @RequestBody RoleUserRequest request,
             @CurrLoginUser LoginUser loginUser) {
 
@@ -248,11 +267,14 @@ public class SysRoleController {
     /**
      * 批量取消授权用户
      */
+    @AuditOperation("@audit.auditRecord(" +
+            "T(com.medcase.mvc.audit.AuditEnums).CANCEL_ROLE_USERS, " +
+            "#spelReturnValue, #servletRequest, #loginUser, #roleId, #userIds)")
     @PreAuthorize("@dp.hasAnyUserType(#loginUser, T(com.medcase.common.enums.UserTypeEnums).ADMIN) " +
             "&& @ss.hasPermi('system:role:edit')")
-    @Log(title = "角色管理", businessType = BusinessType.GRANT)
     @PutMapping("/authUser/cancelAll")
     public void cancelAuthUserAll(
+            HttpServletRequest servletRequest,
             Long roleId,
             Long[] userIds,
             @CurrLoginUser LoginUser loginUser) {
@@ -266,11 +288,14 @@ public class SysRoleController {
     /**
      * 批量选择用户授权
      */
+    @AuditOperation("@audit.auditRecord(" +
+            "T(com.medcase.mvc.audit.AuditEnums).SELECT_ROLE_USERS, " +
+            "#spelReturnValue, #servletRequest, #loginUser, #roleId, #userIds)")
     @PreAuthorize("@dp.hasAnyUserType(#loginUser, T(com.medcase.common.enums.UserTypeEnums).ADMIN) " +
             "&& @ss.hasPermi('system:role:edit')")
-    @Log(title = "角色管理", businessType = BusinessType.GRANT)
     @PutMapping("/authUser/selectAll")
     public void selectAuthUserAll(
+            HttpServletRequest servletRequest,
             Long roleId,
             Long[] userIds,
             @CurrLoginUser LoginUser loginUser) {

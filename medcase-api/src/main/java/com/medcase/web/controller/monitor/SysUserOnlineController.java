@@ -11,15 +11,16 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import com.medcase.common.annotation.Log;
 import com.medcase.common.constant.CacheConstants;
 import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.common.core.redis.RedisCache;
-import com.medcase.common.enums.BusinessType;
 import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
+import com.medcase.mvc.audit.AuditOperation;
+import com.medcase.mvc.authentication.annotation.CurrLoginUser;
 import com.medcase.system.domain.SysUserOnline;
 import com.medcase.system.service.SysUserOnlineService;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * 在线用户监控
@@ -71,11 +72,15 @@ public class SysUserOnlineController {
     /**
      * 强退用户
      */
+    @AuditOperation("@audit.auditRecord(" +
+            "T(com.medcase.mvc.audit.AuditEnums).FORCE_LOGOUT_ONLINE_USER, " +
+            "#spelReturnValue, #servletRequest, #loginUser, #tokenId)")
     @PreAuthorize("@ss.hasPermi('monitor:online:forceLogout')")
-    @Log(title = "在线用户", businessType = BusinessType.FORCE)
     @DeleteMapping("/{tokenId}")
-    public void forceLogout(@PathVariable String tokenId) {
-
+    public void forceLogout(
+            HttpServletRequest servletRequest,
+            @CurrLoginUser LoginUser loginUser,
+            @PathVariable String tokenId) {
         redisCache.deleteObject(CacheConstants.LOGIN_TOKEN_KEY + tokenId);
     }
 }

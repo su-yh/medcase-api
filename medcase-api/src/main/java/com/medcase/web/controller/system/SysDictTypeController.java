@@ -12,16 +12,18 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import com.medcase.common.annotation.Log;
+import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
-import com.medcase.common.enums.BusinessType;
 import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
+import com.medcase.mvc.audit.AuditOperation;
+import com.medcase.mvc.authentication.annotation.CurrLoginUser;
 import com.medcase.system.entity.SysDictTypeEntity;
 import com.medcase.system.service.SysDictTypeService;
 import com.medcase.web.controller.system.dto.DictTypeQueryRequest;
 import com.medcase.web.controller.system.dto.DictTypeSaveRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * 数据字典信息
@@ -56,10 +58,15 @@ public class SysDictTypeController {
     /**
      * 新增字典类型
      */
+    @AuditOperation("@audit.auditRecord(" +
+            "T(com.medcase.mvc.audit.AuditEnums).CREATE_DICT_TYPE, " +
+            "#spelReturnValue, #servletRequest, #loginUser, #request)")
     @PreAuthorize("@ss.hasPermi('system:dict:add')")
-    @Log(title = "字典类型", businessType = BusinessType.INSERT)
     @PostMapping
-    public void add(@Validated @RequestBody DictTypeSaveRequest request) {
+    public void add(
+            HttpServletRequest servletRequest,
+            @CurrLoginUser LoginUser loginUser,
+            @Validated @RequestBody DictTypeSaveRequest request) {
 
         if (!dictTypeService.checkDictTypeUnique(request.getDictId(), request.getDictType())) {
             throw ExceptionUtil.business(ErrorCodeEnums.DICT_TYPE_EXISTS);
@@ -73,10 +80,15 @@ public class SysDictTypeController {
     /**
      * 修改字典类型
      */
+    @AuditOperation("@audit.auditRecord(" +
+            "T(com.medcase.mvc.audit.AuditEnums).UPDATE_DICT_TYPE, " +
+            "#spelReturnValue, #servletRequest, #loginUser, #request)")
     @PreAuthorize("@ss.hasPermi('system:dict:edit')")
-    @Log(title = "字典类型", businessType = BusinessType.UPDATE)
     @PutMapping
-    public void edit(@Validated @RequestBody DictTypeSaveRequest request) {
+    public void edit(
+            HttpServletRequest servletRequest,
+            @CurrLoginUser LoginUser loginUser,
+            @Validated @RequestBody DictTypeSaveRequest request) {
 
         if (!dictTypeService.checkDictTypeUnique(request.getDictId(), request.getDictType())) {
             throw ExceptionUtil.business(ErrorCodeEnums.DICT_TYPE_EXISTS);
@@ -90,10 +102,15 @@ public class SysDictTypeController {
     /**
      * 删除字典类型
      */
+    @AuditOperation("@audit.auditRecord(" +
+            "T(com.medcase.mvc.audit.AuditEnums).DELETE_DICT_TYPE, " +
+            "#spelReturnValue, #servletRequest, #loginUser, #dictIds)")
     @PreAuthorize("@ss.hasPermi('system:dict:remove')")
-    @Log(title = "字典类型", businessType = BusinessType.DELETE)
     @DeleteMapping("/{dictIds}")
-    public void remove(@PathVariable Long[] dictIds) {
+    public void remove(
+            HttpServletRequest servletRequest,
+            @CurrLoginUser LoginUser loginUser,
+            @PathVariable Long[] dictIds) {
 
         dictTypeService.deleteDictTypeByIds(dictIds);
     }
@@ -101,10 +118,14 @@ public class SysDictTypeController {
     /**
      * 刷新字典缓存
      */
+    @AuditOperation("@audit.auditRecord(" +
+            "T(com.medcase.mvc.audit.AuditEnums).REFRESH_DICT_CACHE, " +
+            "#spelReturnValue, #servletRequest, #loginUser)")
     @PreAuthorize("@ss.hasPermi('system:dict:remove')")
-    @Log(title = "字典类型", businessType = BusinessType.CLEAN)
     @DeleteMapping("/refreshCache")
-    public void refreshCache() {
+    public void refreshCache(
+            HttpServletRequest servletRequest,
+            @CurrLoginUser LoginUser loginUser) {
 
         dictTypeService.resetDictCache();
     }

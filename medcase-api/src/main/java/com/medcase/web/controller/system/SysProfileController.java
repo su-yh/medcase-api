@@ -9,19 +9,19 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import com.medcase.common.annotation.Log;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
 import com.medcase.common.core.domain.model.LoginUser;
-import com.medcase.common.enums.BusinessType;
 import com.medcase.common.utils.DateUtils;
 import com.medcase.framework.web.service.TokenService;
+import com.medcase.mvc.audit.AuditOperation;
 import com.medcase.mvc.authentication.annotation.CurrLoginUser;
 import com.medcase.system.service.SysUserService;
 import com.medcase.web.controller.system.dto.ProfileResponse;
 import com.medcase.web.controller.system.dto.UserProfileUpdateRequest;
 import com.medcase.web.controller.system.dto.UserSaveRequest;
 import com.medcase.system.entity.SysUserEntity;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.util.StringUtils;
 
 /**
@@ -59,10 +59,13 @@ public class SysProfileController {
     /**
      * 修改用户
      */
-    @Log(title = "个人信息", businessType = BusinessType.UPDATE)
+    @AuditOperation("@audit.auditRecord(" +
+            "T(com.medcase.mvc.audit.AuditEnums).UPDATE_ADMIN_PROFILE, " +
+            "#spelReturnValue, #servletRequest, #loginUser, #user)")
     @PreAuthorize("@dp.hasAnyUserType(#loginUser, T(com.medcase.common.enums.UserTypeEnums).ADMIN)")
     @PutMapping
     public void updateProfile(
+            HttpServletRequest servletRequest,
             @RequestBody UserProfileUpdateRequest user,
             @CurrLoginUser LoginUser loginUser) {
 
@@ -90,10 +93,13 @@ public class SysProfileController {
     /**
      * 重置密码
      */
-    @Log(title = "个人信息", businessType = BusinessType.UPDATE)
+    @AuditOperation("@audit.auditRecord(" +
+            "T(com.medcase.mvc.audit.AuditEnums).UPDATE_ADMIN_PASSWORD, " +
+            "#spelReturnValue, #servletRequest, #loginUser, #params)")
     @PreAuthorize("@dp.hasAnyUserType(#loginUser, T(com.medcase.common.enums.UserTypeEnums).ADMIN)")
     @PutMapping("/updatePwd")
     public void updatePwd(
+            HttpServletRequest servletRequest,
             @RequestBody Map<String, String> params,
             @CurrLoginUser LoginUser loginUser) {
 

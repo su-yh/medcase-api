@@ -12,20 +12,20 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import com.medcase.common.annotation.Log;
 import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
-import com.medcase.common.enums.BusinessType;
 import com.medcase.common.enums.UserTypeEnums;
 import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
+import com.medcase.mvc.audit.AuditOperation;
 import com.medcase.mvc.authentication.annotation.CurrLoginUser;
 import com.medcase.system.entity.SysPostEntity;
 import com.medcase.system.service.SysPostService;
 import com.medcase.web.controller.system.dto.PostQueryRequest;
 import com.medcase.web.controller.system.dto.PostResponse;
 import com.medcase.web.controller.system.dto.PostSaveRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * 岗位信息操作处理
@@ -68,10 +68,15 @@ public class SysPostController {
     /**
      * 新增岗位
      */
+    @AuditOperation("@audit.auditRecord(" +
+            "T(com.medcase.mvc.audit.AuditEnums).CREATE_POST, " +
+            "#spelReturnValue, #servletRequest, #loginUser, #request)")
     @PreAuthorize("@ss.hasPermi('system:post:add')")
-    @Log(title = "岗位管理", businessType = BusinessType.INSERT)
     @PostMapping
-    public void add(@Validated @RequestBody PostSaveRequest request) {
+    public void add(
+            HttpServletRequest servletRequest,
+            @CurrLoginUser LoginUser loginUser,
+            @Validated @RequestBody PostSaveRequest request) {
 
         if (!postService.checkPostNameUnique(request.getPostId(), request.getPostName())) {
             throw ExceptionUtil.business(ErrorCodeEnums.POST_NAME_EXISTS);
@@ -88,10 +93,15 @@ public class SysPostController {
     /**
      * 修改岗位
      */
+    @AuditOperation("@audit.auditRecord(" +
+            "T(com.medcase.mvc.audit.AuditEnums).UPDATE_POST, " +
+            "#spelReturnValue, #servletRequest, #loginUser, #request)")
     @PreAuthorize("@ss.hasPermi('system:post:edit')")
-    @Log(title = "岗位管理", businessType = BusinessType.UPDATE)
     @PutMapping
-    public void edit(@Validated @RequestBody PostSaveRequest request) {
+    public void edit(
+            HttpServletRequest servletRequest,
+            @CurrLoginUser LoginUser loginUser,
+            @Validated @RequestBody PostSaveRequest request) {
 
         if (!postService.checkPostNameUnique(request.getPostId(), request.getPostName())) {
             throw ExceptionUtil.business(ErrorCodeEnums.POST_NAME_EXISTS);
@@ -108,10 +118,15 @@ public class SysPostController {
     /**
      * 删除岗位
      */
+    @AuditOperation("@audit.auditRecord(" +
+            "T(com.medcase.mvc.audit.AuditEnums).DELETE_POST, " +
+            "#spelReturnValue, #servletRequest, #loginUser, #postIds)")
     @PreAuthorize("@ss.hasPermi('system:post:remove')")
-    @Log(title = "岗位管理", businessType = BusinessType.DELETE)
     @DeleteMapping("/{postIds}")
-    public void remove(@PathVariable Long[] postIds) {
+    public void remove(
+            HttpServletRequest servletRequest,
+            @CurrLoginUser LoginUser loginUser,
+            @PathVariable Long[] postIds) {
 
         if (postService.deletePostByIds(postIds) <= 0) {
             throw ExceptionUtil.business(ErrorCodeEnums.POST_OPERATION_FAILED);

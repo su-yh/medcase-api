@@ -1,8 +1,7 @@
 package com.medcase.web.controller.system;
 
-import com.medcase.common.annotation.Log;
 import com.medcase.common.core.domain.model.LoginUser;
-import com.medcase.common.enums.BusinessType;
+import com.medcase.mvc.audit.AuditOperation;
 import com.medcase.mvc.authentication.annotation.CurrLoginUser;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
@@ -11,6 +10,7 @@ import com.medcase.system.service.SysMenuService;
 import com.medcase.web.controller.system.dto.MenuQueryRequest;
 import com.medcase.web.controller.system.dto.MenuSaveRequest;
 import com.medcase.web.controller.system.dto.MenuSortRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -70,10 +70,15 @@ public class SysMenuController {
     /**
      * 新增菜单
      */
+    @AuditOperation("@audit.auditRecord(" +
+            "T(com.medcase.mvc.audit.AuditEnums).CREATE_MENU, " +
+            "#spelReturnValue, #servletRequest, #loginUser, #menu)")
     @PreAuthorize("@ss.hasPermi('system:menu:add')")
-    @Log(title = "菜单管理", businessType = BusinessType.INSERT)
     @PostMapping
-    public void add(@Validated @RequestBody MenuSaveRequest menu) {
+    public void add(
+            HttpServletRequest servletRequest,
+            @CurrLoginUser LoginUser loginUser,
+            @Validated @RequestBody MenuSaveRequest menu) {
         if (!menuService.checkMenuNameUnique(menu)) {
             throw ExceptionUtil.business(ErrorCodeEnums.MENU_NAME_EXISTS);
         } else if (!menuService.checkRouteConfigUnique(menu)) {
@@ -87,10 +92,15 @@ public class SysMenuController {
     /**
      * 修改菜单
      */
+    @AuditOperation("@audit.auditRecord(" +
+            "T(com.medcase.mvc.audit.AuditEnums).UPDATE_MENU, " +
+            "#spelReturnValue, #servletRequest, #loginUser, #menu)")
     @PreAuthorize("@ss.hasPermi('system:menu:edit')")
-    @Log(title = "菜单管理", businessType = BusinessType.UPDATE)
     @PutMapping
-    public void edit(@Validated @RequestBody MenuSaveRequest menu) {
+    public void edit(
+            HttpServletRequest servletRequest,
+            @CurrLoginUser LoginUser loginUser,
+            @Validated @RequestBody MenuSaveRequest menu) {
         if (!menuService.checkMenuNameUnique(menu)) {
             throw ExceptionUtil.business(ErrorCodeEnums.MENU_NAME_EXISTS);
         }
@@ -108,10 +118,15 @@ public class SysMenuController {
     /**
      * 保存菜单排序
      */
+    @AuditOperation("@audit.auditRecord(" +
+            "T(com.medcase.mvc.audit.AuditEnums).UPDATE_MENU_SORT, " +
+            "#spelReturnValue, #servletRequest, #loginUser, #request)")
     @PreAuthorize("@ss.hasPermi('system:menu:edit')")
-    @Log(title = "保存菜单排序", businessType = BusinessType.UPDATE)
     @PutMapping("/updateSort")
-    public void updateSort(@Validated @RequestBody MenuSortRequest request) {
+    public void updateSort(
+            HttpServletRequest servletRequest,
+            @CurrLoginUser LoginUser loginUser,
+            @Validated @RequestBody MenuSortRequest request) {
         String[] menuIds = request.getMenuIds().split(",");
         String[] orderNums = request.getOrderNums().split(",");
         menuService.updateMenuSort(menuIds, orderNums);
@@ -120,10 +135,15 @@ public class SysMenuController {
     /**
      * 删除菜单
      */
+    @AuditOperation("@audit.auditRecord(" +
+            "T(com.medcase.mvc.audit.AuditEnums).DELETE_MENU, " +
+            "#spelReturnValue, #servletRequest, #loginUser, #id)")
     @PreAuthorize("@ss.hasPermi('system:menu:remove')")
-    @Log(title = "菜单管理", businessType = BusinessType.DELETE)
     @DeleteMapping("/{id}")
-    public void remove(@PathVariable("id") Long id) {
+    public void remove(
+            HttpServletRequest servletRequest,
+            @CurrLoginUser LoginUser loginUser,
+            @PathVariable("id") Long id) {
         if (menuService.hasChildByMenuId(id)) {
             throw ExceptionUtil.business(ErrorCodeEnums.MENU_HAS_CHILDREN);
         }
