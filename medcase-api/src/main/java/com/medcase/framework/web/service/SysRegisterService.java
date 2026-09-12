@@ -4,14 +4,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import com.medcase.common.constant.CacheConstants;
-import com.medcase.common.constant.Constants;
 import com.medcase.common.constant.UserConstants;
 import com.medcase.common.core.domain.model.RegisterBody;
 import com.medcase.common.core.redis.RedisCache;
 import com.medcase.common.utils.DateUtils;
-import com.medcase.common.utils.MessageUtils;
-import com.medcase.framework.manager.AsyncManager;
-import com.medcase.framework.manager.factory.AsyncFactory;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
 import com.medcase.system.service.SysConfigService;
@@ -83,9 +79,6 @@ public class SysRegisterService {
             boolean regFlag = userService.registerUser(sysUser);
             if (!regFlag) {
                 throw ExceptionUtil.business(ErrorCodeEnums.ADMIN_REGISTER_FAILED);
-            }
-            else {
-                AsyncManager.me().execute(AsyncFactory.recordLogininfor(username, Constants.REGISTER, MessageUtils.message("user.register.success")));
             }
         }
     }

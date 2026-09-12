@@ -143,14 +143,6 @@ public interface SysUserMapper extends BaseMapperX<SysUserEntity> {
                 .eq(SysUserEntity::getUserId, userId));
     }
 
-    default int updateLoginInfo(Long userId, String loginIp, Date loginDate) {
-        SysUserEntity entity = new SysUserEntity();
-        entity.setLoginIp(loginIp);
-        entity.setLoginDate(loginDate);
-        return update(entity, new LambdaUpdateWrapper<SysUserEntity>()
-                .eq(SysUserEntity::getUserId, userId));
-    }
-
     default int resetUserPassword(Long userId, String password, Date pwdUpdateDate) {
         SysUserEntity entity = new SysUserEntity();
         entity.setPwdUpdateDate(pwdUpdateDate);

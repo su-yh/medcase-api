@@ -3,15 +3,17 @@ package com.medcase.framework.manager.factory;
 import java.util.TimerTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.medcase.common.constant.Constants;
+import com.medcase.common.enums.LoginRecordStatusEnums;
+import com.medcase.common.enums.UserTypeEnums;
 import com.medcase.common.utils.LogUtils;
 import com.medcase.common.utils.ServletUtils;
 import com.medcase.common.utils.http.UserAgentUtils;
 import com.medcase.common.utils.ip.AddressUtils;
 import com.medcase.common.utils.ip.IpUtils;
 import com.medcase.common.utils.spring.SpringUtils;
-import com.medcase.system.entity.SysLogininforEntity;
-import com.medcase.system.service.SysLogininforService;
+import com.medcase.system.entity.LoginRecordEntity;
+import com.medcase.system.service.LoginRecordService;
+import java.util.Objects;
 
 /**
  * 异步工厂（产生任务用）
@@ -30,11 +32,14 @@ public class AsyncFactory {
      * @param args 列表
      * @return 任务task
      */
-    public static TimerTask recordLogininfor(final String username, final String status, final String message,
-            final Object... args) {
+    public static TimerTask recordLogin(final String username, final Long userId,
+            final UserTypeEnums userType, final LoginRecordStatusEnums status,
+            final String message, final Object... args) {
 
-        final String userAgent = ServletUtils.getRequest().getHeader("User-Agent");
-        final String ip = IpUtils.getIpAddr();
+        final jakarta.servlet.http.HttpServletRequest request = ServletUtils.getRequest();
+        final String userAgent = request == null
+                ? "" : Objects.requireNonNullElse(request.getHeader("User-Agent"), "");
+        final String ip = IpUtils.getIpAddr(request);
         return new TimerTask() {
 
             @Override
@@ -45,7 +50,7 @@ public class AsyncFactory {
                 s.append(LogUtils.getBlock(ip));
                 s.append(address);
                 s.append(LogUtils.getBlock(username));
-                s.append(LogUtils.getBlock(status));
+                s.append(LogUtils.getBlock(status.getCode()));
                 s.append(LogUtils.getBlock(message));
                 // 打印信息到日志
                 sys_user_logger.info(s.toString(), args);
@@ -54,25 +59,18 @@ public class AsyncFactory {
                 // 获取客户端浏览器
                 String browser = UserAgentUtils.getBrowser(userAgent);
                 // 封装对象
-                SysLogininforEntity logininfor = new SysLogininforEntity();
-                logininfor.setUserName(username);
-                logininfor.setIpaddr(ip);
-                logininfor.setLoginLocation(address);
-                logininfor.setBrowser(browser);
-                logininfor.setOs(os);
-                logininfor.setMsg(message);
-                // 日志状态
-                if (org.apache.commons.lang3.Strings.CS.equalsAny(
-                        status, Constants.LOGIN_SUCCESS, Constants.LOGOUT, Constants.REGISTER)) {
-
-                    logininfor.setStatus(Constants.SUCCESS);
-                }
-                else if (Constants.LOGIN_FAIL.equals(status)) {
-
-                    logininfor.setStatus(Constants.FAIL);
-                }
-                // 插入数据
-                SpringUtils.getBean(SysLogininforService.class).insertLogininfor(logininfor);
+                LoginRecordEntity loginRecord = new LoginRecordEntity();
+                loginRecord.setUserId(userId);
+                loginRecord.setUserType(userType);
+                loginRecord.setUserName(username);
+                loginRecord.setStatus(status);
+                loginRecord.setIpaddr(ip);
+                loginRecord.setLoginLocation(address);
+                loginRecord.setBrowser(browser);
+                loginRecord.setOs(os);
+                loginRecord.setMsg(message);
+                loginRecord.setLoginTime(new java.util.Date());
+                SpringUtils.getBean(LoginRecordService.class).insert(loginRecord);
             }
         };
     }

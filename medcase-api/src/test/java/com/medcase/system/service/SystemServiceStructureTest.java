@@ -13,7 +13,6 @@ class SystemServiceStructureTest {
                 "SysDeptService",
                 "SysDictDataService",
                 "SysDictTypeService",
-                "SysLogininforService",
                 "SysMenuService",
                 "SysNoticeReadService",
                 "SysNoticeService",

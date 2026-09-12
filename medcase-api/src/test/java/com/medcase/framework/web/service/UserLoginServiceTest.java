@@ -7,8 +7,9 @@ import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.common.enums.UserStatusEnums;
 import com.medcase.common.enums.UserTypeEnums;
 import com.medcase.common.core.redis.RedisCache;
+import com.medcase.common.utils.spring.SpringUtils;
+import com.medcase.system.service.LoginRecordService;
 import com.medcase.system.service.SysConfigService;
-import com.medcase.system.service.SysUserService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,14 +18,18 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.util.Set;
+import java.util.concurrent.ScheduledExecutorService;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -38,9 +43,6 @@ class UserLoginServiceTest {
 
     @Mock
     private RedisCache redisCache;
-
-    @Mock
-    private SysUserService userService;
 
     @Mock
     private SysConfigService configService;
@@ -62,10 +64,13 @@ class UserLoginServiceTest {
 
     @BeforeEach
     void setUp() {
+        DefaultListableBeanFactory beanFactory = new DefaultListableBeanFactory();
+        beanFactory.registerSingleton("scheduledExecutorService", mock(ScheduledExecutorService.class));
+        beanFactory.registerSingleton("loginRecordService", mock(LoginRecordService.class));
+        ReflectionTestUtils.setField(SpringUtils.class, "beanFactory", beanFactory);
         service = new UserLoginService(
                 tokenService,
                 redisCache,
-                userService,
                 configService,
                 passwordService,
                 userDetailsService,
@@ -104,6 +109,5 @@ class UserLoginServiceTest {
         ArgumentCaptor<LoginUser> loginUserCaptor = ArgumentCaptor.forClass(LoginUser.class);
         verify(tokenService).createToken(loginUserCaptor.capture());
         assertEquals(UserTypeEnums.DOCTOR, loginUserCaptor.getValue().getUser().getUserType());
-        verify(userMapper).updateById(any(UserEntity.class));
     }
 }

@@ -63,9 +63,5 @@ public class UserEntity extends AbstractBaseEntity {
     @JsonIgnore
     private Boolean delFlag;
 
-    private String loginIp;
-
-    private Date loginDate;
-
     private Date pwdUpdateDate;
 }

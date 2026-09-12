@@ -12,7 +12,6 @@ import com.medcase.web.controller.common.CaptchaController;
 import com.medcase.web.controller.file.FileStorageController;
 import com.medcase.web.controller.monitor.CacheController;
 import com.medcase.web.controller.monitor.ServerController;
-import com.medcase.web.controller.monitor.SysLogininforController;
 import com.medcase.web.controller.monitor.AuditLogController;
 import com.medcase.web.controller.monitor.SysUserOnlineController;
 import com.medcase.web.controller.system.SysConfigController;
@@ -49,7 +48,6 @@ class ControllerResponseContractTest {
             FileStorageController.class,
             CacheController.class,
             ServerController.class,
-            SysLogininforController.class,
             AuditLogController.class,
             SysUserOnlineController.class,
             SysConfigController.class,

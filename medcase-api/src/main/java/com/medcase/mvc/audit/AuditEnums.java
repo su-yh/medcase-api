@@ -51,9 +51,6 @@ public enum AuditEnums implements IAudit {
     UPDATE_ADMIN_PROFILE("update_admin_profile", "修改个人信息"),
     UPDATE_ADMIN_PASSWORD("update_admin_password", "修改个人密码"),
     FORCE_LOGOUT_ONLINE_USER("force_logout_online_user", "强退在线用户"),
-    DELETE_LOGIN_LOG("delete_login_log", "删除登录日志"),
-    CLEAN_LOGIN_LOG("clean_login_log", "清空登录日志"),
-    UNLOCK_LOGIN_USER("unlock_login_user", "解锁登录用户"),
     ;
 
     @EnumValue
