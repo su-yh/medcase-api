@@ -9,6 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class LoginRecordMigrationContractTest {
@@ -36,6 +37,23 @@ class LoginRecordMigrationContractTest {
     @Test
     void loginRecordEntityExists() throws Exception {
         assertTrue(Class.forName("com.medcase.system.entity.LoginRecordEntity") != null);
+    }
+
+    @Test
+    void loginRecordStatusUsesBooleanAndTinyint() throws Exception {
+        Field status = Class.forName("com.medcase.system.entity.LoginRecordEntity")
+                .getDeclaredField("status");
+        assertEquals(Boolean.class, status.getType());
+
+        Path statusMigration = Path.of(
+                "src/main/resources/db/migration/master/V01_01_00/"
+                        + "V01_01_00_012__login-record-status.sql");
+        assertTrue(Files.exists(statusMigration));
+        String sql = Files.readString(statusMigration);
+        assertTrue(sql.contains("status tinyint"));
+        assertTrue(sql.contains("1成功 0失败"));
+        assertTrue(sql.contains("when 0 then 1"));
+        assertTrue(sql.contains("when 1 then 0"));
     }
 
     private boolean hasField(Class<?> type, String name) {

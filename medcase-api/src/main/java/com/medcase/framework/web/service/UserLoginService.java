@@ -6,7 +6,6 @@ import com.medcase.common.constant.CacheConstants;
 import com.medcase.common.constant.UserConstants;
 import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.common.core.redis.RedisCache;
-import com.medcase.common.enums.LoginRecordStatusEnums;
 import com.medcase.common.enums.UserStatusEnums;
 import com.medcase.common.enums.UserTypeEnums;
 import com.medcase.common.utils.ip.IpUtils;
@@ -69,7 +68,7 @@ public class UserLoginService {
         if (captcha == null) {
             AsyncManager.me().execute(
                     AsyncFactory.recordLogin(username, null, userType,
-                            LoginRecordStatusEnums.FAIL,
+                            Boolean.FALSE,
                             ErrorCodeEnums.ADMIN_LOGIN_CAPTCHA_EXPIRED.getMsg()));
             throw ExceptionUtil.business(ErrorCodeEnums.ADMIN_LOGIN_CAPTCHA_EXPIRED);
         }
@@ -77,7 +76,7 @@ public class UserLoginService {
         if (!code.equalsIgnoreCase(captcha)) {
             AsyncManager.me().execute(
                     AsyncFactory.recordLogin(username, null, userType,
-                            LoginRecordStatusEnums.FAIL,
+                            Boolean.FALSE,
                             ErrorCodeEnums.ADMIN_LOGIN_CAPTCHA_INVALID.getMsg()));
             throw ExceptionUtil.business(ErrorCodeEnums.ADMIN_LOGIN_CAPTCHA_INVALID);
         }
@@ -87,27 +86,27 @@ public class UserLoginService {
         if (!StringUtils.hasText(username) || !StringUtils.hasText(password)) {
             AsyncManager.me().execute(
                     AsyncFactory.recordLogin(username, null, userType,
-                            LoginRecordStatusEnums.FAIL,
+                            Boolean.FALSE,
                             ErrorCodeEnums.ADMIN_LOGIN_PARAMETER_EMPTY.getMsg()));
             throw ExceptionUtil.business(ErrorCodeEnums.ADMIN_LOGIN_PARAMETER_EMPTY);
         }
         if (password.length() < UserConstants.PASSWORD_MIN_LENGTH
                 || password.length() > UserConstants.PASSWORD_MAX_LENGTH) {
             AsyncManager.me().execute(AsyncFactory.recordLogin(username, null, userType,
-                    LoginRecordStatusEnums.FAIL, ErrorCodeEnums.ADMIN_LOGIN_FAILED.getMsg()));
+                    Boolean.FALSE, ErrorCodeEnums.ADMIN_LOGIN_FAILED.getMsg()));
             throw ExceptionUtil.business(ErrorCodeEnums.ADMIN_LOGIN_FAILED);
         }
         if (username.length() < UserConstants.USERNAME_MIN_LENGTH
                 || username.length() > UserConstants.USERNAME_MAX_LENGTH) {
             AsyncManager.me().execute(AsyncFactory.recordLogin(username, null, userType,
-                    LoginRecordStatusEnums.FAIL, ErrorCodeEnums.ADMIN_LOGIN_FAILED.getMsg()));
+                    Boolean.FALSE, ErrorCodeEnums.ADMIN_LOGIN_FAILED.getMsg()));
             throw ExceptionUtil.business(ErrorCodeEnums.ADMIN_LOGIN_FAILED);
         }
         String blackStr = configService.selectConfigByKey("sys.login.blackIPList");
         if (IpUtils.isMatchedIp(blackStr, IpUtils.getIpAddr())) {
             AsyncManager.me().execute(
                     AsyncFactory.recordLogin(username, null, userType,
-                            LoginRecordStatusEnums.FAIL, ErrorCodeEnums.ADMIN_LOGIN_IP_BLOCKED.getMsg()));
+                            Boolean.FALSE, ErrorCodeEnums.ADMIN_LOGIN_IP_BLOCKED.getMsg()));
             throw ExceptionUtil.business(ErrorCodeEnums.ADMIN_LOGIN_IP_BLOCKED);
         }
     }
@@ -127,21 +126,21 @@ public class UserLoginService {
             passwordService.clearLoginRecordCache(username);
             AsyncManager.me().execute(
                     AsyncFactory.recordLogin(username, userId, UserTypeEnums.ADMIN,
-                            LoginRecordStatusEnums.SUCCESS, "登录成功"));
+                            Boolean.TRUE, "登录成功"));
             return loginUser;
         }
         catch (AbstractBusinessException e) {
             AsyncManager.me().execute(AsyncFactory.recordLogin(
-                    username, userId, UserTypeEnums.ADMIN,
-                    LoginRecordStatusEnums.FAIL, e.getEc().getMsg()));
+                username, userId, UserTypeEnums.ADMIN,
+                    Boolean.FALSE, e.getEc().getMsg()));
             throw e;
         }
         catch (RuntimeException e) {
             String message = resolveExceptionMessage(e);
             log.warn("admin login authentication error, username={}", username, e);
             AsyncManager.me().execute(AsyncFactory.recordLogin(
-                    username, userId, UserTypeEnums.ADMIN,
-                    LoginRecordStatusEnums.FAIL, message));
+                username, userId, UserTypeEnums.ADMIN,
+                    Boolean.FALSE, message));
             throw ExceptionUtil.business(ErrorCodeEnums.ADMIN_LOGIN_AUTHENTICATION_ERROR, message);
         }
     }
@@ -168,22 +167,22 @@ public class UserLoginService {
             LoginUser loginUser = new LoginUser(
                     sysUser.getUserId(), null, sysUser, permissionService.getMenuPermission(sysUser));
             AsyncManager.me().execute(AsyncFactory.recordLogin(
-                    username, userId, userType, LoginRecordStatusEnums.SUCCESS,
+                    username, userId, userType, Boolean.TRUE,
                     "登录成功"));
             return loginUser;
         }
         catch (AbstractBusinessException e) {
             AsyncManager.me().execute(AsyncFactory.recordLogin(
-                    username, userId, userType,
-                    LoginRecordStatusEnums.FAIL, e.getEc().getMsg()));
+                username, userId, userType,
+                    Boolean.FALSE, e.getEc().getMsg()));
             throw e;
         }
         catch (RuntimeException e) {
             String message = resolveExceptionMessage(e);
             log.warn("portal login authentication error, username={}", username, e);
             AsyncManager.me().execute(AsyncFactory.recordLogin(
-                    username, userId, userType,
-                    LoginRecordStatusEnums.FAIL, message));
+                username, userId, userType,
+                    Boolean.FALSE, message));
             throw ExceptionUtil.business(ErrorCodeEnums.USER_LOGIN_FAILED, message);
         }
     }

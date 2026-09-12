@@ -4,7 +4,7 @@ create table sys_login_record (
     user_id bigint default null comment '用户ID',
     user_type varchar(2) default null comment '用户类型',
     user_name varchar(64) default null comment '用户账号',
-    status char(1) default null comment '登录状态（0成功 1失败）',
+    success tinyint default null comment '登录状态（1成功 0失败）',
     ipaddr varchar(128) default null comment '登录IP地址',
     login_location varchar(255) default null comment '登录地点',
     browser varchar(255) default null comment '浏览器',

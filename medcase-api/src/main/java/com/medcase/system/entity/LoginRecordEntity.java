@@ -3,7 +3,6 @@ package com.medcase.system.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.medcase.common.enums.LoginRecordStatusEnums;
 import com.medcase.common.enums.UserTypeEnums;
 import lombok.Data;
 
@@ -25,7 +24,7 @@ public class LoginRecordEntity {
 
     private String userName;
 
-    private LoginRecordStatusEnums status;
+    private Boolean success;
 
     private String ipaddr;
 
