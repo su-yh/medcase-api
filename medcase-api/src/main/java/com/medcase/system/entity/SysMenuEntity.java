@@ -28,8 +28,6 @@ public class SysMenuEntity extends AbstractBaseEntity {
 
     private String routeName;
 
-    private String isCache;
-
     private String menuType;
 
     private Boolean visible;

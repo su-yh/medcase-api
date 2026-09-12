@@ -235,7 +235,6 @@ public class SysMenuService {
         entity.setRoutePath(request.getRoutePath());
         entity.setVueComponentPath(request.getVueComponentPath());
         entity.setRouteName(request.getRouteName());
-        entity.setIsCache(request.getIsCache());
         entity.setMenuType(request.getMenuType());
         entity.setVisible(Boolean.TRUE.equals(request.getVisible()));
         entity.setStatus(request.getStatus());

@@ -36,8 +36,6 @@ public class MenuSaveRequest {
     @Size(max = 50, message = "路由名称长度不能超过50个字符")
     private String routeName;
 
-    private String isCache;
-
     @NotBlank(message = "菜单类型不能为空")
     private String menuType;
 
