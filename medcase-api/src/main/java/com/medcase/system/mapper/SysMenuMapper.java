@@ -14,8 +14,6 @@ import java.util.List;
 public interface SysMenuMapper extends BaseMapperX<SysMenuEntity> {
     List<SysMenuEntity> selectMenuList(@Param("menu") MenuQueryRequest menu);
 
-    List<String> selectMenuPerms();
-
     List<SysMenuEntity> selectMenuListByUserId(
             @Param("menu") MenuQueryRequest menu, @Param("userId") Long userId);
 

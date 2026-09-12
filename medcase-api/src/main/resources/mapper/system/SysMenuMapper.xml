@@ -81,13 +81,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		order by m.parent_id, m.order_num
 	</select>
 
-	<select id="selectMenuPerms" resultType="java.lang.String">
-		select distinct m.perms
-		from sys_menu m
-			 left join sys_role_menu rm on m.id = rm.menu_id
-			 left join sys_user_role ur on rm.role_id = ur.role_id
-	</select>
-
 	<select id="selectMenuPermsByUserId" parameterType="java.lang.Long" resultType="java.lang.String">
 		select distinct m.perms
 		from sys_menu m
