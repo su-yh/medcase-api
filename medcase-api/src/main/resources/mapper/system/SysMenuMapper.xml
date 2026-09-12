@@ -24,33 +24,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		<result property="remark"         column="remark"         />
 	</resultMap>
 
-	<sql id="selectMenuVo">
-        select id, menu_name, parent_id, order_num, route_path, vue_component_path, route_name, menu_type, visible, status, ifnull(perms,'') as perms, icon, create_time
-		from sys_menu
-    </sql>
-
-    <select id="selectMenuList" resultMap="SysMenuResult">
-		<include refid="selectMenuVo"/>
-		<where>
-			<if test="menu.menuName != null and menu.menuName != ''">
-				AND menu_name like concat('%', #{menu.menuName}, '%')
-			</if>
-			<if test="menu.visible != null">
-				AND visible = #{menu.visible}
-			</if>
-			<if test="menu.status != null and menu.status != ''">
-				AND status = #{menu.status}
-			</if>
-		</where>
-		order by parent_id, order_num
-	</select>
-
-	<select id="selectMenuTreeAll" resultMap="SysMenuResult">
-		select distinct m.id, m.parent_id, m.menu_name, m.route_path, m.vue_component_path, m.route_name, m.visible, m.status, ifnull(m.perms,'') as perms, m.menu_type, m.icon, m.order_num, m.create_time
-		from sys_menu m where m.menu_type in ('M', 'C') and m.status = 0
-		order by m.parent_id, m.order_num
-	</select>
-
 	<select id="selectMenuListByUserId" resultMap="SysMenuResult">
 		select distinct m.id, m.parent_id, m.menu_name, m.route_path, m.vue_component_path, m.route_name, m.visible, m.status, ifnull(m.perms,'') as perms, m.menu_type, m.icon, m.order_num, m.create_time
 		from sys_menu m
@@ -95,11 +68,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		from sys_menu m
 			 left join sys_role_menu rm on m.id = rm.menu_id
 		where m.status = '0' and rm.role_id = #{roleId}
-	</select>
-
-	<select id="selectMenusByPathOrRouteName" resultMap="SysMenuResult">
-		<include refid="selectMenuVo"/>
-		where menu_type in ('M', 'C') and (route_path = #{routePath} or route_name = #{routeName})
 	</select>
 
 </mapper>
