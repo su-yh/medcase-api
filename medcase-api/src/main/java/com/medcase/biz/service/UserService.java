@@ -94,7 +94,7 @@ public class UserService {
             throw ExceptionUtil.business(ErrorCodeEnums.USER_REVIEW_STATUS_NOT_MATCH);
         }
 
-        boolean approve = Boolean.TRUE.equals(request.getApprove());
+        boolean approve = request.getApprove() != null && request.getApprove();
         if (!approve && !StringUtils.hasText(request.getReason())) {
             throw ExceptionUtil.business(ErrorCodeEnums.USER_REVIEW_REASON_EMPTY);
         }

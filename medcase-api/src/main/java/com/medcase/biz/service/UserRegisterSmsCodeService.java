@@ -37,7 +37,7 @@ public class UserRegisterSmsCodeService {
 
     public void sendCode(String phone) {
         validatePhone(phone);
-        if (Boolean.TRUE.equals(redisCache.hasKey(getCooldownKey(phone)))) {
+        if (redisCache.hasKey(getCooldownKey(phone))) {
             throw ExceptionUtil.business(ErrorCodeEnums.USER_REGISTER_SMS_CODE_SEND_TOO_FREQUENT);
         }
 

@@ -64,7 +64,7 @@ public class SysPermissionService {
                 // 多角色设置permissions属性，以便权限匹配
                 for (SysRoleEntity role : roles) {
 
-                    if (Boolean.TRUE.equals(role.getEnabled())) {
+                    if (role.getEnabled() != null && role.getEnabled()) {
 
                         Set<String> rolePerms = menuService.selectMenuPermsByRoleId(role.getRoleId());
                         role.setPermissions(rolePerms);

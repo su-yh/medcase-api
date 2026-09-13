@@ -87,8 +87,14 @@ public class SysDeptService {
                 || !department.getDeptName().contains(query.getDeptNameLike()))) {
             return false;
         }
-        return query.getEnabled() == null
-                || query.getEnabled().equals(department.getEnabled());
+        if (query.getEnabled() == null) {
+            return true;
+        }
+        if (department.getEnabled() == null) {
+            return false;
+        }
+        return query.getEnabled() && department.getEnabled()
+                || !query.getEnabled() && !department.getEnabled();
     }
 
     /**
@@ -180,7 +186,7 @@ public class SysDeptService {
             return 0;
         }
         return Math.toIntExact(all().stream()
-                .filter(dept -> Boolean.TRUE.equals(dept.getEnabled()))
+                .filter(dept -> dept.getEnabled() != null && dept.getEnabled())
                 .filter(dept -> dept.getAncestors() != null)
                 .filter(dept -> Arrays.asList(dept.getAncestors().split(","))
                         .contains(String.valueOf(deptId)))
@@ -239,7 +245,7 @@ public class SysDeptService {
 
         SysDeptEntity info = deptMapper.selectById(dept.getParentId());
         // 如果父节点不为正常状态,则不允许新增子节点
-        if (info == null || !Boolean.TRUE.equals(info.getEnabled())) {
+        if (info == null || info.getEnabled() == null || !info.getEnabled()) {
             throw ExceptionUtil.business(ErrorCodeEnums.DEPT_DISABLED);
         }
         SysDeptEntity entity = toEntity(dept);
@@ -276,7 +282,7 @@ public class SysDeptService {
             entity.setAncestors(newParentDept.getAncestors() + "," + newParentDept.getDeptId());
         }
         int result = deptMapper.updateById(entity);
-        if (Boolean.TRUE.equals(dept.getEnabled())
+        if (dept.getEnabled() != null && dept.getEnabled()
                 && org.springframework.util.StringUtils.hasText(entity.getAncestors())
                 && !UserConstants.NORMAL.equals(entity.getAncestors())) {
 

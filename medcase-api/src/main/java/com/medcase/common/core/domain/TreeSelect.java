@@ -23,8 +23,8 @@ public class TreeSelect implements Serializable {
     /** 节点名称 */
     private String label;
 
-    /** 节点禁用 */
-    private boolean disabled = false;
+    /** 节点启用状态 */
+    private Boolean enabled = Boolean.TRUE;
 
     /** 子节点 */
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
@@ -39,7 +39,7 @@ public class TreeSelect implements Serializable {
 
         this.id = dept.getDeptId();
         this.label = dept.getDeptName();
-        this.disabled = !Boolean.TRUE.equals(dept.getEnabled());
+        this.enabled = dept.getEnabled();
         this.children = dept.getChildren().stream().map(TreeSelect::new).collect(Collectors.toList());
     }
 

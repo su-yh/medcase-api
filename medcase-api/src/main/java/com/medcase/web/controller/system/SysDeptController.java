@@ -114,7 +114,7 @@ public class SysDeptController {
         else if (dept.getParentId().equals(deptId)) {
             throw ExceptionUtil.business(ErrorCodeEnums.DEPT_PARENT_SELF);
         }
-        else if (Boolean.FALSE.equals(dept.getEnabled())
+        else if (dept.getEnabled() != null && !dept.getEnabled()
                 && deptService.selectNormalChildrenDeptById(deptId) > 0) {
             throw ExceptionUtil.business(ErrorCodeEnums.DEPT_ENABLED_CHILDREN);
         }

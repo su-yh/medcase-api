@@ -150,7 +150,7 @@ public class SysConfigService {
         for (Long configId : configIds) {
 
             SysConfigEntity config = selectConfigById(configId);
-            if (Boolean.TRUE.equals(config.getBuiltIn())) {
+            if (config.getBuiltIn() != null && config.getBuiltIn()) {
 
                 throw ExceptionUtil.business(ErrorCodeEnums.CONFIG_BUILTIN_DELETE, config.getConfigKey());
             }
