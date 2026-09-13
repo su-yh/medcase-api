@@ -15,4 +15,5 @@ alter table sys_menu rename column component to vue_component_path;
 alter table sys_menu modify column vue_component_path varchar(255) default null comment '路由对应前端组件路径';
 alter table sys_menu modify column route_name varchar(50) default null comment '路由名称，菜单必填且全局唯一';
 alter table sys_menu modify column visible tinyint default 1 comment '菜单显示状态（1显示 0隐藏）';
+alter table sys_menu modify column enabled tinyint default 1 comment '菜单启用状态（1启用 0停用）';
 create unique index uk_sys_menu_route_name on sys_menu(route_name);

@@ -2,7 +2,6 @@ package com.medcase.system.mapper;
 
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.medcase.common.constant.UserConstants;
-import com.medcase.common.enums.NormalDisableEnums;
 import com.medcase.mp.mybatis.BaseMapperX;
 import com.medcase.mp.mybatis.LambdaQueryWrapperX;
 import com.medcase.system.entity.SysMenuEntity;
@@ -18,7 +17,7 @@ public interface SysMenuMapper extends BaseMapperX<SysMenuEntity> {
         LambdaQueryWrapperX<SysMenuEntity> query = build();
         query.likeIfPresent(SysMenuEntity::getMenuName, menu.getMenuName());
         query.eqIfPresent(SysMenuEntity::getVisible, menu.getVisible());
-        query.eqIfPresent(SysMenuEntity::getStatus, menu.getStatus());
+        query.eqIfPresent(SysMenuEntity::getEnabled, menu.getEnabled());
         query.orderByAsc(SysMenuEntity::getParentId);
         query.orderByAsc(SysMenuEntity::getOrderNum);
         return selectList(query);
@@ -34,7 +33,7 @@ public interface SysMenuMapper extends BaseMapperX<SysMenuEntity> {
     default List<SysMenuEntity> selectMenuTreeAll() {
         LambdaQueryWrapperX<SysMenuEntity> query = build();
         query.in(SysMenuEntity::getMenuType, UserConstants.TYPE_DIR, UserConstants.TYPE_MENU);
-        query.eq(SysMenuEntity::getStatus, NormalDisableEnums.NORMAL);
+        query.eq(SysMenuEntity::getEnabled, Boolean.TRUE);
         query.orderByAsc(SysMenuEntity::getParentId);
         query.orderByAsc(SysMenuEntity::getOrderNum);
         return selectList(query);

@@ -5,7 +5,6 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import com.medcase.common.constant.UserConstants;
 import com.medcase.common.core.domain.TreeSelect;
 import com.medcase.common.core.text.Convert;
-import com.medcase.common.enums.NormalDisableEnums;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
 import com.medcase.system.entity.SysDeptEntity;
@@ -88,8 +87,8 @@ public class SysDeptService {
                 || !department.getDeptName().contains(query.getDeptNameLike()))) {
             return false;
         }
-        return query.getStatus() == null
-                || query.getStatus().equals(department.getStatus());
+        return query.getEnabled() == null
+                || query.getEnabled().equals(department.getEnabled());
     }
 
     /**
@@ -181,7 +180,7 @@ public class SysDeptService {
             return 0;
         }
         return Math.toIntExact(all().stream()
-                .filter(dept -> NormalDisableEnums.NORMAL.equals(dept.getStatus()))
+                .filter(dept -> Boolean.TRUE.equals(dept.getEnabled()))
                 .filter(dept -> dept.getAncestors() != null)
                 .filter(dept -> Arrays.asList(dept.getAncestors().split(","))
                         .contains(String.valueOf(deptId)))
@@ -240,7 +239,7 @@ public class SysDeptService {
 
         SysDeptEntity info = deptMapper.selectById(dept.getParentId());
         // 如果父节点不为正常状态,则不允许新增子节点
-        if (info == null || !NormalDisableEnums.NORMAL.equals(info.getStatus())) {
+        if (info == null || !Boolean.TRUE.equals(info.getEnabled())) {
             throw ExceptionUtil.business(ErrorCodeEnums.DEPT_DISABLED);
         }
         SysDeptEntity entity = toEntity(dept);
@@ -277,7 +276,7 @@ public class SysDeptService {
             entity.setAncestors(newParentDept.getAncestors() + "," + newParentDept.getDeptId());
         }
         int result = deptMapper.updateById(entity);
-        if (NormalDisableEnums.NORMAL.equals(dept.getStatus())
+        if (Boolean.TRUE.equals(dept.getEnabled())
                 && org.springframework.util.StringUtils.hasText(entity.getAncestors())
                 && !UserConstants.NORMAL.equals(entity.getAncestors())) {
 
@@ -427,7 +426,7 @@ public class SysDeptService {
         entity.setLeader(request.getLeader());
         entity.setPhone(request.getPhone());
         entity.setEmail(request.getEmail());
-        entity.setStatus(request.getStatus());
+        entity.setEnabled(request.getEnabled());
         return entity;
     }
 }

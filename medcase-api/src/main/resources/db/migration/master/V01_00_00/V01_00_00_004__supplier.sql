@@ -20,40 +20,40 @@ create table medcase_supplier (
 -- 业务管理-供应商管理
 insert into sys_menu
     (menu_id, menu_name, parent_id, order_num, path, component, query, route_name,
-     is_frame, is_cache, menu_type, visible, status, perms, icon, create_by,
+     is_frame, is_cache, menu_type, visible, enabled, perms, icon, create_by,
      create_time, update_by, update_time, remark)
 values
     (2014, '供应商管理', 2003, 300, 'supplier', 'biz/supplier/index', '', 'Supplier',
-     1, 0, 'C', '0', '0', 'supplier:list', 'user', 'admin', sysdate(), '', null, '供应商管理菜单');
+     1, 0, 'C', '0', 1, 'supplier:list', 'user', 'admin', sysdate(), '', null, '供应商管理菜单');
 
 insert into sys_menu
     (menu_id, menu_name, parent_id, order_num, path, component, query, route_name,
-     is_frame, is_cache, menu_type, visible, status, perms, icon, create_by,
+     is_frame, is_cache, menu_type, visible, enabled, perms, icon, create_by,
      create_time, update_by, update_time, remark)
 values
     (2015, '查询', 2014, 1, '', '', '', '',
-     1, 0, 'F', '0', '0', 'supplier:query', '#', 'admin', sysdate(), '', null, '');
+     1, 0, 'F', '0', 1, 'supplier:query', '#', 'admin', sysdate(), '', null, '');
 
 insert into sys_menu
     (menu_id, menu_name, parent_id, order_num, path, component, query, route_name,
-     is_frame, is_cache, menu_type, visible, status, perms, icon, create_by,
+     is_frame, is_cache, menu_type, visible, enabled, perms, icon, create_by,
      create_time, update_by, update_time, remark)
 values
     (2016, '新增', 2014, 2, '', '', '', '',
-     1, 0, 'F', '0', '0', 'supplier:add', '#', 'admin', sysdate(), '', null, '');
+     1, 0, 'F', '0', 1, 'supplier:add', '#', 'admin', sysdate(), '', null, '');
 
 insert into sys_menu
     (menu_id, menu_name, parent_id, order_num, path, component, query, route_name,
-     is_frame, is_cache, menu_type, visible, status, perms, icon, create_by,
+     is_frame, is_cache, menu_type, visible, enabled, perms, icon, create_by,
      create_time, update_by, update_time, remark)
 values
     (2017, '修改', 2014, 3, '', '', '', '',
-     1, 0, 'F', '0', '0', 'supplier:edit', '#', 'admin', sysdate(), '', null, '');
+     1, 0, 'F', '0', 1, 'supplier:edit', '#', 'admin', sysdate(), '', null, '');
 
 insert into sys_menu
     (menu_id, menu_name, parent_id, order_num, path, component, query, route_name,
-     is_frame, is_cache, menu_type, visible, status, perms, icon, create_by,
+     is_frame, is_cache, menu_type, visible, enabled, perms, icon, create_by,
      create_time, update_by, update_time, remark)
 values
     (2018, '状态', 2014, 4, '', '', '', '',
-     1, 0, 'F', '0', '0', 'supplier:status', '#', 'admin', sysdate(), '', null, '');
+     1, 0, 'F', '0', 1, 'supplier:status', '#', 'admin', sysdate(), '', null, '');

@@ -1,6 +1,5 @@
 package com.medcase.web.controller.system.dto;
 
-import com.medcase.common.enums.NoticeStatusEnums;
 import com.medcase.common.enums.NoticeTypeEnums;
 import com.medcase.common.xss.Xss;
 import jakarta.validation.constraints.NotBlank;
@@ -24,5 +23,5 @@ public class NoticeSaveRequest {
 
     private String noticeContent;
 
-    private NoticeStatusEnums status;
+    private Boolean enabled;
 }

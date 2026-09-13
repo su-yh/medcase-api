@@ -4,7 +4,6 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
-import com.medcase.common.enums.NormalDisableEnums;
 import com.medcase.system.entity.SysDictDataEntity;
 import com.medcase.system.mapper.SysDictDataMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,9 +34,9 @@ public class SysDictDataService {
     private SysDictDataMapper dictDataMapper;
 
     public PageResult<SysDictDataEntity> selectPage(
-            PageParam pageParam, String dictType, String dictLabel, NormalDisableEnums status) {
+            PageParam pageParam, String dictType, String dictLabel, Boolean enabled) {
 
-        return dictDataMapper.selectPage(pageParam, dictType, dictLabel, status);
+        return dictDataMapper.selectPage(pageParam, dictType, dictLabel, enabled);
     }
 
     /**

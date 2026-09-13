@@ -1,7 +1,5 @@
 package com.medcase.web.controller.system.dto;
 
-import com.medcase.common.enums.NormalDisableEnums;
-import com.medcase.common.enums.YesNoEnums;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
@@ -33,9 +31,9 @@ public class DictDataSaveRequest {
 
     private String listClass;
 
-    private YesNoEnums isDefault;
+    private Boolean isDefault;
 
-    private NormalDisableEnums status;
+    private Boolean enabled;
 
     private String remark;
 }

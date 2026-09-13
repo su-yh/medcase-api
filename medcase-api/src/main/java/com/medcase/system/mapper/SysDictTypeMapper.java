@@ -4,7 +4,6 @@ import com.medcase.mp.mybatis.BaseMapperX;
 import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
 import com.medcase.mp.mybatis.LambdaQueryWrapperX;
-import com.medcase.common.enums.NormalDisableEnums;
 import com.medcase.system.entity.SysDictTypeEntity;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -13,11 +12,11 @@ import java.util.List;
 @Mapper
 public interface SysDictTypeMapper extends BaseMapperX<SysDictTypeEntity> {
     default PageResult<SysDictTypeEntity> selectPage(
-            PageParam pageParam, String dictName, NormalDisableEnums status, String dictType,
+            PageParam pageParam, String dictName, Boolean enabled, String dictType,
             Object beginTime, Object endTime) {
         LambdaQueryWrapperX<SysDictTypeEntity> query = build();
         query.likeIfPresent(SysDictTypeEntity::getDictName, dictName);
-        query.eqIfPresent(SysDictTypeEntity::getStatus, status);
+        query.eqIfPresent(SysDictTypeEntity::getEnabled, enabled);
         query.likeIfPresent(SysDictTypeEntity::getDictType, dictType);
         query.apply(beginTime != null,
                 "DATE_FORMAT(create_time, '%Y%m%d') >= DATE_FORMAT({0}, '%Y%m%d')",

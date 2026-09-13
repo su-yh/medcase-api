@@ -18,7 +18,7 @@ public interface SysRoleMapper extends BaseMapperX<SysRoleEntity> {
         LambdaQueryWrapperX<SysRoleEntity> query = build();
         query.likeIfPresent(SysRoleEntity::getRoleName, request.getRoleNameLike());
         query.likeIfPresent(SysRoleEntity::getRoleKey, request.getRoleKeyLike());
-        query.eqIfPresent(SysRoleEntity::getStatus, request.getStatus());
+        query.eqIfPresent(SysRoleEntity::getEnabled, request.getEnabled());
         query.geIfPresent(SysRoleEntity::getCreateTime, request.getBeginTime());
         query.ltIfPresent(SysRoleEntity::getCreateTime, request.getEndTime());
         query.eqIfPresent(SysRoleEntity::getCreateUserId, createUserId);

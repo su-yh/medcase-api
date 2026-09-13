@@ -1,6 +1,5 @@
 package com.medcase.web.controller.system.dto;
 
-import com.medcase.common.enums.NormalDisableEnums;
 import com.medcase.mvc.advice.date.DateTimeFormatPlus;
 import com.medcase.mvc.advice.date.OffsetUnit;
 import lombok.Data;
@@ -18,7 +17,7 @@ public class RoleQueryRequest {
 
     private String roleKeyLike;
 
-    private NormalDisableEnums status;
+    private Boolean enabled;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date beginTime;

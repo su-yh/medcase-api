@@ -4,7 +4,6 @@ import com.medcase.mp.mybatis.BaseMapperX;
 import com.medcase.mp.mybatis.LambdaQueryWrapperX;
 import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
-import com.medcase.common.enums.NormalDisableEnums;
 import com.medcase.system.entity.SysPostEntity;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -13,11 +12,11 @@ import java.util.List;
 @Mapper
 public interface SysPostMapper extends BaseMapperX<SysPostEntity> {
     default PageResult<SysPostEntity> selectPage(
-            PageParam pageParam, String postCode, String postName, NormalDisableEnums status) {
+            PageParam pageParam, String postCode, String postName, Boolean enabled) {
         LambdaQueryWrapperX<SysPostEntity> queryWrapper = build();
         queryWrapper.likeIfPresent(SysPostEntity::getPostCode, postCode);
         queryWrapper.likeIfPresent(SysPostEntity::getPostName, postName);
-        queryWrapper.eqIfPresent(SysPostEntity::getStatus, status);
+        queryWrapper.eqIfPresent(SysPostEntity::getEnabled, enabled);
         return selectPage(pageParam, queryWrapper);
     }
 

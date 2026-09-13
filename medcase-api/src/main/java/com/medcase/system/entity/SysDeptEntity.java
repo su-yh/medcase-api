@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.medcase.common.enums.NormalDisableEnums;
 import com.medcase.mp.entity.AbstractBaseEntity;
 import lombok.Data;
 
@@ -35,7 +34,7 @@ public class SysDeptEntity extends AbstractBaseEntity {
 
     private String email;
 
-    private NormalDisableEnums status;
+    private Boolean enabled;
 
     private String delFlag;
 

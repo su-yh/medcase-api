@@ -1,7 +1,6 @@
 package com.medcase.framework.web.service;
 
 import com.medcase.common.constant.Constants;
-import com.medcase.common.enums.NormalDisableEnums;
 import com.medcase.system.entity.SysRoleEntity;
 import com.medcase.system.entity.SysUserEntity;
 import com.medcase.system.service.SysMenuService;
@@ -65,7 +64,7 @@ public class SysPermissionService {
                 // 多角色设置permissions属性，以便权限匹配
                 for (SysRoleEntity role : roles) {
 
-                    if (NormalDisableEnums.NORMAL.equals(role.getStatus())) {
+                    if (Boolean.TRUE.equals(role.getEnabled())) {
 
                         Set<String> rolePerms = menuService.selectMenuPermsByRoleId(role.getRoleId());
                         role.setPermissions(rolePerms);

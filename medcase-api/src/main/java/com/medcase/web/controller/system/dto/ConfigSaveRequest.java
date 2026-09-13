@@ -1,6 +1,5 @@
 package com.medcase.web.controller.system.dto;
 
-import com.medcase.common.enums.YesNoEnums;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
@@ -25,7 +24,7 @@ public class ConfigSaveRequest {
     @Size(max = 500, message = "参数键值长度不能超过500个字符")
     private String configValue;
 
-    private YesNoEnums configType;
+    private Boolean builtIn;
 
     private String remark;
 }

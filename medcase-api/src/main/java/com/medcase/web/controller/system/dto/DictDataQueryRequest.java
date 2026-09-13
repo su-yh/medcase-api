@@ -1,6 +1,5 @@
 package com.medcase.web.controller.system.dto;
 
-import com.medcase.common.enums.NormalDisableEnums;
 import lombok.Data;
 
 /**
@@ -13,5 +12,5 @@ public class DictDataQueryRequest {
 
     private String dictLabel;
 
-    private NormalDisableEnums status;
+    private Boolean enabled;
 }

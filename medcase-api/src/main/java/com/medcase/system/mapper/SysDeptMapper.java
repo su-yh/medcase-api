@@ -2,7 +2,6 @@ package com.medcase.system.mapper;
 
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.medcase.common.constant.UserConstants;
-import com.medcase.common.enums.NormalDisableEnums;
 import com.medcase.mp.mybatis.BaseMapperX;
 import com.medcase.mp.mybatis.LambdaQueryWrapperX;
 import com.medcase.system.entity.SysDeptEntity;
@@ -32,7 +31,7 @@ public interface SysDeptMapper extends BaseMapperX<SysDeptEntity> {
             return 0;
         }
         SysDeptEntity entity = new SysDeptEntity();
-        entity.setStatus(NormalDisableEnums.NORMAL);
+        entity.setEnabled(Boolean.TRUE);
         return update(entity, new LambdaUpdateWrapper<SysDeptEntity>()
                 .in(SysDeptEntity::getDeptId, deptIds));
     }

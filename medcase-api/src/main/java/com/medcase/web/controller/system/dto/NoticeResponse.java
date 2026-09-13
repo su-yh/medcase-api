@@ -1,7 +1,6 @@
 package com.medcase.web.controller.system.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.medcase.common.enums.NoticeStatusEnums;
 import com.medcase.common.enums.NoticeTypeEnums;
 import com.medcase.system.entity.SysNoticeEntity;
 import lombok.Data;
@@ -22,7 +21,7 @@ public class NoticeResponse {
 
     private String noticeContent;
 
-    private NoticeStatusEnums status;
+    private Boolean enabled;
 
     private String createBy;
 
@@ -38,7 +37,7 @@ public class NoticeResponse {
         response.setNoticeTitle(entity.getNoticeTitle());
         response.setNoticeType(entity.getNoticeType());
         response.setNoticeContent(entity.getNoticeContent());
-        response.setStatus(entity.getStatus());
+        response.setEnabled(entity.getEnabled());
         response.setCreateBy(entity.getCreateBy());
         response.setCreateTime(entity.getCreateTime());
         return response;

@@ -257,7 +257,7 @@ public class SysRoleService {
         role.setRoleKey(request.getRoleKey());
         role.setRoleSort(request.getRoleSort());
         role.setMenuCheckStrictly(request.isMenuCheckStrictly());
-        role.setStatus(request.getStatus());
+        role.setEnabled(request.getEnabled());
         role.setRemark(request.getRemark());
 
         if (!checkRoleNameUnique(role)) {
@@ -292,7 +292,7 @@ public class SysRoleService {
         role.setRoleKey(request.getRoleKey());
         role.setRoleSort(request.getRoleSort());
         role.setMenuCheckStrictly(request.isMenuCheckStrictly());
-        role.setStatus(request.getStatus());
+        role.setEnabled(request.getEnabled());
         role.setRemark(request.getRemark());
 
         if (!checkRoleNameUnique(role)) {
@@ -322,7 +322,7 @@ public class SysRoleService {
         selectRoleById(request.getRoleId(), createUserId, admin);
         SysRoleEntity role = new SysRoleEntity();
         role.setRoleId(request.getRoleId());
-        role.setStatus(request.getStatus());
+        role.setEnabled(request.getEnabled());
 
         int row = roleMapper.updateById(role);
         if (row > 0) {

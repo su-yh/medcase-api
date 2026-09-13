@@ -4,7 +4,6 @@ import com.medcase.mp.mybatis.BaseMapperX;
 import com.medcase.mp.mybatis.LambdaQueryWrapperX;
 import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
-import com.medcase.common.enums.YesNoEnums;
 import com.medcase.system.entity.SysConfigEntity;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -18,11 +17,11 @@ public interface SysConfigMapper extends BaseMapperX<SysConfigEntity> {
     }
 
     default PageResult<SysConfigEntity> selectPage(
-            PageParam pageParam, String configName, YesNoEnums configType, String configKey,
+            PageParam pageParam, String configName, Boolean builtIn, String configKey,
             Date beginTime, Date endTime) {
         LambdaQueryWrapperX<SysConfigEntity> query = build();
         query.likeIfPresent(SysConfigEntity::getConfigName, configName);
-        query.eqIfPresent(SysConfigEntity::getConfigType, configType);
+        query.eqIfPresent(SysConfigEntity::getBuiltIn, builtIn);
         query.likeIfPresent(SysConfigEntity::getConfigKey, configKey);
         query.geIfPresent(SysConfigEntity::getCreateTime, beginTime);
         query.leIfPresent(SysConfigEntity::getCreateTime, endTime);

@@ -5,7 +5,6 @@ import com.medcase.mp.mybatis.BaseMapperX;
 import com.medcase.mp.mybatis.LambdaQueryWrapperX;
 import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
-import com.medcase.common.enums.NormalDisableEnums;
 import com.medcase.system.entity.SysDictDataEntity;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -14,18 +13,18 @@ import java.util.List;
 @Mapper
 public interface SysDictDataMapper extends BaseMapperX<SysDictDataEntity> {
     default PageResult<SysDictDataEntity> selectPage(
-            PageParam pageParam, String dictType, String dictLabel, NormalDisableEnums status) {
+            PageParam pageParam, String dictType, String dictLabel, Boolean enabled) {
         LambdaQueryWrapperX<SysDictDataEntity> query = build();
         query.eqIfPresent(SysDictDataEntity::getDictType, dictType);
         query.likeIfPresent(SysDictDataEntity::getDictLabel, dictLabel);
-        query.eqIfPresent(SysDictDataEntity::getStatus, status);
+        query.eqIfPresent(SysDictDataEntity::getEnabled, enabled);
         query.orderByAsc(SysDictDataEntity::getDictSort);
         return selectPage(pageParam, query);
     }
 
     default List<SysDictDataEntity> selectEnabledDictDataByType(String dictType) {
         LambdaQueryWrapperX<SysDictDataEntity> query = build();
-        query.eq(SysDictDataEntity::getStatus, NormalDisableEnums.NORMAL);
+        query.eq(SysDictDataEntity::getEnabled, Boolean.TRUE);
         query.eq(SysDictDataEntity::getDictType, dictType);
         query.orderByAsc(SysDictDataEntity::getDictSort);
         return selectList(query);

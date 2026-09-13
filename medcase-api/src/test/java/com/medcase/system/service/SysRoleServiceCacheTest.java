@@ -6,7 +6,7 @@ import com.medcase.system.entity.SysRoleMenuEntity;
 import com.medcase.system.mapper.SysRoleMapper;
 import com.medcase.system.mapper.SysRoleMenuMapper;
 import com.medcase.system.mapper.SysUserRoleMapper;
-import com.medcase.common.enums.NormalDisableEnums;
+
 import com.medcase.web.controller.system.dto.RoleAddRequest;
 import com.medcase.web.controller.system.dto.RoleEditRequest;
 import com.medcase.web.controller.system.dto.RoleMenuUpdateRequest;
@@ -110,7 +110,7 @@ class SysRoleServiceCacheTest {
         request.setRoleKey("reviewer");
         request.setRoleSort(1);
         request.setMenuCheckStrictly(true);
-        request.setStatus(NormalDisableEnums.NORMAL);
+        request.setEnabled(Boolean.TRUE);
         request.setRemark("病例审核角色");
 
         roleService.insertRole(request);
@@ -122,7 +122,7 @@ class SysRoleServiceCacheTest {
         assertEquals("reviewer", role.getRoleKey());
         assertEquals(1, role.getRoleSort());
         assertEquals(Boolean.TRUE, role.getMenuCheckStrictly());
-        assertEquals(NormalDisableEnums.NORMAL, role.getStatus());
+        assertEquals(Boolean.TRUE, role.getEnabled());
         assertEquals("病例审核角色", role.getRemark());
     }
 

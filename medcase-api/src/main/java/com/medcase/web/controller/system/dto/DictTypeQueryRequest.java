@@ -1,6 +1,5 @@
 package com.medcase.web.controller.system.dto;
 
-import com.medcase.common.enums.NormalDisableEnums;
 import lombok.Data;
 
 /**
@@ -13,7 +12,7 @@ public class DictTypeQueryRequest {
 
     private String dictType;
 
-    private NormalDisableEnums status;
+    private Boolean enabled;
 
     private String beginTime;
 

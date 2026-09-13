@@ -194,7 +194,7 @@ public class SysNoticeController {
         entity.setNoticeTitle(request.getNoticeTitle());
         entity.setNoticeType(request.getNoticeType());
         entity.setNoticeContent(request.getNoticeContent());
-        entity.setStatus(request.getStatus());
+        entity.setEnabled(request.getEnabled());
         return entity;
     }
 }

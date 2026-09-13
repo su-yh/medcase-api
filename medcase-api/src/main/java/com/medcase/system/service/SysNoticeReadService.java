@@ -56,7 +56,7 @@ public class SysNoticeReadService {
             notice.setNoticeId(noticeEntity.getNoticeId());
             notice.setNoticeTitle(noticeEntity.getNoticeTitle());
             notice.setNoticeType(noticeEntity.getNoticeType());
-            notice.setStatus(noticeEntity.getStatus());
+            notice.setEnabled(noticeEntity.getEnabled());
             notice.setCreateBy(noticeEntity.getCreateBy());
             notice.setCreateTime(noticeEntity.getCreateTime());
             notices.add(notice);

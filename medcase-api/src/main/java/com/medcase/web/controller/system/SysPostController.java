@@ -46,7 +46,7 @@ public class SysPostController {
     public PageResult<PostResponse> list(PageParam pageParam, PostQueryRequest request) {
 
         PageResult<SysPostEntity> entityPage = postService.selectPage(
-                pageParam, request.getPostCode(), request.getPostName(), request.getStatus());
+                pageParam, request.getPostCode(), request.getPostName(), request.getEnabled());
         PageResult<PostResponse> result = new PageResult<>();
         result.setList(entityPage.getList().stream()
                 .map(PostResponse::fromEntity)
@@ -150,7 +150,7 @@ public class SysPostController {
         entity.setPostCode(request.getPostCode());
         entity.setPostName(request.getPostName());
         entity.setPostSort(request.getPostSort());
-        entity.setStatus(request.getStatus());
+        entity.setEnabled(request.getEnabled());
         entity.setRemark(request.getRemark());
         return entity;
     }

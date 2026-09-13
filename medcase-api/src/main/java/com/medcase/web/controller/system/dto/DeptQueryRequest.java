@@ -1,6 +1,5 @@
 package com.medcase.web.controller.system.dto;
 
-import com.medcase.common.enums.NormalDisableEnums;
 import lombok.Data;
 
 /**
@@ -11,5 +10,5 @@ public class DeptQueryRequest {
 
     private String deptNameLike;
 
-    private NormalDisableEnums status;
+    private Boolean enabled;
 }

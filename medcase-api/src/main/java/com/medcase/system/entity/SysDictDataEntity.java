@@ -3,8 +3,6 @@ package com.medcase.system.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.medcase.common.enums.NormalDisableEnums;
-import com.medcase.common.enums.YesNoEnums;
 import com.medcase.mp.entity.AbstractBaseEntity;
 import lombok.Data;
 
@@ -30,9 +28,9 @@ public class SysDictDataEntity extends AbstractBaseEntity {
 
     private String listClass;
 
-    private YesNoEnums isDefault;
+    private Boolean isDefault;
 
-    private NormalDisableEnums status;
+    private Boolean enabled;
 
     private String remark;
 }

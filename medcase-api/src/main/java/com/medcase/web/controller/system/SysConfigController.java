@@ -44,7 +44,7 @@ public class SysConfigController {
     public PageResult<ConfigResponse> list(PageParam pageParam, ConfigQueryRequest request) {
 
         PageResult<SysConfigEntity> entityPage = configService.selectPage(
-                pageParam, request.getConfigName(), request.getConfigType(), request.getConfigKey(),
+                pageParam, request.getConfigName(), request.getBuiltIn(), request.getConfigKey(),
                 request.getBeginTime(), request.getEndTime());
         PageResult<ConfigResponse> result = new PageResult<>();
         result.setList(entityPage.getList().stream()
@@ -154,7 +154,7 @@ public class SysConfigController {
         entity.setConfigName(request.getConfigName());
         entity.setConfigKey(request.getConfigKey());
         entity.setConfigValue(request.getConfigValue());
-        entity.setConfigType(request.getConfigType());
+        entity.setBuiltIn(request.getBuiltIn());
         entity.setRemark(request.getRemark());
         return entity;
     }

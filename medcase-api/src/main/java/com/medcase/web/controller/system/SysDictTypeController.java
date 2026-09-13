@@ -41,7 +41,7 @@ public class SysDictTypeController {
     public PageResult<SysDictTypeEntity> list(PageParam pageParam, DictTypeQueryRequest request) {
 
         return dictTypeService.selectPage(
-                pageParam, request.getDictName(), request.getStatus(), request.getDictType(),
+                pageParam, request.getDictName(), request.getEnabled(), request.getDictType(),
                 request.getBeginTime(), request.getEndTime());
     }
 
@@ -146,7 +146,7 @@ public class SysDictTypeController {
         entity.setDictId(request.getDictId());
         entity.setDictName(request.getDictName());
         entity.setDictType(request.getDictType());
-        entity.setStatus(request.getStatus());
+        entity.setEnabled(request.getEnabled());
         entity.setRemark(request.getRemark());
         return entity;
     }

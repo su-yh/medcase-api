@@ -3,7 +3,6 @@ package com.medcase.web.controller.system.dto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
-import com.medcase.common.enums.NoticeStatusEnums;
 import com.medcase.common.enums.NoticeTypeEnums;
 import lombok.Data;
 
@@ -21,7 +20,7 @@ public class NoticeTopItemResponse {
 
     private NoticeTypeEnums noticeType;
 
-    private NoticeStatusEnums status;
+    private Boolean enabled;
 
     private String createBy;
 

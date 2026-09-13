@@ -1,7 +1,6 @@
 package com.medcase.web.controller.system.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.medcase.common.enums.NormalDisableEnums;
 import com.medcase.system.entity.SysPostEntity;
 import lombok.Data;
 
@@ -21,7 +20,7 @@ public class PostResponse {
 
     private Integer postSort;
 
-    private NormalDisableEnums status;
+    private Boolean enabled;
 
     private String remark;
 
@@ -37,7 +36,7 @@ public class PostResponse {
         response.setPostCode(entity.getPostCode());
         response.setPostName(entity.getPostName());
         response.setPostSort(entity.getPostSort());
-        response.setStatus(entity.getStatus());
+        response.setEnabled(entity.getEnabled());
         response.setRemark(entity.getRemark());
         response.setCreateTime(entity.getCreateTime());
         return response;

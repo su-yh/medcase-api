@@ -42,7 +42,7 @@ public class SysDictDataController {
     public PageResult<SysDictDataEntity> list(PageParam pageParam, DictDataQueryRequest request) {
 
         return dictDataService.selectPage(
-                pageParam, request.getDictType(), request.getDictLabel(), request.getStatus());
+                pageParam, request.getDictType(), request.getDictLabel(), request.getEnabled());
     }
 
     /**
@@ -134,7 +134,7 @@ public class SysDictDataController {
         entity.setCssClass(request.getCssClass());
         entity.setListClass(request.getListClass());
         entity.setIsDefault(request.getIsDefault());
-        entity.setStatus(request.getStatus());
+        entity.setEnabled(request.getEnabled());
         entity.setRemark(request.getRemark());
         return entity;
     }

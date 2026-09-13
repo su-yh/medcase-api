@@ -1,7 +1,6 @@
 package com.medcase.system.service;
 
 import com.medcase.common.constant.UserConstants;
-import com.medcase.common.enums.NormalDisableEnums;
 import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
@@ -35,9 +34,9 @@ public class SysPostService {
      * @return 岗位信息集合
      */
     public PageResult<SysPostEntity> selectPage(
-            PageParam pageParam, String postCode, String postName, NormalDisableEnums status) {
+            PageParam pageParam, String postCode, String postName, Boolean enabled) {
 
-        return postMapper.selectPage(pageParam, postCode, postName, status);
+        return postMapper.selectPage(pageParam, postCode, postName, enabled);
     }
 
     /**
