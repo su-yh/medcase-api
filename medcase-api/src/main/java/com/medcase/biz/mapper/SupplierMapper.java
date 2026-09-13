@@ -19,11 +19,11 @@ import java.util.List;
 public interface SupplierMapper extends BaseMapperX<SupplierEntity> {
 
     default PageResult<SupplierEntity> selectPage(PageParam pageParam, SupplierQuery query) {
-        LambdaQueryWrapperX<SupplierEntity> queryWrapper = build()
-                .likeIfPresent(SupplierEntity::getName, query.getName())
-                .likeIfPresent(SupplierEntity::getPhonenumber, query.getPhone())
-                .eqIfPresent(SupplierEntity::getStatus, query.getStatus())
-                .orderByDesc(SupplierEntity::getCreateTime);
+        LambdaQueryWrapperX<SupplierEntity> queryWrapper = build();
+        queryWrapper.likeIfPresent(SupplierEntity::getName, query.getName());
+        queryWrapper.likeIfPresent(SupplierEntity::getPhonenumber, query.getPhone());
+        queryWrapper.eqIfPresent(SupplierEntity::getStatus, query.getStatus());
+        queryWrapper.orderByDesc(SupplierEntity::getCreateTime);
         return selectPage(pageParam, queryWrapper);
     }
 
@@ -32,9 +32,9 @@ public interface SupplierMapper extends BaseMapperX<SupplierEntity> {
             return false;
         }
 
-        LambdaQueryWrapperX<SupplierEntity> queryWrapper = build()
-                .eq(SupplierEntity::getName, name)
-                .neIfPresent(SupplierEntity::getId, id);
+        LambdaQueryWrapperX<SupplierEntity> queryWrapper = build();
+        queryWrapper.eq(SupplierEntity::getName, name);
+        queryWrapper.neIfPresent(SupplierEntity::getId, id);
         return exists(queryWrapper);
     }
 
@@ -42,15 +42,17 @@ public interface SupplierMapper extends BaseMapperX<SupplierEntity> {
         if (id == null) {
             return null;
         }
-        return selectOne(build()
-                .eq(SupplierEntity::getId, id)
-                .eq(SupplierEntity::getStatus, SupplierStatusEnums.NORMAL));
+        LambdaQueryWrapperX<SupplierEntity> queryWrapper = build();
+        queryWrapper.eq(SupplierEntity::getId, id);
+        queryWrapper.eq(SupplierEntity::getStatus, SupplierStatusEnums.NORMAL);
+        return selectOne(queryWrapper);
     }
 
     default List<SupplierEntity> selectEnabledList() {
-        return selectList(build()
-                .eq(SupplierEntity::getStatus, SupplierStatusEnums.NORMAL)
-                .orderByAsc(SupplierEntity::getName)
-                .orderByAsc(SupplierEntity::getId));
+        LambdaQueryWrapperX<SupplierEntity> queryWrapper = build();
+        queryWrapper.eq(SupplierEntity::getStatus, SupplierStatusEnums.NORMAL);
+        queryWrapper.orderByAsc(SupplierEntity::getName);
+        queryWrapper.orderByAsc(SupplierEntity::getId);
+        return selectList(queryWrapper);
     }
 }

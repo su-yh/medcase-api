@@ -1,7 +1,9 @@
 package com.medcase.system.service;
 
 import com.medcase.system.entity.SysNoticeReadEntity;
+import com.medcase.system.entity.SysNoticeEntity;
 import com.medcase.system.mapper.SysNoticeReadMapper;
+import com.medcase.system.mapper.SysNoticeMapper;
 import com.medcase.system.entity.SysDeptEntity;
 import com.medcase.web.controller.system.dto.NoticeReadUserResponse;
 import com.medcase.web.controller.system.dto.NoticeTopItemResponse;
@@ -28,19 +30,22 @@ class SysNoticeReadServiceTest {
     private SysNoticeReadMapper noticeReadMapper;
 
     @Mock
+    private SysNoticeMapper noticeMapper;
+
+    @Mock
     private SysDeptService deptService;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        noticeReadService = new SysNoticeReadService(noticeReadMapper, deptService);
+        noticeReadService = new SysNoticeReadService(noticeReadMapper, noticeMapper, deptService);
     }
 
     @Test
     void selectNoticeListWithReadStatusMarksReadInService() {
-        NoticeTopItemResponse readNotice = notice(1L);
-        NoticeTopItemResponse unreadNotice = notice(2L);
-        when(noticeReadMapper.selectTopNoticeList(5)).thenReturn(List.of(readNotice, unreadNotice));
+        SysNoticeEntity readNotice = notice(1L);
+        SysNoticeEntity unreadNotice = notice(2L);
+        when(noticeMapper.selectTopNoticeList(5)).thenReturn(List.of(readNotice, unreadNotice));
         when(noticeReadMapper.selectReadNoticeIds(12L, List.of(1L, 2L))).thenReturn(Set.of(1L));
 
         List<NoticeTopItemResponse> result = noticeReadService.selectNoticeListWithReadStatus(12L, 5);
@@ -94,9 +99,9 @@ class SysNoticeReadServiceTest {
         assertEquals("管理部", result.get(0).getDeptName());
     }
 
-    private NoticeTopItemResponse notice(Long noticeId) {
-        NoticeTopItemResponse response = new NoticeTopItemResponse();
-        response.setNoticeId(noticeId);
-        return response;
+    private SysNoticeEntity notice(Long noticeId) {
+        SysNoticeEntity notice = new SysNoticeEntity();
+        notice.setNoticeId(noticeId);
+        return notice;
     }
 }

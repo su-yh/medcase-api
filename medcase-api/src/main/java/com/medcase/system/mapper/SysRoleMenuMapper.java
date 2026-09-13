@@ -1,6 +1,7 @@
 package com.medcase.system.mapper;
 
 import com.medcase.mp.mybatis.BaseMapperX;
+import com.medcase.mp.mybatis.LambdaQueryWrapperX;
 import com.medcase.system.entity.SysRoleMenuEntity;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -15,11 +16,15 @@ public interface SysRoleMenuMapper extends BaseMapperX<SysRoleMenuEntity> {
     }
 
     default int deleteByRoleId(Long roleId) {
-        return delete(build().eq(SysRoleMenuEntity::getRoleId, roleId));
+        LambdaQueryWrapperX<SysRoleMenuEntity> queryWrapper = build();
+        queryWrapper.eq(SysRoleMenuEntity::getRoleId, roleId);
+        return delete(queryWrapper);
     }
 
     default int deleteByRoleIds(Long[] roleIds) {
-        return delete(build().in(SysRoleMenuEntity::getRoleId, Arrays.asList(roleIds)));
+        LambdaQueryWrapperX<SysRoleMenuEntity> queryWrapper = build();
+        queryWrapper.in(SysRoleMenuEntity::getRoleId, Arrays.asList(roleIds));
+        return delete(queryWrapper);
     }
 
     default List<Long> selectMenuIdsByRoleId(Long roleId) {

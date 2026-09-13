@@ -1,9 +1,9 @@
 package com.medcase.system.mapper;
 
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.medcase.common.constant.UserConstants;
 import com.medcase.mp.mybatis.BaseMapperX;
+import com.medcase.mp.mybatis.LambdaQueryWrapperX;
 import com.medcase.system.entity.SysMenuEntity;
 import com.medcase.web.controller.system.dto.MenuQueryRequest;
 import org.apache.ibatis.annotations.Param;
@@ -14,12 +14,13 @@ import java.util.List;
 @Mapper
 public interface SysMenuMapper extends BaseMapperX<SysMenuEntity> {
     default List<SysMenuEntity> selectMenuList(MenuQueryRequest menu) {
-        return selectList(build()
-                .likeIfPresent(SysMenuEntity::getMenuName, menu.getMenuName())
-                .eqIfPresent(SysMenuEntity::getVisible, menu.getVisible())
-                .eqIfPresent(SysMenuEntity::getStatus, menu.getStatus())
-                .orderByAsc(SysMenuEntity::getParentId)
-                .orderByAsc(SysMenuEntity::getOrderNum));
+        LambdaQueryWrapperX<SysMenuEntity> query = build();
+        query.likeIfPresent(SysMenuEntity::getMenuName, menu.getMenuName());
+        query.eqIfPresent(SysMenuEntity::getVisible, menu.getVisible());
+        query.eqIfPresent(SysMenuEntity::getStatus, menu.getStatus());
+        query.orderByAsc(SysMenuEntity::getParentId);
+        query.orderByAsc(SysMenuEntity::getOrderNum);
+        return selectList(query);
     }
 
     List<SysMenuEntity> selectMenuListByUserId(
@@ -30,33 +31,37 @@ public interface SysMenuMapper extends BaseMapperX<SysMenuEntity> {
     List<String> selectMenuPermsByUserId(Long userId);
 
     default List<SysMenuEntity> selectMenuTreeAll() {
-        return selectList(build()
-                .in(SysMenuEntity::getMenuType, UserConstants.TYPE_DIR, UserConstants.TYPE_MENU)
-                .eq(SysMenuEntity::getStatus, UserConstants.NORMAL)
-                .orderByAsc(SysMenuEntity::getParentId)
-                .orderByAsc(SysMenuEntity::getOrderNum));
+        LambdaQueryWrapperX<SysMenuEntity> query = build();
+        query.in(SysMenuEntity::getMenuType, UserConstants.TYPE_DIR, UserConstants.TYPE_MENU);
+        query.eq(SysMenuEntity::getStatus, UserConstants.NORMAL);
+        query.orderByAsc(SysMenuEntity::getParentId);
+        query.orderByAsc(SysMenuEntity::getOrderNum);
+        return selectList(query);
     }
 
     List<SysMenuEntity> selectMenuTreeByUserId(Long userId);
 
     default List<SysMenuEntity> selectMenusByPathOrRouteName(String routePath, String routeName) {
-        return selectList(build()
-                .in(SysMenuEntity::getMenuType, UserConstants.TYPE_DIR, UserConstants.TYPE_MENU)
-                .and(query -> query
-                        .eq(SysMenuEntity::getRoutePath, routePath)
-                        .or()
-                        .eq(SysMenuEntity::getRouteName, routeName)));
+        LambdaQueryWrapperX<SysMenuEntity> query = build();
+        query.in(SysMenuEntity::getMenuType, UserConstants.TYPE_DIR, UserConstants.TYPE_MENU);
+        query.and(condition -> {
+            condition.eq(SysMenuEntity::getRoutePath, routePath);
+            condition.or();
+            condition.eq(SysMenuEntity::getRouteName, routeName);
+        });
+        return selectList(query);
     }
 
     default int selectChildrenCount(Long menuId) {
-        return Math.toIntExact(selectCount(
-                build().eq(SysMenuEntity::getParentId, menuId)));
+        LambdaQueryWrapperX<SysMenuEntity> query = build();
+        query.eq(SysMenuEntity::getParentId, menuId);
+        return Math.toIntExact(selectCount(query));
     }
 
     default SysMenuEntity selectMenuByName(String menuName, Long parentId) {
-        LambdaQueryWrapper<SysMenuEntity> query = build()
-                .eq(SysMenuEntity::getMenuName, menuName)
-                .eq(SysMenuEntity::getParentId, parentId);
+        LambdaQueryWrapperX<SysMenuEntity> query = build();
+        query.eq(SysMenuEntity::getMenuName, menuName);
+        query.eq(SysMenuEntity::getParentId, parentId);
         return selectOne(query);
     }
 

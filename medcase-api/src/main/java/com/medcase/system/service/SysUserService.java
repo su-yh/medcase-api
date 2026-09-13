@@ -87,7 +87,7 @@ public class SysUserService {
                 }
             }
         }
-        PageResult<SysUserEntity> result = userMapper.selectPage(
+        PageResult<SysUserEntity> result = userMapper.selectUserPage(
                 pageParam, user, deptIds, beginTime, endTime);
         for (SysUserEntity item : result.getList()) {
             item.setDept(deptService.selectDeptById(item.getDeptId()));

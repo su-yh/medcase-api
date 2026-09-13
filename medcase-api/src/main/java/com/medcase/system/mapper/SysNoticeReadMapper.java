@@ -1,24 +1,33 @@
 package com.medcase.system.mapper;
 
 import com.medcase.mp.mybatis.BaseMapperX;
+import com.medcase.mp.mybatis.LambdaQueryWrapperX;
 import com.medcase.system.entity.SysNoticeReadEntity;
 import com.medcase.web.controller.system.dto.NoticeReadUserResponse;
-import com.medcase.web.controller.system.dto.NoticeTopItemResponse;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Mapper
 public interface SysNoticeReadMapper extends BaseMapperX<SysNoticeReadEntity> {
     int selectUnreadCount(Long userId);
 
-    List<NoticeTopItemResponse> selectTopNoticeList(@Param("limit") int limit);
-
-    Set<Long> selectReadNoticeIds(
-            @Param("userId") Long userId, @Param("noticeIds") Collection<Long> noticeIds);
+    default Set<Long> selectReadNoticeIds(Long userId, Collection<Long> noticeIds) {
+        if (noticeIds == null || noticeIds.isEmpty()) {
+            return Set.of();
+        }
+        LambdaQueryWrapperX<SysNoticeReadEntity> queryWrapper = build();
+        queryWrapper.select(SysNoticeReadEntity::getNoticeId);
+        queryWrapper.eq(SysNoticeReadEntity::getUserId, userId);
+        queryWrapper.in(SysNoticeReadEntity::getNoticeId, noticeIds);
+        return selectList(queryWrapper).stream()
+                .map(SysNoticeReadEntity::getNoticeId)
+                .collect(Collectors.toSet());
+    }
 
     List<NoticeReadUserResponse> selectReadUsersByNoticeId(
             @Param("noticeId") Long noticeId, @Param("nickNameLike") String nickNameLike);
@@ -31,6 +40,8 @@ public interface SysNoticeReadMapper extends BaseMapperX<SysNoticeReadEntity> {
         if (noticeIds == null || noticeIds.isEmpty()) {
             return 0;
         }
-        return delete(build().in(SysNoticeReadEntity::getNoticeId, noticeIds));
+        LambdaQueryWrapperX<SysNoticeReadEntity> queryWrapper = build();
+        queryWrapper.in(SysNoticeReadEntity::getNoticeId, noticeIds);
+        return delete(queryWrapper);
     }
 }

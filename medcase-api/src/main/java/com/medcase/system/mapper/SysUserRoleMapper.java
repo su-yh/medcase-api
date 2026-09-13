@@ -16,23 +16,29 @@ public interface SysUserRoleMapper extends BaseMapperX<SysUserRoleEntity> {
     }
 
     default int deleteByUserId(Long userId) {
-        return delete(build().eq(SysUserRoleEntity::getUserId, userId));
+        LambdaQueryWrapperX<SysUserRoleEntity> queryWrapper = build();
+        queryWrapper.eq(SysUserRoleEntity::getUserId, userId);
+        return delete(queryWrapper);
     }
 
     default int deleteByUserIds(Long[] userIds) {
-        return delete(build().in(SysUserRoleEntity::getUserId, Arrays.asList(userIds)));
+        LambdaQueryWrapperX<SysUserRoleEntity> queryWrapper = build();
+        queryWrapper.in(SysUserRoleEntity::getUserId, Arrays.asList(userIds));
+        return delete(queryWrapper);
     }
 
     default int deleteByUserAndRole(Long userId, Long roleId) {
-        return delete(build()
-                .eq(SysUserRoleEntity::getUserId, userId)
-                .eq(SysUserRoleEntity::getRoleId, roleId));
+        LambdaQueryWrapperX<SysUserRoleEntity> queryWrapper = build();
+        queryWrapper.eq(SysUserRoleEntity::getUserId, userId);
+        queryWrapper.eq(SysUserRoleEntity::getRoleId, roleId);
+        return delete(queryWrapper);
     }
 
     default int deleteByRoleAndUsers(Long roleId, Long[] userIds) {
-        return delete(build()
-                .eq(SysUserRoleEntity::getRoleId, roleId)
-                .in(SysUserRoleEntity::getUserId, Arrays.asList(userIds)));
+        LambdaQueryWrapperX<SysUserRoleEntity> queryWrapper = build();
+        queryWrapper.eq(SysUserRoleEntity::getRoleId, roleId);
+        queryWrapper.in(SysUserRoleEntity::getUserId, Arrays.asList(userIds));
+        return delete(queryWrapper);
     }
 
     default void insertUserRoles(Collection<SysUserRoleEntity> entities) {

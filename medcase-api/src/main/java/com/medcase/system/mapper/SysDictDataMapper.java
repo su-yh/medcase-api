@@ -1,8 +1,8 @@
 package com.medcase.system.mapper;
 
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.medcase.mp.mybatis.BaseMapperX;
+import com.medcase.mp.mybatis.LambdaQueryWrapperX;
 import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
 import com.medcase.system.entity.SysDictDataEntity;
@@ -14,19 +14,20 @@ import java.util.List;
 public interface SysDictDataMapper extends BaseMapperX<SysDictDataEntity> {
     default PageResult<SysDictDataEntity> selectPage(
             PageParam pageParam, String dictType, String dictLabel, String status) {
-        LambdaQueryWrapper<SysDictDataEntity> query = build()
-                .eqIfPresent(SysDictDataEntity::getDictType, dictType)
-                .likeIfPresent(SysDictDataEntity::getDictLabel, dictLabel)
-                .eqIfPresent(SysDictDataEntity::getStatus, status)
-                .orderByAsc(SysDictDataEntity::getDictSort);
+        LambdaQueryWrapperX<SysDictDataEntity> query = build();
+        query.eqIfPresent(SysDictDataEntity::getDictType, dictType);
+        query.likeIfPresent(SysDictDataEntity::getDictLabel, dictLabel);
+        query.eqIfPresent(SysDictDataEntity::getStatus, status);
+        query.orderByAsc(SysDictDataEntity::getDictSort);
         return selectPage(pageParam, query);
     }
 
     default List<SysDictDataEntity> selectEnabledDictDataByType(String dictType) {
-        return selectList(build()
-                .eq(SysDictDataEntity::getStatus, "0")
-                .eq(SysDictDataEntity::getDictType, dictType)
-                .orderByAsc(SysDictDataEntity::getDictSort));
+        LambdaQueryWrapperX<SysDictDataEntity> query = build();
+        query.eq(SysDictDataEntity::getStatus, "0");
+        query.eq(SysDictDataEntity::getDictType, dictType);
+        query.orderByAsc(SysDictDataEntity::getDictSort);
+        return selectList(query);
     }
 
     default SysDictDataEntity selectDictLabel(String dictType, String dictValue) {

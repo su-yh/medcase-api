@@ -1,6 +1,7 @@
 package com.medcase.system.mapper;
 
 import com.medcase.mp.mybatis.BaseMapperX;
+import com.medcase.mp.mybatis.LambdaQueryWrapperX;
 import com.medcase.system.entity.SysUserPostEntity;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -14,11 +15,15 @@ public interface SysUserPostMapper extends BaseMapperX<SysUserPostEntity> {
     }
 
     default int deleteByUserId(Long userId) {
-        return delete(build().eq(SysUserPostEntity::getUserId, userId));
+        LambdaQueryWrapperX<SysUserPostEntity> queryWrapper = build();
+        queryWrapper.eq(SysUserPostEntity::getUserId, userId);
+        return delete(queryWrapper);
     }
 
     default int deleteByUserIds(Long[] userIds) {
-        return delete(build().in(SysUserPostEntity::getUserId, Arrays.asList(userIds)));
+        LambdaQueryWrapperX<SysUserPostEntity> queryWrapper = build();
+        queryWrapper.in(SysUserPostEntity::getUserId, Arrays.asList(userIds));
+        return delete(queryWrapper);
     }
 
     default void insertUserPosts(Collection<SysUserPostEntity> entities) {

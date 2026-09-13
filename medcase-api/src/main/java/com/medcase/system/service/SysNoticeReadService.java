@@ -2,7 +2,9 @@ package com.medcase.system.service;
 
 import com.medcase.system.entity.SysDeptEntity;
 import com.medcase.system.entity.SysNoticeReadEntity;
+import com.medcase.system.entity.SysNoticeEntity;
 import com.medcase.system.mapper.SysNoticeReadMapper;
+import com.medcase.system.mapper.SysNoticeMapper;
 import com.medcase.web.controller.system.dto.NoticeReadUserResponse;
 import com.medcase.web.controller.system.dto.NoticeTopItemResponse;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +26,8 @@ public class SysNoticeReadService {
 
     private final SysNoticeReadMapper noticeReadMapper;
 
+    private final SysNoticeMapper noticeMapper;
+
     private final SysDeptService deptService;
 
     /**
@@ -41,9 +45,21 @@ public class SysNoticeReadService {
      * 查询公告列表并标记当前用户已读状态
      */
     public List<NoticeTopItemResponse> selectNoticeListWithReadStatus(Long userId, int limit) {
-        List<NoticeTopItemResponse> notices = noticeReadMapper.selectTopNoticeList(limit);
-        if (notices.isEmpty()) {
-            return notices;
+        List<SysNoticeEntity> noticeEntities = noticeMapper.selectTopNoticeList(limit);
+        if (noticeEntities.isEmpty()) {
+            return List.of();
+        }
+
+        List<NoticeTopItemResponse> notices = new ArrayList<>(noticeEntities.size());
+        for (SysNoticeEntity noticeEntity : noticeEntities) {
+            NoticeTopItemResponse notice = new NoticeTopItemResponse();
+            notice.setNoticeId(noticeEntity.getNoticeId());
+            notice.setNoticeTitle(noticeEntity.getNoticeTitle());
+            notice.setNoticeType(noticeEntity.getNoticeType());
+            notice.setStatus(noticeEntity.getStatus());
+            notice.setCreateBy(noticeEntity.getCreateBy());
+            notice.setCreateTime(noticeEntity.getCreateTime());
+            notices.add(notice);
         }
 
         List<Long> noticeIds = notices.stream()

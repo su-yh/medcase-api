@@ -65,7 +65,7 @@ class SysUserServicePageTest {
         resultDept.setDeptName("子部门");
         when(deptService.all()).thenReturn(List.of());
         when(deptService.selectDeptById(2L)).thenReturn(resultDept);
-        when(userMapper.selectPage(
+        when(userMapper.selectUserPage(
                 any(PageParam.class), any(UserQueryRequest.class), any(Collection.class),
                 nullable(String.class), nullable(String.class)))
                 .thenReturn(new PageResult<>(List.of(resultUser), 1L));
@@ -74,7 +74,7 @@ class SysUserServicePageTest {
 
         ArgumentCaptor<UserQueryRequest> userCaptor = ArgumentCaptor.forClass(UserQueryRequest.class);
         ArgumentCaptor<Collection> deptIdsCaptor = ArgumentCaptor.forClass(Collection.class);
-        verify(userMapper).selectPage(
+        verify(userMapper).selectUserPage(
                 any(PageParam.class), userCaptor.capture(), deptIdsCaptor.capture(),
                 nullable(String.class), nullable(String.class));
         assertEquals(1, result.getTotal());

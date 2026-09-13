@@ -2,6 +2,7 @@ package com.medcase.system.mapper;
 
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.medcase.mp.mybatis.BaseMapperX;
+import com.medcase.mp.mybatis.LambdaQueryWrapperX;
 import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
 import com.medcase.system.entity.SysRoleEntity;
@@ -14,27 +15,30 @@ import java.util.Arrays;
 public interface SysRoleMapper extends BaseMapperX<SysRoleEntity> {
     default PageResult<SysRoleEntity> selectPage(
             PageParam pageParam, RoleQueryRequest request, Long createUserId) {
-        return selectPage(pageParam, build()
-                .likeIfPresent(SysRoleEntity::getRoleName, request.getRoleNameLike())
-                .likeIfPresent(SysRoleEntity::getRoleKey, request.getRoleKeyLike())
-                .eqIfPresent(SysRoleEntity::getStatus, request.getStatus())
-                .geIfPresent(SysRoleEntity::getCreateTime, request.getBeginTime())
-                .ltIfPresent(SysRoleEntity::getCreateTime, request.getEndTime())
-                .eqIfPresent(SysRoleEntity::getCreateUserId, createUserId)
-                .eq(SysRoleEntity::getDelFlag, "0")
-                .orderByAsc(SysRoleEntity::getRoleSort));
+        LambdaQueryWrapperX<SysRoleEntity> query = build();
+        query.likeIfPresent(SysRoleEntity::getRoleName, request.getRoleNameLike());
+        query.likeIfPresent(SysRoleEntity::getRoleKey, request.getRoleKeyLike());
+        query.eqIfPresent(SysRoleEntity::getStatus, request.getStatus());
+        query.geIfPresent(SysRoleEntity::getCreateTime, request.getBeginTime());
+        query.ltIfPresent(SysRoleEntity::getCreateTime, request.getEndTime());
+        query.eqIfPresent(SysRoleEntity::getCreateUserId, createUserId);
+        query.eq(SysRoleEntity::getDelFlag, "0");
+        query.orderByAsc(SysRoleEntity::getRoleSort);
+        return selectPage(pageParam, query);
     }
 
     default SysRoleEntity selectRoleByName(String roleName) {
-        return selectOne(build()
-                .eq(SysRoleEntity::getRoleName, roleName)
-                .eq(SysRoleEntity::getDelFlag, "0"));
+        LambdaQueryWrapperX<SysRoleEntity> query = build();
+        query.eq(SysRoleEntity::getRoleName, roleName);
+        query.eq(SysRoleEntity::getDelFlag, "0");
+        return selectOne(query);
     }
 
     default SysRoleEntity selectRoleByKey(String roleKey) {
-        return selectOne(build()
-                .eq(SysRoleEntity::getRoleKey, roleKey)
-                .eq(SysRoleEntity::getDelFlag, "0"));
+        LambdaQueryWrapperX<SysRoleEntity> query = build();
+        query.eq(SysRoleEntity::getRoleKey, roleKey);
+        query.eq(SysRoleEntity::getDelFlag, "0");
+        return selectOne(query);
     }
 
     default int deleteRolesByIds(Long[] roleIds) {

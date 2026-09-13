@@ -3,6 +3,7 @@ package com.medcase.system.mapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.medcase.common.constant.UserConstants;
 import com.medcase.mp.mybatis.BaseMapperX;
+import com.medcase.mp.mybatis.LambdaQueryWrapperX;
 import com.medcase.system.entity.SysDeptEntity;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -12,14 +13,17 @@ import java.util.List;
 @Mapper
 public interface SysDeptMapper extends BaseMapperX<SysDeptEntity> {
     default List<SysDeptEntity> selectAllDepartments() {
-        return selectList(build()
-                .eq(SysDeptEntity::getDelFlag, UserConstants.NORMAL)
-                .orderByAsc(SysDeptEntity::getParentId)
-                .orderByAsc(SysDeptEntity::getOrderNum));
+        LambdaQueryWrapperX<SysDeptEntity> queryWrapper = build();
+        queryWrapper.eq(SysDeptEntity::getDelFlag, UserConstants.NORMAL);
+        queryWrapper.orderByAsc(SysDeptEntity::getParentId);
+        queryWrapper.orderByAsc(SysDeptEntity::getOrderNum);
+        return selectList(queryWrapper);
     }
 
     default List<SysDeptEntity> selectChildrenByDeptId(Long deptId) {
-        return selectList(build().apply("find_in_set({0}, ancestors)", deptId));
+        LambdaQueryWrapperX<SysDeptEntity> queryWrapper = build();
+        queryWrapper.apply("find_in_set({0}, ancestors)", deptId);
+        return selectList(queryWrapper);
     }
 
     default int updateParentStatusNormal(Collection<Long> deptIds) {
