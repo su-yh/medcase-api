@@ -71,28 +71,38 @@ class MenuRouteCleanupContractTest {
     }
 
     @Test
-    void menuColumnsAreRemovedByIncrementalMigrations() throws IOException {
-        String queryMigration = Files.readString(Path.of(
-                "src/main/resources/db/migration/master/V01_01_00/V01_01_00_006__drop-menu-query.sql"));
-        String frameMigration = Files.readString(Path.of(
-                "src/main/resources/db/migration/master/V01_01_00/V01_01_00_007__drop-menu-is-frame.sql"));
+    void menuBaselineUsesFinalColumnsAndData() throws IOException {
+        String schema = Files.readString(Path.of(
+                "src/main/resources/db/migration/master/V01_00_00/"
+                        + "V01_00_00_001__system-schema.sql"));
+        String systemData = Files.readString(Path.of(
+                "src/main/resources/db/migration/master/V01_00_00/"
+                        + "V01_00_00_003__system-data.sql"));
+        String businessData = Files.readString(Path.of(
+                "src/main/resources/db/migration/master/V01_00_00/"
+                        + "V01_00_00_004__business-data.sql"));
 
-        assertThat(queryMigration).contains("alter table sys_menu drop column query");
-        assertThat(frameMigration).contains("alter table sys_menu drop column is_frame");
-    }
-
-    @Test
-    void newMenuContractIsMigratedIncrementally() throws IOException {
-        String migration = Files.readString(Path.of(
-                "src/main/resources/db/migration/master/V01_01_00/V01_01_00_008__rename-menu-columns.sql"));
-
-        assertThat(migration).contains(
-                "rename column menu_id to id",
-                "rename column path to route_path",
-                "rename column component to vue_component_path",
-                "modify column visible tinyint",
-                "update sys_menu set visible",
+        assertThat(schema).contains(
+                "id                  bigint",
+                "route_path",
+                "vue_component_path",
+                "visible             tinyint",
                 "create unique index uk_sys_menu_route_name");
+        assertThat(schema).doesNotContain(
+                "menu_id           bigint        not null auto_increment",
+                "  path ",
+                "  component ",
+                "  query ",
+                "  is_frame ",
+                "  is_cache ");
+        assertThat(systemData).contains(
+                "SystemUser", "SystemRole", "SystemMenu", "MonitorOperlog");
+        assertThat(businessData).contains(
+                "BizCaseDoctor", "BizDoctor", "BizPatient", "BizCasePatient", "Supplier");
+        assertThat(systemData).doesNotContain(
+                "(1040,", "(1042,", "(1043,", "(1045,", "(501,");
+        assertThat(systemData).doesNotContain("alter table", "update sys_menu", "delete from sys_menu");
+        assertThat(businessData).doesNotContain("alter table", "update sys_menu", "delete from sys_menu");
     }
 
     private Field findField(Class<?> type, String fieldName) {

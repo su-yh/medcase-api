@@ -33,23 +33,17 @@ class RoleDepartmentDataPermissionRemovalTest {
 
         String userMapper = Files.readString(Path.of("src/main/resources/mapper/system/SysUserMapper.xml"));
         String systemSql = Files.readString(Path.of(
-                "src/main/resources/db/migration/master/V01_00_00/V01_00_00_001__system.sql"));
-        String roleDeptMigration = Files.readString(Path.of(
-                "src/main/resources/db/migration/master/V01_01_00/V01_01_00_001__alter.sql"));
-        String dataScopeMigration = Files.readString(Path.of(
-                "src/main/resources/db/migration/master/V01_01_00/V01_01_00_002__drop-role-data-scope.sql"));
-        String deptStrictMigration = Files.readString(Path.of(
-                "src/main/resources/db/migration/master/V01_01_00/V01_01_00_003__drop-role-dept-check-strictly.sql"));
+                "src/main/resources/db/migration/master/V01_00_00/"
+                        + "V01_00_00_001__system-schema.sql"));
         String roleDeptTable = "sys_" + "role_dept";
         String dataScopeColumn = "data_" + "scope";
         String deptStrictColumn = "dept_" + "check_strictly";
 
         assertThat(Files.exists(Path.of("src/main/resources/mapper/system/SysRoleMapper.xml"))).isFalse();
         assertThat(userMapper).doesNotContain(dataScopeColumn);
-        assertThat(systemSql).contains(roleDeptTable, dataScopeColumn, deptStrictColumn);
-        assertThat(roleDeptMigration).contains("drop table if exists " + roleDeptTable);
-        assertThat(dataScopeMigration).contains("drop column " + dataScopeColumn);
-        assertThat(deptStrictMigration).contains("drop column " + deptStrictColumn);
+        assertThat(systemSql).doesNotContain(
+                roleDeptTable, dataScopeColumn, deptStrictColumn,
+                "sys_oper_log", "sys_logininfor");
     }
 
     @Test

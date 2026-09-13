@@ -14,16 +14,18 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class LoginRecordMigrationContractTest {
 
-    private static final Path LOGIN_RECORD_MIGRATION = Path.of(
-            "src/main/resources/db/migration/master/V01_01_00/"
-                    + "V01_01_00_011__login-record.sql");
+    private static final Path SYSTEM_SCHEMA = Path.of(
+            "src/main/resources/db/migration/master/V01_00_00/"
+                    + "V01_00_00_001__system-schema.sql");
 
     @Test
-    void loginRecordMigrationCreatesNewTableAndRemovesOldTable() throws Exception {
-        assertTrue(Files.exists(LOGIN_RECORD_MIGRATION));
-        String sql = Files.readString(LOGIN_RECORD_MIGRATION);
+    void systemSchemaContainsFinalLoginRecordTable() throws Exception {
+        assertTrue(Files.exists(SYSTEM_SCHEMA));
+        String sql = Files.readString(SYSTEM_SCHEMA);
         assertTrue(sql.contains("create table sys_login_record"));
-        assertTrue(sql.contains("drop table if exists sys_logininfor"));
+        assertTrue(sql.contains("success         tinyint"));
+        assertTrue(sql.contains("1成功 0失败"));
+        assertFalse(sql.contains("sys_logininfor"));
     }
 
     @Test
@@ -40,20 +42,10 @@ class LoginRecordMigrationContractTest {
     }
 
     @Test
-    void loginRecordStatusUsesBooleanAndTinyint() throws Exception {
-        Field status = Class.forName("com.medcase.system.entity.LoginRecordEntity")
-                .getDeclaredField("status");
-        assertEquals(Boolean.class, status.getType());
-
-        Path statusMigration = Path.of(
-                "src/main/resources/db/migration/master/V01_01_00/"
-                        + "V01_01_00_012__login-record-status.sql");
-        assertTrue(Files.exists(statusMigration));
-        String sql = Files.readString(statusMigration);
-        assertTrue(sql.contains("status tinyint"));
-        assertTrue(sql.contains("1成功 0失败"));
-        assertTrue(sql.contains("when 0 then 1"));
-        assertTrue(sql.contains("when 1 then 0"));
+    void loginRecordSuccessUsesBooleanAndTinyint() throws Exception {
+        Field success = Class.forName("com.medcase.system.entity.LoginRecordEntity")
+                .getDeclaredField("success");
+        assertEquals(Boolean.class, success.getType());
     }
 
     private boolean hasField(Class<?> type, String name) {

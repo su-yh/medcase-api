@@ -61,4 +61,3 @@
 * Run focused Maven tests and the full backend test suite if feasible.
 * Run admin test and production build commands available in the repository.
 * Inspect the final diff and both repository statuses.
-
