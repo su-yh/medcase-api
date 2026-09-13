@@ -1,21 +1,22 @@
 package com.medcase.system.service;
 
-import java.util.Collection;
-import java.util.List;
-import jakarta.annotation.PostConstruct;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import com.medcase.common.constant.CacheConstants;
 import com.medcase.common.constant.UserConstants;
 import com.medcase.common.core.redis.RedisCache;
 import com.medcase.common.core.text.Convert;
 import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
-import com.medcase.system.entity.SysConfigEntity;
-import com.medcase.system.mapper.SysConfigMapper;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
+import com.medcase.system.entity.SysConfigEntity;
+import com.medcase.system.mapper.SysConfigMapper;
+import jakarta.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 参数配置 服务层实现
@@ -78,10 +79,8 @@ public class SysConfigService {
      * @return true开启，false关闭
      */
     public boolean selectCaptchaEnabled() {
-
         String captchaEnabled = selectConfigByKey("sys.account.captchaEnabled");
         if (!org.springframework.util.StringUtils.hasText(captchaEnabled)) {
-
             return true;
         }
         return Convert.toBool(captchaEnabled);

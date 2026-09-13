@@ -27,7 +27,6 @@ public class SysRegisterController {
     @Anonymous
     @PostMapping("/register")
     public void register(@RequestBody RegisterBody user) {
-
         if (!("true".equals(configService.selectConfigByKey("sys.account.registerUser")))) {
             throw ExceptionUtil.business(ErrorCodeEnums.ADMIN_REGISTER_DISABLED);
         }

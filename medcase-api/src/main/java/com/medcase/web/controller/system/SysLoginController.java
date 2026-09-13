@@ -125,12 +125,9 @@ public class SysLoginController {
 
     // 检查密码是否过期
     public boolean passwordIsExpiration(Date pwdUpdateDate) {
-
         Integer passwordValidateDays = Convert.toInt(configService.selectConfigByKey("sys.account.passwordValidateDays"));
         if (passwordValidateDays != null && passwordValidateDays > 0) {
-
             if (pwdUpdateDate == null) {
-
                 // 如果从未修改过初始密码，直接提醒过期
                 return true;
             }
