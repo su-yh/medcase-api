@@ -1,6 +1,5 @@
 package com.medcase.biz.request;
 
-import com.medcase.biz.enums.SupplierStatusEnums;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
@@ -10,5 +9,5 @@ import lombok.Data;
 @Data
 public class SupplierStatusRequest {
     @NotNull(message = "供应商状态不能为空")
-    private SupplierStatusEnums status;
+    private Boolean status;
 }

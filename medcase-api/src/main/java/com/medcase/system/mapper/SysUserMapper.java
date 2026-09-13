@@ -161,7 +161,7 @@ public interface SysUserMapper extends BaseMapperX<SysUserEntity> {
 
     default int deleteUsersByIds(Long[] userIds) {
         SysUserEntity entity = new SysUserEntity();
-        entity.setDelFlag("2");
+        entity.setDelFlag("1");
         return update(entity, new LambdaUpdateWrapper<SysUserEntity>()
                 .in(SysUserEntity::getUserId, Arrays.asList(userIds)));
     }

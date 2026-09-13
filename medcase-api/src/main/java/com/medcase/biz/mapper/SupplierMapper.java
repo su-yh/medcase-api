@@ -1,7 +1,6 @@
 package com.medcase.biz.mapper;
 
 import com.medcase.biz.domain.SupplierEntity;
-import com.medcase.biz.enums.SupplierStatusEnums;
 import com.medcase.biz.request.SupplierQuery;
 import com.medcase.mp.mybatis.BaseMapperX;
 import com.medcase.mp.mybatis.LambdaQueryWrapperX;
@@ -44,13 +43,13 @@ public interface SupplierMapper extends BaseMapperX<SupplierEntity> {
         }
         LambdaQueryWrapperX<SupplierEntity> queryWrapper = build();
         queryWrapper.eq(SupplierEntity::getId, id);
-        queryWrapper.eq(SupplierEntity::getStatus, SupplierStatusEnums.NORMAL);
+        queryWrapper.eq(SupplierEntity::getStatus, Boolean.TRUE);
         return selectOne(queryWrapper);
     }
 
     default List<SupplierEntity> selectEnabledList() {
         LambdaQueryWrapperX<SupplierEntity> queryWrapper = build();
-        queryWrapper.eq(SupplierEntity::getStatus, SupplierStatusEnums.NORMAL);
+        queryWrapper.eq(SupplierEntity::getStatus, Boolean.TRUE);
         queryWrapper.orderByAsc(SupplierEntity::getName);
         queryWrapper.orderByAsc(SupplierEntity::getId);
         return selectList(queryWrapper);

@@ -39,7 +39,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             log.info("登录用户：{} 不存在.", username);
             throw ExceptionUtil.business(ErrorCodeEnums.ADMIN_LOGIN_FAILED);
         }
-        else if ("2".equals(user.getDelFlag())) {
+        else if ("1".equals(user.getDelFlag())) {
 
             log.info("登录用户：{} 已被删除.", username);
             throw ExceptionUtil.business(ErrorCodeEnums.USER_DELETED);

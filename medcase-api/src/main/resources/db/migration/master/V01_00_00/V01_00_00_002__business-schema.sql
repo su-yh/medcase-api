@@ -39,7 +39,7 @@ create table medcase_supplier (
   phonenumber     varchar(20)  not null comment '手机号码',
   email           varchar(50)  default null comment '邮箱',
   id_card_number  varchar(30)  not null comment '身份证号',
-  status          char(1)      not null default '0' comment '状态（0正常 1停用）',
+  status          tinyint      not null default 1 comment '状态（1正常 0停用）',
   remark          varchar(500) default null comment '备注',
   create_user_id  bigint       default null comment '创建者用户ID',
   create_by       varchar(64)  not null default '' comment '创建者',

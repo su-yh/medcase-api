@@ -21,7 +21,7 @@ class UserEntityTest {
 
         assertNotNull(tableLogic);
         assertEquals("0", tableLogic.value());
-        assertEquals("2", tableLogic.delval());
+        assertEquals("1", tableLogic.delval());
         assertEquals(Boolean.class, field.getType());
     }
 

@@ -60,7 +60,7 @@ public class UserEntity extends AbstractBaseEntity {
 
     private String reviewReason;
 
-    @TableLogic(value = "0", delval = "2")
+    @TableLogic(value = "0", delval = "1")
     @JsonIgnore
     private Boolean delFlag;
 

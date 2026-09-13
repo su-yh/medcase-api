@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.medcase.biz.enums.SupplierStatusEnums;
 import com.medcase.common.enums.UserSexEnums;
 import com.medcase.mp.entity.AbstractBaseEntity;
 import lombok.Data;
@@ -30,7 +29,7 @@ public class SupplierEntity extends AbstractBaseEntity {
 
     private String idCardNumber;
 
-    private SupplierStatusEnums status;
+    private Boolean status;
 
     private String remark;
 }

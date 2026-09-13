@@ -1,7 +1,6 @@
 package com.medcase.biz.service;
 
 import com.medcase.biz.domain.SupplierEntity;
-import com.medcase.biz.enums.SupplierStatusEnums;
 import com.medcase.biz.mapper.SupplierMapper;
 import com.medcase.biz.request.SupplierQuery;
 import com.medcase.biz.request.SupplierSaveRequest;
@@ -90,7 +89,7 @@ public class SupplierService {
         }
     }
 
-    private void validateStatus(SupplierStatusEnums status) {
+    private void validateStatus(Boolean status) {
         if (status == null) {
             throw ExceptionUtil.business(ErrorCodeEnums.SUPPLIER_STATUS_INVALID);
         }

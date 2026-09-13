@@ -1,7 +1,6 @@
 package com.medcase.biz.service;
 
 import com.medcase.biz.domain.SupplierEntity;
-import com.medcase.biz.enums.SupplierStatusEnums;
 import com.medcase.biz.mapper.SupplierMapper;
 import com.medcase.biz.request.SupplierSaveRequest;
 import com.medcase.common.enums.UserSexEnums;
@@ -78,7 +77,7 @@ class SupplierServiceTest {
         request.setSex(UserSexEnums.MALE);
         request.setPhone("13800000000");
         request.setIdCardNumber("110101199001011234");
-        request.setStatus(SupplierStatusEnums.NORMAL);
+        request.setStatus(Boolean.TRUE);
         return request;
     }
 }

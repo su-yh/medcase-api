@@ -9,7 +9,6 @@ import static org.mockito.Mockito.when;
 
 import com.medcase.biz.domain.UserEntity;
 import com.medcase.biz.domain.SupplierEntity;
-import com.medcase.biz.enums.SupplierStatusEnums;
 import com.medcase.biz.mapper.SupplierMapper;
 import com.medcase.biz.mapper.UserMapper;
 import com.medcase.biz.request.UserProfilePasswordRequest;
@@ -281,7 +280,7 @@ class UserProfileServiceTest {
     private SupplierEntity enabledSupplier() {
         SupplierEntity supplier = new SupplierEntity();
         supplier.setId(1L);
-        supplier.setStatus(SupplierStatusEnums.NORMAL);
+        supplier.setStatus(Boolean.TRUE);
         return supplier;
     }
 }

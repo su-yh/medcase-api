@@ -1,7 +1,6 @@
 package com.medcase.biz.response;
 
 import com.medcase.biz.domain.SupplierEntity;
-import com.medcase.biz.enums.SupplierStatusEnums;
 import com.medcase.common.enums.UserSexEnums;
 import lombok.Data;
 
@@ -24,7 +23,7 @@ public class SupplierResponse {
 
     private String idCardNumber;
 
-    private SupplierStatusEnums status;
+    private Boolean status;
 
     private Date createTime;
 

@@ -1,6 +1,5 @@
 package com.medcase.biz.request;
 
-import com.medcase.biz.enums.SupplierStatusEnums;
 import com.medcase.common.enums.UserSexEnums;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -35,7 +34,7 @@ public class SupplierSaveRequest {
     private String idCardNumber;
 
     @NotNull(message = "供应商状态不能为空")
-    private SupplierStatusEnums status;
+    private Boolean status;
 
     @Size(max = 500, message = "备注不能超过500个字符")
     private String remark;
