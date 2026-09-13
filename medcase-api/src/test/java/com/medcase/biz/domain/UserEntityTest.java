@@ -20,8 +20,8 @@ class UserEntityTest {
         TableLogic tableLogic = field.getAnnotation(TableLogic.class);
 
         assertNotNull(tableLogic);
-        assertEquals("0", tableLogic.value());
-        assertEquals("1", tableLogic.delval());
+        assertEquals("", tableLogic.value());
+        assertEquals("", tableLogic.delval());
         assertEquals(Boolean.class, field.getType());
     }
 

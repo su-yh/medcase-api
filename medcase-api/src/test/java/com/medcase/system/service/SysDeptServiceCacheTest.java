@@ -127,7 +127,7 @@ class SysDeptServiceCacheTest {
         SysDeptEntity cachedDept = new SysDeptEntity();
         cachedDept.setDeptId(1L);
         when(deptMapper.selectAllDepartments()).thenReturn(List.of(cachedDept));
-        when(deptMapper.deleteDeptById(1L)).thenReturn(1);
+        when(deptMapper.deleteById(1L)).thenReturn(1);
 
         deptService.selectDeptById(1L);
         deptService.deleteDeptById(1L);

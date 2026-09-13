@@ -109,7 +109,7 @@ class SysUserServicePageTest {
         entity.setUserId(7L);
         entity.setUserName("admin");
         entity.setDeptId(2L);
-        when(userMapper.selectUserByUserName("admin", UserTypeEnums.ADMIN.getCode(), Boolean.FALSE))
+        when(userMapper.selectUserByUserName("admin", UserTypeEnums.ADMIN.getCode()))
                 .thenReturn(entity);
 
         SysDeptEntity dept = new SysDeptEntity();

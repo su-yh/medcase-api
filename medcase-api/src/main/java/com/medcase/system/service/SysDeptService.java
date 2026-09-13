@@ -369,7 +369,7 @@ public class SysDeptService {
      */
     public int deleteDeptById(Long deptId) {
 
-        int result = deptMapper.deleteDeptById(deptId);
+        int result = deptMapper.deleteById(deptId);
         if (result > 0) {
 
             synchronized (deptCacheLoadLock) {

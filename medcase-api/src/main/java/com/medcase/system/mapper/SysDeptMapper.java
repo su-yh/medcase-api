@@ -13,7 +13,6 @@ import java.util.List;
 public interface SysDeptMapper extends BaseMapperX<SysDeptEntity> {
     default List<SysDeptEntity> selectAllDepartments() {
         LambdaQueryWrapperX<SysDeptEntity> queryWrapper = build();
-        queryWrapper.eq(SysDeptEntity::getDelFlag, Boolean.FALSE);
         queryWrapper.orderByAsc(SysDeptEntity::getParentId);
         queryWrapper.orderByAsc(SysDeptEntity::getOrderNum);
         return selectList(queryWrapper);
@@ -49,10 +48,4 @@ public interface SysDeptMapper extends BaseMapperX<SysDeptEntity> {
                 .eq(SysDeptEntity::getDeptId, deptId));
     }
 
-    default int deleteDeptById(Long deptId) {
-        SysDeptEntity entity = new SysDeptEntity();
-        entity.setDelFlag(Boolean.TRUE);
-        return update(entity, new LambdaUpdateWrapper<SysDeptEntity>()
-                .eq(SysDeptEntity::getDeptId, deptId));
-    }
 }

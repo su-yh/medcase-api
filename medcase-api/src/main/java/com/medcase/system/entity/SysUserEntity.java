@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.medcase.common.enums.UserSexEnums;
 import com.medcase.common.enums.UserStatusEnums;
 import com.medcase.common.enums.UserTypeEnums;
@@ -66,7 +67,8 @@ public class SysUserEntity extends AbstractBaseEntity {
 
     private UserStatusEnums status;
 
-    @TableLogic(value = "0", delval = "1")
+    @TableLogic
+    @JsonIgnore
     private Boolean delFlag;
 
     private Date pwdUpdateDate;

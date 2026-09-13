@@ -217,7 +217,7 @@ class SysRoleServiceCacheTest {
         when(roleMapper.selectList()).thenReturn(List.of(role), List.of(role));
         when(userRoleMapper.countByRoleId(1L)).thenReturn(0L);
         when(roleMenuMapper.deleteByRoleIds(new Long[] {1L})).thenReturn(1);
-        when(roleMapper.deleteRolesByIds(new Long[] {1L})).thenReturn(1);
+        when(roleMapper.deleteByIds(List.of(1L))).thenReturn(1);
 
         roleService.selectRoleAll();
         roleService.deleteRoleByIds(new Long[] {1L}, 1L, true);

@@ -177,7 +177,7 @@ public class SysUserService {
      */
     public SysUserEntity selectUserByUserName(String userName, String userType) {
 
-        SysUserEntity user = userMapper.selectUserByUserName(userName, userType, Boolean.FALSE);
+        SysUserEntity user = userMapper.selectUserByUserName(userName, userType);
         if (user != null) {
             user.setDept(deptService.selectDeptById(user.getDeptId()));
             user.setRoles(roleService.selectRolesByUserId(user.getUserId()));
@@ -247,7 +247,7 @@ public class SysUserService {
         Long userId = user.getUserId() == null ? -1L : user.getUserId();
         useAdminUserTypeIfAbsent(user);
         SysUserEntity info = userMapper.selectUserByUserNameAndType(
-                user.getUserName(), user.getUserType(), Boolean.FALSE);
+                user.getUserName(), user.getUserType());
         if (info != null && !info.getUserId().equals(userId)) {
             return UserConstants.NOT_UNIQUE;
         }
@@ -264,7 +264,7 @@ public class SysUserService {
         Long userId = user.getUserId() == null ? -1L : user.getUserId();
         useAdminUserTypeIfAbsent(user);
         SysUserEntity info = userMapper.selectUserByPhoneAndType(
-                user.getPhonenumber(), user.getUserType(), Boolean.FALSE);
+                user.getPhonenumber(), user.getUserType());
         if (info != null && !info.getUserId().equals(userId)) {
             return UserConstants.NOT_UNIQUE;
         }
@@ -281,7 +281,7 @@ public class SysUserService {
         Long userId = user.getUserId() == null ? -1L : user.getUserId();
         useAdminUserTypeIfAbsent(user);
         SysUserEntity info = userMapper.selectUserByEmailAndType(
-                user.getEmail(), user.getUserType(), Boolean.FALSE);
+                user.getEmail(), user.getUserType());
         if (info != null && !info.getUserId().equals(userId)) {
             return UserConstants.NOT_UNIQUE;
         }
@@ -512,7 +512,7 @@ public class SysUserService {
         userRoleMapper.deleteByUserIds(userIds);
         // 删除用户与岗位关联
         userPostMapper.deleteByUserIds(userIds);
-        return userMapper.deleteUsersByIds(userIds);
+        return userMapper.deleteByIds(Arrays.asList(userIds));
     }
 
     private SysUserEntity toEntity(UserSaveRequest user) {

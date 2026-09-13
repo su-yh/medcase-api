@@ -39,11 +39,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             log.info("登录用户：{} 不存在.", username);
             throw ExceptionUtil.business(ErrorCodeEnums.ADMIN_LOGIN_FAILED);
         }
-        else if (user.getDelFlag() != null && user.getDelFlag()) {
-
-            log.info("登录用户：{} 已被删除.", username);
-            throw ExceptionUtil.business(ErrorCodeEnums.USER_DELETED);
-        }
         else if (UserStatusEnums.DISABLE.equals(user.getStatus())) {
 
             log.info("登录用户：{} 已被停用.", username);

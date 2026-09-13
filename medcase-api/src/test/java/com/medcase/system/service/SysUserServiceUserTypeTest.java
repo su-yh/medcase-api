@@ -33,40 +33,40 @@ class SysUserServiceUserTypeTest {
     @Test
     void checkUserNameUniqueDefaultsToAdminUserType() {
 
-        when(userMapper.selectUserByUserNameAndType(any(), any(), any())).thenReturn(null);
+        when(userMapper.selectUserByUserNameAndType(any(), any())).thenReturn(null);
         UserSaveRequest user = new UserSaveRequest();
         user.setUserName("same-name");
 
         userService.checkUserNameUnique(user);
 
-        verify(userMapper).selectUserByUserNameAndType("same-name", UserTypeEnums.ADMIN, Boolean.FALSE);
+        verify(userMapper).selectUserByUserNameAndType("same-name", UserTypeEnums.ADMIN);
         assertEquals(UserTypeEnums.ADMIN, user.getUserType());
     }
 
     @Test
     void checkPhoneUniquePreservesExplicitUserType() {
 
-        when(userMapper.selectUserByPhoneAndType(any(), any(), any())).thenReturn(null);
+        when(userMapper.selectUserByPhoneAndType(any(), any())).thenReturn(null);
         UserSaveRequest user = new UserSaveRequest();
         user.setPhonenumber("15888888888");
         user.setUserType(UserTypeEnums.DOCTOR);
 
         userService.checkPhoneUnique(user);
 
-        verify(userMapper).selectUserByPhoneAndType("15888888888", UserTypeEnums.DOCTOR, Boolean.FALSE);
+        verify(userMapper).selectUserByPhoneAndType("15888888888", UserTypeEnums.DOCTOR);
         assertEquals(UserTypeEnums.DOCTOR, user.getUserType());
     }
 
     @Test
     void checkEmailUniqueDefaultsToAdminUserType() {
 
-        when(userMapper.selectUserByEmailAndType(any(), any(), any())).thenReturn(null);
+        when(userMapper.selectUserByEmailAndType(any(), any())).thenReturn(null);
         UserSaveRequest user = new UserSaveRequest();
         user.setEmail("same@example.com");
 
         userService.checkEmailUnique(user);
 
-        verify(userMapper).selectUserByEmailAndType("same@example.com", UserTypeEnums.ADMIN, Boolean.FALSE);
+        verify(userMapper).selectUserByEmailAndType("same@example.com", UserTypeEnums.ADMIN);
         assertEquals(UserTypeEnums.ADMIN, user.getUserType());
     }
 }

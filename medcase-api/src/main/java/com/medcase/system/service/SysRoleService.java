@@ -422,7 +422,7 @@ public class SysRoleService {
         }
         // 删除角色与菜单关联
         roleMenuMapper.deleteByRoleIds(roleIds);
-        int row = roleMapper.deleteRolesByIds(roleIds);
+        int row = roleMapper.deleteByIds(Arrays.asList(roleIds));
         if (row > 0) {
             synchronized (roleCacheLoadLock) {
                 roleCache.invalidate(ALL_ROLES_CACHE_KEY);

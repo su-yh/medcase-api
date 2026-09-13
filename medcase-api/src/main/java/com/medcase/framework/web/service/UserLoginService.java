@@ -204,7 +204,6 @@ public class UserLoginService {
         sysUser.setPassword(user.getPassword());
         sysUser.setStatus(user.getStatus());
         sysUser.setReviewReason(user.getReviewReason());
-        sysUser.setDelFlag(user.getDelFlag());
         sysUser.setPwdUpdateDate(user.getPwdUpdateDate());
         return sysUser;
     }

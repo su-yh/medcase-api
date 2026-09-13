@@ -17,7 +17,6 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.util.StringUtils;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -34,14 +33,13 @@ public interface SysUserMapper extends BaseMapperX<SysUserEntity> {
             PageParam pageParam, UserQueryRequest user, Collection<Long> deptIds,
             String beginTime, String endTime) {
         LambdaQueryWrapperX<SysUserEntity> query = build();
-        query.eq(SysUserEntity::getDelFlag, Boolean.FALSE);
         query.select(SysUserEntity::getUserId, SysUserEntity::getDeptId,
                 SysUserEntity::getNickName, SysUserEntity::getUserName,
                 SysUserEntity::getUserType, SysUserEntity::getEmail,
                 SysUserEntity::getAvatar, SysUserEntity::getPhonenumber,
                 SysUserEntity::getSex, SysUserEntity::getStatus,
-                SysUserEntity::getDelFlag, SysUserEntity::getCreateBy,
-                SysUserEntity::getCreateTime, SysUserEntity::getRemark);
+                SysUserEntity::getCreateBy, SysUserEntity::getCreateTime,
+                SysUserEntity::getRemark);
         if (user != null) {
             query.eq(user.getUserId() != null && !Long.valueOf(0L).equals(user.getUserId()),
                     SysUserEntity::getUserId, user.getUserId());
@@ -93,46 +91,40 @@ public interface SysUserMapper extends BaseMapperX<SysUserEntity> {
             @Param("user") UserQueryRequest user,
             @Param("deptIds") Collection<Long> deptIds);
 
-    default SysUserEntity selectUserByUserName(
-            String userName, String userType, Boolean delFlag) {
+    default SysUserEntity selectUserByUserName(String userName, String userType) {
         LambdaQueryWrapperX<SysUserEntity> query = build();
         query.eq(SysUserEntity::getUserName, userName);
         query.eq(SysUserEntity::getUserType, userType);
-        query.eq(SysUserEntity::getDelFlag, delFlag);
         return selectOne(query);
     }
 
     default SysUserEntity selectUserByUserNameAndType(
-            String userName, UserTypeEnums userType, Boolean delFlag) {
+            String userName, UserTypeEnums userType) {
         LambdaQueryWrapperX<SysUserEntity> query = build();
         query.eq(SysUserEntity::getUserName, userName);
         query.eq(SysUserEntity::getUserType, userType);
-        query.eq(SysUserEntity::getDelFlag, delFlag);
         return selectOne(query);
     }
 
     default SysUserEntity selectUserByPhoneAndType(
-            String phone, UserTypeEnums userType, Boolean delFlag) {
+            String phone, UserTypeEnums userType) {
         LambdaQueryWrapperX<SysUserEntity> query = build();
         query.eq(SysUserEntity::getPhonenumber, phone);
         query.eq(SysUserEntity::getUserType, userType);
-        query.eq(SysUserEntity::getDelFlag, delFlag);
         return selectOne(query);
     }
 
     default SysUserEntity selectUserByEmailAndType(
-            String email, UserTypeEnums userType, Boolean delFlag) {
+            String email, UserTypeEnums userType) {
         LambdaQueryWrapperX<SysUserEntity> query = build();
         query.eq(SysUserEntity::getEmail, email);
         query.eq(SysUserEntity::getUserType, userType);
-        query.eq(SysUserEntity::getDelFlag, delFlag);
         return selectOne(query);
     }
 
     default Long countByDeptId(Long deptId) {
         LambdaQueryWrapperX<SysUserEntity> query = build();
         query.eq(SysUserEntity::getDeptId, deptId);
-        query.eq(SysUserEntity::getDelFlag, Boolean.FALSE);
         return selectCount(query);
     }
 
@@ -158,10 +150,4 @@ public interface SysUserMapper extends BaseMapperX<SysUserEntity> {
                 .eq(SysUserEntity::getUserId, userId));
     }
 
-    default int deleteUsersByIds(Long[] userIds) {
-        SysUserEntity entity = new SysUserEntity();
-        entity.setDelFlag(Boolean.TRUE);
-        return update(entity, new LambdaUpdateWrapper<SysUserEntity>()
-                .in(SysUserEntity::getUserId, Arrays.asList(userIds)));
-    }
 }

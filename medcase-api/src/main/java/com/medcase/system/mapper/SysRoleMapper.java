@@ -1,6 +1,5 @@
 package com.medcase.system.mapper;
 
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.medcase.mp.mybatis.BaseMapperX;
 import com.medcase.mp.mybatis.LambdaQueryWrapperX;
 import com.medcase.mp.mybatis.PageParam;
@@ -8,8 +7,6 @@ import com.medcase.mp.mybatis.PageResult;
 import com.medcase.system.entity.SysRoleEntity;
 import com.medcase.web.controller.system.dto.RoleQueryRequest;
 import org.apache.ibatis.annotations.Mapper;
-
-import java.util.Arrays;
 
 @Mapper
 public interface SysRoleMapper extends BaseMapperX<SysRoleEntity> {
@@ -22,7 +19,6 @@ public interface SysRoleMapper extends BaseMapperX<SysRoleEntity> {
         query.geIfPresent(SysRoleEntity::getCreateTime, request.getBeginTime());
         query.ltIfPresent(SysRoleEntity::getCreateTime, request.getEndTime());
         query.eqIfPresent(SysRoleEntity::getCreateUserId, createUserId);
-        query.eq(SysRoleEntity::getDelFlag, Boolean.FALSE);
         query.orderByAsc(SysRoleEntity::getRoleSort);
         return selectPage(pageParam, query);
     }
@@ -30,21 +26,12 @@ public interface SysRoleMapper extends BaseMapperX<SysRoleEntity> {
     default SysRoleEntity selectRoleByName(String roleName) {
         LambdaQueryWrapperX<SysRoleEntity> query = build();
         query.eq(SysRoleEntity::getRoleName, roleName);
-        query.eq(SysRoleEntity::getDelFlag, Boolean.FALSE);
         return selectOne(query);
     }
 
     default SysRoleEntity selectRoleByKey(String roleKey) {
         LambdaQueryWrapperX<SysRoleEntity> query = build();
         query.eq(SysRoleEntity::getRoleKey, roleKey);
-        query.eq(SysRoleEntity::getDelFlag, Boolean.FALSE);
         return selectOne(query);
-    }
-
-    default int deleteRolesByIds(Long[] roleIds) {
-        SysRoleEntity entity = new SysRoleEntity();
-        entity.setDelFlag(Boolean.TRUE);
-        return update(entity, new LambdaUpdateWrapper<SysRoleEntity>()
-                .in(SysRoleEntity::getRoleId, Arrays.asList(roleIds)));
     }
 }

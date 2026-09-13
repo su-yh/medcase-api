@@ -9,6 +9,7 @@ import com.medcase.biz.response.SupplierResponse;
 import com.medcase.system.entity.SysDeptEntity;
 import com.medcase.system.entity.SysRoleEntity;
 import com.medcase.system.entity.SysUserEntity;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
@@ -28,6 +29,12 @@ class BooleanStatusMigrationContractTest {
     private static final Path BUSINESS_SCHEMA = Path.of(
             "src/main/resources/db/migration/master/V01_00_00/"
                     + "V01_00_00_002__business-schema.sql");
+    private static final Path USER_MAPPER = Path.of(
+            "src/main/java/com/medcase/system/mapper/SysUserMapper.java");
+    private static final Path ROLE_MAPPER = Path.of(
+            "src/main/java/com/medcase/system/mapper/SysRoleMapper.java");
+    private static final Path DEPT_MAPPER = Path.of(
+            "src/main/java/com/medcase/system/mapper/SysDeptMapper.java");
     private static final Path USER_DETAILS_SERVICE = Path.of(
             "src/main/java/com/medcase/framework/web/service/UserDetailsServiceImpl.java");
 
@@ -38,14 +45,37 @@ class BooleanStatusMigrationContractTest {
 
         assertEquals(Boolean.class, field.getType());
         assertNotNull(tableLogic);
-        assertEquals("0", tableLogic.value());
-        assertEquals("1", tableLogic.delval());
+        assertEquals("", tableLogic.value());
+        assertEquals("", tableLogic.delval());
     }
 
     @Test
     void systemDeleteFlagsUseBooleanFields() throws Exception {
         assertBooleanField(SysUserEntity.class, "delFlag");
         assertBooleanField(SysRoleEntity.class, "delFlag");
+        assertJsonIgnored(SysUserEntity.class, "delFlag");
+        assertJsonIgnored(SysRoleEntity.class, "delFlag");
+        assertJsonIgnored(SysDeptEntity.class, "delFlag");
+    }
+
+    @Test
+    void logicDeleteAnnotationsUseFrameworkDefaults() throws Exception {
+        assertDefaultLogicDelete(SysUserEntity.class);
+        assertDefaultLogicDelete(SysRoleEntity.class);
+        assertDefaultLogicDelete(SysDeptEntity.class);
+    }
+
+    @Test
+    void logicDeleteUsesMybatisPlusDeleteApisWithoutDeleteFlagConditions() throws Exception {
+        String userMapper = Files.readString(USER_MAPPER);
+        String roleMapper = Files.readString(ROLE_MAPPER);
+        String deptMapper = Files.readString(DEPT_MAPPER);
+        assertFalse(userMapper.contains("deleteUsersByIds"));
+        assertFalse(userMapper.contains("getDelFlag"));
+        assertFalse(roleMapper.contains("deleteRolesByIds"));
+        assertFalse(roleMapper.contains("getDelFlag"));
+        assertFalse(deptMapper.contains("deleteDeptById"));
+        assertFalse(deptMapper.contains("getDelFlag"));
     }
 
     @Test
@@ -76,14 +106,25 @@ class BooleanStatusMigrationContractTest {
     }
 
     @Test
-    void booleanDeleteFlagConversionChecksNullWithoutEquals() throws Exception {
+    void loginPathDoesNotCheckDeleteFlag() throws Exception {
         String source = Files.readString(USER_DETAILS_SERVICE);
 
-        assertFalse(source.contains("user.getDelFlag().equals"));
-        assertTrue(source.contains("user.getDelFlag() != null && user.getDelFlag()"));
+        assertFalse(source.contains("getDelFlag"));
+    }
+
+    private static void assertDefaultLogicDelete(Class<?> entityClass) throws NoSuchFieldException {
+        TableLogic tableLogic = entityClass.getDeclaredField("delFlag")
+                .getAnnotation(TableLogic.class);
+        assertNotNull(tableLogic);
+        assertEquals("", tableLogic.value());
+        assertEquals("", tableLogic.delval());
     }
 
     private void assertBooleanField(Class<?> type, String fieldName) throws NoSuchFieldException {
         assertEquals(Boolean.class, type.getDeclaredField(fieldName).getType());
+    }
+
+    private void assertJsonIgnored(Class<?> type, String fieldName) throws NoSuchFieldException {
+        assertNotNull(type.getDeclaredField(fieldName).getAnnotation(JsonIgnore.class));
     }
 }
