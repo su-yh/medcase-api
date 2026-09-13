@@ -1,5 +1,6 @@
 package com.medcase.web.controller.system.dto;
 
+import com.medcase.common.enums.NoticeTypeEnums;
 import lombok.Data;
 
 /**
@@ -10,7 +11,7 @@ public class NoticeQueryRequest {
 
     private String noticeTitle;
 
-    private String noticeType;
+    private NoticeTypeEnums noticeType;
 
     private String createBy;
 }

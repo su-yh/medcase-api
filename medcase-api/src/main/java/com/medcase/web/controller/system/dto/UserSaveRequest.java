@@ -1,6 +1,8 @@
 package com.medcase.web.controller.system.dto;
 
 import com.medcase.common.enums.UserTypeEnums;
+import com.medcase.common.enums.UserSexEnums;
+import com.medcase.common.enums.UserStatusEnums;
 import com.medcase.common.xss.Xss;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -35,11 +37,11 @@ public class UserSaveRequest {
     @Size(max = 11, message = "手机号码长度不能超过11个字符")
     private String phonenumber;
 
-    private String sex;
+    private UserSexEnums sex;
 
     private String password;
 
-    private String status;
+    private UserStatusEnums status;
 
     private String remark;
 

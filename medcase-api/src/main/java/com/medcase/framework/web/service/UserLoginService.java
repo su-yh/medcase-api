@@ -202,7 +202,7 @@ public class UserLoginService {
         sysUser.setUserType(user.getUserType());
         sysUser.setPhonenumber(user.getPhonenumber());
         sysUser.setPassword(user.getPassword());
-        sysUser.setStatus(user.getStatus().getCode());
+        sysUser.setStatus(user.getStatus());
         sysUser.setReviewReason(user.getReviewReason());
         sysUser.setDelFlag(Boolean.TRUE.equals(user.getDelFlag()) ? "2" : "0");
         sysUser.setPwdUpdateDate(user.getPwdUpdateDate());

@@ -3,6 +3,7 @@ package com.medcase.system.service;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.medcase.common.constant.UserConstants;
+import com.medcase.common.enums.NormalDisableEnums;
 import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
@@ -42,7 +43,7 @@ public class SysDictTypeService {
     private SysDictDataService dictDataService;
 
     public PageResult<SysDictTypeEntity> selectPage(
-            PageParam pageParam, String dictName, String status, String dictType,
+            PageParam pageParam, String dictName, NormalDisableEnums status, String dictType,
             String beginTime, String endTime) {
 
         return dictTypeMapper.selectPage(

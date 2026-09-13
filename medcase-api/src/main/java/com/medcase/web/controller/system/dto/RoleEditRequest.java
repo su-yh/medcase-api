@@ -1,5 +1,6 @@
 package com.medcase.web.controller.system.dto;
 
+import com.medcase.common.enums.NormalDisableEnums;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -27,7 +28,7 @@ public class RoleEditRequest {
 
     private boolean menuCheckStrictly;
 
-    private String status;
+    private NormalDisableEnums status;
 
     private String remark;
 

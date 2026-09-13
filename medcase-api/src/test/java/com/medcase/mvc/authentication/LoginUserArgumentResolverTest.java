@@ -39,7 +39,7 @@ class LoginUserArgumentResolverTest {
 
         LoginUser registeredUser = (LoginUser) resolve("currentUser");
 
-        assertEquals(UserStatusEnums.REGISTER.getCode(), registeredUser.getUser().getStatus());
+        assertEquals(UserStatusEnums.REGISTER, registeredUser.getUser().getStatus());
     }
 
     @Test
@@ -64,7 +64,7 @@ class LoginUserArgumentResolverTest {
         SysUserEntity user = new SysUserEntity();
         user.setUserId(1L);
         user.setUserType(UserTypeEnums.DOCTOR);
-        user.setStatus(status.getCode());
+        user.setStatus(status);
 
         LoginUser loginUser = new LoginUser();
         loginUser.setUserId(user.getUserId());

@@ -1,5 +1,8 @@
 package com.medcase.system.service;
 
+import com.medcase.common.enums.YesNoEnums;
+import com.medcase.common.enums.NormalDisableEnums;
+import com.medcase.common.enums.NoticeTypeEnums;
 import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
 import com.medcase.system.entity.SysConfigEntity;
@@ -19,15 +22,15 @@ class SystemSingleTablePageServiceTest {
     @Test
     void simpleSingleTableServicesExposePageMethods() throws NoSuchMethodException {
         assertPageMethod(SysConfigService.class, SysConfigEntity.class,
-                String.class, String.class, String.class, String.class, String.class);
+                String.class, YesNoEnums.class, String.class, String.class, String.class);
         assertPageMethod(SysDictDataService.class, SysDictDataEntity.class,
-                String.class, String.class, String.class);
+                String.class, String.class, NormalDisableEnums.class);
         assertPageMethod(SysDictTypeService.class, SysDictTypeEntity.class,
-                String.class, String.class, String.class, String.class, String.class);
+                String.class, NormalDisableEnums.class, String.class, String.class, String.class);
         assertPageMethod(SysPostService.class, SysPostEntity.class,
-                String.class, String.class, String.class);
+                String.class, String.class, NormalDisableEnums.class);
         assertPageMethod(SysNoticeService.class, SysNoticeEntity.class,
-                String.class, String.class, String.class);
+                String.class, NoticeTypeEnums.class, String.class);
     }
 
     private void assertPageMethod(

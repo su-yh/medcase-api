@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.medcase.common.enums.UserSexEnums;
 import com.medcase.common.enums.UserStatusEnums;
 import com.medcase.common.enums.UserTypeEnums;
 import com.medcase.mp.entity.AbstractBaseEntity;
@@ -33,7 +34,7 @@ public class UserEntity extends AbstractBaseEntity {
 
     private Long supplierId;
 
-    private String sex;
+    private UserSexEnums sex;
 
     private String idCardNumber;
 

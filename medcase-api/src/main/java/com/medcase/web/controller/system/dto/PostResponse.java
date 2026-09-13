@@ -1,6 +1,7 @@
 package com.medcase.web.controller.system.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.medcase.common.enums.NormalDisableEnums;
 import com.medcase.system.entity.SysPostEntity;
 import lombok.Data;
 
@@ -20,7 +21,7 @@ public class PostResponse {
 
     private Integer postSort;
 
-    private String status;
+    private NormalDisableEnums status;
 
     private String remark;
 

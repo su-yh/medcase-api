@@ -1,6 +1,7 @@
 package com.medcase.biz.response;
 
 import com.medcase.biz.domain.UserEntity;
+import com.medcase.common.enums.UserSexEnums;
 import com.medcase.common.enums.UserStatusEnums;
 import com.medcase.common.enums.UserTypeEnums;
 import com.medcase.storage.pojo.FileAttachment;
@@ -17,7 +18,7 @@ public class UserProfileVO {
 
     private String nickName;
 
-    private String sex;
+    private UserSexEnums sex;
 
     private String phone;
 

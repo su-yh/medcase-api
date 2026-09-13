@@ -3,6 +3,8 @@ package com.medcase.system.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.medcase.common.enums.NoticeStatusEnums;
+import com.medcase.common.enums.NoticeTypeEnums;
 import com.medcase.mp.entity.AbstractBaseEntity;
 import lombok.Data;
 
@@ -18,11 +20,11 @@ public class SysNoticeEntity extends AbstractBaseEntity {
 
     private String noticeTitle;
 
-    private String noticeType;
+    private NoticeTypeEnums noticeType;
 
     private String noticeContent;
 
-    private String status;
+    private NoticeStatusEnums status;
 
     private String remark;
 }

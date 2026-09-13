@@ -2,6 +2,7 @@ package com.medcase.biz.response;
 
 import com.medcase.biz.domain.SupplierEntity;
 import com.medcase.biz.enums.SupplierStatusEnums;
+import com.medcase.common.enums.UserSexEnums;
 import lombok.Data;
 
 import java.util.Date;
@@ -15,7 +16,7 @@ public class SupplierResponse {
 
     private String name;
 
-    private String sex;
+    private UserSexEnums sex;
 
     private String phone;
 

@@ -1,6 +1,7 @@
 package com.medcase.web.controller.system.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.medcase.common.enums.YesNoEnums;
 import com.medcase.system.entity.SysConfigEntity;
 import lombok.Data;
 
@@ -20,7 +21,7 @@ public class ConfigResponse {
 
     private String configValue;
 
-    private String configType;
+    private YesNoEnums configType;
 
     private String remark;
 

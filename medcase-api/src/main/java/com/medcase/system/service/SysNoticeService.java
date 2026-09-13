@@ -2,6 +2,7 @@ package com.medcase.system.service;
 
 import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
+import com.medcase.common.enums.NoticeTypeEnums;
 import com.medcase.system.entity.SysNoticeEntity;
 import com.medcase.system.mapper.SysNoticeMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +38,7 @@ public class SysNoticeService {
      * @return 公告集合
      */
     public PageResult<SysNoticeEntity> selectPage(
-            PageParam pageParam, String noticeTitle, String noticeType, String createBy) {
+            PageParam pageParam, String noticeTitle, NoticeTypeEnums noticeType, String createBy) {
 
         return noticeMapper.selectPage(pageParam, noticeTitle, noticeType, createBy);
     }

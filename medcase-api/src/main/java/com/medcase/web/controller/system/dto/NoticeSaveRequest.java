@@ -1,5 +1,7 @@
 package com.medcase.web.controller.system.dto;
 
+import com.medcase.common.enums.NoticeStatusEnums;
+import com.medcase.common.enums.NoticeTypeEnums;
 import com.medcase.common.xss.Xss;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -18,9 +20,9 @@ public class NoticeSaveRequest {
     @Size(max = 50, message = "公告标题不能超过50个字符")
     private String noticeTitle;
 
-    private String noticeType;
+    private NoticeTypeEnums noticeType;
 
     private String noticeContent;
 
-    private String status;
+    private NoticeStatusEnums status;
 }

@@ -28,7 +28,7 @@ public class UserPermissionService {
             return false;
         }
         return Arrays.stream(statuses)
-                .anyMatch(status -> status != null && status.getCode().equals(user.getUser().getStatus()));
+                .anyMatch(status -> status != null && status == user.getUser().getStatus());
     }
 
     /**

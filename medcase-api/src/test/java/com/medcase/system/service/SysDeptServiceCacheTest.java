@@ -11,6 +11,7 @@ import java.util.List;
 import com.medcase.system.entity.SysDeptEntity;
 import com.medcase.common.core.domain.TreeSelect;
 import com.medcase.common.constant.UserConstants;
+import com.medcase.common.enums.NormalDisableEnums;
 import com.medcase.web.controller.system.dto.DeptQueryRequest;
 import com.medcase.web.controller.system.dto.DeptSaveRequest;
 import com.medcase.system.mapper.SysDeptMapper;
@@ -73,7 +74,7 @@ class SysDeptServiceCacheTest {
 
         SysDeptEntity parentDept = new SysDeptEntity();
         parentDept.setDeptId(1L);
-        parentDept.setStatus(UserConstants.DEPT_NORMAL);
+        parentDept.setStatus(NormalDisableEnums.NORMAL);
         parentDept.setAncestors("0");
         when(deptMapper.selectById(1L)).thenReturn(parentDept);
         when(deptMapper.insert(org.mockito.ArgumentMatchers.any(SysDeptEntity.class))).thenReturn(1);
@@ -142,7 +143,7 @@ class SysDeptServiceCacheTest {
         department.setDeptId(1L);
         department.setParentId(0L);
         department.setDeptName("研发部门");
-        department.setStatus(UserConstants.DEPT_NORMAL);
+        department.setStatus(NormalDisableEnums.NORMAL);
         when(deptMapper.selectAllDepartments()).thenReturn(List.of(department));
 
         DeptQueryRequest query = new DeptQueryRequest();
@@ -204,7 +205,7 @@ class SysDeptServiceCacheTest {
         SysDeptEntity childDepartment = department(2L, 1L, "子部门", "0,1");
         SysDeptEntity grandchildDepartment = department(3L, 2L, "孙部门", "0,1,2");
         SysDeptEntity disabledDepartment = department(4L, 1L, "停用部门", "0,1");
-        disabledDepartment.setStatus(UserConstants.DEPT_DISABLE);
+        disabledDepartment.setStatus(NormalDisableEnums.DISABLE);
         when(deptMapper.selectAllDepartments())
                 .thenReturn(List.of(currentDepartment, childDepartment, grandchildDepartment,
                         disabledDepartment));
@@ -257,7 +258,7 @@ class SysDeptServiceCacheTest {
         department.setParentId(parentId);
         department.setDeptName(name);
         department.setAncestors(ancestors);
-        department.setStatus(UserConstants.DEPT_NORMAL);
+        department.setStatus(NormalDisableEnums.NORMAL);
         return department;
     }
 

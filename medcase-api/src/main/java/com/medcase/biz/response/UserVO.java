@@ -3,6 +3,8 @@ package com.medcase.biz.response;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.medcase.biz.domain.UserEntity;
 import com.medcase.storage.pojo.FileAttachment;
+import com.medcase.common.enums.UserSexEnums;
+import com.medcase.common.enums.UserStatusEnums;
 import com.medcase.common.enums.UserTypeEnums;
 import lombok.Data;
 
@@ -19,7 +21,7 @@ public class UserVO {
 
     private String nickName;
 
-    private String sex;
+    private UserSexEnums sex;
 
     private String idCardNumber;
 
@@ -39,7 +41,7 @@ public class UserVO {
 
     private String phone;
 
-    private String status;
+    private UserStatusEnums status;
 
     private String reviewReason;
 
@@ -60,9 +62,7 @@ public class UserVO {
         result.setQualificationCertificate(user.getQualificationCertificate());
         result.setUsername(user.getUserName());
         result.setPhone(user.getPhonenumber());
-        if (user.getStatus() != null) {
-            result.setStatus(user.getStatus().getCode());
-        }
+        result.setStatus(user.getStatus());
         result.setReviewReason(user.getReviewReason());
         result.setCreateTime(user.getCreateTime());
         return result;

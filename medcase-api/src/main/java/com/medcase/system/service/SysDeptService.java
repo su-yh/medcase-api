@@ -5,6 +5,7 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import com.medcase.common.constant.UserConstants;
 import com.medcase.common.core.domain.TreeSelect;
 import com.medcase.common.core.text.Convert;
+import com.medcase.common.enums.NormalDisableEnums;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
 import com.medcase.system.entity.SysDeptEntity;
@@ -87,7 +88,7 @@ public class SysDeptService {
                 || !department.getDeptName().contains(query.getDeptNameLike()))) {
             return false;
         }
-        return !org.springframework.util.StringUtils.hasText(query.getStatus())
+        return query.getStatus() == null
                 || query.getStatus().equals(department.getStatus());
     }
 
@@ -180,7 +181,7 @@ public class SysDeptService {
             return 0;
         }
         return Math.toIntExact(all().stream()
-                .filter(dept -> UserConstants.DEPT_NORMAL.equals(dept.getStatus()))
+                .filter(dept -> NormalDisableEnums.NORMAL.equals(dept.getStatus()))
                 .filter(dept -> dept.getAncestors() != null)
                 .filter(dept -> Arrays.asList(dept.getAncestors().split(","))
                         .contains(String.valueOf(deptId)))
@@ -239,7 +240,7 @@ public class SysDeptService {
 
         SysDeptEntity info = deptMapper.selectById(dept.getParentId());
         // 如果父节点不为正常状态,则不允许新增子节点
-        if (info == null || !UserConstants.DEPT_NORMAL.equals(info.getStatus())) {
+        if (info == null || !NormalDisableEnums.NORMAL.equals(info.getStatus())) {
             throw ExceptionUtil.business(ErrorCodeEnums.DEPT_DISABLED);
         }
         SysDeptEntity entity = toEntity(dept);
@@ -276,7 +277,7 @@ public class SysDeptService {
             entity.setAncestors(newParentDept.getAncestors() + "," + newParentDept.getDeptId());
         }
         int result = deptMapper.updateById(entity);
-        if (UserConstants.DEPT_NORMAL.equals(dept.getStatus())
+        if (NormalDisableEnums.NORMAL.equals(dept.getStatus())
                 && org.springframework.util.StringUtils.hasText(entity.getAncestors())
                 && !UserConstants.NORMAL.equals(entity.getAncestors())) {
 

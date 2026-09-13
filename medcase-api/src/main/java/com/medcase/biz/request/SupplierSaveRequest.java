@@ -1,6 +1,7 @@
 package com.medcase.biz.request;
 
 import com.medcase.biz.enums.SupplierStatusEnums;
+import com.medcase.common.enums.UserSexEnums;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -19,7 +20,7 @@ public class SupplierSaveRequest {
     private String name;
 
     @NotBlank(message = "供应商性别不能为空")
-    private String sex;
+    private UserSexEnums sex;
 
     @NotBlank(message = "供应商手机号不能为空")
     @Size(max = 20, message = "供应商手机号不能超过20个字符")

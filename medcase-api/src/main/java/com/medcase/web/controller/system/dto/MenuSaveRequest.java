@@ -1,6 +1,7 @@
 package com.medcase.web.controller.system.dto;
 
 import com.medcase.common.constant.UserConstants;
+import com.medcase.common.enums.NormalDisableEnums;
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -41,7 +42,7 @@ public class MenuSaveRequest {
 
     private Boolean visible;
 
-    private String status;
+    private NormalDisableEnums status;
 
     @Size(max = 100, message = "权限标识长度不能超过100个字符")
     private String perms;

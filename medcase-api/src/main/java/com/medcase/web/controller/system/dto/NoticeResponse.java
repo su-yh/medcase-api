@@ -1,6 +1,8 @@
 package com.medcase.web.controller.system.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.medcase.common.enums.NoticeStatusEnums;
+import com.medcase.common.enums.NoticeTypeEnums;
 import com.medcase.system.entity.SysNoticeEntity;
 import lombok.Data;
 
@@ -16,11 +18,11 @@ public class NoticeResponse {
 
     private String noticeTitle;
 
-    private String noticeType;
+    private NoticeTypeEnums noticeType;
 
     private String noticeContent;
 
-    private String status;
+    private NoticeStatusEnums status;
 
     private String createBy;
 

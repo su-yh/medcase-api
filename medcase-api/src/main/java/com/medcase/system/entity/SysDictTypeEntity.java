@@ -3,6 +3,7 @@ package com.medcase.system.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.medcase.common.enums.NormalDisableEnums;
 import com.medcase.mp.entity.AbstractBaseEntity;
 import lombok.Data;
 
@@ -20,7 +21,7 @@ public class SysDictTypeEntity extends AbstractBaseEntity {
 
     private String dictType;
 
-    private String status;
+    private NormalDisableEnums status;
 
     private String remark;
 }

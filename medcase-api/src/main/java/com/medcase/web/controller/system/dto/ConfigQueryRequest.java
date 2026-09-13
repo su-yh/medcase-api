@@ -1,5 +1,6 @@
 package com.medcase.web.controller.system.dto;
 
+import com.medcase.common.enums.YesNoEnums;
 import lombok.Data;
 
 /**
@@ -12,7 +13,7 @@ public class ConfigQueryRequest {
 
     private String configKey;
 
-    private String configType;
+    private YesNoEnums configType;
 
     private String beginTime;
 

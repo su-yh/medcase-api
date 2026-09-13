@@ -65,7 +65,7 @@ class UserPermissionServiceTest {
     private LoginUser loginUser(UserTypeEnums userType, UserStatusEnums status) {
         SysUserEntity user = new SysUserEntity();
         user.setUserType(userType);
-        user.setStatus(status.getCode());
+        user.setStatus(status);
 
         LoginUser loginUser = new LoginUser();
         loginUser.setUser(user);

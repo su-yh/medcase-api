@@ -9,6 +9,7 @@ import com.medcase.common.constant.CacheConstants;
 import com.medcase.common.constant.UserConstants;
 import com.medcase.common.core.redis.RedisCache;
 import com.medcase.common.core.text.Convert;
+import com.medcase.common.enums.YesNoEnums;
 import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
 import com.medcase.system.entity.SysConfigEntity;
@@ -94,7 +95,7 @@ public class SysConfigService {
      * @return 参数配置集合
      */
     public PageResult<SysConfigEntity> selectPage(
-            PageParam pageParam, String configName, String configType, String configKey,
+            PageParam pageParam, String configName, YesNoEnums configType, String configKey,
             String beginTime, String endTime) {
 
         return configMapper.selectPage(
@@ -150,7 +151,7 @@ public class SysConfigService {
         for (Long configId : configIds) {
 
             SysConfigEntity config = selectConfigById(configId);
-            if (org.apache.commons.lang3.Strings.CS.equals(UserConstants.YES, config.getConfigType())) {
+            if (YesNoEnums.YES.equals(config.getConfigType())) {
 
                 throw ExceptionUtil.business(ErrorCodeEnums.CONFIG_BUILTIN_DELETE, config.getConfigKey());
             }

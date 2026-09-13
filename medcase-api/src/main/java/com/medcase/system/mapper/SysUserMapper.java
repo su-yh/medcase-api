@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.medcase.common.constant.UserConstants;
+import com.medcase.common.enums.UserStatusEnums;
 import com.medcase.common.enums.UserTypeEnums;
 import com.medcase.mp.mybatis.BaseMapperX;
 import com.medcase.mp.mybatis.LambdaQueryWrapperX;
@@ -136,7 +137,7 @@ public interface SysUserMapper extends BaseMapperX<SysUserEntity> {
         return selectCount(query);
     }
 
-    default int updateUserStatus(Long userId, String status) {
+    default int updateUserStatus(Long userId, UserStatusEnums status) {
         SysUserEntity entity = new SysUserEntity();
         entity.setStatus(status);
         return update(entity, new LambdaUpdateWrapper<SysUserEntity>()

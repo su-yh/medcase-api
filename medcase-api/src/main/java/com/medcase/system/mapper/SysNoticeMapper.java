@@ -1,6 +1,7 @@
 package com.medcase.system.mapper;
 
-import com.medcase.common.constant.UserConstants;
+import com.medcase.common.enums.NoticeStatusEnums;
+import com.medcase.common.enums.NoticeTypeEnums;
 import com.medcase.mp.mybatis.BaseMapperX;
 import com.medcase.mp.mybatis.LambdaQueryWrapperX;
 import com.medcase.mp.mybatis.PageParam;
@@ -21,13 +22,13 @@ public interface SysNoticeMapper extends BaseMapperX<SysNoticeEntity> {
         pageParam.setPageSize(limit);
         pageParam.setSearchCount(false);
         LambdaQueryWrapperX<SysNoticeEntity> query = build();
-        query.eq(SysNoticeEntity::getStatus, UserConstants.NORMAL);
+        query.eq(SysNoticeEntity::getStatus, NoticeStatusEnums.NORMAL);
         query.orderByDesc(SysNoticeEntity::getNoticeId);
         return selectPage(pageParam, query).getList();
     }
 
     default PageResult<SysNoticeEntity> selectPage(
-            PageParam pageParam, String noticeTitle, String noticeType, String createBy) {
+            PageParam pageParam, String noticeTitle, NoticeTypeEnums noticeType, String createBy) {
         LambdaQueryWrapperX<SysNoticeEntity> query = build();
         query.likeIfPresent(SysNoticeEntity::getNoticeTitle, noticeTitle);
         query.eqIfPresent(SysNoticeEntity::getNoticeType, noticeType);

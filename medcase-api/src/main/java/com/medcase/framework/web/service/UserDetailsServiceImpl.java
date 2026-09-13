@@ -44,7 +44,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             log.info("登录用户：{} 已被删除.", username);
             throw ExceptionUtil.business(ErrorCodeEnums.USER_DELETED);
         }
-        else if (UserStatusEnums.DISABLE.getCode().equals(user.getStatus())) {
+        else if (UserStatusEnums.DISABLE.equals(user.getStatus())) {
 
             log.info("登录用户：{} 已被停用.", username);
             throw ExceptionUtil.business(ErrorCodeEnums.USER_BLOCKED);

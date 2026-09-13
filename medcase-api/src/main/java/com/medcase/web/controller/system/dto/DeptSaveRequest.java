@@ -1,5 +1,6 @@
 package com.medcase.web.controller.system.dto;
 
+import com.medcase.common.enums.NormalDisableEnums;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -32,5 +33,5 @@ public class DeptSaveRequest {
     @Size(max = 50, message = "邮箱长度不能超过50个字符")
     private String email;
 
-    private String status;
+    private NormalDisableEnums status;
 }

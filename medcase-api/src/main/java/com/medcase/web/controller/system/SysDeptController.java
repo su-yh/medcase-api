@@ -13,10 +13,10 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import com.medcase.common.constant.UserConstants;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
 import com.medcase.common.core.domain.model.LoginUser;
+import com.medcase.common.enums.NormalDisableEnums;
 import com.medcase.mvc.audit.AuditOperation;
 import com.medcase.mvc.authentication.annotation.CurrLoginUser;
 import com.medcase.system.entity.SysDeptEntity;
@@ -115,7 +115,7 @@ public class SysDeptController {
         else if (dept.getParentId().equals(deptId)) {
             throw ExceptionUtil.business(ErrorCodeEnums.DEPT_PARENT_SELF);
         }
-        else if (org.apache.commons.lang3.Strings.CS.equals(UserConstants.DEPT_DISABLE, dept.getStatus())
+        else if (NormalDisableEnums.DISABLE.equals(dept.getStatus())
                 && deptService.selectNormalChildrenDeptById(deptId) > 0) {
             throw ExceptionUtil.business(ErrorCodeEnums.DEPT_ENABLED_CHILDREN);
         }

@@ -18,6 +18,7 @@ import com.medcase.biz.request.UserProfileSubmitRequest;
 import com.medcase.biz.response.UserProfileVO;
 import com.medcase.system.entity.SysUserEntity;
 import com.medcase.common.core.domain.model.LoginUser;
+import com.medcase.common.enums.UserSexEnums;
 import com.medcase.common.enums.UserStatusEnums;
 import com.medcase.common.enums.UserTypeEnums;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
@@ -62,7 +63,7 @@ class UserProfileServiceTest {
     void meReturnsCurrentUserProfile() {
         UserEntity doctor = doctor(UserStatusEnums.REGISTER);
         doctor.setNickName("张医生");
-        doctor.setSex("1");
+        doctor.setSex(UserSexEnums.FEMALE);
         doctor.setPhonenumber("13800000000");
         doctor.setIdCardNumber("110101199001011234");
         doctor.setTitle("主治医师");
@@ -75,7 +76,7 @@ class UserProfileServiceTest {
 
         assertEquals(12L, result.getId());
         assertEquals("张医生", result.getNickName());
-        assertEquals("1", result.getSex());
+        assertEquals(UserSexEnums.FEMALE, result.getSex());
         assertEquals("13800000000", result.getPhone());
         assertEquals("110101199001011234", result.getIdCardNumber());
         assertEquals("主治医师", result.getTitle());

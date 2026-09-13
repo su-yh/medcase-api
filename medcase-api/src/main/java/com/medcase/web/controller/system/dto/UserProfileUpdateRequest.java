@@ -1,5 +1,6 @@
 package com.medcase.web.controller.system.dto;
 
+import com.medcase.common.enums.UserSexEnums;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
@@ -19,5 +20,5 @@ public class UserProfileUpdateRequest {
     @Size(max = 11, message = "手机号码长度不能超过11个字符")
     private String phonenumber;
 
-    private String sex;
+    private UserSexEnums sex;
 }

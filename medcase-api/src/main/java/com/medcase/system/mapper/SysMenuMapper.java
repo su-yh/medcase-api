@@ -2,6 +2,7 @@ package com.medcase.system.mapper;
 
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.medcase.common.constant.UserConstants;
+import com.medcase.common.enums.NormalDisableEnums;
 import com.medcase.mp.mybatis.BaseMapperX;
 import com.medcase.mp.mybatis.LambdaQueryWrapperX;
 import com.medcase.system.entity.SysMenuEntity;
@@ -33,7 +34,7 @@ public interface SysMenuMapper extends BaseMapperX<SysMenuEntity> {
     default List<SysMenuEntity> selectMenuTreeAll() {
         LambdaQueryWrapperX<SysMenuEntity> query = build();
         query.in(SysMenuEntity::getMenuType, UserConstants.TYPE_DIR, UserConstants.TYPE_MENU);
-        query.eq(SysMenuEntity::getStatus, UserConstants.NORMAL);
+        query.eq(SysMenuEntity::getStatus, NormalDisableEnums.NORMAL);
         query.orderByAsc(SysMenuEntity::getParentId);
         query.orderByAsc(SysMenuEntity::getOrderNum);
         return selectList(query);

@@ -3,7 +3,10 @@ package com.medcase.framework.web.service;
 import com.medcase.system.entity.SysDeptEntity;
 import com.medcase.system.entity.SysUserEntity;
 import com.medcase.common.core.domain.model.LoginUser;
+import com.medcase.common.enums.UserStatusEnums;
 import com.medcase.common.enums.UserTypeEnums;
+import com.medcase.mvc.constants.enums.ErrorCodeEnums;
+import com.medcase.mvc.exception.AbstractBusinessException;
 import com.medcase.system.service.SysUserService;
 import java.lang.reflect.Field;
 import java.util.List;
@@ -14,6 +17,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -33,6 +37,25 @@ class UserDetailsServiceImplTest {
         assertInstanceOf(LoginUser.class, userDetails);
         verify(userService).selectUserByUserName("suyunhong", UserTypeEnums.ADMIN.getCode());
         assertSame(UserTypeEnums.ADMIN, ((LoginUser) userDetails).getUser().getUserType());
+    }
+
+    @Test
+    void loadUserByUsernameRejectsDisabledUser() throws Exception {
+        SysUserService userService = Mockito.mock(SysUserService.class);
+        SysUserEntity user = adminUser();
+        user.setStatus(UserStatusEnums.DISABLE);
+        when(userService.selectUserByUserName("suyunhong", UserTypeEnums.ADMIN.getCode()))
+                .thenReturn(user);
+
+        UserDetailsServiceImpl service = new UserDetailsServiceImpl();
+        setField(service, "userService", userService);
+        setField(service, "permissionService", new SysPermissionService());
+
+        AbstractBusinessException exception = assertThrows(
+                AbstractBusinessException.class,
+                () -> service.loadUserByUsername("suyunhong"));
+
+        assertEquals(ErrorCodeEnums.USER_BLOCKED, exception.getEc());
     }
 
     private static SysUserEntity adminUser() {

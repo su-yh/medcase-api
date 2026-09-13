@@ -6,6 +6,8 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.medcase.common.enums.UserSexEnums;
+import com.medcase.common.enums.UserStatusEnums;
 import com.medcase.common.enums.UserTypeEnums;
 import com.medcase.mp.entity.AbstractBaseEntity;
 import com.medcase.storage.pojo.FileAttachment;
@@ -53,7 +55,7 @@ public class SysUserEntity extends AbstractBaseEntity {
 
     private String phonenumber;
 
-    private String sex;
+    private UserSexEnums sex;
 
     @TableField(typeHandler = JacksonTypeHandler.class)
     private FileAttachment avatar;
@@ -61,7 +63,7 @@ public class SysUserEntity extends AbstractBaseEntity {
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
-    private String status;
+    private UserStatusEnums status;
 
     private String delFlag;
 

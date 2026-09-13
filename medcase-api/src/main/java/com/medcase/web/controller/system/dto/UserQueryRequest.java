@@ -1,6 +1,7 @@
 package com.medcase.web.controller.system.dto;
 
 import com.medcase.common.enums.UserTypeEnums;
+import com.medcase.common.enums.UserStatusEnums;
 import lombok.Data;
 
 /**
@@ -23,5 +24,5 @@ public class UserQueryRequest {
 
     private String phonenumber;
 
-    private String status;
+    private UserStatusEnums status;
 }

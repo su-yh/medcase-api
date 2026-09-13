@@ -1,5 +1,6 @@
 package com.medcase.web.controller.system.dto;
 
+import com.medcase.common.enums.NormalDisableEnums;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
@@ -12,5 +13,5 @@ public class RoleStatusRequest {
     @NotNull(message = "角色ID不能为空")
     private Long roleId;
 
-    private String status;
+    private NormalDisableEnums status;
 }

@@ -1,5 +1,6 @@
 package com.medcase.web.controller.system.dto;
 
+import com.medcase.common.enums.UserStatusEnums;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
@@ -13,5 +14,5 @@ public class UserStatusRequest {
     private Long userId;
 
     @NotNull(message = "用户状态不能为空")
-    private String status;
+    private UserStatusEnums status;
 }

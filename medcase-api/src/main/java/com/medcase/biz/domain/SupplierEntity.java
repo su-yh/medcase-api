@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.medcase.biz.enums.SupplierStatusEnums;
+import com.medcase.common.enums.UserSexEnums;
 import com.medcase.mp.entity.AbstractBaseEntity;
 import lombok.Data;
 
@@ -21,7 +22,7 @@ public class SupplierEntity extends AbstractBaseEntity {
     @TableField("nick_name")
     private String name;
 
-    private String sex;
+    private UserSexEnums sex;
 
     private String phonenumber;
 
