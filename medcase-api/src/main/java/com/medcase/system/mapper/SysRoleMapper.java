@@ -22,7 +22,7 @@ public interface SysRoleMapper extends BaseMapperX<SysRoleEntity> {
         query.geIfPresent(SysRoleEntity::getCreateTime, request.getBeginTime());
         query.ltIfPresent(SysRoleEntity::getCreateTime, request.getEndTime());
         query.eqIfPresent(SysRoleEntity::getCreateUserId, createUserId);
-        query.eq(SysRoleEntity::getDelFlag, "0");
+        query.eq(SysRoleEntity::getDelFlag, Boolean.FALSE);
         query.orderByAsc(SysRoleEntity::getRoleSort);
         return selectPage(pageParam, query);
     }
@@ -30,20 +30,20 @@ public interface SysRoleMapper extends BaseMapperX<SysRoleEntity> {
     default SysRoleEntity selectRoleByName(String roleName) {
         LambdaQueryWrapperX<SysRoleEntity> query = build();
         query.eq(SysRoleEntity::getRoleName, roleName);
-        query.eq(SysRoleEntity::getDelFlag, "0");
+        query.eq(SysRoleEntity::getDelFlag, Boolean.FALSE);
         return selectOne(query);
     }
 
     default SysRoleEntity selectRoleByKey(String roleKey) {
         LambdaQueryWrapperX<SysRoleEntity> query = build();
         query.eq(SysRoleEntity::getRoleKey, roleKey);
-        query.eq(SysRoleEntity::getDelFlag, "0");
+        query.eq(SysRoleEntity::getDelFlag, Boolean.FALSE);
         return selectOne(query);
     }
 
     default int deleteRolesByIds(Long[] roleIds) {
         SysRoleEntity entity = new SysRoleEntity();
-        entity.setDelFlag("1");
+        entity.setDelFlag(Boolean.TRUE);
         return update(entity, new LambdaUpdateWrapper<SysRoleEntity>()
                 .in(SysRoleEntity::getRoleId, Arrays.asList(roleIds)));
     }

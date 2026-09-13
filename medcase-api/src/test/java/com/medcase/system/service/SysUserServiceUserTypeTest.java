@@ -39,7 +39,7 @@ class SysUserServiceUserTypeTest {
 
         userService.checkUserNameUnique(user);
 
-        verify(userMapper).selectUserByUserNameAndType("same-name", UserTypeEnums.ADMIN, "0");
+        verify(userMapper).selectUserByUserNameAndType("same-name", UserTypeEnums.ADMIN, Boolean.FALSE);
         assertEquals(UserTypeEnums.ADMIN, user.getUserType());
     }
 
@@ -53,7 +53,7 @@ class SysUserServiceUserTypeTest {
 
         userService.checkPhoneUnique(user);
 
-        verify(userMapper).selectUserByPhoneAndType("15888888888", UserTypeEnums.DOCTOR, "0");
+        verify(userMapper).selectUserByPhoneAndType("15888888888", UserTypeEnums.DOCTOR, Boolean.FALSE);
         assertEquals(UserTypeEnums.DOCTOR, user.getUserType());
     }
 
@@ -66,7 +66,7 @@ class SysUserServiceUserTypeTest {
 
         userService.checkEmailUnique(user);
 
-        verify(userMapper).selectUserByEmailAndType("same@example.com", UserTypeEnums.ADMIN, "0");
+        verify(userMapper).selectUserByEmailAndType("same@example.com", UserTypeEnums.ADMIN, Boolean.FALSE);
         assertEquals(UserTypeEnums.ADMIN, user.getUserType());
     }
 }

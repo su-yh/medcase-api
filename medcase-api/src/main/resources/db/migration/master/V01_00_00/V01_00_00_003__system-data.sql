@@ -12,7 +12,7 @@ insert into sys_user (
   null, null, null, null, null,
   null, 'ry@163.com', '15888888888', '1', '',
   '$2a$10$7JB720yubVSZvUI0rEqK/.VqGOZTH.ulu33dHOiBE8ByOhJIrdAu2',
-  '0', '0', sysdate(), '管理员', null, 'admin', sysdate(), null, '', null
+  '0', 0, sysdate(), '管理员', null, 'admin', sysdate(), null, '', null
 );
 
 insert into sys_post (

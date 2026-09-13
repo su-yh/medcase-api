@@ -3,6 +3,7 @@ package com.medcase.system.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -65,7 +66,8 @@ public class SysUserEntity extends AbstractBaseEntity {
 
     private UserStatusEnums status;
 
-    private String delFlag;
+    @TableLogic(value = "0", delval = "1")
+    private Boolean delFlag;
 
     private Date pwdUpdateDate;
 

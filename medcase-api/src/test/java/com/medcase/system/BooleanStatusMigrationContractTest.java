@@ -7,6 +7,8 @@ import com.medcase.biz.request.SupplierSaveRequest;
 import com.medcase.biz.request.SupplierStatusRequest;
 import com.medcase.biz.response.SupplierResponse;
 import com.medcase.system.entity.SysDeptEntity;
+import com.medcase.system.entity.SysRoleEntity;
+import com.medcase.system.entity.SysUserEntity;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
@@ -26,8 +28,8 @@ class BooleanStatusMigrationContractTest {
     private static final Path BUSINESS_SCHEMA = Path.of(
             "src/main/resources/db/migration/master/V01_00_00/"
                     + "V01_00_00_002__business-schema.sql");
-    private static final Path USER_LOGIN_SERVICE = Path.of(
-            "src/main/java/com/medcase/framework/web/service/UserLoginService.java");
+    private static final Path USER_DETAILS_SERVICE = Path.of(
+            "src/main/java/com/medcase/framework/web/service/UserDetailsServiceImpl.java");
 
     @Test
     void departmentDeleteFlagUsesBooleanLogicDelete() throws Exception {
@@ -38,6 +40,12 @@ class BooleanStatusMigrationContractTest {
         assertNotNull(tableLogic);
         assertEquals("0", tableLogic.value());
         assertEquals("1", tableLogic.delval());
+    }
+
+    @Test
+    void systemDeleteFlagsUseBooleanFields() throws Exception {
+        assertBooleanField(SysUserEntity.class, "delFlag");
+        assertBooleanField(SysRoleEntity.class, "delFlag");
     }
 
     @Test
@@ -59,9 +67,9 @@ class BooleanStatusMigrationContractTest {
         assertTrue(systemSql.contains(
                 "status                   char(1)       default '0' comment '账号状态（0正常 1停用 3待审核 4审核失败 5注册）'"));
         assertTrue(systemSql.contains(
-                "del_flag                 char(1)       default '0' comment '逻辑删除（1删除，0未删除）'"));
+                "del_flag                 tinyint      default 0 comment '逻辑删除（1删除，0未删除）'"));
         assertTrue(systemSql.contains(
-                "del_flag            char(1)      default '0' comment '逻辑删除（1删除，0未删除）'"));
+                "del_flag            tinyint      default 0 comment '逻辑删除（1删除，0未删除）'"));
         assertTrue(businessSql.contains(
                 "status          tinyint      not null default 1 comment '状态（1正常 0停用）'"));
         assertFalse(businessSql.contains("status          char(1)"));
@@ -69,9 +77,9 @@ class BooleanStatusMigrationContractTest {
 
     @Test
     void booleanDeleteFlagConversionChecksNullWithoutEquals() throws Exception {
-        String source = Files.readString(USER_LOGIN_SERVICE);
+        String source = Files.readString(USER_DETAILS_SERVICE);
 
-        assertFalse(source.contains("Boolean.TRUE.equals(user.getDelFlag())"));
+        assertFalse(source.contains("user.getDelFlag().equals"));
         assertTrue(source.contains("user.getDelFlag() != null && user.getDelFlag()"));
     }
 

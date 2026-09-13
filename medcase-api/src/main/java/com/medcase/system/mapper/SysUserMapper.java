@@ -3,7 +3,6 @@ package com.medcase.system.mapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.medcase.common.constant.UserConstants;
 import com.medcase.common.enums.UserStatusEnums;
 import com.medcase.common.enums.UserTypeEnums;
 import com.medcase.mp.mybatis.BaseMapperX;
@@ -35,7 +34,7 @@ public interface SysUserMapper extends BaseMapperX<SysUserEntity> {
             PageParam pageParam, UserQueryRequest user, Collection<Long> deptIds,
             String beginTime, String endTime) {
         LambdaQueryWrapperX<SysUserEntity> query = build();
-        query.eq(SysUserEntity::getDelFlag, UserConstants.NORMAL);
+        query.eq(SysUserEntity::getDelFlag, Boolean.FALSE);
         query.select(SysUserEntity::getUserId, SysUserEntity::getDeptId,
                 SysUserEntity::getNickName, SysUserEntity::getUserName,
                 SysUserEntity::getUserType, SysUserEntity::getEmail,
@@ -95,7 +94,7 @@ public interface SysUserMapper extends BaseMapperX<SysUserEntity> {
             @Param("deptIds") Collection<Long> deptIds);
 
     default SysUserEntity selectUserByUserName(
-            String userName, String userType, String delFlag) {
+            String userName, String userType, Boolean delFlag) {
         LambdaQueryWrapperX<SysUserEntity> query = build();
         query.eq(SysUserEntity::getUserName, userName);
         query.eq(SysUserEntity::getUserType, userType);
@@ -104,7 +103,7 @@ public interface SysUserMapper extends BaseMapperX<SysUserEntity> {
     }
 
     default SysUserEntity selectUserByUserNameAndType(
-            String userName, UserTypeEnums userType, String delFlag) {
+            String userName, UserTypeEnums userType, Boolean delFlag) {
         LambdaQueryWrapperX<SysUserEntity> query = build();
         query.eq(SysUserEntity::getUserName, userName);
         query.eq(SysUserEntity::getUserType, userType);
@@ -113,7 +112,7 @@ public interface SysUserMapper extends BaseMapperX<SysUserEntity> {
     }
 
     default SysUserEntity selectUserByPhoneAndType(
-            String phone, UserTypeEnums userType, String delFlag) {
+            String phone, UserTypeEnums userType, Boolean delFlag) {
         LambdaQueryWrapperX<SysUserEntity> query = build();
         query.eq(SysUserEntity::getPhonenumber, phone);
         query.eq(SysUserEntity::getUserType, userType);
@@ -122,7 +121,7 @@ public interface SysUserMapper extends BaseMapperX<SysUserEntity> {
     }
 
     default SysUserEntity selectUserByEmailAndType(
-            String email, UserTypeEnums userType, String delFlag) {
+            String email, UserTypeEnums userType, Boolean delFlag) {
         LambdaQueryWrapperX<SysUserEntity> query = build();
         query.eq(SysUserEntity::getEmail, email);
         query.eq(SysUserEntity::getUserType, userType);
@@ -133,7 +132,7 @@ public interface SysUserMapper extends BaseMapperX<SysUserEntity> {
     default Long countByDeptId(Long deptId) {
         LambdaQueryWrapperX<SysUserEntity> query = build();
         query.eq(SysUserEntity::getDeptId, deptId);
-        query.eq(SysUserEntity::getDelFlag, "0");
+        query.eq(SysUserEntity::getDelFlag, Boolean.FALSE);
         return selectCount(query);
     }
 
@@ -161,7 +160,7 @@ public interface SysUserMapper extends BaseMapperX<SysUserEntity> {
 
     default int deleteUsersByIds(Long[] userIds) {
         SysUserEntity entity = new SysUserEntity();
-        entity.setDelFlag("1");
+        entity.setDelFlag(Boolean.TRUE);
         return update(entity, new LambdaUpdateWrapper<SysUserEntity>()
                 .in(SysUserEntity::getUserId, Arrays.asList(userIds)));
     }

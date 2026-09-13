@@ -177,7 +177,7 @@ public class SysUserService {
      */
     public SysUserEntity selectUserByUserName(String userName, String userType) {
 
-        SysUserEntity user = userMapper.selectUserByUserName(userName, userType, "0");
+        SysUserEntity user = userMapper.selectUserByUserName(userName, userType, Boolean.FALSE);
         if (user != null) {
             user.setDept(deptService.selectDeptById(user.getDeptId()));
             user.setRoles(roleService.selectRolesByUserId(user.getUserId()));
@@ -247,7 +247,7 @@ public class SysUserService {
         Long userId = user.getUserId() == null ? -1L : user.getUserId();
         useAdminUserTypeIfAbsent(user);
         SysUserEntity info = userMapper.selectUserByUserNameAndType(
-                user.getUserName(), user.getUserType(), "0");
+                user.getUserName(), user.getUserType(), Boolean.FALSE);
         if (info != null && !info.getUserId().equals(userId)) {
             return UserConstants.NOT_UNIQUE;
         }
@@ -264,7 +264,7 @@ public class SysUserService {
         Long userId = user.getUserId() == null ? -1L : user.getUserId();
         useAdminUserTypeIfAbsent(user);
         SysUserEntity info = userMapper.selectUserByPhoneAndType(
-                user.getPhonenumber(), user.getUserType(), "0");
+                user.getPhonenumber(), user.getUserType(), Boolean.FALSE);
         if (info != null && !info.getUserId().equals(userId)) {
             return UserConstants.NOT_UNIQUE;
         }
@@ -281,7 +281,7 @@ public class SysUserService {
         Long userId = user.getUserId() == null ? -1L : user.getUserId();
         useAdminUserTypeIfAbsent(user);
         SysUserEntity info = userMapper.selectUserByEmailAndType(
-                user.getEmail(), user.getUserType(), "0");
+                user.getEmail(), user.getUserType(), Boolean.FALSE);
         if (info != null && !info.getUserId().equals(userId)) {
             return UserConstants.NOT_UNIQUE;
         }
