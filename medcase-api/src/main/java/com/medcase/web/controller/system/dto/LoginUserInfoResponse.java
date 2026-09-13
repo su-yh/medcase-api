@@ -19,10 +19,4 @@ public class LoginUserInfoResponse {
     private Set<String> roles;
 
     private Set<String> permissions;
-
-    private String pwdChrtype;
-
-    private boolean defaultModifyPwd;
-
-    private boolean passwordExpired;
 }

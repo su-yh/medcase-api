@@ -40,21 +40,6 @@ insert into sys_user_post (user_id, post_id) values (1, 1);
 insert into sys_config (
   config_id, config_name, config_key, config_value, built_in, remark,
   create_user_id, create_by, create_time, update_user_id, update_by, update_time
-) values (1, '主框架页-默认皮肤样式名称', 'sys.index.skinName', 'skin-blue', 1, '蓝色 skin-blue、绿色 skin-green、紫色 skin-purple、红色 skin-red、黄色 skin-yellow', null, 'admin', sysdate(), null, '', null);
-
-insert into sys_config (
-  config_id, config_name, config_key, config_value, built_in, remark,
-  create_user_id, create_by, create_time, update_user_id, update_by, update_time
-) values (2, '用户管理-账号初始密码', 'sys.user.initPassword', '123456', 1, '初始化密码 123456', null, 'admin', sysdate(), null, '', null);
-
-insert into sys_config (
-  config_id, config_name, config_key, config_value, built_in, remark,
-  create_user_id, create_by, create_time, update_user_id, update_by, update_time
-) values (3, '主框架页-侧边栏主题', 'sys.index.sideTheme', 'theme-dark', 1, '深色主题theme-dark，浅色主题theme-light', null, 'admin', sysdate(), null, '', null);
-
-insert into sys_config (
-  config_id, config_name, config_key, config_value, built_in, remark,
-  create_user_id, create_by, create_time, update_user_id, update_by, update_time
 ) values (4, '账号自助-验证码开关', 'sys.account.captchaEnabled', 'true', 1, '是否开启验证码功能（true开启，false关闭）', null, 'admin', sysdate(), null, '', null);
 
 insert into sys_config (
@@ -66,21 +51,6 @@ insert into sys_config (
   config_id, config_name, config_key, config_value, built_in, remark,
   create_user_id, create_by, create_time, update_user_id, update_by, update_time
 ) values (6, '用户登录-黑名单列表', 'sys.login.blackIPList', '', 1, '设置登录IP黑名单限制，多个匹配项以;分隔，支持匹配（*通配、网段）', null, 'admin', sysdate(), null, '', null);
-
-insert into sys_config (
-  config_id, config_name, config_key, config_value, built_in, remark,
-  create_user_id, create_by, create_time, update_user_id, update_by, update_time
-) values (7, '用户管理-初始密码修改策略', 'sys.account.initPasswordModify', '1', 1, '0：初始密码修改策略关闭，没有任何提示，1：提醒用户，如果未修改初始密码，则在登录时就会提醒修改密码对话框', null, 'admin', sysdate(), null, '', null);
-
-insert into sys_config (
-  config_id, config_name, config_key, config_value, built_in, remark,
-  create_user_id, create_by, create_time, update_user_id, update_by, update_time
-) values (8, '用户管理-账号密码更新周期', 'sys.account.passwordValidateDays', '0', 1, '密码更新周期（填写数字，数据初始化值为0不限制，若修改必须为大于0小于365的正整数），如果超过这个周期登录系统时，则在登录时就会提醒修改密码对话框', null, 'admin', sysdate(), null, '', null);
-
-insert into sys_config (
-  config_id, config_name, config_key, config_value, built_in, remark,
-  create_user_id, create_by, create_time, update_user_id, update_by, update_time
-) values (9, '用户管理-密码字符范围', 'sys.account.chrtype', '0', 1, '默认任意字符范围，0任意（密码可以输入任意字符），1数字（密码只能为0-9数字），2英文字母（密码只能为a-z和A-Z字母），3字母和数字（密码必须包含字母，数字）,4字母数字和特殊字符（目前支持的特殊字符包括：~!@#$%^&*()-=_+）', null, 'admin', sysdate(), null, '', null);
 
 insert into sys_menu (
   id, menu_name, parent_id, order_num, route_path, vue_component_path, route_name,
