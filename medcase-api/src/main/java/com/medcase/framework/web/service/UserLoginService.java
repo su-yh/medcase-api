@@ -16,9 +16,9 @@ import com.medcase.mvc.exception.AbstractBusinessException;
 import com.medcase.mvc.exception.ExceptionUtil;
 import com.medcase.system.entity.SysUserEntity;
 import com.medcase.system.service.SysConfigService;
+import com.medcase.system.service.SysUserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -38,7 +38,7 @@ public class UserLoginService {
 
     private final SysPasswordService passwordService;
 
-    private final UserDetailsServiceImpl userDetailsService;
+    private final SysUserService userService;
 
     private final UserMapper userMapper;
 
@@ -115,8 +115,22 @@ public class UserLoginService {
         Long userId = null;
         try {
             passwordService.validateLoginRetryCount(username);
-            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-            LoginUser loginUser = (LoginUser) userDetails;
+            SysUserEntity user = userService.selectUserByUserName(
+                    username, UserTypeEnums.ADMIN.getCode());
+            if (user == null) {
+                log.info("登录用户：{} 不存在.", username);
+                throw ExceptionUtil.business(ErrorCodeEnums.ADMIN_LOGIN_FAILED);
+            }
+            if (UserStatusEnums.DISABLE.equals(user.getStatus())) {
+                log.info("登录用户：{} 已被停用.", username);
+                throw ExceptionUtil.business(ErrorCodeEnums.USER_BLOCKED);
+            }
+
+            LoginUser loginUser = new LoginUser(
+                    user.getUserId(),
+                    user.getDeptId(),
+                    user,
+                    permissionService.getMenuPermission(user));
             userId = loginUser.getUserId();
             if (!passwordEncoder.matches(password, loginUser.getPassword())) {
                 passwordService.recordLoginFailure(username);

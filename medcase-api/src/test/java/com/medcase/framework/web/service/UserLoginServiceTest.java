@@ -10,6 +10,9 @@ import com.medcase.common.core.redis.RedisCache;
 import com.medcase.common.utils.spring.SpringUtils;
 import com.medcase.system.service.LoginRecordService;
 import com.medcase.system.service.SysConfigService;
+import com.medcase.system.service.SysUserService;
+import com.medcase.mvc.constants.enums.ErrorCodeEnums;
+import com.medcase.mvc.exception.AbstractBusinessException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -51,7 +54,7 @@ class UserLoginServiceTest {
     private SysPasswordService passwordService;
 
     @Mock
-    private UserDetailsServiceImpl userDetailsService;
+    private SysUserService userService;
 
     @Mock
     private UserMapper userMapper;
@@ -73,7 +76,7 @@ class UserLoginServiceTest {
                 redisCache,
                 configService,
                 passwordService,
-                userDetailsService,
+                userService,
                 userMapper,
                 permissionService,
                 passwordEncoder);
@@ -109,5 +112,52 @@ class UserLoginServiceTest {
         ArgumentCaptor<LoginUser> loginUserCaptor = ArgumentCaptor.forClass(LoginUser.class);
         verify(tokenService).createToken(loginUserCaptor.capture());
         assertEquals(UserTypeEnums.DOCTOR, loginUserCaptor.getValue().getUser().getUserType());
+    }
+
+    @Test
+    void loginCreatesTokenForAdmin() {
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.setRemoteAddr("127.0.0.1");
+        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
+        when(configService.selectCaptchaEnabled()).thenReturn(false);
+        when(configService.selectConfigByKey("sys.login.blackIPList")).thenReturn(null);
+
+        SysUserEntity user = new SysUserEntity();
+        user.setUserId(1L);
+        user.setUserName("admin");
+        user.setPassword("encoded-password");
+        user.setStatus(UserStatusEnums.OK);
+        user.setUserType(UserTypeEnums.ADMIN);
+        when(userService.selectUserByUserName("admin", UserTypeEnums.ADMIN.getCode())).thenReturn(user);
+        when(passwordEncoder.matches("secret123", "encoded-password")).thenReturn(true);
+        when(permissionService.getMenuPermission(user)).thenReturn(Set.of("system:user:list"));
+        when(tokenService.createToken(any(LoginUser.class))).thenReturn("admin-token");
+
+        String token = service.login("admin", "secret123", null, null, UserTypeEnums.ADMIN);
+
+        assertEquals("admin-token", token);
+        verify(userService).selectUserByUserName("admin", UserTypeEnums.ADMIN.getCode());
+    }
+
+    @Test
+    void loginRejectsDisabledAdmin() {
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.setRemoteAddr("127.0.0.1");
+        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
+        when(configService.selectCaptchaEnabled()).thenReturn(false);
+        when(configService.selectConfigByKey("sys.login.blackIPList")).thenReturn(null);
+
+        SysUserEntity user = new SysUserEntity();
+        user.setUserId(1L);
+        user.setUserName("admin");
+        user.setStatus(UserStatusEnums.DISABLE);
+        user.setUserType(UserTypeEnums.ADMIN);
+        when(userService.selectUserByUserName("admin", UserTypeEnums.ADMIN.getCode())).thenReturn(user);
+
+        AbstractBusinessException exception = org.junit.jupiter.api.Assertions.assertThrows(
+                AbstractBusinessException.class,
+                () -> service.login("admin", "secret123", null, null, UserTypeEnums.ADMIN));
+
+        assertEquals(ErrorCodeEnums.USER_BLOCKED, exception.getEc());
     }
 }

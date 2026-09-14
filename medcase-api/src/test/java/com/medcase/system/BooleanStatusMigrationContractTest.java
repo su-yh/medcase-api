@@ -35,8 +35,8 @@ class BooleanStatusMigrationContractTest {
             "src/main/java/com/medcase/system/mapper/SysRoleMapper.java");
     private static final Path DEPT_MAPPER = Path.of(
             "src/main/java/com/medcase/system/mapper/SysDeptMapper.java");
-    private static final Path USER_DETAILS_SERVICE = Path.of(
-            "src/main/java/com/medcase/framework/web/service/UserDetailsServiceImpl.java");
+    private static final Path USER_LOGIN_SERVICE = Path.of(
+            "src/main/java/com/medcase/framework/web/service/UserLoginService.java");
 
     @Test
     void departmentDeleteFlagUsesBooleanLogicDelete() throws Exception {
@@ -107,7 +107,7 @@ class BooleanStatusMigrationContractTest {
 
     @Test
     void loginPathDoesNotCheckDeleteFlag() throws Exception {
-        String source = Files.readString(USER_DETAILS_SERVICE);
+        String source = Files.readString(USER_LOGIN_SERVICE);
 
         assertFalse(source.contains("getDelFlag"));
     }
