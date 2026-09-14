@@ -1,10 +1,9 @@
 package com.medcase.biz.service;
 
-import com.medcase.biz.domain.UserEntity;
-import com.medcase.biz.mapper.UserMapper;
 import com.medcase.biz.request.UserLoginRequest;
 import com.medcase.biz.request.UserRegisterRequest;
 import com.medcase.system.entity.SysUserEntity;
+import com.medcase.system.mapper.SysUserMapper;
 import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.common.enums.UserStatusEnums;
 import com.medcase.common.enums.UserTypeEnums;
@@ -44,7 +43,7 @@ class UserAuthServiceTest {
     private Validator validator;
 
     @Mock
-    private UserMapper userMapper;
+    private SysUserMapper userMapper;
 
     @Mock
     private com.medcase.framework.web.service.UserLoginService userLoginService;
@@ -81,15 +80,15 @@ class UserAuthServiceTest {
                 "doctor01", "secret123", "13800000000");
         when(userMapper.usernameExists("doctor01", UserTypeEnums.DOCTOR)).thenReturn(false);
         when(userMapper.phoneExists("13800000000", UserTypeEnums.DOCTOR)).thenReturn(false);
-        when(userMapper.insert(any(UserEntity.class))).thenReturn(1);
-        when(userMapper.updateById(any(UserEntity.class))).thenReturn(1);
+        when(userMapper.insert(any(SysUserEntity.class))).thenReturn(1);
+        when(userMapper.updateById(any(SysUserEntity.class))).thenReturn(1);
         when(passwordEncoder.encode("secret123")).thenReturn("encoded-password");
 
         userAuthService.register(registerRequest);
 
-        ArgumentCaptor<UserEntity> captor = ArgumentCaptor.forClass(UserEntity.class);
+        ArgumentCaptor<SysUserEntity> captor = ArgumentCaptor.forClass(SysUserEntity.class);
         verify(userMapper).insert(captor.capture());
-        UserEntity user = captor.getValue();
+        SysUserEntity user = captor.getValue();
         assertEquals("doctor01", user.getUserName());
         assertEquals(null, user.getNickName());
         assertEquals(UserTypeEnums.DOCTOR, user.getUserType());
@@ -121,7 +120,7 @@ class UserAuthServiceTest {
         AbstractBusinessException exception = assertThrows(AbstractBusinessException.class, () -> userAuthService.register(registerRequest));
 
         assertEquals(ErrorCodeEnums.USER_REGISTER_USER_EXISTS, exception.getEc());
-        verify(userMapper, never()).insert(any(UserEntity.class));
+        verify(userMapper, never()).insert(any(SysUserEntity.class));
         verify(userMapper).usernameExists("doctor01", UserTypeEnums.DOCTOR);
     }
 
@@ -134,7 +133,7 @@ class UserAuthServiceTest {
                 ConstraintViolationException.class, () -> userAuthService.register(registerRequest));
 
         assertTrue(exception.getMessage().contains("注册账号不能为空"));
-        verify(userMapper, never()).insert(any(UserEntity.class));
+        verify(userMapper, never()).insert(any(SysUserEntity.class));
     }
 
     @Test
@@ -146,7 +145,7 @@ class UserAuthServiceTest {
                 ConstraintViolationException.class, () -> userAuthService.register(registerRequest));
 
         assertTrue(exception.getMessage().contains("密码不能为空"));
-        verify(userMapper, never()).insert(any(UserEntity.class));
+        verify(userMapper, never()).insert(any(SysUserEntity.class));
     }
 
     @Test
@@ -158,7 +157,7 @@ class UserAuthServiceTest {
                 ConstraintViolationException.class, () -> userAuthService.register(registerRequest));
 
         assertTrue(exception.getMessage().contains("注册账号长度必须在"));
-        verify(userMapper, never()).insert(any(UserEntity.class));
+        verify(userMapper, never()).insert(any(SysUserEntity.class));
     }
 
     @Test
@@ -170,7 +169,7 @@ class UserAuthServiceTest {
                 ConstraintViolationException.class, () -> userAuthService.register(registerRequest));
 
         assertTrue(exception.getMessage().contains("密码长度必须在"));
-        verify(userMapper, never()).insert(any(UserEntity.class));
+        verify(userMapper, never()).insert(any(SysUserEntity.class));
     }
 
     @Test
@@ -179,7 +178,7 @@ class UserAuthServiceTest {
                 "doctor01", "secret123", "13800000000");
         when(userMapper.usernameExists("doctor01", UserTypeEnums.DOCTOR)).thenReturn(false);
         when(userMapper.phoneExists("13800000000", UserTypeEnums.DOCTOR)).thenReturn(false);
-        when(userMapper.insert(any(UserEntity.class))).thenReturn(0);
+        when(userMapper.insert(any(SysUserEntity.class))).thenReturn(0);
 
         AbstractBusinessException exception = assertThrows(AbstractBusinessException.class, () -> userAuthService.register(registerRequest));
 
@@ -197,7 +196,7 @@ class UserAuthServiceTest {
                 () -> userAuthService.register(registerRequest));
 
         assertTrue(exception.getMessage().contains("手机号不能为空"));
-        verify(userMapper, never()).insert(any(UserEntity.class));
+        verify(userMapper, never()).insert(any(SysUserEntity.class));
     }
 
     @Test
@@ -207,13 +206,13 @@ class UserAuthServiceTest {
         registerRequest.setUserType(UserTypeEnums.PATIENT);
         when(userMapper.usernameExists("patient01", UserTypeEnums.PATIENT)).thenReturn(false);
         when(userMapper.phoneExists("13800000000", UserTypeEnums.PATIENT)).thenReturn(false);
-        when(userMapper.insert(any(UserEntity.class))).thenReturn(1);
+        when(userMapper.insert(any(SysUserEntity.class))).thenReturn(1);
 
         userAuthService.register(registerRequest);
 
-        ArgumentCaptor<UserEntity> captor = ArgumentCaptor.forClass(UserEntity.class);
+        ArgumentCaptor<SysUserEntity> captor = ArgumentCaptor.forClass(SysUserEntity.class);
         verify(userMapper).insert(captor.capture());
-        UserEntity user = captor.getValue();
+        SysUserEntity user = captor.getValue();
         assertEquals(UserTypeEnums.PATIENT, user.getUserType());
         assertEquals(null, user.getTitle());
         assertEquals(null, user.getQualificationCertificate());
@@ -251,7 +250,7 @@ class UserAuthServiceTest {
 
     @Test
     void deleteAccountAllowsDoctorBeforeApproval() {
-        UserEntity doctor = user(
+        SysUserEntity doctor = user(
                 "doctor01", "secret123", UserStatusEnums.REVIEW_FAILED);
         when(userMapper.selectUserById(12L, UserTypeEnums.DOCTOR)).thenReturn(doctor);
         when(userMapper.deleteById(12L)).thenReturn(1);
@@ -318,13 +317,13 @@ class UserAuthServiceTest {
         return loginUser;
     }
 
-    private UserEntity user(String username, String rawPassword) {
+    private SysUserEntity user(String username, String rawPassword) {
         return user(username, rawPassword, UserStatusEnums.OK);
     }
 
-    private UserEntity user(
+    private SysUserEntity user(
             String username, String rawPassword, UserStatusEnums status) {
-        UserEntity user = new UserEntity();
+        SysUserEntity user = new SysUserEntity();
         user.setUserId(12L);
         user.setUserName(username);
         user.setNickName(username);

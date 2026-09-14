@@ -1,10 +1,10 @@
 package com.medcase.biz.response;
 
-import com.medcase.biz.domain.UserEntity;
 import com.medcase.common.enums.UserSexEnums;
 import com.medcase.common.enums.UserStatusEnums;
 import com.medcase.common.enums.UserTypeEnums;
 import com.medcase.storage.pojo.FileAttachment;
+import com.medcase.system.entity.SysUserEntity;
 import lombok.Data;
 
 /**
@@ -40,7 +40,7 @@ public class UserProfileVO {
 
     private String reviewReason;
 
-    public static UserProfileVO fromEntity(UserEntity user) {
+    public static UserProfileVO fromEntity(SysUserEntity user) {
         UserProfileVO result = new UserProfileVO();
         result.setId(user.getUserId());
         result.setNickName(user.getNickName());

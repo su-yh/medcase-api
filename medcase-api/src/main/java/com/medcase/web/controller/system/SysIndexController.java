@@ -43,7 +43,7 @@ public class SysIndexController {
             throw ExceptionUtil.business(ErrorCodeEnums.SCREEN_UNLOCK_PASSWORD_EMPTY);
         }
         SysUserEntity user = userService.selectUserByUserName(
-                loginUser.getUsername(), UserTypeEnums.ADMIN.getCode());
+                loginUser.getUsername(), UserTypeEnums.ADMIN);
         if (user == null) {
             throw ExceptionUtil.business(ErrorCodeEnums.SCREEN_UNLOCK_USER_NOT_FOUND);
         }

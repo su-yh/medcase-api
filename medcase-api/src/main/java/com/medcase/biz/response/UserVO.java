@@ -1,11 +1,11 @@
 package com.medcase.biz.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.medcase.biz.domain.UserEntity;
 import com.medcase.storage.pojo.FileAttachment;
 import com.medcase.common.enums.UserSexEnums;
 import com.medcase.common.enums.UserStatusEnums;
 import com.medcase.common.enums.UserTypeEnums;
+import com.medcase.system.entity.SysUserEntity;
 import lombok.Data;
 
 import java.util.Date;
@@ -48,7 +48,7 @@ public class UserVO {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date createTime;
 
-    public static UserVO fromEntity(UserEntity user) {
+    public static UserVO fromEntity(SysUserEntity user) {
         UserVO result = new UserVO();
         result.setId(user.getUserId());
         result.setNickName(user.getNickName());

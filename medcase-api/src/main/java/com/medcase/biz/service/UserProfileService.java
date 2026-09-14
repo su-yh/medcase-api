@@ -1,9 +1,7 @@
 package com.medcase.biz.service;
 
-import com.medcase.biz.domain.UserEntity;
 import com.medcase.biz.domain.SupplierEntity;
 import com.medcase.biz.mapper.SupplierMapper;
-import com.medcase.biz.mapper.UserMapper;
 import com.medcase.biz.request.UserProfilePasswordRequest;
 import com.medcase.biz.request.UserProfilePhoneRequest;
 import com.medcase.biz.request.UserProfileSubmitRequest;
@@ -14,6 +12,8 @@ import com.medcase.common.enums.UserTypeEnums;
 import com.medcase.common.validation.groups.ValidationGroups;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
+import com.medcase.system.entity.SysUserEntity;
+import com.medcase.system.mapper.SysUserMapper;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Validator;
@@ -32,7 +32,7 @@ import java.util.Set;
 @Service
 @RequiredArgsConstructor
 public class UserProfileService {
-    private final UserMapper userMapper;
+    private final SysUserMapper userMapper;
     private final SupplierMapper supplierMapper;
 
     private final Validator validator;
@@ -45,7 +45,7 @@ public class UserProfileService {
 
     @Transactional(rollbackFor = Exception.class)
     public void updatePhone(LoginUser user, UserProfilePhoneRequest request) {
-        UserEntity userEntity = requireUser(user);
+        SysUserEntity userEntity = requireUser(user);
         String phone = request.getPhone().trim();
         if (phone.equals(userEntity.getPhonenumber())) {
             return;
@@ -65,7 +65,7 @@ public class UserProfileService {
 
     @Transactional(rollbackFor = Exception.class)
     public void updatePassword(LoginUser user, UserProfilePasswordRequest request) {
-        UserEntity userEntity = requireUser(user);
+        SysUserEntity userEntity = requireUser(user);
         if (!passwordEncoder.matches(request.getOldPassword(), userEntity.getPassword())) {
             throw ExceptionUtil.business(ErrorCodeEnums.PROFILE_OLD_PASSWORD_INVALID);
         }
@@ -85,7 +85,7 @@ public class UserProfileService {
 
     @Transactional(rollbackFor = Exception.class)
     public void submit(LoginUser user, UserProfileSubmitRequest request) {
-        UserEntity userEntity = requireUser(user);
+        SysUserEntity userEntity = requireUser(user);
         validateSubmitRequest(request, userEntity.getUserType());
         SupplierEntity supplier = supplierMapper.selectEnabledById(request.getSupplierId());
         if (supplier == null) {
@@ -130,13 +130,13 @@ public class UserProfileService {
         }
     }
 
-    private UserEntity requireUser(LoginUser user) {
+    private SysUserEntity requireUser(LoginUser user) {
         if (user == null || user.getUserId() == null) {
             throw ExceptionUtil.business(ErrorCodeEnums.USER_NOT_FOUND);
         }
 
         UserTypeEnums userType = user.getUser() == null ? null : user.getUser().getUserType();
-        UserEntity userEntity = userMapper.selectUserById(user.getUserId(), userType);
+        SysUserEntity userEntity = userMapper.selectUserById(user.getUserId(), userType);
         if (userEntity == null) {
             throw ExceptionUtil.business(ErrorCodeEnums.USER_NOT_FOUND);
         }

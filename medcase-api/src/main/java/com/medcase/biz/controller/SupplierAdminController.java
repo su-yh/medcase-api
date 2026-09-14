@@ -12,9 +12,10 @@ import com.medcase.biz.response.UserVO;
 import com.medcase.biz.response.CaseVO;
 import com.medcase.biz.service.CaseService;
 import com.medcase.biz.service.SupplierService;
-import com.medcase.biz.service.UserService;
 import com.medcase.mp.mybatis.PageParam;
 import com.medcase.mp.mybatis.PageResult;
+import com.medcase.system.entity.SysUserEntity;
+import com.medcase.system.service.SysUserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -34,7 +35,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/biz/supplier")
 public class SupplierAdminController {
     private final SupplierService supplierService;
-    private final UserService userService;
+    private final SysUserService userService;
     private final CaseService caseService;
 
     @PreAuthorize("@ss.hasPermi('supplier:list')")
@@ -81,7 +82,11 @@ public class SupplierAdminController {
     public PageResult<UserVO> userList(
             @PathVariable Long supplierId, PageParam pageParam, UserQuery query) {
         query.setSupplierId(supplierId);
-        return userService.page(pageParam, query);
+        PageResult<SysUserEntity> page = userService.selectBizPage(pageParam, query);
+        PageResult<UserVO> result = new PageResult<>();
+        result.setTotal(page.getTotal());
+        result.setList(page.getList().stream().map(UserVO::fromEntity).toList());
+        return result;
     }
 
     @PreAuthorize("@ss.hasPermi('supplier:query')")
@@ -95,7 +100,7 @@ public class SupplierAdminController {
         if (supplier == null) {
             return PageResult.empty();
         }
-        UserVO user = userService.detailAny(userId);
+        SysUserEntity user = userService.selectAnyUserById(userId);
         if (user == null || user.getSupplierId() == null || !user.getSupplierId().equals(supplierId)) {
             return PageResult.empty();
         }

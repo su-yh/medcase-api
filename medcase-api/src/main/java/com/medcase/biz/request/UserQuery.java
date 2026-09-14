@@ -1,5 +1,6 @@
 package com.medcase.biz.request;
 
+import com.medcase.common.enums.UserStatusEnums;
 import lombok.Data;
 
 /**
@@ -15,5 +16,5 @@ public class UserQuery {
 
     private String phone;
 
-    private String status;
+    private UserStatusEnums status;
 }

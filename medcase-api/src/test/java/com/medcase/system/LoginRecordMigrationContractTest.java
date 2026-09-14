@@ -1,6 +1,5 @@
 package com.medcase.system;
 
-import com.medcase.biz.domain.UserEntity;
 import com.medcase.system.entity.SysUserEntity;
 import org.junit.jupiter.api.Test;
 
@@ -32,8 +31,6 @@ class LoginRecordMigrationContractTest {
     void userEntitiesDoNotContainLastLoginFields() {
         assertFalse(hasField(SysUserEntity.class, "loginIp"));
         assertFalse(hasField(SysUserEntity.class, "loginDate"));
-        assertFalse(hasField(UserEntity.class, "loginIp"));
-        assertFalse(hasField(UserEntity.class, "loginDate"));
     }
 
     @Test

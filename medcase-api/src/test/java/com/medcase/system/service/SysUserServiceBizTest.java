@@ -1,7 +1,5 @@
-package com.medcase.biz.service;
+package com.medcase.system.service;
 
-import com.medcase.biz.domain.UserEntity;
-import com.medcase.biz.mapper.UserMapper;
 import com.medcase.biz.request.UserReviewRequest;
 import com.medcase.biz.request.UserQuery;
 import com.medcase.biz.response.UserVO;
@@ -12,10 +10,13 @@ import com.medcase.mp.mybatis.PageResult;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.AbstractBusinessException;
 import com.medcase.storage.pojo.FileAttachment;
+import com.medcase.system.entity.SysUserEntity;
+import com.medcase.system.mapper.SysUserMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.List;
 
@@ -29,21 +30,22 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-class UserServiceTest {
-    private UserService userService;
+class SysUserServiceBizTest {
+    private SysUserService userService;
 
     @Mock
-    private UserMapper userMapper;
+    private SysUserMapper userMapper;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        userService = new UserService(userMapper);
+        userService = new SysUserService();
+        ReflectionTestUtils.setField(userService, "userMapper", userMapper);
     }
 
     @Test
     void userModelExposesReviewReason() {
-        assertDoesNotThrow(() -> UserEntity.class.getDeclaredField("reviewReason"));
+        assertDoesNotThrow(() -> SysUserEntity.class.getDeclaredField("reviewReason"));
         assertDoesNotThrow(() -> UserVO.class.getDeclaredField("reviewReason"));
     }
 
@@ -52,9 +54,9 @@ class UserServiceTest {
         UserQuery query = new UserQuery();
         query.setNickName("张医生");
         query.setPhone("13800000000");
-        query.setStatus("0");
+        query.setStatus(UserStatusEnums.OK);
 
-        UserEntity user = new UserEntity();
+        SysUserEntity user = new SysUserEntity();
         user.setUserId(1L);
         user.setNickName("张医生");
         user.setUserName("doctor01");
@@ -69,30 +71,32 @@ class UserServiceTest {
                 any(PageParam.class), org.mockito.ArgumentMatchers.same(query), eq(UserTypeEnums.DOCTOR)))
                 .thenReturn(new PageResult<>(List.of(user), 1L));
 
-        PageResult<UserVO> result = userService.page(new PageParam(), query, UserTypeEnums.DOCTOR);
+        PageResult<SysUserEntity> result = userService.selectBizPage(
+                new PageParam(), query, UserTypeEnums.DOCTOR);
 
         verify(userMapper).selectUserPage(
                 any(PageParam.class), org.mockito.ArgumentMatchers.same(query), eq(UserTypeEnums.DOCTOR));
+        UserVO response = UserVO.fromEntity(result.getList().get(0));
         assertEquals(1, result.getTotal());
-        assertEquals(1L, result.getList().get(0).getId());
-        assertEquals("张医生", result.getList().get(0).getNickName());
-        assertEquals("110101199001011234", result.getList().get(0).getIdCardNumber());
-        assertEquals("主治医师", result.getList().get(0).getTitle());
+        assertEquals(1L, response.getId());
+        assertEquals("张医生", response.getNickName());
+        assertEquals("110101199001011234", response.getIdCardNumber());
+        assertEquals("主治医师", response.getTitle());
     }
 
     @Test
     void detailRejectsNonUser() {
-        UserEntity user = new UserEntity();
+        SysUserEntity user = new SysUserEntity();
         user.setUserId(1L);
         user.setUserType(UserTypeEnums.ADMIN);
         when(userMapper.selectUserById(1L, UserTypeEnums.DOCTOR)).thenReturn(user);
 
-        assertNull(userService.detail(1L));
+        assertNull(userService.selectBizUserById(1L, UserTypeEnums.DOCTOR));
     }
 
     @Test
     void detailMapsDoctorAttachments() {
-        UserEntity user = new UserEntity();
+        SysUserEntity user = new SysUserEntity();
         user.setUserId(1L);
         user.setUserType(UserTypeEnums.DOCTOR);
         user.setNickName("张医生");
@@ -103,7 +107,8 @@ class UserServiceTest {
         user.setQualificationCertificate(attachment("qualification"));
         when(userMapper.selectUserById(1L, UserTypeEnums.DOCTOR)).thenReturn(user);
 
-        UserVO result = userService.detail(1L);
+        UserVO result = UserVO.fromEntity(
+                userService.selectBizUserById(1L, UserTypeEnums.DOCTOR));
 
         assertEquals("front", result.getIdCardFront().getOriginalFilename());
         assertEquals("qualification", result.getQualificationCertificate().getOriginalFilename());
@@ -111,7 +116,7 @@ class UserServiceTest {
 
     @Test
     void reviewApprovesPendingDoctor() {
-        UserEntity user = new UserEntity();
+        SysUserEntity user = new SysUserEntity();
         user.setUserId(1L);
         user.setUserType(UserTypeEnums.DOCTOR);
         user.setStatus(UserStatusEnums.PENDING_REVIEW);
@@ -121,7 +126,7 @@ class UserServiceTest {
         UserReviewRequest request = new UserReviewRequest();
         request.setApprove(true);
 
-        userService.review(1L, request);
+        userService.reviewUser(1L, request, UserTypeEnums.DOCTOR);
 
         assertEquals(UserStatusEnums.OK, user.getStatus());
         verify(userMapper).updateById(user);
@@ -129,7 +134,7 @@ class UserServiceTest {
 
     @Test
     void reviewApprovesRegisteredDoctor() {
-        UserEntity user = new UserEntity();
+        SysUserEntity user = new SysUserEntity();
         user.setUserId(1L);
         user.setUserType(UserTypeEnums.DOCTOR);
         user.setStatus(UserStatusEnums.REGISTER);
@@ -139,7 +144,7 @@ class UserServiceTest {
         UserReviewRequest request = new UserReviewRequest();
         request.setApprove(true);
 
-        userService.review(1L, request);
+        userService.reviewUser(1L, request, UserTypeEnums.DOCTOR);
 
         assertEquals(UserStatusEnums.OK, user.getStatus());
         verify(userMapper).updateById(user);
@@ -147,7 +152,7 @@ class UserServiceTest {
 
     @Test
     void reviewRejectsRegisteredDoctor() {
-        UserEntity user = new UserEntity();
+        SysUserEntity user = new SysUserEntity();
         user.setUserId(1L);
         user.setUserType(UserTypeEnums.DOCTOR);
         user.setStatus(UserStatusEnums.REGISTER);
@@ -158,7 +163,7 @@ class UserServiceTest {
         request.setApprove(false);
         request.setReason("身份证照片不清晰");
 
-        userService.review(1L, request);
+        userService.reviewUser(1L, request, UserTypeEnums.DOCTOR);
 
         assertEquals(UserStatusEnums.REVIEW_FAILED, user.getStatus());
         assertEquals("身份证照片不清晰", user.getReviewReason());
@@ -168,7 +173,7 @@ class UserServiceTest {
 
     @Test
     void reviewRejectsWithoutReason() {
-        UserEntity user = new UserEntity();
+        SysUserEntity user = new SysUserEntity();
         user.setUserId(1L);
         user.setUserType(UserTypeEnums.DOCTOR);
         user.setStatus(UserStatusEnums.PENDING_REVIEW);
@@ -179,16 +184,16 @@ class UserServiceTest {
 
         AbstractBusinessException exception = assertThrows(
                 AbstractBusinessException.class,
-                () -> userService.review(1L, request));
+                () -> userService.reviewUser(1L, request, UserTypeEnums.DOCTOR));
 
         assertEquals(ErrorCodeEnums.USER_REVIEW_REASON_EMPTY, exception.getEc());
         assertEquals(UserStatusEnums.PENDING_REVIEW, user.getStatus());
-        verify(userMapper, never()).updateById(any(UserEntity.class));
+        verify(userMapper, never()).updateById(any(SysUserEntity.class));
     }
 
     @Test
     void reviewDoesNotCheckPhoneDuplicate() {
-        UserEntity user = new UserEntity();
+        SysUserEntity user = new SysUserEntity();
         user.setUserId(1L);
         user.setUserType(UserTypeEnums.DOCTOR);
         user.setStatus(UserStatusEnums.PENDING_REVIEW);
@@ -198,7 +203,7 @@ class UserServiceTest {
         UserReviewRequest request = new UserReviewRequest();
         request.setApprove(true);
 
-        userService.review(1L, request);
+        userService.reviewUser(1L, request, UserTypeEnums.DOCTOR);
 
         assertEquals(UserStatusEnums.OK, user.getStatus());
         verify(userMapper, never()).phoneExists(any());
@@ -207,7 +212,7 @@ class UserServiceTest {
 
     @Test
     void reviewRejectsPendingDoctorWithReviewFailedStatus() {
-        UserEntity user = new UserEntity();
+        SysUserEntity user = new SysUserEntity();
         user.setUserId(1L);
         user.setUserType(UserTypeEnums.DOCTOR);
         user.setStatus(UserStatusEnums.PENDING_REVIEW);
@@ -218,7 +223,7 @@ class UserServiceTest {
         request.setApprove(false);
         request.setReason("资格证信息不完整");
 
-        userService.review(1L, request);
+        userService.reviewUser(1L, request, UserTypeEnums.DOCTOR);
 
         assertEquals(UserStatusEnums.REVIEW_FAILED, user.getStatus());
         assertEquals("资格证信息不完整", user.getReviewReason());
@@ -227,7 +232,7 @@ class UserServiceTest {
 
     @Test
     void reviewApprovesDoctorAndClearsPreviousReviewReason() {
-        UserEntity user = new UserEntity();
+        SysUserEntity user = new SysUserEntity();
         user.setUserId(1L);
         user.setUserType(UserTypeEnums.DOCTOR);
         user.setStatus(UserStatusEnums.PENDING_REVIEW);
@@ -238,7 +243,7 @@ class UserServiceTest {
         UserReviewRequest request = new UserReviewRequest();
         request.setApprove(true);
 
-        userService.review(1L, request);
+        userService.reviewUser(1L, request, UserTypeEnums.DOCTOR);
 
         assertEquals(UserStatusEnums.OK, user.getStatus());
         assertNull(user.getReviewReason());

@@ -7,15 +7,14 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.medcase.biz.domain.UserEntity;
 import com.medcase.biz.domain.SupplierEntity;
 import com.medcase.biz.mapper.SupplierMapper;
-import com.medcase.biz.mapper.UserMapper;
 import com.medcase.biz.request.UserProfilePasswordRequest;
 import com.medcase.biz.request.UserProfilePhoneRequest;
 import com.medcase.biz.request.UserProfileSubmitRequest;
 import com.medcase.biz.response.UserProfileVO;
 import com.medcase.system.entity.SysUserEntity;
+import com.medcase.system.mapper.SysUserMapper;
 import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.common.enums.UserSexEnums;
 import com.medcase.common.enums.UserStatusEnums;
@@ -42,7 +41,7 @@ class UserProfileServiceTest {
     private Validator validator;
 
     @Mock
-    private UserMapper userMapper;
+    private SysUserMapper userMapper;
 
     @Mock
     private SupplierMapper supplierMapper;
@@ -60,7 +59,7 @@ class UserProfileServiceTest {
 
     @Test
     void meReturnsCurrentUserProfile() {
-        UserEntity doctor = doctor(UserStatusEnums.REGISTER);
+        SysUserEntity doctor = doctor(UserStatusEnums.REGISTER);
         doctor.setNickName("张医生");
         doctor.setSex(UserSexEnums.FEMALE);
         doctor.setPhonenumber("13800000000");
@@ -85,7 +84,7 @@ class UserProfileServiceTest {
 
     @Test
     void submitMovesRegisteredDoctorToPendingReview() {
-        UserEntity doctor = doctor(UserStatusEnums.REGISTER);
+        SysUserEntity doctor = doctor(UserStatusEnums.REGISTER);
         when(userMapper.selectUserById(12L, UserTypeEnums.DOCTOR)).thenReturn(doctor);
         when(userMapper.updateById(doctor)).thenReturn(1);
         UserProfileSubmitRequest request = request("张医生", "13800000000");
@@ -100,7 +99,7 @@ class UserProfileServiceTest {
 
     @Test
     void submitMovesReviewFailedDoctorBackToPendingReview() {
-        UserEntity doctor = doctor(UserStatusEnums.REVIEW_FAILED);
+        SysUserEntity doctor = doctor(UserStatusEnums.REVIEW_FAILED);
         when(userMapper.selectUserById(12L, UserTypeEnums.DOCTOR)).thenReturn(doctor);
         when(userMapper.updateById(doctor)).thenReturn(1);
 
@@ -112,7 +111,7 @@ class UserProfileServiceTest {
 
     @Test
     void submitAllowsChangingExistingNicknameAndPhoneAfterReviewFailed() {
-        UserEntity doctor = doctor(UserStatusEnums.REVIEW_FAILED);
+        SysUserEntity doctor = doctor(UserStatusEnums.REVIEW_FAILED);
         doctor.setNickName("原姓名");
         doctor.setPhonenumber("13800000000");
         when(userMapper.selectUserById(12L, UserTypeEnums.DOCTOR)).thenReturn(doctor);
@@ -127,7 +126,7 @@ class UserProfileServiceTest {
 
     @Test
     void submitRejectsDoctorOutsideProfileSubmissionStatuses() {
-        UserEntity doctor = doctor(UserStatusEnums.OK);
+        SysUserEntity doctor = doctor(UserStatusEnums.OK);
         when(userMapper.selectUserById(12L, UserTypeEnums.DOCTOR)).thenReturn(doctor);
 
         AbstractBusinessException exception = assertThrows(
@@ -135,12 +134,12 @@ class UserProfileServiceTest {
                 () -> userProfileService.submit(loginUser(), request("张医生", "13800000000")));
 
         assertEquals(ErrorCodeEnums.USER_PROFILE_SUBMIT_STATUS_NOT_MATCH, exception.getEc());
-        verify(userMapper, never()).updateById(any(UserEntity.class));
+        verify(userMapper, never()).updateById(any(SysUserEntity.class));
     }
 
     @Test
     void submitRejectsDoctorMissingQualificationByValidation() {
-        UserEntity doctor = doctor(UserStatusEnums.REGISTER);
+        SysUserEntity doctor = doctor(UserStatusEnums.REGISTER);
         when(userMapper.selectUserById(12L, UserTypeEnums.DOCTOR)).thenReturn(doctor);
         UserProfileSubmitRequest request = request("张医生", "13800000000");
         request.setQualificationCertificate(null);
@@ -151,12 +150,12 @@ class UserProfileServiceTest {
 
         assertEquals("医师职业资格证图片不能为空",
                 exception.getConstraintViolations().iterator().next().getMessage());
-        verify(userMapper, never()).updateById(any(UserEntity.class));
+        verify(userMapper, never()).updateById(any(SysUserEntity.class));
     }
 
     @Test
     void submitPatientDoesNotRequireDoctorQualification() {
-        UserEntity patient = doctor(UserStatusEnums.REGISTER);
+        SysUserEntity patient = doctor(UserStatusEnums.REGISTER);
         patient.setUserType(UserTypeEnums.PATIENT);
         LoginUser patientUser = loginUser(UserTypeEnums.PATIENT);
         when(userMapper.selectUserById(12L, UserTypeEnums.PATIENT)).thenReturn(patient);
@@ -174,7 +173,7 @@ class UserProfileServiceTest {
 
     @Test
     void updatePhoneChangesOnlyPhoneForCurrentUser() {
-        UserEntity doctor = doctor(UserStatusEnums.OK);
+        SysUserEntity doctor = doctor(UserStatusEnums.OK);
         doctor.setPhonenumber("13800000000");
         when(userMapper.selectUserById(12L, UserTypeEnums.DOCTOR)).thenReturn(doctor);
         when(userMapper.phoneExists("13900000000", UserTypeEnums.DOCTOR)).thenReturn(false);
@@ -191,7 +190,7 @@ class UserProfileServiceTest {
 
     @Test
     void updatePhoneRejectsDuplicatePhone() {
-        UserEntity doctor = doctor(UserStatusEnums.OK);
+        SysUserEntity doctor = doctor(UserStatusEnums.OK);
         when(userMapper.selectUserById(12L, UserTypeEnums.DOCTOR)).thenReturn(doctor);
         when(userMapper.phoneExists("13900000000", UserTypeEnums.DOCTOR)).thenReturn(true);
 
@@ -203,12 +202,12 @@ class UserProfileServiceTest {
                 () -> userProfileService.updatePhone(loginUser(), request));
 
         assertEquals(ErrorCodeEnums.PROFILE_PHONE_EXISTS, exception.getEc());
-        verify(userMapper, never()).updateById(any(UserEntity.class));
+        verify(userMapper, never()).updateById(any(SysUserEntity.class));
     }
 
     @Test
     void updatePasswordVerifiesOldPasswordAndStoresEncryptedNewPassword() {
-        UserEntity doctor = doctor(UserStatusEnums.OK);
+        SysUserEntity doctor = doctor(UserStatusEnums.OK);
         doctor.setPassword("old-password-hash");
         when(userMapper.selectUserById(12L, UserTypeEnums.DOCTOR)).thenReturn(doctor);
         when(userMapper.updateById(doctor)).thenReturn(1);
@@ -269,8 +268,8 @@ class UserProfileServiceTest {
         return loginUser;
     }
 
-    private UserEntity doctor(UserStatusEnums status) {
-        UserEntity doctor = new UserEntity();
+    private SysUserEntity doctor(UserStatusEnums status) {
+        SysUserEntity doctor = new SysUserEntity();
         doctor.setUserId(12L);
         doctor.setUserType(UserTypeEnums.DOCTOR);
         doctor.setStatus(status);

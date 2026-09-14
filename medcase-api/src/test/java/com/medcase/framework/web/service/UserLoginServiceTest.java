@@ -1,8 +1,7 @@
 package com.medcase.framework.web.service;
 
-import com.medcase.biz.domain.UserEntity;
-import com.medcase.biz.mapper.UserMapper;
 import com.medcase.system.entity.SysUserEntity;
+import com.medcase.system.mapper.SysUserMapper;
 import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.common.enums.UserStatusEnums;
 import com.medcase.common.enums.UserTypeEnums;
@@ -57,7 +56,7 @@ class UserLoginServiceTest {
     private SysUserService userService;
 
     @Mock
-    private UserMapper userMapper;
+    private SysUserMapper userMapper;
 
     @Mock
     private SysPermissionService permissionService;
@@ -95,13 +94,13 @@ class UserLoginServiceTest {
         when(configService.selectCaptchaEnabled()).thenReturn(false);
         when(configService.selectConfigByKey("sys.login.blackIPList")).thenReturn(null);
 
-        UserEntity user = new UserEntity();
+        SysUserEntity user = new SysUserEntity();
         user.setUserId(12L);
         user.setUserName("doctor01");
         user.setPassword("encoded-password");
         user.setStatus(UserStatusEnums.OK);
         user.setUserType(UserTypeEnums.DOCTOR);
-        when(userMapper.selectUserByUsername("doctor01", UserTypeEnums.DOCTOR)).thenReturn(user);
+        when(userMapper.selectUserByUserName("doctor01", UserTypeEnums.DOCTOR)).thenReturn(user);
         when(passwordEncoder.matches("secret123", "encoded-password")).thenReturn(true);
         when(permissionService.getMenuPermission(any(SysUserEntity.class))).thenReturn(Set.of("case:read"));
         when(tokenService.createToken(any(LoginUser.class))).thenReturn("doctor-token");
@@ -128,7 +127,7 @@ class UserLoginServiceTest {
         user.setPassword("encoded-password");
         user.setStatus(UserStatusEnums.OK);
         user.setUserType(UserTypeEnums.ADMIN);
-        when(userService.selectUserByUserName("admin", UserTypeEnums.ADMIN.getCode())).thenReturn(user);
+        when(userService.selectUserByUserName("admin", UserTypeEnums.ADMIN)).thenReturn(user);
         when(passwordEncoder.matches("secret123", "encoded-password")).thenReturn(true);
         when(permissionService.getMenuPermission(user)).thenReturn(Set.of("system:user:list"));
         when(tokenService.createToken(any(LoginUser.class))).thenReturn("admin-token");
@@ -136,7 +135,7 @@ class UserLoginServiceTest {
         String token = service.login("admin", "secret123", null, null, UserTypeEnums.ADMIN);
 
         assertEquals("admin-token", token);
-        verify(userService).selectUserByUserName("admin", UserTypeEnums.ADMIN.getCode());
+        verify(userService).selectUserByUserName("admin", UserTypeEnums.ADMIN);
     }
 
     @Test
@@ -152,7 +151,7 @@ class UserLoginServiceTest {
         user.setUserName("admin");
         user.setStatus(UserStatusEnums.DISABLE);
         user.setUserType(UserTypeEnums.ADMIN);
-        when(userService.selectUserByUserName("admin", UserTypeEnums.ADMIN.getCode())).thenReturn(user);
+        when(userService.selectUserByUserName("admin", UserTypeEnums.ADMIN)).thenReturn(user);
 
         AbstractBusinessException exception = org.junit.jupiter.api.Assertions.assertThrows(
                 AbstractBusinessException.class,

@@ -1,7 +1,10 @@
 package com.medcase.system.service;
 
 import com.medcase.common.constant.UserConstants;
+import com.medcase.biz.request.UserQuery;
+import com.medcase.biz.request.UserReviewRequest;
 import com.medcase.common.enums.UserTypeEnums;
+import com.medcase.common.enums.UserStatusEnums;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
 import com.medcase.mp.mybatis.PageParam;
@@ -34,6 +37,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.springframework.util.StringUtils;
 
 /**
  * 用户 业务层处理
@@ -175,14 +179,62 @@ public class SysUserService {
      * @param userName 用户名
      * @return 用户对象信息
      */
-    public SysUserEntity selectUserByUserName(String userName, String userType) {
-
+    public SysUserEntity selectUserByUserName(String userName, UserTypeEnums userType) {
         SysUserEntity user = userMapper.selectUserByUserName(userName, userType);
         if (user != null) {
             user.setDept(deptService.selectDeptById(user.getDeptId()));
             user.setRoles(roleService.selectRolesByUserId(user.getUserId()));
         }
         return user;
+    }
+
+    public PageResult<SysUserEntity> selectBizPage(
+            PageParam pageParam, UserQuery query, UserTypeEnums userType) {
+        return userMapper.selectUserPage(pageParam, query, userType);
+    }
+
+    public PageResult<SysUserEntity> selectBizPage(PageParam pageParam, UserQuery query) {
+        return userMapper.selectUserPage(pageParam, query);
+    }
+
+    public SysUserEntity selectBizUserById(Long userId, UserTypeEnums userType) {
+        if (userId == null) {
+            return null;
+        }
+
+        SysUserEntity user = userMapper.selectUserById(userId, userType);
+        return user == null || user.getUserType() != userType ? null : user;
+    }
+
+    public SysUserEntity selectAnyUserById(Long userId) {
+        if (userId == null) {
+            return null;
+        }
+
+        return userMapper.selectUserById(userId);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void reviewUser(Long userId, UserReviewRequest request, UserTypeEnums userType) {
+        SysUserEntity user = userMapper.selectUserById(userId, userType);
+        if (user == null) {
+            throw ExceptionUtil.business(ErrorCodeEnums.USER_NOT_FOUND);
+        }
+        if (user.getStatus() != UserStatusEnums.REGISTER
+                && user.getStatus() != UserStatusEnums.PENDING_REVIEW) {
+            throw ExceptionUtil.business(ErrorCodeEnums.USER_REVIEW_STATUS_NOT_MATCH);
+        }
+
+        boolean approve = request.getApprove() != null && request.getApprove();
+        if (!approve && !StringUtils.hasText(request.getReason())) {
+            throw ExceptionUtil.business(ErrorCodeEnums.USER_REVIEW_REASON_EMPTY);
+        }
+
+        user.setStatus(approve ? UserStatusEnums.OK : UserStatusEnums.REVIEW_FAILED);
+        user.setReviewReason(approve ? null : request.getReason().trim());
+        if (userMapper.updateById(user) <= 0) {
+            throw ExceptionUtil.business(ErrorCodeEnums.USER_REVIEW_FAILED);
+        }
     }
 
     /**
@@ -246,7 +298,7 @@ public class SysUserService {
     public boolean checkUserNameUnique(UserSaveRequest user) {
         Long userId = user.getUserId() == null ? -1L : user.getUserId();
         useAdminUserTypeIfAbsent(user);
-        SysUserEntity info = userMapper.selectUserByUserNameAndType(
+        SysUserEntity info = userMapper.selectUserByUserName(
                 user.getUserName(), user.getUserType());
         if (info != null && !info.getUserId().equals(userId)) {
             return UserConstants.NOT_UNIQUE;

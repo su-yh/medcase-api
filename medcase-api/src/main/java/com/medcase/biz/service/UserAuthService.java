@@ -1,8 +1,5 @@
 package com.medcase.biz.service;
 
-import com.medcase.biz.domain.UserEntity;
-import com.medcase.biz.mapper.SupplierMapper;
-import com.medcase.biz.mapper.UserMapper;
 import com.medcase.biz.request.UserLoginRequest;
 import com.medcase.biz.request.UserRegisterRequest;
 import com.medcase.common.core.domain.model.LoginUser;
@@ -11,6 +8,8 @@ import com.medcase.common.enums.UserTypeEnums;
 import com.medcase.common.utils.DateUtils;
 import com.medcase.framework.web.service.TokenService;
 import com.medcase.framework.web.service.UserLoginService;
+import com.medcase.system.entity.SysUserEntity;
+import com.medcase.system.mapper.SysUserMapper;
 import com.medcase.common.validation.groups.ValidationGroups;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
@@ -34,7 +33,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 @Slf4j
 public class UserAuthService {
-    private final UserMapper userMapper;
+    private final SysUserMapper userMapper;
 
     private final UserLoginService userLoginService;
 
@@ -64,7 +63,7 @@ public class UserAuthService {
         }
         smsCodeService.verifyCode(phone, registerBody.getSmsCode());
 
-        UserEntity user = new UserEntity();
+        SysUserEntity user = new SysUserEntity();
         user.setUserName(username);
         user.setUserType(userType);
         user.setPhonenumber(phone);
@@ -103,7 +102,7 @@ public class UserAuthService {
     @Transactional(rollbackFor = Exception.class)
     public void deleteAccount(LoginUser user) {
         UserTypeEnums userType = user.getUser() == null ? null : user.getUser().getUserType();
-        UserEntity currentUser = userMapper.selectUserById(user.getUserId(), userType);
+        SysUserEntity currentUser = userMapper.selectUserById(user.getUserId(), userType);
         if (currentUser == null) {
             throw ExceptionUtil.business(ErrorCodeEnums.USER_NOT_FOUND);
         }

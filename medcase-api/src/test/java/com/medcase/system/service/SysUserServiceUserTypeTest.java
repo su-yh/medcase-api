@@ -33,13 +33,13 @@ class SysUserServiceUserTypeTest {
     @Test
     void checkUserNameUniqueDefaultsToAdminUserType() {
 
-        when(userMapper.selectUserByUserNameAndType(any(), any())).thenReturn(null);
+        when(userMapper.selectUserByUserName(any(), any())).thenReturn(null);
         UserSaveRequest user = new UserSaveRequest();
         user.setUserName("same-name");
 
         userService.checkUserNameUnique(user);
 
-        verify(userMapper).selectUserByUserNameAndType("same-name", UserTypeEnums.ADMIN);
+        verify(userMapper).selectUserByUserName("same-name", UserTypeEnums.ADMIN);
         assertEquals(UserTypeEnums.ADMIN, user.getUserType());
     }
 

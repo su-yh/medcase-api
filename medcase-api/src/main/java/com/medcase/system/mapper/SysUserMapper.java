@@ -3,6 +3,7 @@ package com.medcase.system.mapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.medcase.biz.request.UserQuery;
 import com.medcase.common.enums.UserStatusEnums;
 import com.medcase.common.enums.UserTypeEnums;
 import com.medcase.mp.mybatis.BaseMapperX;
@@ -23,6 +24,84 @@ import java.util.List;
 
 @Mapper
 public interface SysUserMapper extends BaseMapperX<SysUserEntity> {
+    default boolean usernameExists(String username, UserTypeEnums userType) {
+        if (!StringUtils.hasText(username)) {
+            return false;
+        }
+
+        LambdaQueryWrapperX<SysUserEntity> queryWrapper = build();
+        queryWrapper.eq(SysUserEntity::getUserName, username);
+        queryWrapper.eq(SysUserEntity::getUserType, userType);
+        return exists(queryWrapper);
+    }
+
+    default boolean phoneExists(String phone, UserTypeEnums userType) {
+        if (!StringUtils.hasText(phone)) {
+            return false;
+        }
+
+        LambdaQueryWrapperX<SysUserEntity> queryWrapper = build();
+        queryWrapper.eq(SysUserEntity::getPhonenumber, phone);
+        queryWrapper.eq(SysUserEntity::getUserType, userType);
+        return exists(queryWrapper);
+    }
+
+    default boolean phoneExists(String phone) {
+        return phoneExists(phone, UserTypeEnums.DOCTOR);
+    }
+
+    default SysUserEntity selectUserById(Long userId) {
+        if (userId == null) {
+            return null;
+        }
+
+        return selectById(userId);
+    }
+
+    default SysUserEntity selectUserById(Long userId, UserTypeEnums userType) {
+        if (userId == null) {
+            return null;
+        }
+
+        LambdaQueryWrapperX<SysUserEntity> queryWrapper = build();
+        queryWrapper.eq(SysUserEntity::getUserId, userId);
+        queryWrapper.eq(SysUserEntity::getUserType, userType);
+        return selectOne(queryWrapper);
+    }
+
+    default SysUserEntity selectUserByUserName(String userName, UserTypeEnums userType) {
+        if (!StringUtils.hasText(userName)) {
+            return null;
+        }
+
+        LambdaQueryWrapperX<SysUserEntity> queryWrapper = build();
+        queryWrapper.eq(SysUserEntity::getUserName, userName);
+        queryWrapper.eq(SysUserEntity::getUserType, userType);
+        return selectOne(queryWrapper);
+    }
+
+    default PageResult<SysUserEntity> selectUserPage(PageParam pageParam, UserQuery query) {
+        LambdaQueryWrapperX<SysUserEntity> queryWrapper = build();
+        queryWrapper.eqIfPresent(SysUserEntity::getSupplierId, query.getSupplierId());
+        queryWrapper.likeIfPresent(SysUserEntity::getNickName, query.getNickName());
+        queryWrapper.likeIfPresent(SysUserEntity::getPhonenumber, query.getPhone());
+        queryWrapper.eqIfPresent(SysUserEntity::getStatus, query.getStatus());
+        queryWrapper.orderByDesc(SysUserEntity::getCreateTime);
+        return selectPage(pageParam, queryWrapper);
+    }
+
+    default PageResult<SysUserEntity> selectUserPage(
+            PageParam pageParam, UserQuery query, UserTypeEnums userType) {
+        LambdaQueryWrapperX<SysUserEntity> queryWrapper = build();
+        queryWrapper.eqIfPresent(SysUserEntity::getSupplierId, query.getSupplierId());
+        queryWrapper.eq(SysUserEntity::getUserType, userType);
+        queryWrapper.likeIfPresent(SysUserEntity::getNickName, query.getNickName());
+        queryWrapper.likeIfPresent(SysUserEntity::getPhonenumber, query.getPhone());
+        queryWrapper.eqIfPresent(SysUserEntity::getStatus, query.getStatus());
+        queryWrapper.orderByDesc(SysUserEntity::getCreateTime);
+        return selectPage(pageParam, queryWrapper);
+    }
+
     List<SysUserEntity> selectAllocatedList(
             @Param("user") UserQueryRequest user, @Param("deptIds") Collection<Long> deptIds);
 
@@ -90,21 +169,6 @@ public interface SysUserMapper extends BaseMapperX<SysUserEntity> {
             Page<SysUserEntity> page,
             @Param("user") UserQueryRequest user,
             @Param("deptIds") Collection<Long> deptIds);
-
-    default SysUserEntity selectUserByUserName(String userName, String userType) {
-        LambdaQueryWrapperX<SysUserEntity> query = build();
-        query.eq(SysUserEntity::getUserName, userName);
-        query.eq(SysUserEntity::getUserType, userType);
-        return selectOne(query);
-    }
-
-    default SysUserEntity selectUserByUserNameAndType(
-            String userName, UserTypeEnums userType) {
-        LambdaQueryWrapperX<SysUserEntity> query = build();
-        query.eq(SysUserEntity::getUserName, userName);
-        query.eq(SysUserEntity::getUserType, userType);
-        return selectOne(query);
-    }
 
     default SysUserEntity selectUserByPhoneAndType(
             String phone, UserTypeEnums userType) {

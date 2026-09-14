@@ -1,4 +1,4 @@
-package com.medcase.biz.domain;
+package com.medcase.system.entity;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -12,11 +12,11 @@ import com.medcase.storage.pojo.FileAttachment;
 import java.lang.reflect.Field;
 import org.junit.jupiter.api.Test;
 
-class UserEntityTest {
+class SysUserEntityTest {
 
     @Test
     void delFlagShouldBeLogicDeleteField() throws NoSuchFieldException {
-        Field field = UserEntity.class.getDeclaredField("delFlag");
+        Field field = SysUserEntity.class.getDeclaredField("delFlag");
         TableLogic tableLogic = field.getAnnotation(TableLogic.class);
 
         assertNotNull(tableLogic);
@@ -26,9 +26,9 @@ class UserEntityTest {
     }
 
     @Test
-    void doesNotContainDepartmentField() {
-        assertThrows(NoSuchFieldException.class,
-                () -> UserEntity.class.getDeclaredField("deptId"));
+    void containsSystemAndBusinessFields() throws NoSuchFieldException {
+        assertNotNull(SysUserEntity.class.getDeclaredField("deptId"));
+        assertNotNull(SysUserEntity.class.getDeclaredField("supplierId"));
     }
 
     @Test
@@ -56,15 +56,15 @@ class UserEntityTest {
 
     @Test
     void exposesDoctorRegistrationProfileFields() throws NoSuchFieldException {
-        assertEquals(String.class, UserEntity.class
+        assertEquals(String.class, SysUserEntity.class
                 .getDeclaredField("idCardNumber").getType());
-        assertEquals(String.class, UserEntity.class
+        assertEquals(String.class, SysUserEntity.class
                 .getDeclaredField("title").getType());
-        assertEquals(FileAttachment.class, UserEntity.class
+        assertEquals(FileAttachment.class, SysUserEntity.class
                 .getDeclaredField("idCardFront").getType());
-        assertEquals(FileAttachment.class, UserEntity.class
+        assertEquals(FileAttachment.class, SysUserEntity.class
                 .getDeclaredField("idCardBack").getType());
-        assertEquals(FileAttachment.class, UserEntity.class
+        assertEquals(FileAttachment.class, SysUserEntity.class
                 .getDeclaredField("qualificationCertificate").getType());
     }
 
@@ -76,7 +76,7 @@ class UserEntityTest {
     }
 
     private void assertJacksonTypeHandler(String fieldName) throws NoSuchFieldException {
-        TableField tableField = UserEntity.class
+        TableField tableField = SysUserEntity.class
                 .getDeclaredField(fieldName).getAnnotation(TableField.class);
         assertNotNull(tableField);
         assertEquals(JacksonTypeHandler.class, tableField.typeHandler());

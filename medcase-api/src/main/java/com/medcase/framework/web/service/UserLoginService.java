@@ -1,7 +1,5 @@
 package com.medcase.framework.web.service;
 
-import com.medcase.biz.domain.UserEntity;
-import com.medcase.biz.mapper.UserMapper;
 import com.medcase.common.constant.CacheConstants;
 import com.medcase.common.constant.UserConstants;
 import com.medcase.common.core.domain.model.LoginUser;
@@ -15,6 +13,7 @@ import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.AbstractBusinessException;
 import com.medcase.mvc.exception.ExceptionUtil;
 import com.medcase.system.entity.SysUserEntity;
+import com.medcase.system.mapper.SysUserMapper;
 import com.medcase.system.service.SysConfigService;
 import com.medcase.system.service.SysUserService;
 import lombok.RequiredArgsConstructor;
@@ -40,7 +39,7 @@ public class UserLoginService {
 
     private final SysUserService userService;
 
-    private final UserMapper userMapper;
+    private final SysUserMapper userMapper;
 
     private final SysPermissionService permissionService;
 
@@ -116,7 +115,7 @@ public class UserLoginService {
         try {
             passwordService.validateLoginRetryCount(username);
             SysUserEntity user = userService.selectUserByUserName(
-                    username, UserTypeEnums.ADMIN.getCode());
+                    username, UserTypeEnums.ADMIN);
             if (user == null) {
                 log.info("登录用户：{} 不存在.", username);
                 throw ExceptionUtil.business(ErrorCodeEnums.ADMIN_LOGIN_FAILED);
@@ -162,7 +161,7 @@ public class UserLoginService {
     private LoginUser loginPortalUser(String username, String password, UserTypeEnums userType) {
         Long userId = null;
         try {
-            UserEntity user = userMapper.selectUserByUsername(username, userType);
+            SysUserEntity user = userMapper.selectUserByUserName(username, userType);
             if (user == null) {
                 log.warn("portal login failed, user not exists, username={}", username);
                 throw ExceptionUtil.business(ErrorCodeEnums.USER_LOGIN_USER_NOT_EXISTS);
@@ -177,9 +176,8 @@ public class UserLoginService {
                 throw ExceptionUtil.business(ErrorCodeEnums.USER_LOGIN_FAILED);
             }
 
-            SysUserEntity sysUser = toSysUser(user);
             LoginUser loginUser = new LoginUser(
-                    sysUser.getUserId(), null, sysUser, permissionService.getMenuPermission(sysUser));
+                    user.getUserId(), null, user, permissionService.getMenuPermission(user));
             AsyncManager.me().execute(AsyncFactory.recordLogin(
                     username, userId, userType, Boolean.TRUE,
                     "登录成功"));
@@ -199,27 +197,6 @@ public class UserLoginService {
                     Boolean.FALSE, message));
             throw ExceptionUtil.business(ErrorCodeEnums.USER_LOGIN_FAILED, message);
         }
-    }
-
-    private SysUserEntity toSysUser(UserEntity user) {
-        SysUserEntity sysUser = new SysUserEntity();
-        sysUser.setUserId(user.getUserId());
-        sysUser.setUserName(user.getUserName());
-        sysUser.setNickName(user.getNickName());
-        sysUser.setSupplierId(user.getSupplierId());
-        sysUser.setSex(user.getSex());
-        sysUser.setIdCardNumber(user.getIdCardNumber());
-        sysUser.setTitle(user.getTitle());
-        sysUser.setIdCardFront(user.getIdCardFront());
-        sysUser.setIdCardBack(user.getIdCardBack());
-        sysUser.setQualificationCertificate(user.getQualificationCertificate());
-        sysUser.setUserType(user.getUserType());
-        sysUser.setPhonenumber(user.getPhonenumber());
-        sysUser.setPassword(user.getPassword());
-        sysUser.setStatus(user.getStatus());
-        sysUser.setReviewReason(user.getReviewReason());
-        sysUser.setPwdUpdateDate(user.getPwdUpdateDate());
-        return sysUser;
     }
 
     private String resolveExceptionMessage(Throwable throwable) {

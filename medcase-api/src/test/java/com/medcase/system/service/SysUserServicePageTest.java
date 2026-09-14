@@ -109,7 +109,7 @@ class SysUserServicePageTest {
         entity.setUserId(7L);
         entity.setUserName("admin");
         entity.setDeptId(2L);
-        when(userMapper.selectUserByUserName("admin", UserTypeEnums.ADMIN.getCode()))
+        when(userMapper.selectUserByUserName("admin", UserTypeEnums.ADMIN))
                 .thenReturn(entity);
 
         SysDeptEntity dept = new SysDeptEntity();
@@ -117,7 +117,7 @@ class SysUserServicePageTest {
         dept.setDeptName("子部门");
         when(deptService.selectDeptById(2L)).thenReturn(dept);
 
-        SysUserEntity result = userService.selectUserByUserName("admin", UserTypeEnums.ADMIN.getCode());
+        SysUserEntity result = userService.selectUserByUserName("admin", UserTypeEnums.ADMIN);
 
         assertEquals("子部门", result.getDept().getDeptName());
     }
