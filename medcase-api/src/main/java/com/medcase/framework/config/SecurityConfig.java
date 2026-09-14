@@ -67,6 +67,8 @@ public class SecurityConfig {
                     requests.requestMatchers(ERROR_PATH).permitAll()
                             .anyRequest().authenticated();
                 })
+                // 登出由Controller统一处理，禁用Spring Security默认LogoutFilter
+                .logout(AbstractHttpConfigurer::disable)
                 // 添加JWT filter
                 .addFilterBefore(authenticationTokenFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
