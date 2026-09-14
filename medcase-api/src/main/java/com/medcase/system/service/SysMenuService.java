@@ -2,6 +2,7 @@ package com.medcase.system.service;
 
 import com.medcase.common.constant.UserConstants;
 import com.medcase.common.core.text.Convert;
+import com.medcase.common.enums.MenuTypeEnums;
 import com.medcase.common.utils.SecurityUtils;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
@@ -191,7 +192,7 @@ public class SysMenuService {
      * @return 结果
      */
     public boolean checkRouteConfigUnique(MenuSaveRequest menu) {
-        if (!UserConstants.TYPE_MENU.equals(menu.getMenuType())) {
+        if (MenuTypeEnums.MENU != menu.getMenuType()) {
             return UserConstants.UNIQUE;
         }
         if (!org.springframework.util.StringUtils.hasText(menu.getRouteName())) {

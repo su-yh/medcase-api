@@ -1,7 +1,7 @@
 package com.medcase.system.mapper;
 
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.medcase.common.constant.UserConstants;
+import com.medcase.common.enums.MenuTypeEnums;
 import com.medcase.mp.mybatis.BaseMapperX;
 import com.medcase.mp.mybatis.LambdaQueryWrapperX;
 import com.medcase.system.entity.SysMenuEntity;
@@ -32,7 +32,7 @@ public interface SysMenuMapper extends BaseMapperX<SysMenuEntity> {
 
     default List<SysMenuEntity> selectMenuTreeAll() {
         LambdaQueryWrapperX<SysMenuEntity> query = build();
-        query.in(SysMenuEntity::getMenuType, UserConstants.TYPE_DIR, UserConstants.TYPE_MENU);
+        query.in(SysMenuEntity::getMenuType, MenuTypeEnums.DIRECTORY, MenuTypeEnums.MENU);
         query.eq(SysMenuEntity::getEnabled, Boolean.TRUE);
         query.orderByAsc(SysMenuEntity::getParentId);
         query.orderByAsc(SysMenuEntity::getOrderNum);
@@ -43,7 +43,7 @@ public interface SysMenuMapper extends BaseMapperX<SysMenuEntity> {
 
     default List<SysMenuEntity> selectMenusByPathOrRouteName(String routePath, String routeName) {
         LambdaQueryWrapperX<SysMenuEntity> query = build();
-        query.in(SysMenuEntity::getMenuType, UserConstants.TYPE_DIR, UserConstants.TYPE_MENU);
+        query.in(SysMenuEntity::getMenuType, MenuTypeEnums.DIRECTORY, MenuTypeEnums.MENU);
         query.and(condition -> {
             condition.eq(SysMenuEntity::getRoutePath, routePath);
             condition.or();

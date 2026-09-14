@@ -9,15 +9,6 @@ public class UserConstants {
     /** 正常状态 */
     public static final String NORMAL = "0";
 
-    /** 菜单类型（目录） */
-    public static final String TYPE_DIR = "M";
-
-    /** 菜单类型（菜单） */
-    public static final String TYPE_MENU = "C";
-
-    /** 菜单类型（按钮） */
-    public static final String TYPE_BUTTON = "F";
-
     /** 校验是否唯一的返回标识 */
     public final static boolean UNIQUE = true;
     public final static boolean NOT_UNIQUE = false;

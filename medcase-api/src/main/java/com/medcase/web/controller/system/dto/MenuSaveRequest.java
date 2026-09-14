@@ -1,6 +1,6 @@
 package com.medcase.web.controller.system.dto;
 
-import com.medcase.common.constant.UserConstants;
+import com.medcase.common.enums.MenuTypeEnums;
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -36,8 +36,8 @@ public class MenuSaveRequest {
     @Size(max = 50, message = "路由名称长度不能超过50个字符")
     private String routeName;
 
-    @NotBlank(message = "菜单类型不能为空")
-    private String menuType;
+    @NotNull(message = "菜单类型不能为空")
+    private MenuTypeEnums menuType;
 
     private Boolean visible;
 
@@ -53,6 +53,6 @@ public class MenuSaveRequest {
     @AssertTrue(message = "菜单路由名称不能为空")
     public boolean isRouteNameValid() {
 
-        return !UserConstants.TYPE_MENU.equals(menuType) || StringUtils.hasText(routeName);
+        return MenuTypeEnums.MENU != menuType || StringUtils.hasText(routeName);
     }
 }

@@ -3,6 +3,7 @@ package com.medcase.system.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.medcase.common.enums.MenuTypeEnums;
 import com.medcase.mp.entity.AbstractBaseEntity;
 import lombok.Data;
 
@@ -28,7 +29,7 @@ public class SysMenuEntity extends AbstractBaseEntity {
 
     private String routeName;
 
-    private String menuType;
+    private MenuTypeEnums menuType;
 
     private Boolean visible;
 
