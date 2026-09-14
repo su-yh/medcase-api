@@ -10,7 +10,6 @@ import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.ExceptionUtil;
 import com.medcase.system.entity.SysConfigEntity;
 import com.medcase.system.mapper.SysConfigMapper;
-import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -30,15 +29,6 @@ public class SysConfigService {
 
     @Autowired
     private RedisCache redisCache;
-
-    /**
-     * 项目启动时，初始化参数到缓存
-     */
-    @PostConstruct
-    public void init() {
-
-        loadingConfigCache();
-    }
 
     /**
      * 查询参数配置信息
