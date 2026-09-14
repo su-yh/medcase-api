@@ -62,6 +62,15 @@ public class SysLoginController {
     }
 
     /**
+     * 登出方法
+     */
+    @PreAuthorize("@dp.hasAnyUserType(#loginUser, T(com.medcase.common.enums.UserTypeEnums).ADMIN)")
+    @PostMapping("/logout")
+    public void logout(@CurrLoginUser LoginUser loginUser) {
+        tokenService.delLoginUser(loginUser.getToken());
+    }
+
+    /**
      * 获取用户信息
      * 
      * @return 用户信息

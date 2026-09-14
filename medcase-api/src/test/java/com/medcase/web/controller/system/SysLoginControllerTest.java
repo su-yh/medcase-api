@@ -1,7 +1,9 @@
 package com.medcase.web.controller.system;
 
 import com.medcase.common.core.domain.model.LoginBody;
+import com.medcase.common.core.domain.model.LoginUser;
 import com.medcase.common.enums.UserTypeEnums;
+import com.medcase.framework.web.service.TokenService;
 import com.medcase.framework.web.service.UserLoginService;
 import com.medcase.web.controller.system.dto.LoginResponse;
 import org.junit.jupiter.api.Test;
@@ -28,6 +30,19 @@ class SysLoginControllerTest {
         assertEquals("admin-token", response.getToken());
         verify(userLoginService).login(
                 "admin", "secret123", "1234", "captcha-uuid", UserTypeEnums.ADMIN);
+    }
+
+    @Test
+    void logoutDeletesCurrentUserToken() {
+        TokenService tokenService = mock(TokenService.class);
+        SysLoginController controller = new SysLoginController();
+        ReflectionTestUtils.setField(controller, "tokenService", tokenService);
+        LoginUser loginUser = new LoginUser();
+        loginUser.setToken("admin-token");
+
+        controller.logout(loginUser);
+
+        verify(tokenService).delLoginUser("admin-token");
     }
 
     private LoginBody loginBody() {

@@ -2,7 +2,6 @@ package com.medcase.framework.config;
 
 import com.medcase.framework.config.properties.PermitAllUrlProperties;
 import com.medcase.framework.security.filter.JwtAuthenticationTokenFilter;
-import com.medcase.framework.security.handle.LogoutSuccessHandlerImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,12 +22,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 public class SecurityConfig {
     static final String ERROR_PATH = "/error";
-
-    /**
-     * 退出处理类
-     */
-    @Autowired
-    private LogoutSuccessHandlerImpl logoutSuccessHandler;
 
     /**
      * token认证过滤器
@@ -74,8 +67,6 @@ public class SecurityConfig {
                     requests.requestMatchers(ERROR_PATH).permitAll()
                             .anyRequest().authenticated();
                 })
-                // 添加Logout filter
-                .logout(logout -> logout.logoutUrl("/logout").logoutSuccessHandler(logoutSuccessHandler))
                 // 添加JWT filter
                 .addFilterBefore(authenticationTokenFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
