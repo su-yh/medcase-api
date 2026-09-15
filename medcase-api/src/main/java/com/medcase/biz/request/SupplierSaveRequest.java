@@ -18,7 +18,7 @@ public class SupplierSaveRequest {
     @Size(max = 30, message = "供应商姓名不能超过30个字符")
     private String name;
 
-    @NotBlank(message = "供应商性别不能为空")
+    @NotNull(message = "供应商性别不能为空")
     private UserSexEnums sex;
 
     @NotBlank(message = "供应商手机号不能为空")
