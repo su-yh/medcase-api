@@ -2,6 +2,7 @@ package com.medcase.biz.controller;
 
 import com.medcase.biz.request.UserProfilePasswordRequest;
 import com.medcase.biz.request.UserProfilePhoneRequest;
+import com.medcase.biz.request.UserProfilePhoneSmsCodeRequest;
 import com.medcase.biz.request.UserProfileSubmitRequest;
 import com.medcase.biz.response.UserProfileVO;
 import com.medcase.biz.service.UserProfileService;
@@ -11,6 +12,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -43,6 +45,16 @@ public class UserProfilePortalController {
             @CurrLoginUser LoginUser user,
             @RequestBody @Valid UserProfileSubmitRequest request) {
         userProfileService.submit(user, request);
+    }
+
+    @PreAuthorize("@dp.hasAnyUserType(#user, " +
+            "T(com.medcase.common.enums.UserTypeEnums).DOCTOR, " +
+            "T(com.medcase.common.enums.UserTypeEnums).PATIENT)")
+    @PostMapping("/phone/sms-code")
+    public void sendPhoneSmsCode(
+            @CurrLoginUser LoginUser user,
+            @RequestBody @Valid UserProfilePhoneSmsCodeRequest request) {
+        userProfileService.sendPhoneSmsCode(user, request);
     }
 
     @PreAuthorize("@dp.hasAnyUserType(#user, " +

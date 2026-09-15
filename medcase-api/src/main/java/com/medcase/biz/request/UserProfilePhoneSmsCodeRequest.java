@@ -6,18 +6,12 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 /**
- * 病例端手机号修改请求。
+ * 病例端修改手机号短信验证码请求。
  */
 @Data
-public class UserProfilePhoneRequest {
+public class UserProfilePhoneSmsCodeRequest {
     @NotBlank(message = "手机号不能为空")
     @Size(max = 20, message = "手机号不能超过20个字符")
     @Pattern(regexp = "^1[3-9]\\d{9}$", message = "手机号格式不正确")
     private String phone;
-
-    @NotBlank(message = "当前密码不能为空")
-    private String password;
-
-    @NotBlank(message = "短信验证码不能为空")
-    private String smsCode;
 }

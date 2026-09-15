@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -21,6 +22,7 @@ import com.medcase.common.enums.UserStatusEnums;
 import com.medcase.common.enums.UserTypeEnums;
 import com.medcase.mvc.constants.enums.ErrorCodeEnums;
 import com.medcase.mvc.exception.AbstractBusinessException;
+import com.medcase.mvc.exception.ExceptionUtil;
 import com.medcase.common.utils.SecurityUtils;
 import com.medcase.storage.pojo.FileAttachment;
 import jakarta.validation.ConstraintViolationException;
@@ -49,11 +51,15 @@ class UserProfileServiceTest {
     @Mock
     private PasswordEncoder passwordEncoder;
 
+    @Mock
+    private UserRegisterSmsCodeService smsCodeService;
+
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
         validator = Validation.buildDefaultValidatorFactory().getValidator();
-        userProfileService = new UserProfileService(userMapper, supplierMapper, validator, passwordEncoder);
+        userProfileService = new UserProfileService(
+                userMapper, supplierMapper, validator, passwordEncoder, smsCodeService);
         when(supplierMapper.selectEnabledById(1L)).thenReturn(enabledSupplier());
     }
 
@@ -175,27 +181,70 @@ class UserProfileServiceTest {
     void updatePhoneChangesOnlyPhoneForCurrentUser() {
         SysUserEntity doctor = doctor(UserStatusEnums.OK);
         doctor.setPhonenumber("13800000000");
+        doctor.setPassword("old-password-hash");
         when(userMapper.selectUserById(12L, UserTypeEnums.DOCTOR)).thenReturn(doctor);
         when(userMapper.phoneExists("13900000000", UserTypeEnums.DOCTOR)).thenReturn(false);
         when(userMapper.updateById(doctor)).thenReturn(1);
+        when(passwordEncoder.matches("current-password", "old-password-hash")).thenReturn(true);
 
         UserProfilePhoneRequest request = new UserProfilePhoneRequest();
         request.setPhone("13900000000");
+        request.setPassword("current-password");
+        request.setSmsCode("123456");
 
         userProfileService.updatePhone(loginUser(), request);
 
         assertEquals("13900000000", doctor.getPhonenumber());
+        verify(smsCodeService).verifyCode("13900000000", "123456");
         verify(userMapper).updateById(doctor);
     }
 
     @Test
-    void updatePhoneRejectsDuplicatePhone() {
+    void updatePhoneRejectsInvalidCurrentPassword() {
         SysUserEntity doctor = doctor(UserStatusEnums.OK);
+        doctor.setPassword("old-password-hash");
+        when(userMapper.selectUserById(12L, UserTypeEnums.DOCTOR)).thenReturn(doctor);
+        when(passwordEncoder.matches("wrong-password", "old-password-hash")).thenReturn(false);
+
+        UserProfilePhoneRequest request = phoneRequest("13900000000", "wrong-password", "123456");
+
+        AbstractBusinessException exception = assertThrows(
+                AbstractBusinessException.class,
+                () -> userProfileService.updatePhone(loginUser(), request));
+
+        assertEquals(ErrorCodeEnums.PROFILE_OLD_PASSWORD_INVALID, exception.getEc());
+        verify(smsCodeService, never()).verifyCode(any(), any());
+        verify(userMapper, never()).updateById(any(SysUserEntity.class));
+    }
+
+    @Test
+    void updatePhoneRejectsInvalidSmsCode() {
+        SysUserEntity doctor = doctor(UserStatusEnums.OK);
+        doctor.setPassword("old-password-hash");
+        when(userMapper.selectUserById(12L, UserTypeEnums.DOCTOR)).thenReturn(doctor);
+        when(passwordEncoder.matches("current-password", "old-password-hash")).thenReturn(true);
+        doThrow(ExceptionUtil.business(ErrorCodeEnums.USER_REGISTER_SMS_CODE_INVALID))
+                .when(smsCodeService).verifyCode("13900000000", "wrong-code");
+
+        UserProfilePhoneRequest request = phoneRequest("13900000000", "current-password", "wrong-code");
+
+        assertThrows(
+                AbstractBusinessException.class,
+                () -> userProfileService.updatePhone(loginUser(), request));
+
+        verify(userMapper, never()).phoneExists(any(), any());
+        verify(userMapper, never()).updateById(any(SysUserEntity.class));
+    }
+
+    @Test
+    void updatePhoneRejectsDuplicatePhoneAfterPasswordAndSmsVerification() {
+        SysUserEntity doctor = doctor(UserStatusEnums.OK);
+        doctor.setPassword("old-password-hash");
         when(userMapper.selectUserById(12L, UserTypeEnums.DOCTOR)).thenReturn(doctor);
         when(userMapper.phoneExists("13900000000", UserTypeEnums.DOCTOR)).thenReturn(true);
+        when(passwordEncoder.matches("current-password", "old-password-hash")).thenReturn(true);
 
-        UserProfilePhoneRequest request = new UserProfilePhoneRequest();
-        request.setPhone("13900000000");
+        UserProfilePhoneRequest request = phoneRequest("13900000000", "current-password", "123456");
 
         AbstractBusinessException exception = assertThrows(
                 AbstractBusinessException.class,
@@ -244,6 +293,14 @@ class UserProfileServiceTest {
         request.setIdCardFront(attachment("front"));
         request.setIdCardBack(attachment("back"));
         request.setQualificationCertificate(attachment("qualification"));
+        return request;
+    }
+
+    private UserProfilePhoneRequest phoneRequest(String phone, String password, String smsCode) {
+        UserProfilePhoneRequest request = new UserProfilePhoneRequest();
+        request.setPhone(phone);
+        request.setPassword(password);
+        request.setSmsCode(smsCode);
         return request;
     }
 

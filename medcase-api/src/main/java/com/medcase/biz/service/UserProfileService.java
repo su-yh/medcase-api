@@ -4,6 +4,7 @@ import com.medcase.biz.domain.SupplierEntity;
 import com.medcase.biz.mapper.SupplierMapper;
 import com.medcase.biz.request.UserProfilePasswordRequest;
 import com.medcase.biz.request.UserProfilePhoneRequest;
+import com.medcase.biz.request.UserProfilePhoneSmsCodeRequest;
 import com.medcase.biz.request.UserProfileSubmitRequest;
 import com.medcase.biz.response.UserProfileVO;
 import com.medcase.common.core.domain.model.LoginUser;
@@ -39,14 +40,26 @@ public class UserProfileService {
 
     private final PasswordEncoder passwordEncoder;
 
+    private final UserRegisterSmsCodeService smsCodeService;
+
     public UserProfileVO me(LoginUser user) {
         return UserProfileVO.fromEntity(requireUser(user));
+    }
+
+    public void sendPhoneSmsCode(LoginUser user, UserProfilePhoneSmsCodeRequest request) {
+        requireUser(user);
+        smsCodeService.sendCode(request.getPhone().trim());
     }
 
     @Transactional(rollbackFor = Exception.class)
     public void updatePhone(LoginUser user, UserProfilePhoneRequest request) {
         SysUserEntity userEntity = requireUser(user);
+        if (!passwordEncoder.matches(request.getPassword(), userEntity.getPassword())) {
+            throw ExceptionUtil.business(ErrorCodeEnums.PROFILE_OLD_PASSWORD_INVALID);
+        }
+
         String phone = request.getPhone().trim();
+        smsCodeService.verifyCode(phone, request.getSmsCode());
         if (phone.equals(userEntity.getPhonenumber())) {
             return;
         }

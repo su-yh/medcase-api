@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 
 import com.medcase.biz.request.UserProfilePasswordRequest;
 import com.medcase.biz.request.UserProfilePhoneRequest;
+import com.medcase.biz.request.UserProfilePhoneSmsCodeRequest;
 import com.medcase.biz.request.UserProfileSubmitRequest;
 import com.medcase.biz.response.UserProfileVO;
 import com.medcase.biz.service.UserProfileService;
@@ -18,6 +19,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import jakarta.validation.Valid;
 
@@ -62,6 +64,15 @@ class UserProfilePortalControllerTest {
         assertEquals("/password", updatePassword.getAnnotation(PutMapping.class).value()[0]);
         assertNotNull(updatePhone.getParameters()[1].getAnnotation(Valid.class));
         assertNotNull(updatePassword.getParameters()[1].getAnnotation(Valid.class));
+    }
+
+    @Test
+    void profileMaintenanceExposesPhoneSmsCodeEndpoint() throws NoSuchMethodException {
+        Method sendPhoneSmsCode = UserProfilePortalController.class.getMethod(
+                "sendPhoneSmsCode", LoginUser.class, UserProfilePhoneSmsCodeRequest.class);
+
+        assertEquals("/phone/sms-code", sendPhoneSmsCode.getAnnotation(PostMapping.class).value()[0]);
+        assertNotNull(sendPhoneSmsCode.getParameters()[1].getAnnotation(Valid.class));
     }
 
     @Test
