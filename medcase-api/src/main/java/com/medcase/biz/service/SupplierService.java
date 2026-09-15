@@ -38,7 +38,7 @@ public class SupplierService {
 
     @Transactional(rollbackFor = Exception.class)
     public void create(SupplierSaveRequest request) {
-        validateStatus(request.getStatus());
+        request.setSupplierId(null);
         String name = request.getName().trim();
         ensureNameUnique(null, name);
 
@@ -55,7 +55,6 @@ public class SupplierService {
             throw ExceptionUtil.business(ErrorCodeEnums.SUPPLIER_NOT_FOUND);
         }
 
-        validateStatus(request.getStatus());
         String name = request.getName().trim();
         ensureNameUnique(request.getSupplierId(), name);
 
@@ -86,12 +85,6 @@ public class SupplierService {
     private void ensureNameUnique(Long supplierId, String name) {
         if (supplierMapper.existsByName(name, supplierId)) {
             throw ExceptionUtil.business(ErrorCodeEnums.SUPPLIER_NICKNAME_EXISTS, name);
-        }
-    }
-
-    private void validateStatus(Boolean status) {
-        if (status == null) {
-            throw ExceptionUtil.business(ErrorCodeEnums.SUPPLIER_STATUS_INVALID);
         }
     }
 
