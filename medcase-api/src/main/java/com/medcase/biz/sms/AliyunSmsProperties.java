@@ -25,8 +25,14 @@ public class AliyunSmsProperties {
 
     private String accessKeySecret;
 
+    /**
+     * 【签名管理】里面可以看到签名名称
+     */
     private String signName;
 
+    /**
+     * 【模板管理】点击模板名称可以看到模板详情，里面会有模板CODE
+     */
     private String templateCode;
 
     public boolean isConfigured() {

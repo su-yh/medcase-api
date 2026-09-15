@@ -55,5 +55,10 @@ spring:
 
 sms:
   aliyun:
-    enabled: false
+    enabled: true
+    endpoint: dysmsapi.aliyuncs.com
+    access-key-id: ""
+    access-key-secret: ""
+    sign-name: "北京万宁科技"
+    template-code: "SMS_512130816"
 
