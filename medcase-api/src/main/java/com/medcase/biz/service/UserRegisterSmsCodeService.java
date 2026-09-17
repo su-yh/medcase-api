@@ -42,7 +42,7 @@ public class UserRegisterSmsCodeService {
         }
 
         String code = smsProperties.isEnabled()
-                ? String.format(Locale.ROOT, "%06d", RANDOM.nextInt(1_000_000))
+                ? String.valueOf(RANDOM.nextInt(900000) + 100000)
                 : FIXED_SMS_CODE;
         if (smsProperties.isEnabled()) {
             aliyunSmsService.sendVerificationCode(phone, code);
