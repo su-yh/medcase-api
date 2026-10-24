@@ -10,7 +10,7 @@ import lombok.Getter;
  */
 @Getter
 public enum UserTypeEnums implements BaseEnum {
-    ADMIN("00", "后台用户"),
+    ADMIN("00", "后台"),
     DOCTOR("01", "医生"),
     PATIENT("02", "患者"),
     ;

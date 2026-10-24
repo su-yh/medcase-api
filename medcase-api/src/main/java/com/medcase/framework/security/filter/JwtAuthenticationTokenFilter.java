@@ -25,6 +25,7 @@ import java.io.IOException;
 public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
     public static final String LOGIN_USER_ID = "user-id";
     public static final String LOGIN_USER_NICK_NAME = "user-nick-name";
+    public static final String LOGIN_USER_TYPE = "user-type";
 
     @Autowired
     private TokenService tokenService;
@@ -43,11 +44,13 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
 
             MDC.put(LOGIN_USER_ID, loginUser.getUserId() + "");
             MDC.put(LOGIN_USER_NICK_NAME, loginUser.getUser().getNickName());
+            MDC.put(LOGIN_USER_TYPE, loginUser.getUser().getUserType().getDesc());
         }
 
         try {
             chain.doFilter(request, response);
         } finally {
+            MDC.remove(LOGIN_USER_TYPE);
             MDC.remove(LOGIN_USER_NICK_NAME);
             MDC.remove(LOGIN_USER_ID);
         }

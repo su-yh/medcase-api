@@ -9,8 +9,8 @@
     <!--日志文件保存路径-->
     <springProperty scope="context" name="LOG_FILE_PATH" source="logging.file.path" defaultValue="/tmp"/>
 
-    <property name="PATTERN_STDOUT" value="%d{${LOG_DATEFORMAT_PATTERN:-yyyy-MM-dd HH:mm:ss.SSS}} | %highlight(${LOG_LEVEL_PATTERN:-%5p}) | %-15.15thread | %boldGreen(%-40.40logger:%4L) | %yellow(%X{trace-id}) | %blue(%X{user-id}) ｜ %blue(%X{user-nick-name}) | %m%n"/>
-    <property name="PATTERN_FILE" value="%d{${LOG_DATEFORMAT_PATTERN:-yyyy-MM-dd HH:mm:ss.SSS}} | ${LOG_LEVEL_PATTERN:-%5p} | %-15.15thread | %-40.40logger: %4L | %X{trace-id} | %X{user-id} ｜ %X{user-nick-name} | %m%n"/>
+    <property name="PATTERN_STDOUT" value="%d{${LOG_DATEFORMAT_PATTERN:-yyyy-MM-dd HH:mm:ss.SSS}} | %highlight(${LOG_LEVEL_PATTERN:-%5p}) | %-15.15thread | %boldGreen(%-40.40logger:%4L) | %yellow(%X{trace-id}) | %blue(%4X{user-id}): %blue(%X{user-nick-name})[%X{user-type}] | %m%n"/>
+    <property name="PATTERN_FILE" value="%d{${LOG_DATEFORMAT_PATTERN:-yyyy-MM-dd HH:mm:ss.SSS}} | ${LOG_LEVEL_PATTERN:-%5p} | %-15.15thread | %-40.40logger: %4L | %X{trace-id} | %4X{user-id}: %X{user-nick-name}[%X{user-type}] | %m%n"/>
 
     <contextName>${LOG_FILE_NAME}</contextName>
 
