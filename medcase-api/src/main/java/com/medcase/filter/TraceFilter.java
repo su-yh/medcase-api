@@ -44,9 +44,8 @@ public class TraceFilter implements Filter {
         HttpServletResponse response = (HttpServletResponse) servletResponse;
         String traceId = request.getHeader(TRACE_ID);
         if (!StringUtils.hasText(traceId)) {
-            int delta = RANDOM.nextInt(10, 20);
-            final long traceIdLong = AL_TRACE_ID.addAndGet(delta);
-            traceId = traceIdLong + "";
+
+            traceId = nextTraceId() + "";
             request.setAttribute(TRACE_ID, traceId);
         }
         MDC.put(TRACE_ID, traceId);
@@ -56,5 +55,10 @@ public class TraceFilter implements Filter {
         } finally {
             MDC.remove(TRACE_ID);
         }
+    }
+
+    public static long nextTraceId() {
+        int delta = RANDOM.nextInt(10, 20);
+        return AL_TRACE_ID.addAndGet(delta);
     }
 }
