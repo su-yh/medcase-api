@@ -26,10 +26,11 @@ public class TraceFilter implements Filter {
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
-        long startTraceId = System.currentTimeMillis() - BASE_TIME_MILLS;
-        startTraceId = (startTraceId << 16) + RANDOM.nextInt(Short.MAX_VALUE);
+        long initTraceId = System.currentTimeMillis() - BASE_TIME_MILLS;
+        // 每一毫秒的增量空间是 2^12
+        final long firstTraceId = (initTraceId << 12) + RANDOM.nextInt((1 << 12) - 1);
 
-        AL_TRACE_ID.set(startTraceId);
+        AL_TRACE_ID.set(firstTraceId);
     }
 
     @Override
@@ -38,7 +39,6 @@ public class TraceFilter implements Filter {
         HttpServletResponse response = (HttpServletResponse) servletResponse;
         String traceId = request.getHeader(TRACE_ID);
         if (!StringUtils.hasText(traceId)) {
-            // 关键②：原子累加随机增量(10~20)，得到下一个 traceId
             int delta = RANDOM.nextInt(10, 20);
             final long traceIdLong = AL_TRACE_ID.addAndGet(delta);
             traceId = traceIdLong + "";
