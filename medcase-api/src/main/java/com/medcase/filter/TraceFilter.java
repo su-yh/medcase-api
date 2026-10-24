@@ -2,6 +2,7 @@ package com.medcase.filter;
 
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
+import jakarta.servlet.FilterConfig;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
@@ -12,11 +13,24 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
-import java.util.UUID;
+import java.util.Random;
+import java.util.concurrent.atomic.AtomicLong;
 
 @Component
 public class TraceFilter implements Filter {
     public static final String TRACE_ID = "trace-id";
+    public static final AtomicLong AL_TRACE_ID = new AtomicLong(0);
+    // 以北京时间20261001 0 点为基线时间戳
+    public static final long BASE_TIME_MILLS = 1790784000000L;
+    private static final Random RANDOM = new Random();
+
+    @Override
+    public void init(FilterConfig filterConfig) throws ServletException {
+        long startTraceId = System.currentTimeMillis() - BASE_TIME_MILLS;
+        startTraceId = (startTraceId << 16) + RANDOM.nextInt(Short.MAX_VALUE);
+
+        AL_TRACE_ID.set(startTraceId);
+    }
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
@@ -24,14 +38,14 @@ public class TraceFilter implements Filter {
         HttpServletResponse response = (HttpServletResponse) servletResponse;
         String traceId = request.getHeader(TRACE_ID);
         if (!StringUtils.hasText(traceId)) {
-            traceId = UUID.randomUUID().toString().replace("-", "");
+            // 关键②：原子累加随机增量(10~20)，得到下一个 traceId
+            int delta = RANDOM.nextInt(10, 20);
+            final long traceIdLong = AL_TRACE_ID.addAndGet(delta);
+            traceId = traceIdLong + "";
             request.setAttribute(TRACE_ID, traceId);
         }
-
         MDC.put(TRACE_ID, traceId);
-
         response.setHeader(TRACE_ID, traceId);
-
         try {
             filterChain.doFilter(request, response);
         } finally {
