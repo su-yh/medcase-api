@@ -15,7 +15,6 @@ import com.medcase.system.service.SysPostService;
 import com.medcase.system.service.SysRoleService;
 import com.medcase.system.service.SysUserService;
 import com.medcase.web.controller.system.dto.DeptQueryRequest;
-import com.medcase.web.controller.system.dto.PostResponse;
 import com.medcase.web.controller.system.dto.UserAuthRoleResponse;
 import com.medcase.web.controller.system.dto.UserDetailResponse;
 import com.medcase.web.controller.system.dto.UserQueryRequest;
@@ -80,41 +79,20 @@ public class SysUserController {
     }
 
     /**
-     * 获取新增用户所需的基础数据。
-     */
-    @PreAuthorize("@ss.hasPermi('system:user:query')")
-    @GetMapping("/")
-    public UserDetailResponse getNewUserInfo() {
-        return buildUserDetailResponse(null);
-    }
-
-    /**
-     * 根据用户编号获取详细信息。
+     * 根据用户编号获取用户详细信息（含该用户已关联的岗位、角色 ID）。
+     * <p>新增/修改用户表单的「岗位」「角色」下拉选项，请分别调用
+     * {@code GET /system/post/optionselect} 与 {@code GET /system/role/optionselect}，
+     * 本接口不再返回全量岗位/角色列表。
      */
     @PreAuthorize("@ss.hasPermi('system:user:query')")
     @GetMapping("/{userId}")
     public UserDetailResponse getInfo(@PathVariable Long userId) {
-        return buildUserDetailResponse(userId);
-    }
-
-    private UserDetailResponse buildUserDetailResponse(Long userId) {
-        SysUserEntity sysUser = null;
-        List<Long> postIds = null;
-        List<Long> roleIds = null;
-        if (userId != null) {
-
-            sysUser = userService.selectUserById(userId);
-            postIds = postService.selectPostListByUserId(userId);
-            List<SysRoleEntity> roles = sysUser.getRoles();
-            if (roles != null) {
-                roleIds = roles.stream().map(SysRoleEntity::getRoleId).collect(Collectors.toList());
-            }
-        }
-        List<SysRoleEntity> availableRoles = roleService.selectRoleAll();
-        List<PostResponse> posts = postService.selectPostAll().stream()
-                .map(PostResponse::fromEntity)
-                .toList();
-        return new UserDetailResponse(sysUser, postIds, roleIds, availableRoles, posts);
+        SysUserEntity sysUser = userService.selectUserById(userId);
+        List<Long> postIds = postService.selectPostListByUserId(userId);
+        List<SysRoleEntity> roles = sysUser.getRoles();
+        List<Long> roleIds = roles == null ? null
+                : roles.stream().map(SysRoleEntity::getRoleId).collect(Collectors.toList());
+        return new UserDetailResponse(sysUser, postIds, roleIds);
     }
 
     /**
